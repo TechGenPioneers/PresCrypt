@@ -19,7 +19,7 @@ export default function PatientProfile() {
             <h2>Ms Kayle Fernando</h2>
             <p>📞 +94 713456784 / 052656712</p>
             <p>📧 kaylefernan67@gmail.com</p>
-            <p>📍 No 67, Temple Street, Kolpity, Colombo</p>
+            <p>📍 No 67, Temple Street, Kollpitiya, Colombo</p>
             <button className={styles.addPrescriptionButton}>
               Add Prescription
             </button>
