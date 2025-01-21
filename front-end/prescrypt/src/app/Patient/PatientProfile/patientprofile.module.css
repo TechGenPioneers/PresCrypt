@@ -1,0 +1,68 @@
+.container {
+    padding: 2rem;
+    background-color: #f9f9f9;
+  }
+  
+  .profileSection {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .profileCard {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profileImage {
+    border-radius: 50%;
+    height: 80px;
+    width: 80px;
+    margin-right: 1rem;
+  }
+  
+  .contactDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .addPrescriptionButton {
+    margin-top: 1rem;
+    background-color: #004d40;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .addPrescriptionButton:hover {
+    background-color: #00332e;
+  }
+  
+  .healthOverview {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .overviewDetails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .detailCard {
+    background-color: #e0f2f1;
+    padding: 1rem;
+    border-radius: 4px;
+    flex: 1 1 calc(33% - 1rem);
+    text-align: center;
+  }
+  
