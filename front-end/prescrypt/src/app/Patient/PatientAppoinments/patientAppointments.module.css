@@ -1,0 +1,146 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .appointmentsPage {
+    padding: 1rem;
+    flex: 1;
+  }
+  
+  .searchSection {
+    background: linear-gradient(to right, #00796b, #26a69a);
+    padding: 1.5rem;
+    border-radius: 8px;
+    color: white;
+    margin-bottom: 1.5rem;
+  }
+  
+  .searchSection h2 {
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .searchFields {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .inputField {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .actionButtons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .moreOptionsButton,
+  .calendarButton {
+    padding: 0.8rem 1.5rem;
+    background: white;
+    color: #00796b;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    align-items:left;
+  }
+  
+  .moreOptionsButton:hover,
+  .calendarButton:hover {
+    background: #004d40;
+    color: white;
+    
+  }
+  
+  .appointmentsContent {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+  
+  .calendar {
+    flex: 1;
+    max-width: 300px;
+  }
+  
+  .calendarDetails {
+    background: #f3f3f3;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .appointmentList {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .appointmentCard {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .doctorImage {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 1rem;
+  }
+  
+  .doctorDetails {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .timeAndButton {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .bookButton {
+    padding: 0.5rem 1rem;
+    background: #00796b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .bookButton:hover {
+    background: #004d40;
+  }
+  
+  .loadMoreButton {
+    padding: 0.8rem 1.5rem;
+    background: #00796b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: center;
+  }
+  
+  .loadMoreButton:hover {
+    background: #004d40;
+  }
+  
