@@ -38,21 +38,21 @@
   
   .actionButtons {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
+    justify-content: left;
+    gap: 3rem;
     margin-top: 1rem;
   }
   
   .moreOptionsButton,
   .calendarButton {
-    padding: 0.8rem 1.5rem;
+    padding: 0.8rem 4.5rem;
     background: white;
     color: #00796b;
     border: none;
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
-    align-items:left;
+    
   }
   
   .moreOptionsButton:hover,
