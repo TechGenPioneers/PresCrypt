@@ -102,7 +102,7 @@ export default function Header() {
               <li className="pl-8 mb-4 bg-white rounded-2xl hover:opacity-90">
                 <a href="#" className="flex items-center space-x-3 py-2">
                   <img
-                    src="/image15.png" // Place in public/images/health-records.jpg
+                    src="/image18.png" // Place in public/images/health-records.jpg
                     alt="Chat"
                     className="w-5 h-5 object-fill"
                     quality={80}

@@ -64,6 +64,12 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <div className="relative">
+          <button className="cursor-pointer absolute bottom-5 right-5">
+            <img src="/image18.png" className="w-16 h-16" alt="chat-icon" />
+          </button>
+        </div>
+
         <Footer />
       </div>
     </div>
