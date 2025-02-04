@@ -1,0 +1,64 @@
+/* HealthRecord.css */
+
+.health-record {
+    padding: 2rem;
+  }
+  
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+  }
+  
+  .user-info p {
+    margin: 0.25rem 0;
+  }
+  
+  .appointment-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  
+  .appointment-stats p {
+    margin: 0;
+  }
+  
+  .appointment-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .appointment-table th,
+  .appointment-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+  }
+  
+  .appointment-table th {
+    background-color: #f5f5f5;
+  }
+  
+  .appointment-table td.checked-in-yes {
+    color: green;
+  }
+  
+  .appointment-table td.checked-in-no {
+    color: red;
+  }
+  
+  .appointment-table td.checked-in-cancelled {
+    color: orange;
+  }
+  
+  .load-more-button {
+    display: block;
+    margin: 1.5rem auto 0;
+    padding: 0.75rem 1.5rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }

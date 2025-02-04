@@ -1,13 +1,16 @@
 // src/app/page.js
 import React from "react";
 import Home from "./Pages/Home";
-import styles from "./page.module.css";
-import Link from "next/link";  // Import the Link component
+import HealthRecord from "./Pages/HealthRecord";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 export default function App() {
   return (
-    <div>
-     <Home/>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/HealthRecord" element={<HealthRecord />} />
+      </Routes>
+    </Router>
   );
 }
