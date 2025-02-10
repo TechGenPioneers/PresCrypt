@@ -16,7 +16,7 @@ export default function Footer() {
               layout="intrinsic"
             />
             <p className="pt-1 text-sm opacity-70">
-              Copyright © 2024 BRIX Templates |<br /> All Rights Reserved{" "}
+              Copyright © 2025 |<br /> All Rights Reserved{" "}
             </p>
           </div>
         </div>
