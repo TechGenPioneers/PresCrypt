@@ -4,6 +4,9 @@ import Header from "./Components/header/Header";
 import Footer from "./Components/footer/Footer";
 import styles from "./page.module.css";
 import Link from "next/link";  
+
+
+
 export default function Home() {
   return (
     <div className={styles.page}>
@@ -34,12 +37,12 @@ export default function Home() {
               <p>Communicate with your healthcare provider.</p>
             </a>
           </Link>
-          <Link href="/Patient/Home" passHref legacyBehavior>
-            <a className={styles.card}>
-              <h2>Dashboard &rarr;</h2>
-              <p>Access your dashboard for quick updates.</p>
-            </a>
-          </Link>
+          <Link href="/Patient/PatientDashboard" passHref legacyBehavior>
+  <a className={styles.card}>
+    <h2>Dashboard &rarr;</h2>
+    <p>Access your dashboard for quick updates.</p>
+  </a>
+</Link>
         </div>
       </main>
       <Footer />
