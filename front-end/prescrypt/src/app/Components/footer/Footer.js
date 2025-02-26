@@ -13,7 +13,8 @@ export default function Footer() {
     >
       <div>
         <p style={{ margin: 0 }}>
-          Copyright © 2024 BRIX Templates | All Rights Reserved
+          Copyright © 2025 PrescCrypt | All Rights Reserved
+          Copyright © 2025 PrescCrypt | All Rights Reserved
         </p>
         <div style={{ marginTop: "0.5rem" }}>
           <a href="/help" style={{ color: "#80cbc4", margin: "0 0.5rem" }}>
