@@ -16,10 +16,10 @@ export default function PatientProfile() {
             className={styles.profileImage}
           />
           <div className={styles.contactDetails}>
-            <h2>Ms Kayle Fernando</h2>
+            <h2>Ms Kamala Fernando</h2>
             <p>📞 +94 713456784 / 052656712</p>
-            <p>📧 kaylefernan67@gmail.com</p>
-            <p>📍 No 67, Temple Street, Kollpitiya, Colombo</p>
+            <p>📧 kamalaFernando69@gmail.com</p>
+            <p>📍 No 67, Temple Street, Kollupitiya, Colombo</p>
             <button className={styles.addPrescriptionButton}>
               Add Prescription
             </button>
@@ -33,6 +33,7 @@ export default function PatientProfile() {
             <div className={styles.detailCard}>Blood Group: O+</div>
             <div className={styles.detailCard}>Height: 160 cm</div>
             <div className={styles.detailCard}>Weight: 42 kg</div>
+            <div className={styles.detailCard}>Kegalle</div>
           </div>
         </div>
       </div>
