@@ -1,46 +1,34 @@
 import React from "react";
-import Image from "next/image";
+
 export default function Footer() {
   return (
-    <footer className="bg-[#0A7379] text-white">
-      <div className="grid md:grid-cols-2 ">
-        <div className="relative">
-          <div className=" pl-20 pt-15 pb-15">
-            <Image
-              src="/logo.png"
-              alt="logo"
-              width={200}
-              height={200}
-              className="w-26 h-26 sm:w-20 sm:h-25 md:w-28 md:h-28 lg:w-35 lg:h-35"
-              quality={80}
-              layout="intrinsic"
-            />
-            <p className="pt-1 text-sm opacity-70">
-              Copyright © 2025 |<br /> All Rights Reserved{" "}
-            </p>
-          </div>
-        </div>
-        <div className="relative">
-          <div className="absolute bottom right-10 pt-10">
-            Support
-            <ul className="mt-1">
-              <li>
-                <a href="#">Getting Started</a>
-              </li>
-              <li>
-                <a href="#">Help center</a>
-              </li>
-              <li>
-                <a href="#">Server Status</a>
-              </li>
-              <li>
-                <a href="#">Report a Bug</a>
-              </li>
-              <li>
-                <a href="#">Chat Support</a>
-              </li>
-            </ul>
-          </div>
+    <footer
+      style={{
+        backgroundColor: "#004d40",
+        color: "#fff",
+        padding: "1rem 2rem",
+        marginTop: "2rem",
+        textAlign: "center",
+      }}
+    >
+      <div>
+        <p style={{ margin: 0 }}>
+          Copyright © 2025 PrescCrypt | All Rights Reserved
+          Copyright © 2025 PrescCrypt | All Rights Reserved
+        </p>
+        <div style={{ marginTop: "0.5rem" }}>
+          <a href="/help" style={{ color: "#80cbc4", margin: "0 0.5rem" }}>
+            Getting Started
+          </a>
+          <a href="/support" style={{ color: "#80cbc4", margin: "0 0.5rem" }}>
+            Help Center
+          </a>
+          <a href="/status" style={{ color: "#80cbc4", margin: "0 0.5rem" }}>
+            Server Status
+          </a>
+          <a href="/bugs" style={{ color: "#80cbc4", margin: "0 0.5rem" }}>
+            Report a Bug
+          </a>
         </div>
       </div>
     </footer>
