@@ -4,7 +4,7 @@ import { useState } from "react";
 import ChatList from "./ChatList";
 import ChatWindow from "./ChatWindow";
 import VideoCall from "./VideoCall";
-import "../Chat/styles/telehealth.css"; // Import the CSS file
+import "./styles/telehealth.css"; // Import the CSS file
 
 const Layout = () => {
   const contacts = [
