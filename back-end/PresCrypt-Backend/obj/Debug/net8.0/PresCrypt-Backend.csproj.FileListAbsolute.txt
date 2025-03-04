@@ -1,0 +1,281 @@
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\appsettings.Development.json
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\appsettings.json
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.staticwebassets.endpoints.json
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.exe
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.deps.json
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.runtimeconfig.json
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.pdb
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Azure.Core.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Azure.Identity.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Humanizer.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.Workspaces.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Design.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Win32.SystemEvents.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Mono.TextTemplating.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.CodeDom.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.AttributedModel.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.Convention.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.Hosting.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.Runtime.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.TypedParts.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Drawing.Common.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Memory.Data.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Runtime.Caching.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Security.Permissions.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\System.Windows.Extensions.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\unix\lib\net6.0\Microsoft.Data.SqlClient.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Data.SqlClient.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.csproj.AssemblyReference.cache
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.GeneratedMSBuildEditorConfig.editorconfig
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.AssemblyInfoInputs.cache
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.AssemblyInfo.cs
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.csproj.CoreCompileInputs.cache
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.MvcApplicationPartsAssemblyInfo.cs
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.MvcApplicationPartsAssemblyInfo.cache
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\scopedcss\bundle\PresCrypt-Backend.styles.css
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.build.json
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.development.json
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.PresCrypt-Backend.Microsoft.AspNetCore.StaticWebAssets.props
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.PresCrypt-Backend.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.build.PresCrypt-Backend.props
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.PresCrypt-Backend.props
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.PresCrypt-Backend.props
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.pack.json
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCryp.21F6AD51.Up2Date
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\refint\PresCrypt-Backend.dll
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.pdb
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.genruntimeconfig.cache
+F:\Modules\L2S2\Web Things\Practices\ASPNET\Projects\PresCrypt-Backend\PresCrypt-Backend\obj\Debug\net8.0\ref\PresCrypt-Backend.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.staticwebassets.endpoints.json
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.exe
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.deps.json
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.runtimeconfig.json
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt-Backend.pdb
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Azure.Core.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Azure.Identity.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Humanizer.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.Workspaces.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Design.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Microsoft.Win32.SystemEvents.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Mono.TextTemplating.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.CodeDom.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.AttributedModel.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.Convention.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.Hosting.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.Runtime.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Composition.TypedParts.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Drawing.Common.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Memory.Data.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Runtime.Caching.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Security.Permissions.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\System.Windows.Extensions.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\unix\lib\net6.0\Microsoft.Data.SqlClient.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Data.SqlClient.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.csproj.AssemblyReference.cache
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.GeneratedMSBuildEditorConfig.editorconfig
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.AssemblyInfoInputs.cache
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.AssemblyInfo.cs
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.csproj.CoreCompileInputs.cache
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.MvcApplicationPartsAssemblyInfo.cs
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.MvcApplicationPartsAssemblyInfo.cache
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.sourcelink.json
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\scopedcss\bundle\PresCrypt-Backend.styles.css
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.build.json
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.development.json
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.PresCrypt-Backend.Microsoft.AspNetCore.StaticWebAssets.props
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.PresCrypt-Backend.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.build.PresCrypt-Backend.props
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.PresCrypt-Backend.props
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.PresCrypt-Backend.props
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.pack.json
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCryp.21F6AD51.Up2Date
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\refint\PresCrypt-Backend.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.pdb
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\PresCrypt-Backend.genruntimeconfig.cache
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\obj\Debug\net8.0\ref\PresCrypt-Backend.dll
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt.API\appsettings.Development.json
+F:\Modules\L2S1\Software Development Project\Project Folder\PresCrypt\back-end\PresCrypt-Backend\bin\Debug\net8.0\PresCrypt.API\appsettings.json
