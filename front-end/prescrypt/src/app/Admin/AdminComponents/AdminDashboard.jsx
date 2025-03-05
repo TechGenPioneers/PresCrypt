@@ -93,16 +93,22 @@ const AdminDashboard = () => {
           {/* Stats & Chart */}
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <div className="text-[#094A4D] bg-[#E9FAF2] p-6 rounded-lg shadow-[0px_10px_5px_rgba(0,0,0,0.5)] m-10">
-                <h4 className="text-xl font-semibold">Patient Visits</h4>
-                <p className="text-3xl font-bold mt-2">20</p>
-                <p className="text-[#094A4D]">15, July 2024</p>
+              <div className="flex text-[#094A4D] bg-[#E9FAF2] p-6 rounded-lg shadow-[0px_10px_5px_rgba(0,0,0,0.5)] m-10">
+                <img src="image12.png" alt="icon" className="w-18 h-18 mr-2 mt-2" />
+                <div className="ml-5">
+                  <h4 className="text-xl font-semibold">Patient Visits</h4>
+                  <p className="text-3xl font-bold mt-2">20</p>
+                  <p className="text-[#094A4D]">15, July 2024</p>
+                </div>
               </div>
 
-              <div className="text-[#094A4D] bg-[#E9FAF2] p-6 rounded-lg shadow-[0px_10px_5px_rgba(0,0,0,0.5)] m-10">
+              <div className="flex text-[#094A4D] bg-[#E9FAF2] p-6 rounded-lg shadow-[0px_10px_5px_rgba(0,0,0,0.5)] m-10">
+                <img src="image26.png" alt="icon" className="w-18 h-18 mr-2 mt-2" />
+                <div className="ml-5">
                 <h4 className="text-xl font-semibold">Appointments</h4>
                 <p className="text-3xl font-bold mt-2">20</p>
                 <p className="text-[#094A4D]">15, July 2024</p>
+                </div>
               </div>
             </div>
 
@@ -198,14 +204,28 @@ const AdminDashboard = () => {
           {/* Total Counts */}
           <div className="mt-15 p-7 bg-white">
             <img src="/image23.png" alt="image" />
-            <div className="mt-15 bg-[#E9FAF2] p-4 rounded-lg mb-4 text-[#094A4D] shadow-[0px_10px_5px_rgba(0,0,0,0.5)]">
-              <h4 className="text-lg font-semibold">Total Doctors</h4>
-              <p className="text-3xl font-bold">07</p>
+            <div className="flex mt-15 bg-[#E9FAF2] p-4 rounded-lg mb-4 text-[#094A4D] shadow-[0px_10px_5px_rgba(0,0,0,0.5)]">
+              <img
+                src="/image19.png"
+                alt="icon"
+                className="w-10 h-12 mr-2 mt-2"
+              />
+              <div className=" pl-5">
+                <h4 className="text-lg font-semibold">Total Doctors</h4>
+                <p className="text-3xl font-bold">07</p>
+              </div>
             </div>
 
-            <div className="mt-15 bg-[#E9FAF2] p-4 rounded-lg text-[#094A4D] shadow-[0px_10px_5px_rgba(0,0,0,0.5)]">
-              <h4 className="text-lg font-semibold">Total Patients</h4>
-              <p className="text-3xl font-bold">50</p>
+            <div className="flex mt-15 bg-[#E9FAF2] p-4 rounded-lg text-[#094A4D] shadow-[0px_10px_5px_rgba(0,0,0,0.5)]">
+              <img
+                src="/image25.png"
+                alt="icon"
+                className="w-10 h-12 mr-2 mt-2"
+              />
+              <div className=" pl-5">
+                <h4 className="text-lg font-semibold">Total Patients</h4>
+                <p className="text-3xl font-bold">50</p>
+              </div>
             </div>
             {/* Date & Time */}
             <div className="mt-15 text-center text-[#094A4D]">
