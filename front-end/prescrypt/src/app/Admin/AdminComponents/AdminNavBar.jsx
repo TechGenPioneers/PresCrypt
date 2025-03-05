@@ -21,7 +21,7 @@ const AdminNavBar = () => {
 
   return (
     <aside
-      className={`bg-white p-4 shadow-md flex flex-col items-center justify-between min-h-screen transition-all duration-50 ease-in-out z-10 ${
+      className={`bg-white p-4 shadow-md flex flex-col items-center justify-between min-h-screen transition-all duration-300 ease-in-out fixed left-0 top-0 h-full ${
         isExpanded ? "w-64" : "w-25"
       }`}
       onMouseEnter={() => setIsExpanded(true)}
