@@ -50,7 +50,7 @@ const AdminNavBar = () => {
             className={`w-12 h-12 justify-center
                 flex items-center p-2 rounded-full hover:bg-gray-100  ${
               isExpanded
-                ? "justify-star space-x-3"
+                ? "justify-star space-x-3 cursor-pointer"
                 : "justify-center rounded-full border-2 border-gray-300"
             }`}
           >
@@ -79,7 +79,7 @@ const AdminNavBar = () => {
       <button
         className={`flex items-center p-2 rounded-full border-2 border-red-600 hover:bg-red-100 mb-10 ${
           isExpanded
-            ? "justify-start space-x-3"
+            ? "justify-start space-x-3 cursor-pointer"
             : "justify-center "
         }`}
       >
