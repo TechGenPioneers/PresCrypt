@@ -81,7 +81,6 @@ export default function DoctorDetails({  }) {
         </div>
       </div>
 
-      {/* Footer Date & Time */}
       <div className="mt-6 text-gray-500 text-right">
         <p>{formattedDate}</p>
         <p>{formattedTime}</p>

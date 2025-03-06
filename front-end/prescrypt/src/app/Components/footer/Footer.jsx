@@ -7,7 +7,6 @@ export default function Footer() {
         backgroundColor: "#004d40",
         color: "#fff",
         padding: "1rem 2rem",
-        marginTop: "2rem",
         textAlign: "center",
       }}
     >
