@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include=".gitignore\" />
     <Folder Include="NewFolder\" />
     <Folder Include="PresCrypt.API\Dto\" />
     <Folder Include="PresCrypt.API\Middlewares\" />
@@ -33,12 +34,12 @@
     <Folder Include="PresCrypt.Application\Services\" />
     <Folder Include="PresCrypt.Core\Enums\" />
     <Folder Include="PresCrypt.Core\ValueObjects\" />
-    <Folder Include="PresCrypt.Infrastructions\Identity\" />
-    <Folder Include="PresCrypt.Infrastructions\Email\" />
-    <Folder Include="PresCrypt.Infrastructions\Abstractions\" />
-    <Folder Include="PresCrypt.Infrastructions\Payments\" />
-    <Folder Include="PresCrypt.Infrastructions\OpenMRSIntegration\" />
-    <Folder Include="PresCrypt.Infrastructions\Repositories\" />
+    <Folder Include="PresCrypt.Infrastructure\Identity\" />
+    <Folder Include="PresCrypt.Infrastructure\Email\" />
+    <Folder Include="PresCrypt.Infrastructure\Abstractions\" />
+    <Folder Include="PresCrypt.Infrastructure\Payments\" />
+    <Folder Include="PresCrypt.Infrastructure\OpenMRSIntegration\" />
+    <Folder Include="PresCrypt.Infrastructure\Repositories\" />
     <Folder Include="PresCrypt.Integration\PaymentGateway\" />
     <Folder Include="PresCrypt.Integration\OpenMRS\" />
     <Folder Include="PresCrypt.Shared\Helpers\" />

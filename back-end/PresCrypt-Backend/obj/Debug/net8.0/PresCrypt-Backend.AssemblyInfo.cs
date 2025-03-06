@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PresCrypt-Backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1439740ad9965f8499695e1aaf26793010809192")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0e704dddac08bfadbd0b0a672999bfaa6d6df25f")]
 [assembly: System.Reflection.AssemblyProductAttribute("PresCrypt-Backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PresCrypt-Backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -7,5 +7,6 @@ namespace PresCrypt_Backend.PresCrypt.API.Controllers
     [ApiController]
     public class AppointmentsController : ControllerBase
     {
+       
     }
 }
