@@ -1,13 +1,14 @@
 import React from 'react';
-import AdminNavBar from './AdminComponents/AdminNavBar';
 import AdminDashboard from './AdminComponents/AdminDashboard';
+import AdminNavBar from './AdminComponents/AdminNavBar';
 import Footer from '../Components/footer/Footer';
 
-const Admin = () => {
+const AdminDashboardPage = () => {
     return (
         <div>
             <AdminNavBar/>
             <div className='ml-10'>
+            {/* <AdminDashboard/> */}
             <AdminDashboard/>
             </div>
             <Footer/>
@@ -15,4 +16,4 @@ const Admin = () => {
     );
 };
 
-export default Admin;
+export default AdminDashboardPage;

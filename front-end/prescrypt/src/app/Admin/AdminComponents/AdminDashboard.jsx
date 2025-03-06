@@ -150,7 +150,7 @@ const AdminDashboard = () => {
 
         {/* Notifications */}
         {/* Button to toggle the Notification Bar */}
-        <aside className="w-80 bg-[#CEE4E6] p-5 shadow-md relative">
+        <aside className="w-100 bg-[#CEE4E6] p-5 shadow-md relative">
           <div className="relative">
             {/* Notification Button */}
             <div className="pb-9">
