@@ -1,8 +1,6 @@
 import React from 'react';
 import AdminNavBar from './AdminComponents/AdminNavBar';
-import Doctors from './AdminComponents/Doctors';
 import Footer from '../Components/footer/Footer';
-import DoctorDetails from './AdminComponents/DoctorDetails';
 import DoctorRegistrationForm from './AdminComponents/DoctorsRegistrationForm';
 
 const AdminDoctorsPage = () => {
@@ -11,7 +9,6 @@ const AdminDoctorsPage = () => {
         <div>
             <AdminNavBar/>
             <div className='ml-10'>
-            {/* <AdminDashboard/> */}
             <DoctorRegistrationForm/>
             </div>
             <Footer/>

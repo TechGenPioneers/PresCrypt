@@ -8,7 +8,6 @@ const AdminDashboardPage = () => {
         <div>
             <AdminNavBar/>
             <div className='ml-10'>
-            {/* <AdminDashboard/> */}
             <AdminDashboard/>
             </div>
             <Footer/>

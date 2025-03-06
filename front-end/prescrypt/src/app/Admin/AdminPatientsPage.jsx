@@ -8,7 +8,6 @@ const AdminPatientsPage = () => {
         <div>
             <AdminNavBar/>
             <div className='ml-10'>
-            {/* <AdminDashboard/> */}
             <Patients/>
             </div>
             <Footer/>

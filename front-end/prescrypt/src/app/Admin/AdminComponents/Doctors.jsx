@@ -66,7 +66,7 @@ const Doctors = () => {
 
         <button
           className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
-          hover:bg-[#91B4B8] transition duration-300"
+          hover:bg-[#91B4B8] transition duration-300 "
         >
           Add New Doctor
         </button>
