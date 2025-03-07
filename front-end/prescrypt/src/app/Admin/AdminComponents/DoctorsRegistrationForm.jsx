@@ -13,7 +13,8 @@ export default function DoctorRegistrationForm() {
   });
   const [availableData, setAvailableData] = useState({
     availability: [],
-    timeSlot: "",
+    startTime: "",
+    endTime: "",
   });
 
   const [dateTime, setDateTime] = useState(null);
@@ -35,34 +36,59 @@ export default function DoctorRegistrationForm() {
     }));
   };
 
-  const handleChangeDropdown = (e) => {
-    setAvailableData((prev) => ({
-      ...prev,
-      timeSlot: e.target.value,
-    }));
+  const handleTime = (e) => {
+    const { name, value } = e.target;
+    setAvailableData({ ...availableData, [name]: value });
+    console.log(availableData);
   };
 
-  //handle add time slots
+  // const handleChangeDropdown = (e) => {
+  //   setAvailableData((prev) => ({
+  //     ...prev,
+  //     timeSlot: e.target.value,
+  //   }));
+  // };
+
+  //handle add time slots (check - same day , time || start time and end time)
   const handleAddTime = () => {
-    if (availableData.availability.length > 0 && availableData.timeSlot) {
+    if (
+      availableData.availability.length > 0 &&
+      availableData.startTime &&
+      availableData.endTime
+    ) {
       const newSchedule = availableData.availability.map((day) => ({
         day,
-        time: availableData.timeSlot,
+        startTime: availableData.startTime,
+        endTime: availableData.endTime,
       }));
-    
-     
+
+      // Check if start time is before end time
+      if (newSchedule.some((item) => item.startTime >= item.endTime)) {
+        setErrorMessage("Start time must be before end time.");
+        return;
+      }
+
       const isDuplicate = newSchedule.some((newItem) =>
-        schedule.some((existing) => existing.day === newItem.day && existing.time === newItem.time)
+        schedule.some(
+          (existing) =>
+            existing.day === newItem.day ||
+            existing.startTime === newItem.startTime ||
+            existing.endTime === newItem.endTime
+        )
       );
-    
+
       if (!isDuplicate) {
-        setSchedule((prev) => [...prev, ...newSchedule]); 
-        setAvailableData({ availability: [], timeSlot: "" });
+        setSchedule((prev) => [...prev, ...newSchedule]);
+        setAvailableData({ availability: [], startTime: "", endTime: "" });
         setErrorMessage("");
+        console.log(schedule);
       } else {
-        setErrorMessage("Selected time slot already selected.");
+        setErrorMessage(
+          "Selected time slot already exists.please check again!"
+        );
       }
     }
+
     // if (availableData.availability.length > 0 && availableData.timeSlot) {
     //   const newSchedule = availableData.availability.map((day) => ({
     //     day,
@@ -78,38 +104,37 @@ export default function DoctorRegistrationForm() {
   // Remove a time slot from the table
   const handleRemoveSlot = (index) => {
     setSchedule(schedule.filter((_, i) => i !== index));
-    console.log(schedule)
+    console.log(schedule);
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if(schedule.length > 0){
+    if (schedule.length > 0) {
       e.preventDefault();
-    console.log("Form Data Submitted:", formData,schedule);
-    alert("Doctor Registered Successfully!");
+      console.log("Form Data Submitted:", formData, schedule);
+      alert("Doctor Registered Successfully!");
 
-    setAvailableData({
-      availability: [],
-      timeSlot: ""
-    });
+      setAvailableData({
+        availability: [],
+        timeSlot: "",
+      });
 
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      specialization: "",
-      smlcLicense: "",
-      contactNumber: "",
-      hospital: "",
-    });
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        specialization: "",
+        smlcLicense: "",
+        contactNumber: "",
+        hospital: "",
+      });
 
-    setSchedule([]);
+      setSchedule([]);
 
-    setErrorMessage("");
-
-    }else{
-      console.log("time slots empty")
+      setErrorMessage("");
+    } else {
+      console.log("time slots empty");
       setErrorMessage("Please select available time");
     }
   };
@@ -121,7 +146,7 @@ export default function DoctorRegistrationForm() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!dateTime) return null; // Prevent SSR mismatch
+  if (!dateTime) return null;
 
   // Date Formatting
   const formattedDate = dateTime.toLocaleDateString("en-GB", {
@@ -224,7 +249,7 @@ export default function DoctorRegistrationForm() {
                 required
               />
 
-            {/* checkboxes */}
+              {/* checkboxes */}
               <label className="block font-semibold mb-2 mt-2">
                 Availability:
               </label>
@@ -254,7 +279,7 @@ export default function DoctorRegistrationForm() {
               </div>
 
               {/* Select Time Dropdown */}
-              <select
+              {/* <select
                 name="timeSlot"
                 value={availableData.timeSlot}
                 onChange={handleChangeDropdown}
@@ -264,7 +289,30 @@ export default function DoctorRegistrationForm() {
                 <option value="">Select Time</option>
                 <option value="4:00 PM - 6:00 PM">4:00 PM - 6:00 PM</option>
                 <option value="6:00 PM - 8:00 PM">6:00 PM - 8:00 PM</option>
-              </select>
+              </select> */}
+
+              {/* give custom Time */}
+              <div className="flex gap-5">
+                <input
+                  type="time"
+                  name="startTime"
+                  placeholder="startTime"
+                  value={availableData.startTime}
+                  onChange={handleTime}
+                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
+                />
+                <input
+                  type="time"
+                  name="endTime"
+                  placeholder="endTime"
+                  value={availableData.endTime}
+                  onChange={handleTime}
+                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
+                />
+              </div>
+
               <div className="mt-5 w-[100%]">
                 <button
                   type="button"
@@ -283,7 +331,8 @@ export default function DoctorRegistrationForm() {
               <thead className="bg-gray-100">
                 <tr>
                   <th className="p-2">Day</th>
-                  <th className="p-2">Time Slot</th>
+                  <th className="p-2">Start Time</th>
+                  <th className="p-2">End Time</th>
                   <th className="p-2">Action</th>
                 </tr>
               </thead>
@@ -296,10 +345,11 @@ export default function DoctorRegistrationForm() {
                     }`}
                   >
                     <td className="p-2 text-center">{slot.day}</td>
-                    <td className="p-2 text-center">{slot.time}</td>
+                    <td className="p-2 text-center">{slot.startTime}</td>
+                    <td className="p-2 text-center">{slot.endTime}</td>
                     <td className="p-2 text-center">
                       <button
-                      type="button"
+                        type="button"
                         onClick={() => handleRemoveSlot(index)}
                         className="text-red-500 cursor-pointer hover:underline"
                       >
@@ -313,7 +363,9 @@ export default function DoctorRegistrationForm() {
           </div>
           {/* Submit Button */}
           <div className="mt-5 w-[100%]">
-          <p className="text-red-500 font-bold text-center mb-5">{errorMessage}</p>
+            <p className="text-red-500 font-bold text-center mb-5">
+              {errorMessage}
+            </p>
             <button
               type="submit"
               className=" bg-[#007e8556] text-[#006369] p-2 w-[100%] rounded-lg hover:bg-[#007e8589] cursor-pointer"
