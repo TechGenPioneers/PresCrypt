@@ -13,6 +13,7 @@ export default function DoctorRegistrationForm() {
     availability: [],
     timeSlot: "",
   });
+ 
   const [dateTime, setDateTime] = useState(null);
 
   const [schedule, setSchedule] = useState([]);
@@ -32,9 +33,9 @@ export default function DoctorRegistrationForm() {
     }));
   };
 
-//   const handleChangeDropdown = (e) => {
-//     setFormData({ ...formData, timeSlot: e.target.value });
-//   };
+  const handleChangeDropdown = (e) => {
+    setFormData({ ...formData, timeSlot: e.target.value });
+  };
 
   const handleAddTime = () => {
     if (formData.availability.length > 0 && formData.timeSlot) {
@@ -196,7 +197,7 @@ export default function DoctorRegistrationForm() {
               <select
                 name="timeSlot"
                 value={formData.timeSlot}
-                onChange={handleChange}
+                onChange={handleChangeDropdown}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-3"
               >
@@ -206,7 +207,7 @@ export default function DoctorRegistrationForm() {
               </select>
               <div className="mt-5 w-[100%]">
                 <button
-                  type="submit"
+                  type="button"
                   onClick={handleAddTime}
                   className=" bg-[#007e8556] text-[#006369] p-2 w-[100%] rounded-lg hover:bg-[#007e8589] cursor-pointer"
                 >
@@ -217,7 +218,7 @@ export default function DoctorRegistrationForm() {
              
             </div>
           </div>
-          <h3 className="font-semibold mb-2">Selected Time Slots:</h3>
+          <h3 className="font-semibold mb-2 mt-4">Selected Time Slots:</h3>
 
                 <div className="rounded-xl">
           <table className="w-full mt-5 border border-gray-200 rounded-xl">
