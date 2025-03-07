@@ -4,7 +4,17 @@ import React, { useState, useEffect } from "react";
 const Doctors = () => {
   const [dateTime, setDateTime] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [bookData, setBookData] = useState([]);
+  //add useEffect to load Table
+  //   useEffect(() => {
+  //     const loadData = async () => {
+  //         const doctorDetails = await GetDoctors()
+  //         console.log(doctorDetails)
+  //         setBookData(doctorDetails)
+  //     }
+  //     loadData();
+  // }, [])
+  
   // Sample Doctor Data
   const doctors = [
     { id: "D001", name: "Dr. Nimal Perera", specialty: "Cardiology" },
@@ -54,24 +64,24 @@ const Doctors = () => {
 
       {/* Search Input  and Button*/}
       <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <input
-          type="text"
-          placeholder="Search Doctor Id or Name..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full max-w-5xl p-2 bg-[#E9FAF2] border border-gray-300 rounded-full shadow-sm 
+        <div className="flex justify-between items-center mb-6">
+          <input
+            type="text"
+            placeholder="Search Doctor Id or Name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full max-w-5xl p-2 bg-[#E9FAF2] border border-gray-300 rounded-full shadow-sm 
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6]"
-        />
+          />
 
-        <button
-          className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
+          <button
+            className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
           hover:bg-[#91B4B8] transition duration-300 "
-        >
-          Add New Doctor
-        </button>
+          >
+            Add New Doctor
+          </button>
+        </div>
       </div>
-    </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
@@ -116,13 +126,13 @@ const Doctors = () => {
                     </td>
                     <td className="p-3 text-[#094A4D]">{doctor.specialty}</td>
                     <td className="p-3">
-                <button
-                  onClick={() => router.push(`${doctor.id}`)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  View
-                </button>
-              </td>
+                      <button
+                        onClick={() => router.push(`${doctor.id}`)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      >
+                        View
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

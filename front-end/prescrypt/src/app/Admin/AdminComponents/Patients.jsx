@@ -93,7 +93,7 @@ const Patients = () => {
       patient.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
   return (
-    <div className="p-6 ml-15 bg-white rounded-lg shadow-md">
+    <div className="p-6 ml-15 bg-white rounded-lg shadow-md h-[84.5%]">
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">Patients</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
