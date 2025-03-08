@@ -1,35 +1,60 @@
-import React from "react";
+import Image from "next/image";
+import Link from "next/link";
 
-export default function Footer() {
+const Footer = () => {
   return (
-    <footer
-      style={{
-        backgroundColor: "#004d40",
-        color: "#fff",
-        padding: "1rem 2rem",
-        textAlign: "center",
-      }}
-    >
-      <div>
-        <p style={{ margin: 0 }}>
-          Copyright © 2025 PrescCrypt | All Rights Reserved
-          Copyright © 2025 PrescCrypt | All Rights Reserved
-        </p>
-        <div style={{ marginTop: "0.5rem" }}>
-          <a href="/help" style={{ color: "#80cbc4", margin: "0 0.5rem" }}>
-            Getting Started
-          </a>
-          <a href="/support" style={{ color: "#80cbc4", margin: "0 0.5rem" }}>
-            Help Center
-          </a>
-          <a href="/status" style={{ color: "#80cbc4", margin: "0 0.5rem" }}>
-            Server Status
-          </a>
-          <a href="/bugs" style={{ color: "#80cbc4", margin: "0 0.5rem" }}>
-            Report a Bug
-          </a>
+    <footer className="bg-gradient-to-r from-white via-[rgba(0,126,133,0.3)] to-[rgba(0,126,133,0.5)]  p-8 py-4 ml-15">
+      <div className="container mx-auto flex items-center justify-between">
+        {/* Left Side: Logo and Copyright */}
+        <div className="grid grid-cols-1 ml-15" >
+          <div className="flex items-center justify-center">
+            <Image
+              src="/logo.png" // Replace with your actual logo path
+              alt="PresCrypt Logo"
+              width={110} // Adjust as needed
+              height={100} // Adjust as needed
+              className="mr-2"
+            />
+          </div>
+          <div className="justify-end">
+            <p className="text-gray-600 text-sm block">
+              Copyright © PresCrypt. All Rights Reserved
+            </p>
+          </div>
+        </div>
+
+        {/* Right Side: Contact, Help, About Us */}
+        <div>
+          <ul className=" space-x-4">
+            <li>
+              <Link
+                href="/contact-us"
+                className="text-gray-600 hover:text-gray-800 font-bold "
+              >
+                Contact Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/help-us"
+                className="text-gray-600 hover:text-gray-800 font-bold "
+              >
+                Help Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/about-us"
+                className="text-gray-600 hover:text-gray-800 font-bold "
+              >
+                About Us
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;
