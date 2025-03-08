@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-white via-[rgba(0,126,133,0.3)] to-[rgba(0,126,133,0.5)]  p-8 py-4 ml-15">
+    <footer className="bg-gradient-to-r from-white via-[rgba(0,126,133,0.3)] to-[rgba(0,126,133,0.5)] p-8 py-4 ml-15">
       <div className="container mx-auto flex items-center justify-between">
         {/* Left Side: Logo and Copyright */}
         <div className="grid grid-cols-1 ml-15" >
@@ -25,7 +25,7 @@ const Footer = () => {
 
         {/* Right Side: Contact, Help, About Us */}
         <div>
-          <ul className=" space-x-4">
+          <ul className="space-x-4">
             <li>
               <Link
                 href="/contact-us"
