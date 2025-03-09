@@ -1,15 +1,21 @@
 import React from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
+import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay"; // Import the DateTimeDisplay component
 
 export default function page() {
+  const Title = "Dashboard"; // Dynamic title for each page
+
   return (
-    <div>
-      <Sidebar />
-
-
-
-
+    <div className="flex flex-col min-h-screen">
+      <div className="flex flex-grow">
+        <Sidebar />
+        <div className="flex-grow p-2 bg-[#D4E9EA]">
+          <div className="m-[0.1px] bg-white h-full w-full">
+            <DateTimeDisplay title={Title} /> {/* Pass the dynamic title */}
+          </div>
+        </div>
+      </div>
       <Footer />
     </div>
   );
