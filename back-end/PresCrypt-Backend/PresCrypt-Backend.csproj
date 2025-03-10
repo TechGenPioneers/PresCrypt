@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -23,8 +24,7 @@
 
   <ItemGroup>
     <Folder Include=".gitignore\" />
-    <Folder Include="NewFolder\" />
-    <Folder Include="PresCrypt.API\Dto\" />
+    <Folder Include="Migrations\" />
     <Folder Include="PresCrypt.API\Middlewares\" />
     <Folder Include="PresCrypt.API\Filters\" />
     <Folder Include="PresCrypt.API\Configuration\" />
@@ -48,6 +48,12 @@
     <Folder Include="PresCrypt.Tests\ApplicationTests\" />
     <Folder Include="PresCrypt.Tests\InsfrasturctureTests\" />
     <Folder Include="PresCrypt.Tests\APITests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="PresCrypt.API\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -1,13 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PresCrypt_Backend.PresCrypt.Core.Models;
-using static Azure.Core.HttpHeader;
+﻿using PresCrypt_Backend.PresCrypt.Core.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace PresCrypt_Backend.PresCrypt.Infrastructions.Data
+public class ApplicationDbContext : DbContext
 {
-    public class ApplicationDbContext : DbContext
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        { }
-        public DbSet<Doctor> Doctor { get; set; }
     }
+
+    // DbSets for your entities
+    public DbSet<Doctor> Doctors { get; set; }
+    public DbSet<Appointment> Appointments { get; set; }
+    public DbSet<Hospital> Hospitals { get; set; }
+    public DbSet<Doctor_Availability> Doctor_Availability { get; set; } // This is the correct declaration
 }
