@@ -167,7 +167,7 @@ export default function DoctorRegistrationForm() {
   return (
     <div className="p-6 ml-15 bg-white rounded-lg shadow-md">
       {/* Title */}
-      <h1 className="text-2xl font-bold mb-2">Doctors</h1>
+      <h1 className="text-2xl font-bold mb-2">Doctor Registration</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
       <div className="mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-[100%]">
         <form onSubmit={handleSubmit}>
