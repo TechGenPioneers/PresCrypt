@@ -62,16 +62,15 @@ const AdminDashboard = () => {
   });
   return (
     <>
-      <div className="flex min-h-screen bg-white">
-        <div className="border-5 border-[#E9FAF2]"></div>
+      <div className="flex min-h-screen bg-white border-15 border-[#E9FAF2]">
         {/* Main Content */}
-        <main className="overflow-auto flex-grow p-6 ml-5">
-          <div className="mb-10 pl-5 ml-5">
+        <main className="overflow-auto flex-grow p-6">
+          <div className="mb-10 pl-5 ">
             <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
             <p className="text-gray-500">{formattedDate}</p>
           </div>
           {/* Welcome Section */}
-          <div className="bg-[#E9FAF2] p-6 rounded-4xl mb-6 ml-10">
+          <div className="bg-[#E9FAF2] p-6 rounded-4xl mb-6">
             <h3 className="text-2xl text-[#094A4D] font-semibold ">
               Welcome, Nimal
             </h3>
@@ -79,13 +78,17 @@ const AdminDashboard = () => {
           </div>
 
           {/* Search & Add Doctor */}
-          <div className="grid grid-cols-2 ml-10 gap-20 mb-6 ">
+          <div className="grid grid-cols-3 ml-10 gap-20 mb-6 ">
             <button className="flex items-center cursor-pointer justify-center bg-[#E9FAF2] p-5 rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.5)] hover:bg-gray-100 transition">
-              <img src="image22.png" className="w-6 h-6 mr-2 text-[#006369] " />
+              <img src="/image22.png" className="w-6 h-6 mr-2 text-[#006369] " />
               Search Patients
             </button>
             <button className="flex items-center cursor-pointer justify-center bg-[#E9FAF2] p-5 rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.5)] hover:bg-gray-100 transition">
-              <img src="image21.png" className="w-6 h-6 mr-2 text-[#006369]" />
+              <img src="/image27.png" className="w-6 h-6 mr-2 text-[#006369]" />
+              Doctor Request
+            </button>
+            <button className="flex items-center cursor-pointer justify-center bg-[#E9FAF2] p-5 rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.5)] hover:bg-gray-100 transition">
+              <img src="/image21.png" className="w-6 h-6 mr-2 text-[#006369]" />
               Add New Doctor
             </button>
           </div>
@@ -94,7 +97,7 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <div className="flex text-[#094A4D] bg-[#E9FAF2] p-6 rounded-lg shadow-[0px_10px_5px_rgba(0,0,0,0.5)] m-10">
-                <img src="image12.png" alt="icon" className="w-18 h-18 mr-2 mt-2" />
+                <img src="/image12.png" alt="icon" className="w-18 h-18 mr-2 mt-2" />
                 <div className="ml-5">
                   <h4 className="text-xl font-semibold">Patient Visits</h4>
                   <p className="text-3xl font-bold mt-2">20</p>
@@ -103,7 +106,7 @@ const AdminDashboard = () => {
               </div>
 
               <div className="flex text-[#094A4D] bg-[#E9FAF2] p-6 rounded-lg shadow-[0px_10px_5px_rgba(0,0,0,0.5)] m-10">
-                <img src="image26.png" alt="icon" className="w-18 h-18 mr-2 mt-2" />
+                <img src="/image26.png" alt="icon" className="w-18 h-18 mr-2 mt-2" />
                 <div className="ml-5">
                 <h4 className="text-xl font-semibold">Appointments</h4>
                 <p className="text-3xl font-bold mt-2">20</p>
@@ -235,7 +238,6 @@ const AdminDashboard = () => {
           </div>
         </aside>
       </div>
-      <div className="border-5 border-[#E9FAF2]"></div>
     </>
   );
 };

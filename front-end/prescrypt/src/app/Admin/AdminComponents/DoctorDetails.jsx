@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// Sample Data (Can be fetched from API in real use case)
+// Sample Data 
 const doctors = {
   D001: {
     name: "Shenali Perera",
@@ -52,7 +52,7 @@ export default function DoctorDetails({}) {
   if (!doctor) return <p className="text-center">Doctor not found.</p>;
 
   return (
-    <div className="p-8 ml-15">
+    <div className="p-8 border-15 border-[#E9FAF2]">
       <h1 className="text-3xl font-bold mb-2">Doctor - {doctor.name}</h1>
       <p className="text-gray-500">{formattedDate}</p>
 

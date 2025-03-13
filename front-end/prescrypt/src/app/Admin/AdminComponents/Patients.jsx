@@ -83,7 +83,6 @@ const Patients = () => {
       doctor: "Dr. Moore",
       lastVisit: "2025-02-25",
     },
-    // Add more patients here
   ];
 
   // Filtered patients based on search query (searching by id or name)
@@ -93,7 +92,7 @@ const Patients = () => {
       patient.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
   return (
-    <div className="p-6 ml-15 bg-white rounded-lg shadow-md h-[84.5%]">
+    <div className="p-6 border-15 border-[#E9FAF2] bg-white ">
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">Patients</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
@@ -143,7 +142,7 @@ const Patients = () => {
                     <td className="p-3 text-[#094A4D]">{patient.id}</td>
                     <td className="p-3 flex items-center space-x-3">
                       <img
-                        src="profile2.png"
+                        src="/profile2.png"
                         alt="Avatar"
                         className="w-10 h-10 rounded-full"
                       />
