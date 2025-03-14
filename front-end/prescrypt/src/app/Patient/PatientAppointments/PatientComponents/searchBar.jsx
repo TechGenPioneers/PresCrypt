@@ -1,36 +1,10 @@
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  IconButton,
-  TextField,
-} from "@mui/material";
-
-import CloseIcon from "@mui/icons-material/Close";
-
-const specializations = [
-  "General Practitioner",
-  "Dental Care",
-  "Orthopedics",
-  "Cancer Diseases",
-  "Gynaecologist",
-  "Psychotherapy",
-  "Injury Care",
-  "All Dermatologist",
-];
-
-const locations = ["Piliyandala", "Colombo", "Kandy", "Remote Appointment"];
+import SpecializationDialog from "../PatientComponents/specializationBox";
+import LocationDialog from "../PatientComponents/locationSelectBox.jsx";
 
 const SearchBar = () => {
-  const [openSpecialization, setOpenSpecialization] = useState(false);
-  const [openLocation, setOpenLocation] = useState(false);
-  const [searchSpecialization, setSearchSpecialization] = useState("");
-  const [searchLocation, setSearchLocation] = useState("");
+  const [specializationOpen, setSpecializationOpen] = useState(false);
+  const [locationOpen, setLocationOpen] = useState(false);
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
 
@@ -39,115 +13,51 @@ const SearchBar = () => {
       <h2 className="text-2xl mb-4">Search for available appointments</h2>
       <div className="flex gap-4 mb-4 items-center">
         {/* Specialization Selection */}
-        <div className="flex-1">
-          <button
-            className="w-full p-3 text-lg border border-gray-300 rounded-md text-gray-500 bg-white"
-            onClick={() => setOpenSpecialization(true)}
-          >
-            {selectedSpecialization || "Select Specialization/Category"}
-          </button>
-        </div>
+        <button
+          className="flex-1 p-3 text-lg border border-gray-300 rounded-md text-gray-500"
+          onClick={() => setSpecializationOpen(true)}
+        >
+          {selectedSpecialization || "Select Specialization"}
+        </button>
 
         {/* Location Selection */}
-        <div className="flex-1">
-          <button
-            className="w-full p-3 text-lg border border-gray-300 rounded-md text-gray-500 bg-white"
-            onClick={() => setOpenLocation(true)}
-          >
-            {selectedLocation || "Select Location"}
-          </button>
-        </div>
-
-        {/* Buttons */}
-        <button className="border border-gray-400 text-gray-700 py-3 px-6 rounded-md">
-          More options
-        </button>
-        <button className="border border-gray-400 text-gray-700 py-3 px-6 rounded-md">
-          Calendar
+        <button
+          className="flex-1 p-3 text-lg border border-gray-300 rounded-md text-gray-500"
+          onClick={() => setLocationOpen(true)}
+        >
+          {selectedLocation || "Select Location"}
         </button>
       </div>
 
-      {/* Specialization Selection Dialog */}
-      <Dialog open={openSpecialization} onClose={() => setOpenSpecialization(false)}>
-        <DialogTitle>
-          Select Specialization
-          <IconButton
-            aria-label="close"
-            onClick={() => setOpenSpecialization(false)}
-            sx={{ position: "absolute", right: 8, top: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            placeholder="Search specialization..."
-            value={searchSpecialization}
-            onChange={(e) => setSearchSpecialization(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <List>
-            {specializations
-              .filter((spec) =>
-                spec.toLowerCase().includes(searchSpecialization.toLowerCase())
-              )
-              .map((spec, index) => (
-                <ListItem key={index} disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      setSelectedSpecialization(spec);
-                      setOpenSpecialization(false);
-                    }}
-                  >
-                    <ListItemText primary={spec} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-          </List>
-        </DialogContent>
-      </Dialog>
+      {/* Additional Buttons */}
+      <div className="flex gap-4">
+        <button className="p-3 text-lg border border-gray-300 rounded-md text-gray-500">
+          More Options
+        </button>
+        <button className="p-3 text-lg border border-gray-300 rounded-md text-gray-500">
+          Calendar
+        </button>
+        
+      </div>
 
-      {/* Location Selection Dialog */}
-      <Dialog open={openLocation} onClose={() => setOpenLocation(false)}>
-        <DialogTitle>
-          Select Location
-          <IconButton
-            aria-label="close"
-            onClick={() => setOpenLocation(false)}
-            sx={{ position: "absolute", right: 8, top: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            placeholder="Search location..."
-            value={searchLocation}
-            onChange={(e) => setSearchLocation(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <List>
-            {locations
-              .filter((loc) =>
-                loc.toLowerCase().includes(searchLocation.toLowerCase())
-              )
-              .map((loc, index) => (
-                <ListItem key={index} disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      setSelectedLocation(loc);
-                      setOpenLocation(false);
-                    }}
-                  >
-                    <ListItemText primary={loc} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-          </List>
-        </DialogContent>
-      </Dialog>
+      {/* Dialogs */}
+      <SpecializationDialog
+        open={specializationOpen}
+        handleClose={() => setSpecializationOpen(false)}
+        onSelect={(spec) => {
+          setSelectedSpecialization(spec);
+          setSpecializationOpen(false);
+        }}
+      />
+
+      <LocationDialog
+        open={locationOpen}
+        handleClose={() => setLocationOpen(false)}
+        onSelect={(loc) => {
+          setSelectedLocation(loc);
+          setLocationOpen(false);
+        }}
+      />
     </div>
   );
 };
