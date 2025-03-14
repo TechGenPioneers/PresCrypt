@@ -1,134 +1,17 @@
 // src/app/Components/Header/Header.js
 "use client";
-import { useState } from "react";
 import React from "react";
 import Link from "next/link";
-import styles from "./header.modules.css";
 import Image from "next/image";
 
 export default function Header() {
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-
-  // Toggle function to show or hide the sidebar
-  const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
-  };
-
   return (
     <header className="grid md:grid-cols-3">
       <div className="relative">
-        {/* Button to toggle the sidebar */}
-        <div className="p-10">
-          <button
-            onClick={toggleSidebar}
-            className="p-2 focus:outline-none overflow-hidden cursor-pointer"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 448 512"
-              width="40"
-              height="40"
-              className="text-white"
-            >
-              <path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Sidebar (Navigation) */}
-        <div
-          className={`fixed z-10 top-0 left-0 h-full bg-[#2B6E71] text-white w-1/3 sm:w-1/2 md:w-1/3 lg:w-1/4 transform ${
-            isSidebarVisible ? "translate-x-0" : "-translate-x-full"
-          } transition-transform duration-300 ease-in-out`}
-        >
-          <div className="flex justify-center mt-10 p-10">
-            <Image
-              src="/logo.png"
-              alt="logo"
-              width={200}
-              height={200}
-              className="w-26 h-26 sm:w-20 sm:h-25 md:w-28 md:h-28 lg:w-35 lg:h-35"
-              quality={80}
-              layout="intrinsic"
-            />
-          </div>
-          <nav className="p-4 text-black text-xl font-bold">
-            <ul>
-              <li className="pl-8 mb-4 bg-white rounded-2xl hover:opacity-90">
-                <a href="#" className="flex items-center space-x-3 py-2 ">
-                  <img
-                    src="/image11.png" // Place in public/images/health-records.jpg
-                    alt="Dashboard"
-                    className="w-5 h-5 object-fill"
-                    quality={80}
-                  />
-                  <div className="text-lg">Dashboard</div>
-                </a>
-              </li>
-
-              <li className="pl-8 mb-4 bg-white rounded-2xl hover:opacity-90">
-                <a href="#" className="flex items-center space-x-3 py-2 ">
-                  <img
-                    src="/image12.png" // Place in public/images/health-records.jpg
-                    alt="Profile"
-                    className="w-5 h-5 object-fill"
-                    quality={80}
-                  />
-                  <div className="text-lg">Profile</div>
-                </a>
-              </li>
-              <li className="pl-8 mb-4 bg-white rounded-2xl hover:opacity-90">
-                <a href="#" className="flex items-center space-x-3 py-2">
-                  <img
-                    src="/clock13.png" // Place in public/images/health-records.jpg
-                    alt="Appointments"
-                    className="w-5 h-5 object-fill"
-                    quality={80}
-                  />
-                  <div className="text-lg">Appointments</div>
-                </a>
-              </li>
-              <li className="pl-8 mb-4 bg-white rounded-2xl hover:opacity-90">
-                <a href="#" className="flex items-center space-x-3 py-2">
-                  <img
-                    src="/image14.png" // Place in public/images/health-records.jpg
-                    alt="Health Records"
-                    className="w-5 h-5 object-fill"
-                    quality={80}
-                  />
-                  <div className="text-lg">Health Records</div>
-                </a>
-              </li>
-              <li className="pl-8 mb-4 bg-white rounded-2xl hover:opacity-90">
-                <a href="#" className="flex items-center space-x-3 py-2">
-                  <img
-                    src="/image18.png" // Place in public/images/health-records.jpg
-                    alt="Chat"
-                    className="w-5 h-5 object-fill"
-                    quality={80}
-                  />
-                  <div className="text-lg">Chat With Doctor</div>
-                </a>
-              </li>
-            </ul>
-          </nav>
-
-          {/* Close button */}
-          <button
-            onClick={toggleSidebar}
-            className="absolute top-4 right-4 text-white cursor-pointer focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 320 512"
-              width="20"
-              height="20"
-            >
-              <path d="M310.6 361.4l-33.9 33.9L176 256l100.7-100.7-33.9-33.9-100.7 100.7-100.7-100.7-33.9 33.9L143.9 256 43.2 356.7l33.9 33.9L144 256l100.7 100.7z" />
-            </svg>
-          </button>
-        </div>
+        {/* Button to toggle the sidebar (removed sidebar content) */}
+        <div className="p-10"></div>
       </div>
+
       <div className="flex justify-center relative group p-10">
         <Image
           src="/logo.png"
@@ -140,8 +23,9 @@ export default function Header() {
           layout="intrinsic"
         />
       </div>
+
       <div className="flex justify-end relative group p-10 ">
-        <div className="flex  space-x-10">
+        <div className="flex space-x-10">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 448 512"
