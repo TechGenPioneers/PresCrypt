@@ -1,0 +1,6 @@
+@PresCrypt_Backend_HostAddress = http://localhost:5213
+
+GET {{PresCrypt_Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

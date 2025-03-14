@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>PresCrypt_Backend</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include=".gitignore\" />
+    <Folder Include="Migrations\" />
+    <Folder Include="PresCrypt.API\Middlewares\" />
+    <Folder Include="PresCrypt.API\Filters\" />
+    <Folder Include="PresCrypt.API\Configuration\" />
+    <Folder Include="PresCrypt.Application\Abstractions\" />
+    <Folder Include="PresCrypt.Application\Commands &amp; Queries\" />
+    <Folder Include="PresCrypt.Application\Mappings\" />
+    <Folder Include="PresCrypt.Core\Enums\" />
+    <Folder Include="PresCrypt.Core\ValueObjects\" />
+    <Folder Include="PresCrypt.Infrastructure\Identity\" />
+    <Folder Include="PresCrypt.Infrastructure\Email\" />
+    <Folder Include="PresCrypt.Infrastructure\Abstractions\" />
+    <Folder Include="PresCrypt.Infrastructure\Payments\" />
+    <Folder Include="PresCrypt.Infrastructure\OpenMRSIntegration\" />
+    <Folder Include="PresCrypt.Infrastructure\Repositories\" />
+    <Folder Include="PresCrypt.Integration\PaymentGateway\" />
+    <Folder Include="PresCrypt.Integration\OpenMRS\" />
+    <Folder Include="PresCrypt.Shared\Helpers\" />
+    <Folder Include="PresCrypt.Shared\Constants\" />
+    <Folder Include="PresCrypt.Shared\Extensions\" />
+    <Folder Include="PresCrypt.Tests\ApplicationTests\" />
+    <Folder Include="PresCrypt.Tests\InsfrasturctureTests\" />
+    <Folder Include="PresCrypt.Tests\APITests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="PresCrypt.API\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
