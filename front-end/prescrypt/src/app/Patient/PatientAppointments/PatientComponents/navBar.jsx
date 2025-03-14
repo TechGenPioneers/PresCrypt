@@ -67,8 +67,8 @@ const AdminNavBar = () => {
             
             {isExpanded && (
               // <span className="rounded-full border-2 border-gray-300 hover:bg-gray-100 py-0 px-4 flex items-center space-x-3">
-              <span className={`rounded-full border-2 border-gray-300 hover:bg-gray-100 py-0 px-4 flex items-center space-x-3
-                ${activeIndex === index ? "bg-[#E9FAF2] text-gray-600" : "bg-transparent"}`}>
+              <span className={`rounded-full border-2 border-gray-300 hover:bg-green-100 py-0 px-4 flex items-center space-x-3
+                ${activeIndex === index ? "bg-[#E9FAF2] text-grey-600" : "bg-transparent"}`}>
                 <div className="flex items-center space-x-3 py-2 mx-10">
                   <img
                     className="w-5 h-5 object-fill"
