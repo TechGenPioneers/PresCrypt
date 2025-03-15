@@ -1,13 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
+import { AddNewDoctor } from "../service/AdminService";
+
 
 export default function DoctorRegistrationForm() {
-  const [formData, setFormData] = useState({
+  const [newDoctor, setNewDoctor] = useState({
     firstName: "",
     lastName: "",
     email: "",
     specialization: "",
-    smlcLicense: "",
+    slmcLicense: "",
     contactNumber: "",
     hospital: "",
   });
@@ -23,7 +25,7 @@ export default function DoctorRegistrationForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setNewDoctor({ ...newDoctor, [name]: value });
   };
 
   // Handle checkbox selection
@@ -107,12 +109,12 @@ export default function DoctorRegistrationForm() {
     console.log(schedule);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
     if (schedule.length > 0) {
       e.preventDefault();
-      console.log("Form Data Submitted:", formData, schedule);
+      console.log("Form Data Submitted:", newDoctor, schedule);
       alert("Doctor Registered Successfully!");
 
       setAvailableData({
@@ -120,15 +122,23 @@ export default function DoctorRegistrationForm() {
         timeSlot: "",
       });
 
-      setFormData({
+      setNewDoctor({
         firstName: "",
         lastName: "",
         email: "",
         specialization: "",
-        smlcLicense: "",
+        slmcLicense: "",
         contactNumber: "",
         hospital: "",
       });
+
+      //send new doctor details into backend
+      try{
+        const newDoctorDetails = await AddNewDoctor(newDoctor);
+        console.log(newDoctorDetails)
+      }catch(err){
+        console.error("Failed to add the doctor",err)
+      }
 
       setSchedule([]);
 
@@ -178,7 +188,7 @@ export default function DoctorRegistrationForm() {
                 type="text"
                 name="firstName"
                 placeholder="First Name"
-                value={formData.firstName}
+                value={newDoctor.firstName}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
@@ -188,7 +198,7 @@ export default function DoctorRegistrationForm() {
                 type="text"
                 name="lastName"
                 placeholder="Last Name"
-                value={formData.lastName}
+                value={newDoctor.lastName}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
@@ -198,7 +208,7 @@ export default function DoctorRegistrationForm() {
                 type="text"
                 name="specialization"
                 placeholder="Specialization"
-                value={formData.specialization}
+                value={newDoctor.specialization}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
@@ -206,9 +216,9 @@ export default function DoctorRegistrationForm() {
               />
               <input
                 type="text"
-                name="smlcLicense"
-                placeholder="SMLC License Number"
-                value={formData.smlcLicense}
+                name="slmcLicense"
+                placeholder="SLMC License Number"
+                value={newDoctor.slmcLicense}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
@@ -218,7 +228,7 @@ export default function DoctorRegistrationForm() {
                 type="text"
                 name="contactNumber"
                 placeholder="Contact Number"
-                value={formData.contactNumber}
+                value={newDoctor.contactNumber}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
@@ -228,7 +238,7 @@ export default function DoctorRegistrationForm() {
                 type="text"
                 name="hospital"
                 placeholder="Hospital"
-                value={formData.hospital}
+                value={newDoctor.hospital}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
@@ -242,7 +252,7 @@ export default function DoctorRegistrationForm() {
                 type="email"
                 name="email"
                 placeholder="Email"
-                value={formData.email}
+                value={newDoctor.email}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
