@@ -11,7 +11,7 @@ const BookingCard = ({ doctorName, appointmentTime, imageUrl }) => {
       </div>
       <div className="text-right">
         <p>{appointmentTime}</p>
-        <button className="bg-teal-600 text-white py-2 px-4 rounded-md mt-2">Book</button>
+        <button className="bg-white-600 text-green-700 py-2 px-4 rounded-md mt-2 border border-black">Book</button>
       </div>
     </div>
   );

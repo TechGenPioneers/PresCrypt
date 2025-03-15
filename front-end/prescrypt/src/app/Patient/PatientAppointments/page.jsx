@@ -22,7 +22,7 @@ export default function Appointments() {
         <div className="flex gap-6">
           <CustomCalendar date={date} setDate={setDate} />
           <div className="flex-2">
-            <h3 className="text-2xl mb-4">Appointments</h3>
+            <h3 className="text-2xl mb-4">Available Appointments</h3>
             {[...Array(6)].map((_, index) => (
               <BookingCard
                 key={index}
@@ -31,7 +31,7 @@ export default function Appointments() {
                 imageUrl="https://png.pngtree.com/png-clipart/20240323/original/pngtree-professional-doctor-with-stethoscope-png-image_14666123.png"
               />
             ))}
-            <button className="bg-teal-600 text-white py-3 px-6 rounded-md mt-6">Load more</button>
+            <button className="bg-green-500 text-white py-3 px-6 rounded-md mt-10">Load more</button>
           </div>
         </div>
       </div>

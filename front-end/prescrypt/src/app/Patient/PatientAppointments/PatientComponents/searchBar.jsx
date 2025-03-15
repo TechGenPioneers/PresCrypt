@@ -31,13 +31,16 @@ const SearchBar = () => {
 
       {/* Additional Buttons */}
       <div className="flex gap-4">
-        <button className="p-3 text-lg border border-gray-300 rounded-md text-gray-500">
+        <button className="p-3 text-lg border border-gray-300 rounded-md text-green-700">
           More Options
         </button>
-        <button className="p-3 text-lg border border-gray-300 rounded-md text-gray-500">
+        <button className="p-3 text-lg border border-gray-300 rounded-md text-green-700">
           Calendar
         </button>
-        
+        <button className = "p-3 text-lg border border-gray-300 rounded-md text-green-700">
+          Find my Doctor
+
+        </button>        
       </div>
 
       {/* Dialogs */}
