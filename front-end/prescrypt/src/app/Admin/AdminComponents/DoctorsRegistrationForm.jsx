@@ -134,7 +134,7 @@ export default function DoctorRegistrationForm() {
 
       //send new doctor details into backend
       try{
-        const newDoctorDetails = await AddNewDoctor(newDoctor);
+        const newDoctorDetails = await AddNewDoctor(newDoctor,schedule);
         console.log(newDoctorDetails)
       }catch(err){
         console.error("Failed to add the doctor",err)
