@@ -31,6 +31,7 @@ const BookingCard = ({ doctorId, doctorName, appointmentTime, appointmentDate, i
           handleClose={() => setOpenDialog(false)}
         />
       )}
+    
     </div>
   );
 };
