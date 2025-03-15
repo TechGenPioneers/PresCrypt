@@ -5,33 +5,42 @@ const BookingCard = ({ doctorId, doctorName, appointmentTime, appointmentDate, i
   const [openDialog, setOpenDialog] = useState(false);
 
   return (
-    <div className="flex gap-4 items-center p-4 border border-gray-300 rounded-lg bg-gray-50 mb-4">
-      <img src={imageUrl} alt="Doctor" className="w-12 h-12 rounded-full object-cover" />
-      <div className="flex-1">
-        <p className="font-semibold">Dr. {doctorName}</p>
-        <p className="text-gray-600">{appointmentDate}</p>
-        <p className="text-gray-600">{appointmentTime}</p>
-      </div>
-      <div className="text-right">
-        <button
-          className="bg-white-600 text-green-700 py-2 px-4 rounded-md mt-2 border border-black"
-          onClick={() => setOpenDialog(true)}
-        >
-          Book
-        </button>
+    <div className="flex flex-col md:flex-row items-center p-4 border border-gray-400 rounded-3xl shadow-md mb-4">
+      {/* Left Section: Date & Time */}
+      <div className="text-center md:text-left mr-4 mb-4 md:mb-0">
+        <p className="text-green-700 font-bold text-sm md:text-base">{appointmentDate}</p>
+        <p className="text-sm md:text-base font-semibold">{appointmentTime}</p>
       </div>
 
+      {/* Doctor Image */}
+      <img
+        src={imageUrl}
+        alt="Doctor"
+        className="w-16 h-16 rounded-full object-cover border border-gray-300 mb-4 md:mb-0"
+      />
+
+      {/* Doctor Name */}
+      <p className="ml-4 text-lg font-semibold flex-1">{`Dr. ${doctorName}`}</p>
+
+      {/* Book Button */}
+      <button
+        className="border border-green-700 text-green-700 font-semibold px-4 py-1 rounded-full hover:bg-green-50 ml-4 mt-4 md:mt-0"
+        onClick={() => {
+          console.log("Opening Dialog for:", doctorId, doctorName); // Debugging
+          setOpenDialog(true);
+        }}
+      >
+        Book
+      </button>
+
       {/* Dialog Component */}
-      {openDialog && (
-        <AppointmentCard
-          doctorId={doctorId}
-          doctorName={doctorName}
-          imageUrl={imageUrl}
-          open={openDialog}
-          handleClose={() => setOpenDialog(false)}
-        />
-      )}
-    
+      <AppointmentCard
+        doctorId={doctorId}
+        doctorName={doctorName}
+        imageUrl={imageUrl}
+        open={openDialog}
+        handleClose={() => setOpenDialog(false)}
+      />
     </div>
   );
 };

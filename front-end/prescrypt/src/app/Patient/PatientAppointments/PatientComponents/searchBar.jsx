@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import SpecializationDialog from "../PatientComponents/specializationBox";
 import LocationDialog from "../PatientComponents/locationSelectBox.jsx";
+import { CircularProgress } from "@mui/material"; // Import MUI CircularProgress
 
 const SearchBar = ({ setDoctors }) => {
   const [specializationOpen, setSpecializationOpen] = useState(false);
@@ -15,7 +16,7 @@ const SearchBar = ({ setDoctors }) => {
       alert("Please select both specialization and location.");
       return;
     }
-  
+
     setLoading(true);
     try {
       const response = await axios.get("https://localhost:7021/api/Doctor/search", {
@@ -24,8 +25,8 @@ const SearchBar = ({ setDoctors }) => {
           hospitalName: selectedLocation,
         },
       });
-  
-      setDoctors(response.data); // Assuming backend returns doctor details correctly
+
+      setDoctors(response.data);
     } catch (error) {
       console.error("Error fetching doctors:", error);
       alert("Failed to fetch doctor details. Please try again.");
@@ -33,43 +34,48 @@ const SearchBar = ({ setDoctors }) => {
       setLoading(false);
     }
   };
-  
 
   return (
-    <div className="mb-6 bg-green-50 w-full px-8 sm:px-6 lg:px-10">
-      <h2 className="text-2xl mb-4">Search for available appointments</h2>
-      <div className="flex gap-4 mb-4 items-center">
-        <button
-          className="flex-1 p-3 text-lg border border-gray-300 rounded-md text-gray-500"
-          onClick={() => setSpecializationOpen(true)}
-        >
-          {selectedSpecialization || "Select Specialization"}
-        </button>
-
-        <button
-          className="flex-1 p-3 text-lg border border-gray-300 rounded-md text-gray-500"
-          onClick={() => setLocationOpen(true)}
-        >
-          {selectedLocation || "Select Location"}
-        </button>
+    <div className="bg-[#E8F4F2] p-6 rounded-md">
+      <h2 className="text-lg font-semibold mb-4 text-gray-700">Search for available appointments</h2>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1 flex flex-col gap-4">
+          <button
+            className="p-4 text-md border border-green-700 rounded-md text-gray-700 bg-white shadow-sm text-left"
+            onClick={() => setSpecializationOpen(true)}
+          >
+            <span className="text-gray-400 text-sm">Specialization / Category</span>
+            <br />
+            <span className="font-medium text-green-700">{selectedSpecialization || "Find Your Category"}</span>
+          </button>
+          <div className="flex gap-4">
+            <button className="flex-1 p-3 border border-green-700 rounded-md text-green-700 bg-white shadow-sm">
+              More options
+            </button>
+            <button className="flex-1 p-3 border border-green-700 rounded-md text-green-700 bg-white shadow-sm">
+              🗓 Calendar
+            </button>
+          </div>
+        </div>
+        <div className="flex-1 flex flex-col gap-4">
+          <button
+            className="p-4 text-md border border-green-700 rounded-md text-gray-700 bg-white shadow-sm text-left"
+            onClick={() => setLocationOpen(true)}
+          >
+            <span className="text-gray-400 text-sm">Location or remote appointment</span>
+            <br />
+            <span className="font-medium text-green-700">{selectedLocation || "Find Your Location"}</span>
+          </button>
+          <button
+            className="self-end w-1/2 p-3 border border-gray-300 rounded-md text-white bg-green-700 shadow-sm hover:bg-green-600 flex justify-center items-center"
+            onClick={handleFindDoctor}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Find my Doctor"}
+          </button>
+        </div>
       </div>
-
-      <div className="flex gap-4">
-        <button className="p-3 text-lg border border-gray-300 rounded-md text-green-700">
-          More Options
-        </button>
-        <button className="p-3 text-lg border border-gray-300 rounded-md text-green-700">
-          Calendar
-        </button>
-        <button
-          className="p-3 text-lg border border-gray-300 rounded-md text-green-700"
-          onClick={handleFindDoctor}
-          disabled={loading}
-        >
-          {loading ? "Searching..." : "Find my Doctor"}
-        </button>
-      </div>
-
+      
       <SpecializationDialog
         open={specializationOpen}
         handleClose={() => setSpecializationOpen(false)}

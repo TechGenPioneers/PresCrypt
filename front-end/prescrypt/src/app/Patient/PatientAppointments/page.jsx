@@ -40,11 +40,11 @@ export default function Appointments() {
               ))
             )}
 
-            {doctors.length > 0 && (
+            {/* {doctors.length > 0 && (
               <button className="bg-green-500 text-white py-3 px-6 rounded-md mt-10">
                 Load more
               </button>
-            )}
+            )} */}
           </div>
         </div>
       </div>

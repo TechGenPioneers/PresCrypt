@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 const locations = [
   { district: "Battaramulla", hospitals: ["Nawaloka Hospital", "Santa Dora Hospital"] },
@@ -26,28 +27,23 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
 
   const filteredLocations = locations
     .map(({ district, hospitals }) => {
-      // Check if district matches the search query
       const districtMatch = district.toLowerCase().includes(search.toLowerCase());
-      // Check if any hospital matches the search query
-      const filteredHospitals = hospitals.filter(hospital =>
+      const filteredHospitals = hospitals.filter((hospital) =>
         hospital.toLowerCase().includes(search.toLowerCase())
       );
 
-      // If district matches, include all hospitals; otherwise, show only filtered ones
       return {
         district,
         hospitals: districtMatch ? hospitals : filteredHospitals,
       };
     })
-    // Remove districts that have no matching hospitals or district name match
     .filter(({ hospitals }) => hospitals.length > 0);
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" sx={{ "& .MuiDialog-paper": { border: "2px solid #4CAF50", borderRadius: "30px" } }} >
       {/* Header */}
-      <div className="flex justify-between items-center px-4 py-3 border-b">
-        <DialogTitle className="text-xl font-semibold text-green-700">Select Location</DialogTitle>
-        <IconButton onClick={handleClose} className="text-green-700">
+      <div className="flex justify-between items-center px-5 py-3 border-b border-gray-300">
+        <IconButton onClick={handleClose} className="text-gray-500">
           <CloseIcon />
         </IconButton>
       </div>
@@ -58,31 +54,40 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
           fullWidth
           variant="outlined"
           placeholder="Search for location or clinic..."
-          className="mb-4"
+          className="mb-4 rounded-md border"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
+        {/* Title */}
+        <div>
+          <h6 className="text-xs font-semibold relative top-4 mb-6 text-green-800">
+            Available Locations
+          </h6>
+        </div>
 
         {/* Locations List */}
         <div className="flex-grow overflow-y-auto">
           <List>
             {filteredLocations.length === 0 ? (
-              <p className="text-green-700 text-center py-4">No results found</p>
+              <p className="text-gray-500 text-center py-4">No results found</p>
             ) : (
               filteredLocations.map(({ district, hospitals }, index) => (
-                <div key={index} className="mb-3">
+                <div key={index} className="mb-5">
                   {/* District Name */}
-                  <Typography variant="h6" className="font-semibold text-gray-700">
+                  <Typography variant="h6" className="font-semibold text-gray-700 mb-2 pl-3">
                     {district.toUpperCase()}
                   </Typography>
+
                   {/* Hospitals List */}
                   {hospitals.map((hospital, i) => (
                     <ListItemButton
                       key={i}
                       onClick={() => onSelect(hospital)}
-                      className="hover:bg-gray-100 rounded-md"
+                      className="flex items-center space-x-3 border rounded-[20px] border-green-700 px-6 py-4 mb-2 shadow-sm hover:bg-gray-100"
                     >
-                      <ListItemText primary={hospital} />
+                      <LocationOnIcon className="text-green-500 text-xl" />
+                      <ListItemText primary={hospital} className="font-medium" />
                     </ListItemButton>
                   ))}
                 </div>
