@@ -2,6 +2,7 @@
   "name": "prescrypt",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:5192",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,6 +12,8 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.0",
     "axios": "^1.8.2",
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.477.0",
     "next": "^15.2.2-canary.5",
     "postcss": "^8.5.1",
