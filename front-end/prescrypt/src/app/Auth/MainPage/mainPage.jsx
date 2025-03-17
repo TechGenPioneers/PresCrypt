@@ -1,22 +1,20 @@
-"use client";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
+
+"use client"; 
+import React, { useState } from "react";
+import { useRouter } from "next/router";
+import styles from "./mainPage.module.css";
+import Header from "../../Components/header/Header";
+import Footer from "../../Components/footer/Footer";
+import Calendar from "react-calendar"; 
+import "react-calendar/dist/Calendar.css"; 
 
 export default function HomePage() {
   const router = useRouter();
 
   return (
     <div className="min-h-screen flex flex-col justify-between items-center bg-white text-gray-700">
-      {/* Header with Logo & Login */}
-      <header className="w-full flex justify-between items-center p-6">
-        <Image src="/logo.png" alt="PresCrypt Logo" width={150} height={50} />
-        <button
-          onClick={() => router.push("/Auth")}
-          className="border border-blue-500 text-blue-500 px-6 py-2 rounded-lg hover:bg-blue-500 hover:text-white transition"
-        >
-          LOG IN
-        </button>
-      </header>
+     
+      
 
       {/* Main Content */}
       <main className="text-center px-6">
@@ -49,8 +47,7 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* Footer */}
-   
+     
     </div>
   );
 }
