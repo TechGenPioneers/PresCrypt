@@ -1,21 +1,27 @@
 using Microsoft.EntityFrameworkCore;
-using PresCrypt_Backend.PresCrypt.Infrastructions.Data;
+using PresCrypt_Backend.PresCrypt.Application.Services.DoctorServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Correct the base path to the folder where appsettings.json is located
+builder.Configuration
+    .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "PresCrypt.API"))
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IDoctorService, DoctorServices>();
+
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//Console.WriteLine($"Connection string: {connectionString}");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -23,9 +29,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

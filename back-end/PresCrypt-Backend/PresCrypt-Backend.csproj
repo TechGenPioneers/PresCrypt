@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -22,23 +23,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="NewFolder\" />
-    <Folder Include="PresCrypt.API\Dto\" />
+    <Folder Include=".gitignore\" />
+    <Folder Include="Migrations\" />
     <Folder Include="PresCrypt.API\Middlewares\" />
     <Folder Include="PresCrypt.API\Filters\" />
     <Folder Include="PresCrypt.API\Configuration\" />
     <Folder Include="PresCrypt.Application\Abstractions\" />
     <Folder Include="PresCrypt.Application\Commands &amp; Queries\" />
     <Folder Include="PresCrypt.Application\Mappings\" />
-    <Folder Include="PresCrypt.Application\Services\" />
     <Folder Include="PresCrypt.Core\Enums\" />
     <Folder Include="PresCrypt.Core\ValueObjects\" />
-    <Folder Include="PresCrypt.Infrastructions\Identity\" />
-    <Folder Include="PresCrypt.Infrastructions\Email\" />
-    <Folder Include="PresCrypt.Infrastructions\Abstractions\" />
-    <Folder Include="PresCrypt.Infrastructions\Payments\" />
-    <Folder Include="PresCrypt.Infrastructions\OpenMRSIntegration\" />
-    <Folder Include="PresCrypt.Infrastructions\Repositories\" />
+    <Folder Include="PresCrypt.Infrastructure\Identity\" />
+    <Folder Include="PresCrypt.Infrastructure\Email\" />
+    <Folder Include="PresCrypt.Infrastructure\Abstractions\" />
+    <Folder Include="PresCrypt.Infrastructure\Payments\" />
+    <Folder Include="PresCrypt.Infrastructure\OpenMRSIntegration\" />
+    <Folder Include="PresCrypt.Infrastructure\Repositories\" />
     <Folder Include="PresCrypt.Integration\PaymentGateway\" />
     <Folder Include="PresCrypt.Integration\OpenMRS\" />
     <Folder Include="PresCrypt.Shared\Helpers\" />
@@ -47,6 +47,12 @@
     <Folder Include="PresCrypt.Tests\ApplicationTests\" />
     <Folder Include="PresCrypt.Tests\InsfrasturctureTests\" />
     <Folder Include="PresCrypt.Tests\APITests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="PresCrypt.API\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

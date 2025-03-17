@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace PresCrypt_Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250307072821_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,31 +131,6 @@ namespace PresCrypt_Backend.Migrations
                     b.ToTable("Doctors");
                 });
 
-            modelBuilder.Entity("PresCrypt_Backend.PresCrypt.Core.Models.Doctor_Availability", b =>
-                {
-                    b.Property<int>("AvailabilityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AvailabilityId"));
-
-                    b.Property<DateOnly>("AvailableDate")
-                        .HasColumnType("date");
-
-                    b.Property<TimeOnly>("AvailableTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("DoctorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("AvailabilityId");
-
-                    b.HasIndex("DoctorId");
-
-                    b.ToTable("Doctor_Availability");
-                });
-
             modelBuilder.Entity("PresCrypt_Backend.PresCrypt.Core.Models.Hospital", b =>
                 {
                     b.Property<string>("HospitalId")
@@ -200,17 +178,6 @@ namespace PresCrypt_Backend.Migrations
                     b.Navigation("Doctor");
                 });
 
-            modelBuilder.Entity("PresCrypt_Backend.PresCrypt.Core.Models.Doctor_Availability", b =>
-                {
-                    b.HasOne("PresCrypt_Backend.PresCrypt.Core.Models.Doctor", "Doctor")
-                        .WithMany("Availabilities")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Doctor");
-                });
-
             modelBuilder.Entity("PresCrypt_Backend.PresCrypt.Core.Models.Hospital", b =>
                 {
                     b.HasOne("PresCrypt_Backend.PresCrypt.Core.Models.Doctor", "Doctorid")
@@ -220,11 +187,6 @@ namespace PresCrypt_Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Doctorid");
-                });
-
-            modelBuilder.Entity("PresCrypt_Backend.PresCrypt.Core.Models.Doctor", b =>
-                {
-                    b.Navigation("Availabilities");
                 });
 #pragma warning restore 612, 618
         }
