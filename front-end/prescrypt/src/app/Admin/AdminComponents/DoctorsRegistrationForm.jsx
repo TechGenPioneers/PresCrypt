@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { AddNewDoctor } from "../service/AdminService";
 
-
 export default function DoctorRegistrationForm() {
+  const [schedule, setSchedule] = useState([]);
   const [newDoctor, setNewDoctor] = useState({
     firstName: "",
     lastName: "",
@@ -11,7 +11,7 @@ export default function DoctorRegistrationForm() {
     specialization: "",
     slmcLicense: "",
     contactNumber: "",
-    hospital: "",
+    hospital: [],
   });
   const [availableData, setAvailableData] = useState({
     availability: [],
@@ -19,8 +19,19 @@ export default function DoctorRegistrationForm() {
     endTime: "",
   });
 
+  //set hospital
+  const Hospitals = [
+    "Asiri Hospital",
+    "Nawaloka Hospital",
+    "Lanka Hospital",
+    "Hemas",
+  ];
+  const [input, setInput] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  //date and time
   const [dateTime, setDateTime] = useState(null);
-  const [schedule, setSchedule] = useState([]);
+  //set error message
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
@@ -28,7 +39,7 @@ export default function DoctorRegistrationForm() {
     setNewDoctor({ ...newDoctor, [name]: value });
   };
 
-  // Handle checkbox selection
+  // checkbox selection
   const handleCheckboxChange = (day) => {
     setAvailableData((prev) => ({
       ...prev,
@@ -37,7 +48,7 @@ export default function DoctorRegistrationForm() {
         : [...prev.availability, day],
     }));
   };
-
+  //set available data
   const handleTime = (e) => {
     const { name, value } = e.target;
     setAvailableData({ ...availableData, [name]: value });
@@ -51,7 +62,7 @@ export default function DoctorRegistrationForm() {
   //   }));
   // };
 
-  //handle add time slots (check - same day , time || start time and end time)
+  //add available table
   const handleAddTime = () => {
     if (
       availableData.availability.length > 0 &&
@@ -109,14 +120,56 @@ export default function DoctorRegistrationForm() {
     console.log(schedule);
   };
 
-  const handleSubmit = async(e) => {
+  //handle hospital input
+  const handleHospitalInputChange = (e) => {
+    const value = e.target.value;
+    setInput(value);
+
+    if (value.trim() === "") {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    // Filter hospitals (avoid duplicates)
+    const filtered = Hospitals.filter(
+      (hospital) =>
+        hospital.toLowerCase().includes(value.toLowerCase()) &&
+        !newDoctor.hospital.includes(hospital)
+    );
+
+    setSuggestions(filtered.length > 0 ? filtered : [`Use "${value}"`]);
+    setShowSuggestions(true);
+  };
+
+  // Handle selecting a hospital
+  const handleSelectHospital = (value) => {
+    const hospitalName = value.replace('Use "', "").replace('"', "");
+
+    setNewDoctor((prev) => ({
+      ...prev,
+      hospital: [...prev.hospital, hospitalName],
+    }));
+
+    setInput("");
+    setShowSuggestions(false);
+  };
+
+  // Handle removing a selected hospital
+  const removeHospital = (hospital) => {
+    setNewDoctor((prev) => ({
+      ...prev,
+      hospital: prev.hospital.filter((h) => h !== hospital),
+    }));
+  };
+
+  //form submit
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (schedule.length > 0) {
       e.preventDefault();
       console.log("Form Data Submitted:", newDoctor, schedule);
-      alert("Doctor Registered Successfully!");
-
       setAvailableData({
         availability: [],
         timeSlot: "",
@@ -129,15 +182,18 @@ export default function DoctorRegistrationForm() {
         specialization: "",
         slmcLicense: "",
         contactNumber: "",
-        hospital: "",
+        hospital: [],
       });
 
       //send new doctor details into backend
-      try{
-        const newDoctorDetails = await AddNewDoctor(newDoctor,schedule);
-        console.log(newDoctorDetails)
-      }catch(err){
-        console.error("Failed to add the doctor",err)
+      try {
+        const newDoctorDetails = await AddNewDoctor(newDoctor, schedule);
+        console.log(newDoctorDetails);
+        alert("Doctor Registered Successfully!");
+      } catch (err) {
+        console.error("Failed to add the doctor", err);
+        
+      alert("only Doctor form submit!",err);
       }
 
       setSchedule([]);
@@ -156,6 +212,7 @@ export default function DoctorRegistrationForm() {
     return () => clearInterval(interval);
   }, []);
 
+  // set date and time
   if (!dateTime) return null;
 
   // Date Formatting
@@ -234,7 +291,7 @@ export default function DoctorRegistrationForm() {
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
                 required
               />
-              <input
+              {/* <input
                 type="text"
                 name="hospital"
                 placeholder="Hospital"
@@ -243,7 +300,58 @@ export default function DoctorRegistrationForm() {
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
                 required
-              />
+              /> */}
+
+              <div className="mb-4">
+              <div className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5">
+                 {/* Display Selected Hospitals */}
+                  <div className="flex flex-wrap">
+                    {newDoctor.hospital.map((hospital, index) => (
+                      <div
+                        key={index}
+                        className="bg-[#E9FAF2] text-[#09424D] px-2 py-1 rounded-md flex items-center m-1"
+                      >
+                        {hospital}
+                        <span
+                          className="ml-2 cursor-pointer text-red-400 font-bold"
+                          onClick={() => removeHospital(hospital)}
+                        >
+                          ✕
+                        </span>
+                      </div>
+                    ))}
+
+                    {/* Input Field */}
+                    <input
+                      type="text"
+                      placeholder="Type hospital name..."
+                      value={input}
+                      onChange={handleHospitalInputChange}
+                      className="border-none outline-none flex-1"
+                      onFocus={() => setShowSuggestions(true)}
+                      onBlur={() =>
+                        setTimeout(() => setShowSuggestions(false), 200)
+                      } // Delay to allow clicks
+                    />
+                  </div>
+                  </div>
+
+                {/* Dropdown Suggestions */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute bg-white border mt-1 shadow-lg rounded-md w-full max-w-5xl">
+                    {suggestions.map((hospital, index) => (
+                      <div
+                        key={index}
+                        className="p-2 hover:bg-gray-200 cursor-pointer"
+                        onClick={() => handleSelectHospital(hospital)}
+                      >
+                        {hospital}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div>
               {/* Availability Checkboxes */}
