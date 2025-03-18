@@ -19,6 +19,12 @@ export default function Home() {
         </p>
         <div className={styles.actions}>
           {/* Use Next.js Link for routing */}
+          <Link href="/Auth/MainPage" passHref legacyBehavior>
+            <a className={styles.card}>
+              <h2>Welcome &rarr;</h2>
+              <p>go to the main page</p>
+            </a>
+          </Link>
           <Link href="/Patient/PatientProfile" passHref legacyBehavior>
             <a className={styles.card}>
               <h2>Profile &rarr;</h2>
@@ -43,12 +49,7 @@ export default function Home() {
               <p>Access your dashboard for quick updates.</p>
             </a>
           </Link>
-          <Link href="/Auth/MainPage" passHref legacyBehavior>
-            <a className={styles.card}>
-              <h2>Welcome &rarr;</h2>
-              <p>go to the main page</p>
-            </a>
-          </Link>
+          
         </div>
       </main>
       <Footer />
