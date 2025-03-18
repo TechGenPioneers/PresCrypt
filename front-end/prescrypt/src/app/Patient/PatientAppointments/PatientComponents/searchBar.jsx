@@ -26,7 +26,7 @@ const SearchBar = ({ setDoctors }) => {
         },
       });
 
-      setDoctors(response.data);
+      setDoctors(response.data);  // Passing doctor details to the parent component
     } catch (error) {
       console.error("Error fetching doctors:", error);
       alert("Failed to fetch doctor details. Please try again.");

@@ -8,16 +8,14 @@ import {
   CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Link from "next/link";  
+
+// const doctorId = "D001"; // Hardcoded for testing
 
 const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) => {
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // Debugging to see if doctorId is received
-  useEffect(() => {
-    console.log("Doctor ID received:", doctorId);
-  }, [doctorId]);
 
   // Fetch doctor details from API
   useEffect(() => {
@@ -32,6 +30,7 @@ const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) 
             throw new Error("Failed to fetch doctor details");
           }
           const data = await response.json();
+          console.log("Doctor details:", data); // Check API response
           setDoctorDetails(data);
         } catch (err) {
           setError(err.message);
@@ -44,24 +43,38 @@ const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) 
     }
   }, [open, doctorId]);
 
+
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <div className="bg-white rounded-2xl shadow-lg p-5 relative w-full border border-gray-300">
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="sm"
+      sx={{
+        "& .MuiDialog-paper": {
+          borderRadius: "20px", // Same border-radius as the content
+          border: "2px solid #4CAF50", // Green border
+          backgroundColor: "transparent", 
+          boxShadow: "none", // Optional: Remove the default shadow of Dialog
+        },
+      }}
+    >
+      <div className="bg-white rounded-3xl shadow-lg p-5 relative w-full border-2 border-green-600">
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 text-gray-700 hover:text-gray-900"
+          className="absolute top-2 right-2 text-gray-700 hover:text-gray-900 rounded-full p-2"
         >
           <CloseIcon />
         </button>
 
         {/* HEADER */}
-        <div className="bg-teal-700 text-white py-3 rounded-t-2xl text-center">
+        <div className="bg-teal-700 text-white py-3 rounded-t-3xl text-center">
           <DialogTitle className="text-lg font-semibold">{doctorName}</DialogTitle>
         </div>
 
         {/* CONTENT */}
-        <DialogContent className="p-6 flex flex-col items-center">
+        <DialogContent className="p-6 flex flex-col items-center bg-white"> {/* Ensure background is white to match content */}
           {loading ? (
             <CircularProgress />
           ) : error ? (
@@ -70,7 +83,7 @@ const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) 
             <>
               {/* Doctor Image */}
               <img
-                src={doctorDetails.imageUrl || imageUrl}
+                src={doctorDetails.imageUrl || '/path/to/default-image.jpg'} // Fallback image
                 alt="Doctor"
                 className="w-28 h-28 rounded-full object-cover mb-4 border-4 border-gray-200 shadow-md"
               />
@@ -81,23 +94,26 @@ const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) 
               </Typography>
 
               {/* Specialization Tag */}
-              <div className="bg-teal-100 text-teal-700 py-2 px-4 rounded-full mt-3">
+              <div className="bg-teal-100 text-teal-700 py-2 px-4 rounded-full mt-4 mb-5">
                 {doctorDetails.specialization}
               </div>
 
               {/* Price & Info */}
               <Typography variant="body2" className="text-gray-600 text-center mt-4 px-4">
-                The price estimate includes the physician’s fee, outpatient fee, 
+                The price estimate includes the physician’s fee, outpatient fee,
                 and other potential costs for procedures and supplies.
               </Typography>
 
               {/* Confirm Button */}
+
+              <Link href="/Patient/Bookings">
               <button
                 className="bg-teal-700 text-white py-2 px-6 rounded-full mt-6 shadow-md hover:bg-teal-800 transition"
-                onClick={handleClose}
+                
               >
-                Confirm
+                Book this Slot
               </button>
+              </Link>
             </>
           ) : (
             <p className="text-gray-600">No details available</p>

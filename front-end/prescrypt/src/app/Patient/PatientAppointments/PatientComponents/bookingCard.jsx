@@ -26,7 +26,7 @@ const BookingCard = ({ doctorId, doctorName, appointmentTime, appointmentDate, i
       <button
         className="border border-green-700 text-green-700 font-semibold px-4 py-1 rounded-full hover:bg-green-50 ml-4 mt-4 md:mt-0"
         onClick={() => {
-          console.log("Opening Dialog for:", doctorId, doctorName); // Debugging
+          console.log("Opening Dialog for:", doctorId, doctorName,); // Debugging
           setOpenDialog(true);
         }}
       >
@@ -35,10 +35,10 @@ const BookingCard = ({ doctorId, doctorName, appointmentTime, appointmentDate, i
 
       {/* Dialog Component */}
       <AppointmentCard
-        doctorId={doctorId}
+        doctorId='D002'
         doctorName={doctorName}
         imageUrl={imageUrl}
-        open={openDialog}
+        open={openDialog && doctorName}
         handleClose={() => setOpenDialog(false)}
       />
     </div>
