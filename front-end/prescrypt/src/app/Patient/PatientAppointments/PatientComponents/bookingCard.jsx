@@ -35,7 +35,7 @@ const BookingCard = ({ doctorId, doctorName, appointmentTime, appointmentDate, i
 
       {/* Dialog Component */}
       <AppointmentCard
-        doctorId='D002'
+        doctorId="D002"
         doctorName={doctorName}
         imageUrl={imageUrl}
         open={openDialog && doctorName}

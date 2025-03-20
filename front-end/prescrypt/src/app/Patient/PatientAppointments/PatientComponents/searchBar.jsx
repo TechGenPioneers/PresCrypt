@@ -11,13 +11,15 @@ const SearchBar = ({ setDoctors }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // This function is triggered when the "Find my Doctor" button is clicked
   const handleFindDoctor = async () => {
     if (!selectedSpecialization || !selectedLocation) {
       alert("Please select both specialization and location.");
       return;
     }
-
-    setLoading(true);
+  
+    setLoading(true);  // Show loading spinner when fetching data
+  
     try {
       const response = await axios.get("https://localhost:7021/api/Doctor/search", {
         params: {
@@ -25,13 +27,14 @@ const SearchBar = ({ setDoctors }) => {
           hospitalName: selectedLocation,
         },
       });
-
-      setDoctors(response.data);  // Passing doctor details to the parent component
+  
+      console.log("Fetched doctors:", response.data); // Debugging: Check the response data
+      setDoctors(response.data);  // Pass the fetched doctor data to the parent component's setDoctors
     } catch (error) {
       console.error("Error fetching doctors:", error);
       alert("Failed to fetch doctor details. Please try again.");
     } finally {
-      setLoading(false);
+      setLoading(false);  // Hide loading spinner
     }
   };
 
@@ -48,14 +51,6 @@ const SearchBar = ({ setDoctors }) => {
             <br />
             <span className="font-medium text-green-700">{selectedSpecialization || "Find Your Category"}</span>
           </button>
-          <div className="flex gap-4">
-            <button className="flex-1 p-3 border border-green-700 rounded-md text-green-700 bg-white shadow-sm">
-              More options
-            </button>
-            <button className="flex-1 p-3 border border-green-700 rounded-md text-green-700 bg-white shadow-sm">
-              🗓 Calendar
-            </button>
-          </div>
         </div>
         <div className="flex-1 flex flex-col gap-4">
           <button

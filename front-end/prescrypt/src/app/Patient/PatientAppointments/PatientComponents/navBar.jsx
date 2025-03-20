@@ -30,11 +30,10 @@ const AdminNavBar = () => {
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
-      {/* Logo */}
-      <img src="/logo.png" alt="Logo" className="w-28 h-13 mt-4" />
+     
 
       {/* User Avatar and Name */}
-      <div className="flex flex-col items-center mt-[-50PX]">
+      <div className="flex flex-col items-center mt-[100PX]">
         <div className="w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center overflow-hidden relative">
           <img
             src="/profile.png"
@@ -42,7 +41,7 @@ const AdminNavBar = () => {
             className="w-full h-full object-cover"
           />
         </div>
-        {isExpanded && <div className="mt-2">Nimal Perera</div>}
+        {isExpanded && <div className="mt-1">Nimal Perera</div>}
       </div>
 
       {/* Navigation Icons */}
@@ -55,7 +54,7 @@ const AdminNavBar = () => {
             className={`w-12 h-12 justify-center
                 flex items-center p-2 rounded-full hover:bg-gray-100  ${
               isExpanded
-                ? "justify-star space-x-3 cursor-pointer"
+                ? "justify-between space-x-3 cursor-pointer"
                 : "justify-center rounded-full border-2 border-gray-300"
             }
                   ${!isExpanded && activeIndex === index ? "bg-[#E9FAF2] text-gray-600" : "bg-transparent"}`}
@@ -67,9 +66,9 @@ const AdminNavBar = () => {
             
             {isExpanded && (
               // <span className="rounded-full border-2 border-gray-300 hover:bg-gray-100 py-0 px-4 flex items-center space-x-3">
-              <span className={`rounded-full border-2 border-gray-300 hover:bg-green-100 py-0 px-4 flex items-center space-x-3
+              <span className={`rounded-full border-2 border-gray-300 hover:bg-green-50 py-0 px-4 flex items-center space-x-3
                 ${activeIndex === index ? "bg-[#E9FAF2] text-grey-600" : "bg-transparent"}`}>
-                <div className="flex items-center space-x-3 py-2 mx-10">
+                <div className="flex items-center space-x-3 py-2 mx-5">
                   <img
                     className="w-5 h-5 object-fill"
                     src={item.image}

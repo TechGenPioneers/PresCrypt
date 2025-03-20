@@ -10,7 +10,6 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import Link from "next/link";  
 
-// const doctorId = "D001"; // Hardcoded for testing
 
 const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) => {
   const [doctorDetails, setDoctorDetails] = useState(null);
@@ -63,14 +62,14 @@ const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) 
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-2 right-2 text-gray-700 hover:text-gray-900 rounded-full p-2"
+          className="absolute top-0 right-0 text-gray-700 hover:text-gray-900 rounded-full p-2"
         >
           <CloseIcon />
         </button>
 
         {/* HEADER */}
         <div className="bg-teal-700 text-white py-3 rounded-t-3xl text-center">
-          <DialogTitle className="text-lg font-semibold">{doctorName}</DialogTitle>
+          <DialogTitle className="text-lg font-semibold"> Dr. {doctorName}</DialogTitle>
         </div>
 
         {/* CONTENT */}
@@ -106,7 +105,7 @@ const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) 
 
               {/* Confirm Button */}
 
-              <Link href="/Patient/Bookings">
+              <Link href="/Patient/Bookings/Payments">
               <button
                 className="bg-teal-700 text-white py-2 px-6 rounded-full mt-6 shadow-md hover:bg-teal-800 transition"
                 

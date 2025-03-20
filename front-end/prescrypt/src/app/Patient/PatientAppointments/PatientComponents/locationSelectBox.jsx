@@ -17,7 +17,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 const locations = [
   { district: "Battaramulla", hospitals: ["Nawaloka Hospital", "Santa Dora Hospital"] },
   { district: "Maharagama", hospitals: ["Asia Hospital"] },
-  { district: "Colombo", hospitals: ["National Hospital of Sri Lanka", "Durdans Hospital", "Asiri Surgical Hospital"] },
+  { district: "Colombo", hospitals: ["Durdans Hospital", "Asiri Surgical Hospital"] },
   { district: "Thalawathugoda", hospitals: ["Hemas Hospital"] },
   { district: "Athurugiriya", hospitals: ["Hemas Hospital"] },
 ];
