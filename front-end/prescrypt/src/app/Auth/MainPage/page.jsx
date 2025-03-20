@@ -1,7 +1,7 @@
 import styles from "./mainPage.module.css";
 import Image from "next/image";
 import Link from "next/link";
-import Footer from "../../Components/footer/Footer";
+
 
 export default function MainPage() {
   return (
@@ -61,7 +61,7 @@ export default function MainPage() {
           </Link>
         </div>
       </div>
-      <Footer/>
+     
     </div>
   );
 }
