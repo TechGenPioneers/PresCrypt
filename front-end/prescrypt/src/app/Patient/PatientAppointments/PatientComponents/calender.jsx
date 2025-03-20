@@ -3,7 +3,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
-//import "./CalendarStyles.css"; // Import custom CSS for styling
 
 const CustomCalendar = () => {
   const [date, setDate] = useState(dayjs());
@@ -43,6 +42,8 @@ const CustomCalendar = () => {
           const fullDate = `${currentMonth}-${dayText}`;
           const status = getAppointmentStatus(dayjs(fullDate));
 
+          el.classList.remove("pending-appointment", "completed-appointment"); // Clear previous styles
+
           if (status === "Pending") {
             el.classList.add("pending-appointment");
           } else if (status === "Completed") {
@@ -57,7 +58,11 @@ const CustomCalendar = () => {
 
   return (
     <div className="flex flex-col p-6 border border-gray-300 rounded-xl bg-white shadow-md">
-      <h3 className="text-center mb-2 font-semibold">Appointments</h3>
+      <h3 className="text-center mb-2 font-semibold">Your Appointments</h3>
+
+      {/* Legend Box */}
+      
+
       <div className="flex justify-center items-center">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateCalendar
@@ -67,6 +72,16 @@ const CustomCalendar = () => {
             className="custom-calendar"
           />
         </LocalizationProvider>
+      </div>
+      <div className="flex justify-center space-x-4 mb-4">
+        <div className="flex items-center space-x-2">
+          <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+          <span className="text-sm">Upcoming Appointments</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+          <span className="text-sm">Completed Appointments</span>
+        </div>
       </div>
     </div>
   );
