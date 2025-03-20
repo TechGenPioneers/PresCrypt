@@ -1,6 +1,6 @@
-import Footer from "../Components/footer/Footer";
-import Header from "../Components/header/Header";
-import styles from "../page.module.css";
+import Footer from "../../Components/footer/Footer";
+import Header from "../../Components/header/Header";
+//import styles from "../page.module.css";
 import Link from "next/link"; // Import the Link component
 import Image from "next/image";
 
