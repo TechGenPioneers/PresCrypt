@@ -1,5 +1,5 @@
-import PatientHeader from "@/components/header/Header";
-import Footer from "@/components/footer/Footer";
+import PatientHeader from "./components/header/Header";
+import Footer from "./components/footer/Footer";
 
 export default function PatientLayout({ children }) {
   return (
