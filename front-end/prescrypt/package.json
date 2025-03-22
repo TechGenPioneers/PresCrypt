@@ -25,14 +25,12 @@
     "react": "^19.0.0",
     "react-calendar": "^5.1.0",
     "react-dom": "^19.0.0",
-    "recharts": "^2.15.1",
-    "tailwindcss": "^4.0.0"
+    "recharts": "^2.15.1"
   },
   "devDependencies": {
     "@types/estree": "^1.0.6",
     "@types/json-schema": "^7.0.15",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.5.1",
     "tailwindcss": "^4.0.0"
   }
 }

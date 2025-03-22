@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["json-schema"]
   }
 }
