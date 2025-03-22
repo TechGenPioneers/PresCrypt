@@ -1,32 +1,47 @@
 "use client";
 import { useState, useEffect } from "react";
+import { AddNewDoctor } from "../service/AdminService";
 
 export default function DoctorRegistrationForm() {
-  const [formData, setFormData] = useState({
+  const [schedule, setSchedule] = useState([]);
+  const [newDoctor, setNewDoctor] = useState({
     firstName: "",
     lastName: "",
     email: "",
     specialization: "",
-    smlcLicense: "",
+    slmcLicense: "",
     contactNumber: "",
-    hospital: "",
+    nic:"",
   });
   const [availableData, setAvailableData] = useState({
     availability: [],
     startTime: "",
     endTime: "",
+    hospital: "",
   });
 
+  //set hospital
+  const Hospitals = [
+    "Asiri Hospital",
+    "Nawaloka Hospital",
+    "Lanka Hospital",
+    "Hemas",
+  ];
+  const [input, setInput] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  //date and time
   const [dateTime, setDateTime] = useState(null);
-  const [schedule, setSchedule] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
-
+  //set error message
+  const [errorMessage, setErrorMessage] = useState(" ");
+  const [timeErrorMessage, setTimeErrorMessage] = useState(" ");
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setNewDoctor({ ...newDoctor, [name]: value });
   };
 
-  // Handle checkbox selection
+  // checkbox selection
   const handleCheckboxChange = (day) => {
     setAvailableData((prev) => ({
       ...prev,
@@ -35,103 +50,133 @@ export default function DoctorRegistrationForm() {
         : [...prev.availability, day],
     }));
   };
-
+  //set available data
   const handleTime = (e) => {
     const { name, value } = e.target;
     setAvailableData({ ...availableData, [name]: value });
-    console.log(availableData);
   };
 
-  // const handleChangeDropdown = (e) => {
-  //   setAvailableData((prev) => ({
-  //     ...prev,
-  //     timeSlot: e.target.value,
-  //   }));
-  // };
-
-  //handle add time slots (check - same day , time || start time and end time)
+  //add available table
   const handleAddTime = () => {
     if (
       availableData.availability.length > 0 &&
       availableData.startTime &&
-      availableData.endTime
+      availableData.endTime &&
+      availableData.hospital
     ) {
       const newSchedule = availableData.availability.map((day) => ({
         day,
         startTime: availableData.startTime,
         endTime: availableData.endTime,
+        hospital: availableData.hospital,
       }));
 
       // Check if start time is before end time
       if (newSchedule.some((item) => item.startTime >= item.endTime)) {
-        setErrorMessage("Start time must be before end time.");
+        setTimeErrorMessage("Start time must be before end time.");
         return;
       }
 
       const isDuplicate = newSchedule.some((newItem) =>
         schedule.some(
           (existing) =>
-            existing.day === newItem.day ||
-            existing.startTime === newItem.startTime ||
-            existing.endTime === newItem.endTime
+            existing.day === newItem.day &&
+            existing.startTime === newItem.startTime &&
+            existing.endTime === newItem.endTime &&
+            existing.hospital === newItem.hospital
         )
       );
 
       if (!isDuplicate) {
         setSchedule((prev) => [...prev, ...newSchedule]);
-        setAvailableData({ availability: [], startTime: "", endTime: "" });
+        setAvailableData({
+          availability: [],
+          startTime: "",
+          endTime: "",
+          hospital: "",
+        });
         setErrorMessage("");
-        console.log(schedule);
       } else {
-        setErrorMessage(
-          "Selected time slot already exists.please check again!"
+        setTimeErrorMessage(
+          "Selected time slot already exists. Please check again!"
         );
       }
     }
-
-    // if (availableData.availability.length > 0 && availableData.timeSlot) {
-    //   const newSchedule = availableData.availability.map((day) => ({
-    //     day,
-    //     time: availableData.timeSlot,
-    //   }));
-    //   setSchedule([...schedule, ...newSchedule]);
-    //   setAvailableData({ availability: [], timeSlot: "" }); // Reset selection
-    //   setErrorMessage("");
-    //   console.log(schedule);
-    // }
   };
 
   // Remove a time slot from the table
   const handleRemoveSlot = (index) => {
     setSchedule(schedule.filter((_, i) => i !== index));
-    console.log(schedule);
   };
 
-  const handleSubmit = (e) => {
+  // Handle hospital input
+  const handleHospitalInputChange = (e) => {
+    const value = e.target.value;
+    setInput(value);
+
+    if (value.trim() === "") {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    // Filter hospitals (avoid duplicates)
+    const filtered = Hospitals.filter(
+      (hospital) =>
+        hospital.toLowerCase().includes(value.toLowerCase()) &&
+        availableData.hospital !== hospital // Prevent duplicate selection
+    );
+
+    setSuggestions(filtered.length > 0 ? filtered : [`Use "${value}"`]);
+    setShowSuggestions(true);
+  };
+
+  // Handle selecting a hospital
+  const handleSelectHospital = (value) => {
+    const hospitalName = value.replace('Use "', "").replace('"', "");
+    setAvailableData((prev) => ({
+      ...prev,
+      hospital: hospitalName,
+    }));
+    setInput("");
+    setShowSuggestions(false);
+  };
+
+  //form submit
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (schedule.length > 0) {
       e.preventDefault();
-      console.log("Form Data Submitted:", formData, schedule);
-      alert("Doctor Registered Successfully!");
-
+      console.log("Form Data Submitted:", newDoctor, schedule);
       setAvailableData({
         availability: [],
-        timeSlot: "",
+        startTime: "",
+        endTime:"",
+        hospital: "",
       });
 
-      setFormData({
+      setNewDoctor({
         firstName: "",
         lastName: "",
         email: "",
         specialization: "",
-        smlcLicense: "",
+        slmcLicense: "",
         contactNumber: "",
-        hospital: "",
+        nic:"",
       });
 
+      //send new doctor details into backend
+      console.log("Before sending Data --->", newDoctor,schedule)
+      try {
+        const newDoctorDetails = await AddNewDoctor(newDoctor, schedule);
+        console.log(newDoctorDetails);
+        alert("Doctor Registered Successfully!");
+      } catch (err) {
+        console.error("Failed to add the doctor", err);
+        alert("Failed to add the doctor!", err);
+      }
       setSchedule([]);
-
       setErrorMessage("");
     } else {
       console.log("time slots empty");
@@ -146,6 +191,7 @@ export default function DoctorRegistrationForm() {
     return () => clearInterval(interval);
   }, []);
 
+  // set date and time
   if (!dateTime) return null;
 
   // Date Formatting
@@ -178,7 +224,7 @@ export default function DoctorRegistrationForm() {
                 type="text"
                 name="firstName"
                 placeholder="First Name"
-                value={formData.firstName}
+                value={newDoctor.firstName}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
@@ -188,7 +234,7 @@ export default function DoctorRegistrationForm() {
                 type="text"
                 name="lastName"
                 placeholder="Last Name"
-                value={formData.lastName}
+                value={newDoctor.lastName}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
@@ -198,7 +244,7 @@ export default function DoctorRegistrationForm() {
                 type="text"
                 name="specialization"
                 placeholder="Specialization"
-                value={formData.specialization}
+                value={newDoctor.specialization}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
@@ -206,9 +252,19 @@ export default function DoctorRegistrationForm() {
               />
               <input
                 type="text"
-                name="smlcLicense"
-                placeholder="SMLC License Number"
-                value={formData.smlcLicense}
+                name="slmcLicense"
+                placeholder="SLMC License Number"
+                value={newDoctor.slmcLicense}
+                onChange={handleChange}
+                className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+                required
+              />
+              <input
+                type="text"
+                name="nic"
+                placeholder="NIC"
+                value={newDoctor.nic}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
@@ -218,17 +274,17 @@ export default function DoctorRegistrationForm() {
                 type="text"
                 name="contactNumber"
                 placeholder="Contact Number"
-                value={formData.contactNumber}
+                value={newDoctor.contactNumber}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
                 required
               />
               <input
-                type="text"
-                name="hospital"
-                placeholder="Hospital"
-                value={formData.hospital}
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={newDoctor.email}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
@@ -236,19 +292,8 @@ export default function DoctorRegistrationForm() {
               />
             </div>
             <div>
-              {/* Availability Checkboxes */}
 
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
-                required
-              />
-
+              {/* Availability */}
               {/* checkboxes */}
               <label className="block font-semibold mb-2 mt-2">
                 Availability:
@@ -278,19 +323,57 @@ export default function DoctorRegistrationForm() {
                 ))}
               </div>
 
-              {/* Select Time Dropdown */}
-              {/* <select
-                name="timeSlot"
-                value={availableData.timeSlot}
-                onChange={handleChangeDropdown}
-                className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-3"
-              >
-                <option value="">Select Time</option>
-                <option value="4:00 PM - 6:00 PM">4:00 PM - 6:00 PM</option>
-                <option value="6:00 PM - 8:00 PM">6:00 PM - 8:00 PM</option>
-              </select> */}
+              <div className="mb-4">
+                <div
+                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+                >
+                  {/* Display Selected Hospital */}
+                  {availableData.hospital && (
+                    <div className="bg-[#E9FAF2] text-[#09424D] px-2 rounded-md flex items-center ">
+                      {availableData.hospital}
+                      <span
+                        className="ml-2 cursor-pointer text-red-400 font-bold "
+                        onClick={() =>
+                          setAvailableData((prev) => ({
+                            ...prev,
+                            hospital: "",
+                          }))
+                        }
+                      >
+                        ✕
+                      </span>
+                    </div>
+                  )}
 
+                  {/* Input Field */}
+                  {!availableData.hospital && (
+                    <input
+                      type="text"
+                      placeholder="Hospital"
+                      name="hospital"
+                      value={input}
+                      onChange={handleHospitalInputChange}
+                      className="border-none outline-none flex-1"
+                      onFocus={() => setShowSuggestions(true)}
+                    />
+                  )}
+                </div>
+
+                {/* Dropdown Suggestions */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute bg-[#E9FAF2] border mt-1 shadow-lg rounded-md w-full max-w-5xl">
+                    {suggestions.map((hospital, index) => (
+                      <div
+                        key={index}
+                        className="p-2 hover:bg-gray-200 cursor-pointer"
+                        onClick={() => handleSelectHospital(hospital)}
+                      >
+                        {hospital}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               {/* give custom Time */}
               <div className="flex gap-5">
                 <input
@@ -312,8 +395,10 @@ export default function DoctorRegistrationForm() {
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
                 />
               </div>
-
-              <div className="mt-5 w-[100%]">
+              <p className="text-red-500 font-bold text-center my-5">
+              {timeErrorMessage}
+            </p>
+              <div className="mt-3 w-[100%]">
                 <button
                   type="button"
                   onClick={handleAddTime}
@@ -333,6 +418,7 @@ export default function DoctorRegistrationForm() {
                   <th className="p-2">Day</th>
                   <th className="p-2">Start Time</th>
                   <th className="p-2">End Time</th>
+                  <th className="p-2">Hospital</th>
                   <th className="p-2">Action</th>
                 </tr>
               </thead>
@@ -347,6 +433,7 @@ export default function DoctorRegistrationForm() {
                     <td className="p-2 text-center">{slot.day}</td>
                     <td className="p-2 text-center">{slot.startTime}</td>
                     <td className="p-2 text-center">{slot.endTime}</td>
+                    <td className="p-2 text-center">{slot.hospital}</td>
                     <td className="p-2 text-center">
                       <button
                         type="button"
