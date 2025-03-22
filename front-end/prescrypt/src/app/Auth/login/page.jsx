@@ -1,10 +1,11 @@
 "use client"; // Required for event handlers in Next.js
 
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // Import Next.js router
 import Image from "next/image";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react"; // Import icons
 import { loginPatient } from "../../../utils/api"; // Import API function
-import { EyeIcon, EyeOffIcon } from "@hugeicons/react"; // Import password toggle icons
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,38 +13,36 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  const router = useRouter(); // Initialize Next.js router
 
   const handleLogin = async () => {
-    setError(null); // Clear previous errors
-
-    console.log("Attempting login with:", { email, password });
-
+    setError(null);
     if (!email || !password) {
       setError("Email and Password are required.");
       return;
     }
-
+  
     try {
       setLoading(true);
       const response = await loginPatient({ email, password });
-
-      if (!response || !response.message) {
-        throw new Error("Unexpected response format.");
+  
+      console.log("API Response:", response); // Debugging
+  
+      if (response && response.success) {
+        console.log("Login successful:", response);
+        router.push("/Patient/PatientDashboard"); // Redirect
+      } else {
+        setError(response?.message || "Invalid credentials");
       }
-
-      console.log("User data:", response);
-      alert(response.message); // Show "Login Successful"
     } catch (err) {
-      console.error("Login error:", err.message);
-
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      console.error("Login error:", err);
+      setError(err.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
       <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden max-w-3xl w-full">
@@ -73,24 +72,23 @@ export default function LoginPage() {
             />
             <button
               type="button"
-              className="absolute right-3 top-3 text-gray-500 hover:text-teal-500 transition"
+              className="absolute inset-y-0 right-3 flex items-center text-gray-600"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
 
           {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
-          <Link href="/Patient/PatientDashboard">
-            <button
-              className="w-full py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition disabled:opacity-50"
-              onClick={handleLogin}
-              disabled={loading}
-            >
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </Link>
+          {/* Login Button - Navigates only on success */}
+          <button
+            className="w-full py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition disabled:opacity-50"
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
 
           <p className="text-gray-600 text-sm text-center mt-4">Not registered yet?</p>
           <Link href="/Auth/PatientRegistration">
@@ -108,4 +106,3 @@ export default function LoginPage() {
     </div>
   );
 }
-  
