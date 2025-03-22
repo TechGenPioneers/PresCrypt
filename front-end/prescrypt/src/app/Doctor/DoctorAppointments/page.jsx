@@ -26,12 +26,12 @@ export default function AppointmentsPage() {
         console.log("Formatted Date:", formattedDate);
 
         const response = await axiosInstance.get(
-          `/api/Appointments/date/${formattedDate}?doctorId=1` // Replace with dynamic doctor ID
+          `/api/Appointments/date/${formattedDate}?doctorId=D1` // replace with dynamic doc id
         );
         setAppointments(response.data);
 
         const availabilityResponse = await axiosInstance.get(
-          `/api/Appointments/availability/${formattedDate}?doctorId=1` // Replace with dynamic doctor ID
+          `/api/Appointments/availability/${formattedDate}?doctorId=D1`
         );
         setAvailability(availabilityResponse.data);
 
@@ -41,7 +41,10 @@ export default function AppointmentsPage() {
           setNoAppointments(false);
         }
       } catch (error) {
-        console.error("Error fetching appointments:", error.response || error.message);
+        console.error(
+          "Error fetching appointments:",
+          error.response || error.message
+        );
         setNoAppointments(true); // Show no appointments message on error
       } finally {
         setLoading(false);
@@ -56,6 +59,24 @@ export default function AppointmentsPage() {
 
   const toggleMenu = (id) => {
     setOpenMenuId(openMenuId === id ? null : id);
+  };
+
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob); // Parse the DOB string into a Date object
+    const today = new Date(); // Get the current date
+
+    let age = today.getFullYear() - birthDate.getFullYear(); // Calculate the difference in years
+    const monthDifference = today.getMonth() - birthDate.getMonth(); // Check if the birthday has occurred this year
+
+    // If the birthday hasn't occurred yet this year, subtract 1 from the age
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
   };
 
   return (
@@ -85,7 +106,9 @@ export default function AppointmentsPage() {
                     const timeString = avail.availableTime.split(".")[0];
                     return (
                       <div key={avail.availabilityId}>
-                        {new Date(`1970-01-01T${timeString}`).toLocaleTimeString([], {
+                        {new Date(
+                          `1970-01-01T${timeString}`
+                        ).toLocaleTimeString([], {
                           hour: "numeric",
                           minute: "2-digit",
                           hour12: true,
@@ -113,7 +136,9 @@ export default function AppointmentsPage() {
                       <tr>
                         <th className="px-4 py-2 text-left">Patient ID</th>
                         <th className="px-4 py-2 text-left">Patient</th>
-                        <th className="px-4 py-2 text-left">Appointment Time</th>
+                        <th className="px-4 py-2 text-left">
+                          Appointment Time
+                        </th>
                         <th className="px-4 py-2 text-left">Status</th>
                         <th className="px-4 py-2 text-left">Actions</th>
                       </tr>
@@ -124,16 +149,21 @@ export default function AppointmentsPage() {
                     <table className="w-full table-auto sm:table-fixed min-w-full">
                       <tbody>
                         {appointments.length > 0 ? (
-                          appointments.map((appointment) => (
+                          appointments.map((appointment, index) => (
                             <tr
-                              key={appointment.id}
+                              key={appointment.id || index} // Use index as a fallback
                               className="border-b border-[#094A4D] relative odd:bg-[#E9FAF2]"
                             >
-                              <td className="px-4 py-2">{appointment.patientId}</td>
+                              <td className="px-4 py-2">
+                                {appointment.patientId}
+                              </td>
                               <td className="px-4 py-2">
                                 <div className="flex items-center space-x-3">
                                   <img
-                                    src={appointment.profilePictureUrl || "/profile.png"}
+                                    src={
+                                      appointment.profilePictureUrl ||
+                                      "/profile.png"
+                                    }
                                     alt="Profile"
                                     width={50}
                                     height={50}
@@ -144,28 +174,38 @@ export default function AppointmentsPage() {
                                       {appointment.patientName}
                                     </span>
                                     <span className="text-sm text-gray-600">
-                                      {appointment.gender}, {appointment.age}
+                                      {appointment.gender}, {calculateAge(appointment.dob)} yrs
                                     </span>
                                   </div>
                                 </div>
                               </td>
                               <td className="px-4 py-2">
-                                {new Date(appointment.appointmentTime).toLocaleTimeString([], {
-                                  hour: "numeric",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                })}
+                                {new Date(appointment.time).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                  }
+                                )}
                               </td>
-                              <td className="px-4 py-2">{appointment.status}</td>
+                              <td className="px-4 py-2">
+                                {appointment.status}
+                              </td>
                               <td className="relative">
                                 <button
-                                  onClick={() => toggleMenu(appointment.id)}
+                                  onClick={() =>
+                                    toggleMenu(appointment.appointmentId)
+                                  }
                                   className="p-2"
                                   aria-label="Open menu"
                                 >
-                                  <MoreHorizontal size={20} className="cursor-pointer" />
+                                  <MoreHorizontal
+                                    size={20}
+                                    className="cursor-pointer"
+                                  />
                                 </button>
-                                {openMenuId === appointment.id && (
+                                {openMenuId === appointment.appointmentId && (
                                   <div className="absolute w-50 bg-[#E9FAF2] border border-[#094A4D] shadow-2xl p-2 z-50 mt-[-20px] ml-[30px] text-[#094A4D] transition-opacity duration-200">
                                     <button className="block p-3 text-left w-full hover:bg-white cursor-pointer border-b border-[#094A4D]">
                                       Reschedule

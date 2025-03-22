@@ -28,9 +28,7 @@ const Footer = () => {
           <ul className="space-x-4">
             <li>
               <Link
-                href="/contact-us"
-                className="text-gray-600 hover:text-gray-800 font-bold "
-              >
+                href="/contact-us" className="text-gray-600 hover:text-gray-800 font-bold">
                 Contact Us
               </Link>
             </li>
