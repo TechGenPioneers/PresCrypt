@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 
 const Doctors = () => {
   const [dateTime, setDateTime] = useState(null);
@@ -80,7 +81,9 @@ const Doctors = () => {
             className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
           hover:bg-[#91B4B8] transition duration-300 "
           >
+            <Link href="/Admin/DoctorRegistrationForm">
             Add New Doctor
+            </Link>
           </button>
         </div>
       </div>
