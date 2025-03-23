@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SpecializationDialog from "../PatientComponents/specializationBox";
 import LocationDialog from "../PatientComponents/locationSelectBox.jsx";
 import { CircularProgress } from "@mui/material"; // Import MUI CircularProgress
@@ -7,8 +7,12 @@ import { CircularProgress } from "@mui/material"; // Import MUI CircularProgress
 const SearchBar = ({ setDoctors }) => {
   const [specializationOpen, setSpecializationOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
-  const [selectedSpecialization, setSelectedSpecialization] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedSpecialization, setSelectedSpecialization] = useState(
+    localStorage.getItem("selectedSpecialization") || ""  // Retrieve from localStorage if available
+  );
+  const [selectedLocation, setSelectedLocation] = useState(
+    localStorage.getItem("selectedLocation") || ""  // Retrieve from localStorage if available
+  );
   const [loading, setLoading] = useState(false);
 
   // This function is triggered when the "Find my Doctor" button is clicked
@@ -17,9 +21,9 @@ const SearchBar = ({ setDoctors }) => {
       alert("Please select both specialization and location.");
       return;
     }
-  
-    setLoading(true);  // Show loading spinner when fetching data
-  
+
+    setLoading(true); // Show loading spinner when fetching data
+
     try {
       const response = await axios.get("https://localhost:7021/api/Doctor/search", {
         params: {
@@ -27,16 +31,25 @@ const SearchBar = ({ setDoctors }) => {
           hospitalName: selectedLocation,
         },
       });
-  
+
       console.log("Fetched doctors:", response.data); // Debugging: Check the response data
-      setDoctors(response.data);  // Pass the fetched doctor data to the parent component's setDoctors
+      setDoctors(response.data); // Pass the fetched doctor data to the parent component's setDoctors
     } catch (error) {
       console.error("Error fetching doctors:", error);
       alert("Failed to fetch doctor details. Please try again.");
     } finally {
-      setLoading(false);  // Hide loading spinner
+      setLoading(false); // Hide loading spinner
     }
   };
+
+  // Save selected specialization and location to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem("selectedSpecialization", selectedSpecialization);
+  }, [selectedSpecialization]);
+
+  useEffect(() => {
+    localStorage.setItem("selectedLocation", selectedLocation);
+  }, [selectedLocation]);
 
   return (
     <div className="bg-[#E8F4F2] p-6 rounded-md">
@@ -70,12 +83,12 @@ const SearchBar = ({ setDoctors }) => {
           </button>
         </div>
       </div>
-      
+
       <SpecializationDialog
         open={specializationOpen}
         handleClose={() => setSpecializationOpen(false)}
         onSelect={(spec) => {
-          setSelectedSpecialization(spec);
+          setSelectedSpecialization(spec); // Update state
           setSpecializationOpen(false);
         }}
       />
@@ -84,7 +97,7 @@ const SearchBar = ({ setDoctors }) => {
         open={locationOpen}
         handleClose={() => setLocationOpen(false)}
         onSelect={(loc) => {
-          setSelectedLocation(loc);
+          setSelectedLocation(loc); // Update state
           setLocationOpen(false);
         }}
       />

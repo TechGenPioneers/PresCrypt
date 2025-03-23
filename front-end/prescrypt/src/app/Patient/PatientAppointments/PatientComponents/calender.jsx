@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 const CustomCalendar = () => {
   const [date, setDate] = useState(dayjs());
   const [appointments, setAppointments] = useState([]);
-  const patientId = "P001"; // Replace with dynamic patient ID if needed
+  const patientId = "P021"; // Replace with dynamic patient ID if needed
 
   useEffect(() => {
     const fetchAppointments = async () => {

@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 
-const AdminNavBar = ({ patientId = "P001" }) => {
+const AdminNavBar = ({ patientId = "P021" }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
   const [profileImage, setProfileImage] = useState("/profile.png"); // Default placeholder image
@@ -50,9 +50,9 @@ const AdminNavBar = ({ patientId = "P001" }) => {
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
-      {/* User Avatar and Name */}
+      {/* User Image and Name */}
       <div className="flex flex-col items-center mt-[100px]">
-        <div className="w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center overflow-hidden relative">
+        <div className="w-20 h-20 rounded-full border-2 border-gray-200 flex items-center justify-center overflow-hidden relative">
           <img
             src={profileImage}
             alt="User"

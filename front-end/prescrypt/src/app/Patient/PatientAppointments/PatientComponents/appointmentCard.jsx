@@ -8,13 +8,13 @@ import {
   CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import Link from "next/link";  
+import { useRouter } from "next/navigation"; // Import useRouter
 
-
-const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) => {
+const AppointmentCard = ({ doctorId, doctorName, appointmentTime, appointmentDate, imageUrl, open, handleClose }) => {
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter(); // Initialize the Next.js router
 
   // Fetch doctor details from API
   useEffect(() => {
@@ -42,6 +42,11 @@ const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) 
     }
   }, [open, doctorId]);
 
+  // Handle booking with state passed to the next page
+  const handleBooking = () => {
+    router.push(`/Patient/Bookings/Payments/${doctorName}`);
+  };
+  
 
   return (
     <Dialog
@@ -73,51 +78,62 @@ const AppointmentCard = ({ doctorId, doctorName, imageUrl, open, handleClose }) 
         </div>
 
         {/* CONTENT */}
-        <DialogContent className="p-6 flex flex-col items-center bg-white"> {/* Ensure background is white to match content */}
-          {loading ? (
-            <CircularProgress />
-          ) : error ? (
-            <p className="text-red-500">{error}</p>
-          ) : doctorDetails ? (
-            <>
-              {/* Doctor Image */}
-              <img
-                src={doctorDetails.imageUrl || '/path/to/default-image.jpg'} // Fallback image
-                alt="Doctor"
-                className="w-28 h-28 rounded-full object-cover mb-4 border-4 border-gray-200 shadow-md"
-              />
+        <DialogContent className="p-6 flex flex-col items-center bg-white"> 
+  {loading ? (
+    <CircularProgress />
+  ) : error ? (
+    <p className="text-red-500">{error}</p>
+  ) : doctorDetails ? (
+    <>
+      {/* Doctor Image */}
+      <img
+        src={doctorDetails.imageUrl || '/path/to/default-image.jpg'} // Fallback image
+        alt="Doctor"
+        className="w-28 h-28 rounded-full object-cover mb-4 border-4 border-gray-200 shadow-md"
+      />
 
-              {/* Description */}
-              <Typography variant="body1" className="text-gray-800 text-center mb-2">
-                {doctorDetails.description}
-              </Typography>
+      {/* Description */}
+      <Typography variant="body1" className="text-gray-800 text-center mb-2">
+        {doctorDetails.description}
+      </Typography>
 
-              {/* Specialization Tag */}
-              <div className="bg-teal-100 text-teal-700 py-2 px-4 rounded-full mt-4 mb-5">
-                {doctorDetails.specialization}
-              </div>
+      {/* Specialization, Appointment Date, and Appointment Time */}
+      <div className="flex justify-between w-full mb-2">
+        {/* Specialization */}
+        <div className="bg-teal-100 text-teal-700 py-1 px-4 rounded-full">
+          {doctorDetails.specialization}
+        </div>
 
-              {/* Price & Info */}
-              <Typography variant="body2" className="text-gray-600 text-center mt-4 px-4">
-                The price estimate includes the physician’s fee, outpatient fee,
-                and other potential costs for procedures and supplies.
-              </Typography>
+        {/* Appointment Date */}
+        <div className="bg-teal-100 text-teal-700 py-1 px-4 rounded-full">
+          {appointmentDate}
+        </div>
 
-              {/* Confirm Button */}
+        {/* Appointment Time */}
+        <div className="bg-teal-100 text-teal-700 py-1 px-4 rounded-full">
+          {appointmentTime}
+        </div>
+      </div>
 
-              <Link href="/Patient/Bookings/Payments">
-              <button
-                className="bg-teal-700 text-white py-2 px-6 rounded-full mt-6 shadow-md hover:bg-teal-800 transition"
-                
-              >
-                Book this Slot
-              </button>
-              </Link>
-            </>
-          ) : (
-            <p className="text-gray-600">No details available</p>
-          )}
-        </DialogContent>
+      {/* Price & Info */}
+      <Typography variant="body2" className="text-gray-600 text-center mt-4 px-4">
+        The price estimate includes the physician’s fee, outpatient fee,
+        and other potential costs for procedures and supplies.
+      </Typography>
+
+      {/* Confirm Button */}
+      <button
+        onClick={handleBooking}
+        className="bg-teal-700 text-white py-2 px-6 rounded-full mt-6 shadow-md hover:bg-teal-800 transition"
+      >
+        Book this Slot
+      </button>
+    </>
+  ) : (
+    <p className="text-gray-600">No details available</p>
+  )}
+</DialogContent>
+
       </div>
     </Dialog>
   );

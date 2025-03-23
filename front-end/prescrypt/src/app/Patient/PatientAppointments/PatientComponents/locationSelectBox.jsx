@@ -15,9 +15,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 const locations = [
-  { district: "Battaramulla", hospitals: ["Nawaloka Hospital", "Santa Dora Hospital"] },
+  { district: "Battaramulla", hospitals: ["Nawaloka Hospital", "Sehara Hospital"] },
   { district: "Maharagama", hospitals: ["Asia Hospital"] },
-  { district: "Colombo", hospitals: ["Durdans Hospital", "Asiri Surgical Hospital"] },
+  { district: "Colombo", hospitals: ["Durdans Hospital", "Asiri Surgical Hospital", "Asiri General Hospital"] },
   { district: "Thalawathugoda", hospitals: ["Hemas Hospital"] },
   { district: "Athurugiriya", hospitals: ["Hemas Hospital"] },
 ];
