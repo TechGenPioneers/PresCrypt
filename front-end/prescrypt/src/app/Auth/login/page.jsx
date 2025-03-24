@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   const router = useRouter(); // Initialize Next.js router
 
   const handleLogin = async () => {
@@ -22,13 +22,13 @@ export default function LoginPage() {
       setError("Email and Password are required.");
       return;
     }
-  
+
     try {
       setLoading(true);
       const response = await loginPatient({ email, password });
-  
+
       console.log("API Response:", response); // Debugging
-  
+
       if (response && response.success) {
         console.log("Login successful:", response);
         router.push("/Patient/PatientDashboard"); // Redirect
@@ -42,7 +42,7 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
       <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden max-w-3xl w-full">
@@ -80,6 +80,9 @@ export default function LoginPage() {
           </div>
 
           {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+          <p className="text-sm text-center text-teal-600 cursor-pointer hover:underline mt-2">
+            <Link href="/Auth/ForgotPassword">Forgot Password?</Link>
+          </p>
 
           {/* Login Button - Navigates only on success */}
           <button
@@ -99,7 +102,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right: Image Section */}
-        <div className="hidden md:flex justify-center items-center p-6 bg-blue-100 md:w-1/2">
+        <div className="hidden md:flex justify-center items-center p-6 md:w-1/2">
           <Image src="/loginimage.jpg" alt="Login Illustration" width={350} height={300} />
         </div>
       </div>

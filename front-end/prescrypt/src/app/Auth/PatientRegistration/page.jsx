@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import styles from "./patientReg.module.css";
 
 export default function PatientRegistration() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -13,7 +15,6 @@ export default function PatientRegistration() {
     confirmPassword: "",
     contactNumber: "",
     nic: "",
-    bloodGroup: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -44,7 +45,6 @@ export default function PatientRegistration() {
     }
     if (!formData.contactNumber.trim()) newErrors.contactNumber = "Contact Number is required.";
     if (!formData.nic.trim()) newErrors.nic = "NIC is required.";
-    if (!formData.bloodGroup.trim()) newErrors.bloodGroup = "Blood Group is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -62,8 +62,9 @@ export default function PatientRegistration() {
       const data = await response.text();
       if (!response.ok) throw new Error(data);
       alert("Registration Successful!");
-      setFormData({ fullName: "", email: "", password: "", confirmPassword: "", contactNumber: "", nic: "", bloodGroup: "" });
+      setFormData({ fullName: "", email: "", password: "", confirmPassword: "", contactNumber: "", nic: "" });
       setErrors({});
+      router.push("/Patient/PatientDashboard");
     } catch (err) {
       setErrors({ general: err.message });
     } finally {
@@ -83,7 +84,6 @@ export default function PatientRegistration() {
             { name: "email", placeholder: "Email", type: "email" },
             { name: "contactNumber", placeholder: "Contact Number" },
             { name: "nic", placeholder: "NIC" },
-           
           ].map(({ name, placeholder, type = "text" }) => (
             <div key={name} className={styles.inputGroup}>
               <input type={type} name={name} placeholder={placeholder} className={errors[name] ? styles.inputError : styles.input} value={formData[name]} onChange={handleChange} />
