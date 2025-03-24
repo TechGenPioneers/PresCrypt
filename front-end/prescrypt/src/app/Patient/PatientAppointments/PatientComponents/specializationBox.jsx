@@ -25,6 +25,7 @@ const specializations = [
   { name: "Pulmonology", icon: <FaLungs /> },
   { name: "Ophthalmology", icon: <FaEye /> },
   { name: "Neurology", icon: <FaBrain /> },
+  {name: "Psychiatry", icon: <FaBrain />},
   { name: "All Dermatologists", icon: <FaUserNurse /> },
 ];
 

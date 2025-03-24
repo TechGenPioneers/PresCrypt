@@ -10,7 +10,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { useRouter } from "next/navigation"; // Import useRouter
 
-const AppointmentCard = ({ doctorId, doctorName, appointmentTime, appointmentDate, imageUrl, open, handleClose }) => {
+const AppointmentCard = ({ doctorId, doctorName, appointmentTime, appointmentDate, charge, imageUrl, open, handleClose }) => {
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -31,6 +31,7 @@ const AppointmentCard = ({ doctorId, doctorName, appointmentTime, appointmentDat
           const data = await response.json();
           console.log("Doctor details:", data); // Check API response
           setDoctorDetails(data);
+          
         } catch (err) {
           setError(err.message);
         } finally {
@@ -44,6 +45,7 @@ const AppointmentCard = ({ doctorId, doctorName, appointmentTime, appointmentDat
 
   // Handle booking with state passed to the next page
   const handleBooking = () => {
+    localStorage.setItem("selectedCharge",JSON.stringify(doctorDetails.charge));//this is doctor charge
     router.push(`/Patient/Bookings/Payments/${doctorName}`);
   };
   
