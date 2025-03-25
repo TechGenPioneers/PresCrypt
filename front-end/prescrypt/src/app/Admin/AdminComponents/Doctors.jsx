@@ -20,7 +20,7 @@ const Doctors = () => {
   // Sample Doctor Data
 
   const doctors = [
-    { id: "D001", name: "Dr. Nimal Perera", specialty: "Cardiology" },
+    { id: "D001", name: "Dr. Shenali Perera", specialty: "Cardiology" },
     { id: "D002", name: "Dr. Hiruni Silva", specialty: "Neurology" },
     { id: "D003", name: "Dr. Sunil Fernando", specialty: "Pediatrics" },
     { id: "D004", name: "Dr. Kamal De Silva", specialty: "Dermatology" },
@@ -135,7 +135,9 @@ const Doctors = () => {
                         onClick={() => router.push(`${doctor.id}`)}
                         className="px-4 py-2 text-[#094A4D] cursor-pointer rounded "
                       >
+                         <Link href="/Admin/DoctorDetailPage">
                         View
+                        </Link>
                       </button>
                     </td>
                   </tr>

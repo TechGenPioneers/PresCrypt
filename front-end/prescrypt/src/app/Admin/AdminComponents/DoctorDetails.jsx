@@ -69,7 +69,7 @@ export default function DoctorDetails({}) {
         {/* Profile Card */}
         <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md w-1/3 text-center">
           <div className="w-24 h-24 bg-red-500 rounded-full mx-auto mb-3">
-            <img src="profile2.png" alt="Avatar" className="rounded-full" />
+            <img src="/profile2.png" alt="Avatar" className="rounded-full" />
           </div>
           <h2 className="text-lg font-bold">{doctor.name}</h2>
           <p className="text-gray-600">{doctor.gender}</p>
