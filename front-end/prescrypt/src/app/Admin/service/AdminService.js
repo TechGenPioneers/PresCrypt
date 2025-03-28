@@ -33,4 +33,15 @@ const GetDoctors = async () => {
          throw error
        }
  }
-export{AddNewDoctor,GetDoctors}
+
+ const GetHospitals = async () => {
+    //get the doctors
+       try{
+         const response = await  axios.get(`${AddDoctorURL}/getAllHospitals`)
+         return response.data
+       }catch(error){
+         console.error("Failed to get the data",error);
+         throw error
+       }
+ }
+export{AddNewDoctor,GetDoctors,GetHospitals}

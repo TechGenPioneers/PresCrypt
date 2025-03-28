@@ -3,23 +3,22 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 // Sample Data 
-const doctors = {
-  D001: {
-    name: "Shenali Perera",
-    gender: "Female",
-    specialty: "Cardiology",
-    hospital: "Nawaloka Hospital",
-    availability: [
-      "Monday 4.00 PM - 6.00 PM",
-      "Wednesday 4.00 PM - 6.00 PM",
-      "Sunday 4.00 PM - 6.00 PM",
-    ],
-  },
-};
+// const doctors = {
+//   D001: {
+//     name: "Shenali Perera",
+//     gender: "Female",
+//     specialty: "Cardiology",
+//     hospital: "Nawaloka Hospital",
+//     availability: [
+//       "Monday 4.00 PM - 6.00 PM",
+//       "Wednesday 4.00 PM - 6.00 PM",
+//       "Sunday 4.00 PM - 6.00 PM",
+//     ],
+//   },
+// };
 
-export default function DoctorDetails({}) {
-  const id = "D001";
-  const router = useRouter();
+export default function DoctorDetails({doctorID }) {
+  // const id = "D001";
   const [doctor, setDoctor] = useState(null);
   const [dateTime, setDateTime] = useState(null);
 

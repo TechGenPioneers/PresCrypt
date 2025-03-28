@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AddNewDoctor } from "../service/AdminService";
+import { AddNewDoctor, GetHospitals } from "../service/AdminService";
+import { Hospital } from "lucide-react";
 
 export default function DoctorRegistrationForm() {
   const [schedule, setSchedule] = useState([]);
@@ -12,21 +13,16 @@ export default function DoctorRegistrationForm() {
     SlmcLicense: "",
     ContactNumber: "",
     NIC: "",
+    Gender: "",
   });
   const [availableData, setAvailableData] = useState({
     availability: [],
     startTime: "",
     endTime: "",
     HospitalId: "",
+    HospitalName: "",
   });
-
-  //set hospital
-  const Hospitals = [
-    "Asiri Hospital",
-    "Nawaloka Hospital",
-    "Lanka Hospital",
-    "Hemas",
-  ];
+  const [hospitalsData, setHospitalsData] = useState([]);
   const [input, setInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -50,6 +46,14 @@ export default function DoctorRegistrationForm() {
         : [...prev.availability, day],
     }));
   };
+  //handle gender
+  const handleGenderChange = (event) => {
+    setNewDoctor((prevDoctor) => ({
+      ...prevDoctor,
+      Gender: event.target.value,
+    }));
+  };
+
   //set available data
   const handleTime = (e) => {
     const { name, value } = e.target;
@@ -62,13 +66,15 @@ export default function DoctorRegistrationForm() {
       availableData.availability.length > 0 &&
       availableData.startTime &&
       availableData.endTime &&
-      availableData.HospitalId
+      availableData.HospitalId &&
+      availableData.HospitalName
     ) {
       const newSchedule = availableData.availability.map((day) => ({
         day,
         startTime: availableData.startTime,
         endTime: availableData.endTime,
         HospitalId: availableData.HospitalId,
+        HospitalName: availableData.HospitalName,
       }));
 
       // Check if start time is before end time
@@ -94,6 +100,7 @@ export default function DoctorRegistrationForm() {
           startTime: "",
           endTime: "",
           HospitalId: "",
+          HospitalName: "",
         });
         setErrorMessage("");
       } else {
@@ -121,10 +128,10 @@ export default function DoctorRegistrationForm() {
     }
 
     // Filter hospitals (avoid duplicates)
-    const filtered = Hospitals.filter(
-      (HospitalId) =>
-        HospitalId.toLowerCase().includes(value.toLowerCase()) &&
-        availableData.HospitalId !== HospitalId // Prevent duplicate selection
+    const filtered = hospitalsData.filter(
+      (hospital) =>
+        hospital.hospitalName.toLowerCase().includes(value.toLowerCase()) &&
+        availableData.HospitalName !== hospital.hospitalName // Prevent duplicate selection
     );
 
     setSuggestions(filtered.length > 0 ? filtered : [`Use "${value}"`]);
@@ -132,11 +139,12 @@ export default function DoctorRegistrationForm() {
   };
 
   // Handle selecting a hospital
-  const handleSelectHospital = (value) => {
+  const handleSelectHospital = (value, Id) => {
     const hospitalName = value.replace('Use "', "").replace('"', "");
     setAvailableData((prev) => ({
       ...prev,
-      HospitalId: hospitalName,
+      HospitalName: hospitalName,
+      HospitalId: Id,
     }));
     setInput("");
     setShowSuggestions(false);
@@ -154,6 +162,7 @@ export default function DoctorRegistrationForm() {
         startTime: "",
         endTime: "",
         HospitalId: "",
+        HospitalName:"",
       });
 
       setNewDoctor({
@@ -163,6 +172,7 @@ export default function DoctorRegistrationForm() {
         specialization: "",
         SlmcLicense: "",
         ContactNumber: "",
+        Gender: "",
         NIC: "",
       });
 
@@ -185,10 +195,17 @@ export default function DoctorRegistrationForm() {
   };
 
   useEffect(() => {
-    const updateDateTime = () => setDateTime(new Date());
-    updateDateTime(); // Set initial time
-    const interval = setInterval(updateDateTime, 1000);
-    return () => clearInterval(interval);
+    const loadData = async () => {
+      const HospitalDetails = await GetHospitals();
+      console.log(HospitalDetails);
+      setHospitalsData(HospitalDetails); // Set doctor data as an array
+
+      const updateDateTime = () => setDateTime(new Date());
+      updateDateTime(); // Set initial time
+      const interval = setInterval(updateDateTime, 1000);
+      return () => clearInterval(interval);
+    };
+    loadData();
   }, []);
 
   // set date and time
@@ -292,6 +309,34 @@ export default function DoctorRegistrationForm() {
               />
             </div>
             <div>
+              <label className="block font-semibold mb-2">Gender:</label>
+              <div className="grid grid-cols-2 gap-2 items-center mt-2">
+                <div className="ml-3">
+                  <input
+                    type="radio"
+                    id="male"
+                    name="Gender"
+                    value="Male"
+                    onChange={handleGenderChange}
+                    className="mr-2 bg-[#007e8556] cursor-pointer"
+                  />
+                  <label htmlFor="male" className="font-small text-[#5E6767]">
+                    Male
+                  </label>
+                </div>
+
+                <div className="ml-3">
+                  <input
+                    type="radio"
+                    id="female"
+                    name="Gender"
+                    value="Female"
+                    onChange={handleGenderChange}
+                    className="mr-2 bg-[#007e8556] cursor-pointer"
+                  />
+                  <label htmlFor="female" className="font-small text-[#5E6767]">Female</label>
+                </div>
+              </div>
               {/* Availability */}
               {/* checkboxes */}
               <label className="block font-semibold mb-2 mt-2">
@@ -327,12 +372,13 @@ export default function DoctorRegistrationForm() {
                   {/* Display Selected Hospital */}
                   {availableData.HospitalId && (
                     <div className="bg-[#E9FAF2] text-[#09424D] px-2 rounded-md flex items-center ">
-                      {availableData.HospitalId}
+                      {availableData.HospitalName}
                       <span
                         className="ml-2 cursor-pointer text-red-400 font-bold "
                         onClick={() =>
                           setAvailableData((prev) => ({
                             ...prev,
+                            HospitalName: "",
                             HospitalId: "",
                           }))
                         }
@@ -343,11 +389,11 @@ export default function DoctorRegistrationForm() {
                   )}
 
                   {/* Input Field */}
-                  {!availableData.HospitalId && (
+                  {!availableData.HospitalName && (
                     <input
                       type="text"
                       placeholder="Hospital"
-                      name="HospitalId"
+                      name="HospitalName"
                       value={input}
                       onChange={handleHospitalInputChange}
                       className="border-none outline-none flex-1"
@@ -359,13 +405,18 @@ export default function DoctorRegistrationForm() {
                 {/* Dropdown Suggestions */}
                 {showSuggestions && suggestions.length > 0 && (
                   <div className="absolute bg-[#E9FAF2] border mt-1 shadow-lg rounded-md w-full max-w-5xl">
-                    {suggestions.map((HospitalId, index) => (
+                    {suggestions.map((hospital, index) => (
                       <div
                         key={index}
                         className="p-2 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => handleSelectHospital(HospitalId)}
+                        onClick={() =>
+                          handleSelectHospital(
+                            hospital.hospitalName,
+                            hospital.hospitalId
+                          )
+                        }
                       >
-                        {HospitalId}
+                        {hospital.hospitalName}
                       </div>
                     ))}
                   </div>
@@ -415,7 +466,8 @@ export default function DoctorRegistrationForm() {
                   <th className="p-2">Day</th>
                   <th className="p-2">Start Time</th>
                   <th className="p-2">End Time</th>
-                  <th className="p-2">Hospital</th>
+                  <th className="p-2">Hospital Name</th>
+                  <th className="p-2">Hospital Id</th>
                   <th className="p-2">Action</th>
                 </tr>
               </thead>
@@ -430,6 +482,7 @@ export default function DoctorRegistrationForm() {
                     <td className="p-2 text-center">{slot.day}</td>
                     <td className="p-2 text-center">{slot.startTime}</td>
                     <td className="p-2 text-center">{slot.endTime}</td>
+                    <td className="p-2 text-center">{slot.HospitalName}</td>
                     <td className="p-2 text-center">{slot.HospitalId}</td>
                     <td className="p-2 text-center">
                       <button

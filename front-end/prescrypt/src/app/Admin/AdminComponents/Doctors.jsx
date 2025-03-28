@@ -103,9 +103,14 @@ const Doctors = () => {
                         alt="Avatar"
                         className="w-10 h-10 rounded-full"
                       />
+                      <div>
                       <span className="font-semibold text-[#094A4D]">
                         {doctor.firstName} {doctor.lastName}
                       </span>
+                        <p className="text-[#094A4D] text-sm">
+                          {doctor.gender}
+                        </p>
+                      </div>
                     </td>
                     <td className="p-3 text-[#094A4D]">{doctor.specialization}</td>
                     <td className="p-3">
