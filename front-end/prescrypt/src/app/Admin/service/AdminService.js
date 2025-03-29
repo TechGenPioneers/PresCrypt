@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { cacheTag } from 'next/dist/server/use-cache/cache-tag';
 
 const AddDoctorURL = "https://localhost:7021/api/AdminDoctor"
 
@@ -22,7 +23,7 @@ const AddNewDoctor = async (doctors,schedule) => {
         throw error;
     }
 }
-
+//get all doctors
 const GetDoctors = async () => {
     //get the doctors
        try{
@@ -33,7 +34,18 @@ const GetDoctors = async () => {
          throw error
        }
  }
+//get doctor by id
+const GetDoctorById = async (doctorId) => {
+  try{
+    const response = await axios.get(`${AddDoctorURL}/${doctorId}`);
+    return response.data;
+  }catch(error){
+    console.error("Failed to get the data",error);
+    throw error
+  }
+}
 
+//get all hospitals
  const GetHospitals = async () => {
     //get the doctors
        try{
@@ -44,4 +56,4 @@ const GetDoctors = async () => {
          throw error
        }
  }
-export{AddNewDoctor,GetDoctors,GetHospitals}
+export{AddNewDoctor,GetDoctors,GetHospitals,GetDoctorById}

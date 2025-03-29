@@ -1,34 +1,26 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { GetDoctorById } from "../service/AdminService";
 
-// Sample Data 
-// const doctors = {
-//   D001: {
-//     name: "Shenali Perera",
-//     gender: "Female",
-//     specialty: "Cardiology",
-//     hospital: "Nawaloka Hospital",
-//     availability: [
-//       "Monday 4.00 PM - 6.00 PM",
-//       "Wednesday 4.00 PM - 6.00 PM",
-//       "Sunday 4.00 PM - 6.00 PM",
-//     ],
-//   },
-// };
-
-export default function DoctorDetails({doctorID }) {
-  // const id = "D001";
+export default function DoctorDetails({ doctorID }) {
   const [doctor, setDoctor] = useState(null);
   const [dateTime, setDateTime] = useState(null);
 
   useEffect(() => {
-    setDoctor(doctors[id]);
+    const fetchDoctor = async () => {
+      const getDoctor = await GetDoctorById(doctorID);
+      setDoctor(getDoctor);
+      console.log("Doctor:", getDoctor);
+    };
+
+    fetchDoctor();
+
     const updateDateTime = () => setDateTime(new Date());
     updateDateTime(); // Set initial time
     const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
-  }, [id]);
+  }, [doctorID]);
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
@@ -52,7 +44,9 @@ export default function DoctorDetails({doctorID }) {
 
   return (
     <div className="p-8 border-15 border-[#E9FAF2]">
-      <h1 className="text-3xl font-bold mb-2">Doctor - {doctor.name}</h1>
+      <h1 className="text-3xl font-bold mb-2">
+        {doctor.doctor.doctorId} - {doctor.doctor.firstName} {doctor.doctor.lastName}
+      </h1>
       <p className="text-gray-500">{formattedDate}</p>
 
       <div className="grid col-span-1 justify-end">
@@ -66,25 +60,90 @@ export default function DoctorDetails({doctorID }) {
 
       <div className="flex mt-6 space-x-6">
         {/* Profile Card */}
-        <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md w-1/3 text-center">
+        <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 text-left">
+          {/* Profile Photo */}
           <div className="w-24 h-24 bg-red-500 rounded-full mx-auto mb-3">
-            <img src="/profile2.png" alt="Avatar" className="rounded-full" />
+            <img
+              src={doctor.doctor.profilePhoto || "/profile2.png"}
+              alt="Avatar"
+              className="rounded-full"
+            />
           </div>
-          <h2 className="text-lg font-bold">{doctor.name}</h2>
-          <p className="text-gray-600">{doctor.gender}</p>
-          <p className="text-gray-600">{doctor.specialty}</p>
-          <p className="text-gray-600">{doctor.hospital}</p>
+
+          {/* Doctor Name */}
+          <div className="text-center">
+            <h2 className="text-lg font-bold">
+              {doctor.doctor.firstName} {doctor.doctor.lastName}
+            </h2>
+          </div>
+
+          {/* Doctor Details */}
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Gender:</h1>{" "}
+            <p className="text-gray-600">{doctor.doctor.gender}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Contact:</h1>
+            <p className="text-gray-600">{doctor.doctor.contactNumber}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Specialization:</h1>{" "}
+            <p className="text-gray-600">{doctor.doctor.specialization}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">SLMC License:</h1>
+            <p className="text-gray-600">{doctor.doctor.slmcLicense}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Email:</h1>{" "}
+            <p className="text-gray-600">{doctor.doctor.email}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">NIC:</h1>
+            <p className="text-gray-600">{doctor.doctor.nic}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Email Verified:</h1>{" "}
+            <p className="text-gray-600">
+              {doctor.doctor.emailVerified ? "Verified" : "Not Verified"}
+            </p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Status:</h1>{" "}
+            <p className="text-gray-600">
+              {doctor.doctor.status ? "Active" : "Inactive"}
+            </p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Created At:</h1>{" "}
+            <p className="text-gray-600">{doctor.doctor.createdAt}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Updated At:</h1>{" "}
+            <p className="text-gray-600">{doctor.doctor.updatedAt}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Last Login:</h1>
+            <p className="text-gray-600">{doctor.doctor.lastLogin}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Description:</h1>{" "}
+            <p className="text-gray-600">{doctor.doctor.description}</p>
+          </div>
         </div>
 
         {/* Availability */}
         <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md w-2/3">
-          <h3 className="font-semibold">Availability:</h3>
-          {doctor.availability.map((time, index) => (
-            <p key={index} className="text-gray-700 pt-10 pl-5">
-              {time}
-            </p>
-          ))}
-        </div>
+  <h3 className="font-semibold mb-2">Availability:</h3>
+  <ul className="list-disc pl-5">
+    {doctor.availability.map((slot, index) => (
+      <li key={index} className="text-gray-700 pt-2">
+        <span className="font-bold">{slot.day}</span>: {slot.startTime} - {slot.endTime} at <span className="font-bold">{slot.hospitalName}</span>
+      </li>
+    ))}
+  </ul>
+</div>
+
       </div>
 
       <div className="mt-6 text-gray-500 text-right">
