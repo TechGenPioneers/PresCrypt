@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-white via-[rgba(0,126,133,0.3)] to-[rgba(0,126,133,0.5)]  p-8 py-4 ml-15">
+    <footer className="bg-gradient-to-r from-white via-[rgba(0,126,133,0.3)] to-[rgba(0,126,133,0.5)]  p-8 py-4 ml-10">
       <div className="container mx-auto flex items-center justify-between">
         {/* Left Side: Logo and Copyright */}
         <div className="grid grid-cols-1 ml-15" >
