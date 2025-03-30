@@ -84,6 +84,7 @@ const Doctors = () => {
                   <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Doctor ID</th>
                   <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Doctor</th>
                   <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Specialty</th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Status</th>
                   <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Action</th>
                 </tr>
               </thead>
@@ -113,6 +114,7 @@ const Doctors = () => {
                       </div>
                     </td>
                     <td className="p-3 text-[#094A4D]">{doctor.specialization}</td>
+                    <td className="p-3 text-[#094A4D]">{doctor.status ? "Active" : "Inactive"}</td>
                     <td className="p-3">
                       <Link href={`/Admin/DoctorDetailPage/${doctor.doctorId}`}>
                         <button className="px-4 py-2 text-[#094A4D] cursor-pointer rounded ">
