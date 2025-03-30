@@ -75,7 +75,7 @@ export default function DoctorDetails({ doctorID }) {
     <div className="p-8 border-15 border-[#E9FAF2]">
       <h1 className="text-3xl font-bold mb-2">
         {doctor.doctor.doctorId} - {doctor.doctor.firstName}{" "}
-        {doctor.doctor.lastName}
+        {doctor.doctor.lastName} - {doctor.doctor.specialization}.
         <span
           className={`font-semibold text-lg flex items-center gap-2 ${
             doctor.doctor.status ? "text-green-500" : "text-red-500"
