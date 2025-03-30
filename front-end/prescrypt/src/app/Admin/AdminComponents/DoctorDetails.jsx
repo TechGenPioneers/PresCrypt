@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 export default function DoctorDetails({ doctorID }) {
   const [doctor, setDoctor] = useState(null);
   const [dateTime, setDateTime] = useState(null);
+  const [isDoctorNull, setIsDoctorNull] = useState(false);
   const router = useRouter();
   useEffect(() => {
     const fetchDoctor = async () => {
@@ -43,19 +44,27 @@ export default function DoctorDetails({ doctorID }) {
 
   if (!doctor) {
     return (
-      <div className="text-center min-h-screen m-10 ">
-        <p className="mb-10 text-2xl text-red-400">Doctor not found.</p>
-        <Link href="/Admin/AdminDoctor">
-        <button 
-         className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
+      <div className="h-[650px] p-8 border-15 border-[#E9FAF2]">
+        <h1 className="text-3xl font-bold mb-2"> Doctor Details</h1>
+        <div className="h-[400px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
+          
+          <div className="flex-grow flex items-center justify-center">
+              <p className="text-red-400 font-bold text-xl text-center mb-5">
+              Doctor not found
+              </p>
+            </div>
+          <Link href="/Admin/AdminDoctor">
+            <button
+              className="w-full ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
           hover:bg-[#91B4B8] transition duration-300 cursor-pointer"
-        >
-          Go to Doctor List
-        </button>
-        </Link>
+            >
+              Go to Doctor List
+            </button>
+          </Link>
+        </div>
       </div>
     );
-  }  
+  }
 
   const handleManageDoctor = () => {
     localStorage.setItem("doctor", JSON.stringify(doctor));
@@ -84,7 +93,7 @@ export default function DoctorDetails({ doctorID }) {
       <div className="grid col-span-1 justify-end">
         <button
           className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
-          hover:bg-[#91B4B8] transition duration-300 "
+          hover:bg-[#91B4B8] transition duration-300 cursor-pointer"
           onClick={handleManageDoctor}
         >
           Manage Doctor

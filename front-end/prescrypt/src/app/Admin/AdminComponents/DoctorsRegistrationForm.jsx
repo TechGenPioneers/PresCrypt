@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { AddNewDoctor, GetHospitals } from "../service/AdminService";
-import { Hospital } from "lucide-react";
 
 export default function DoctorRegistrationForm() {
   const [schedule, setSchedule] = useState([]);
@@ -23,6 +22,8 @@ export default function DoctorRegistrationForm() {
     HospitalId: "",
     HospitalName: "",
   });
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(" ");
   const [hospitalsData, setHospitalsData] = useState([]);
   const [input, setInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -183,13 +184,14 @@ export default function DoctorRegistrationForm() {
       try {
         const newDoctorDetails = await AddNewDoctor(newDoctor, schedule);
         console.log(newDoctorDetails);
-        alert("Doctor Registered Successfully!");
       } catch (err) {
         console.error("Failed to add the doctor", err);
         alert("Failed to add the doctor!", err);
       }
       setSchedule([]);
       setErrorMessage("");
+      setIsSubmitted(true);
+      setSuccessMessage("Doctor Registered Successfully!");
     } else {
       console.log("time slots empty");
       setErrorMessage("Please select available time");
@@ -234,6 +236,7 @@ export default function DoctorRegistrationForm() {
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">Doctor Registration</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
+      {!isSubmitted ? (
       <div className="mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-[100%]">
         <form onSubmit={handleSubmit}>
           {/* Text Inputs */}
@@ -320,6 +323,7 @@ export default function DoctorRegistrationForm() {
                     name="Gender"
                     value="Male"
                     onChange={handleGenderChange}
+                    checked={newDoctor.Gender === "Male"}
                     className="mr-2 bg-[#007e8556] cursor-pointer"
                   />
                   <label htmlFor="male" className="font-small text-[#5E6767]">
@@ -334,6 +338,7 @@ export default function DoctorRegistrationForm() {
                     name="Gender"
                     value="Female"
                     onChange={handleGenderChange}
+                    checked={newDoctor.Gender === "Female"}
                     className="mr-2 bg-[#007e8556] cursor-pointer"
                   />
                   <label htmlFor="female" className="font-small text-[#5E6767]">
@@ -527,6 +532,20 @@ export default function DoctorRegistrationForm() {
           </div>
         </form>
       </div>
+       ) : (
+        <div className="h-[500px] ">
+          <div className="h-[500px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
+            <h1 className="text-2xl font-bold text-center mb-2">
+              Add data status
+            </h1>
+            <div className="flex-grow flex items-center justify-center">
+              <p className="text-green-600 font-bold text-xl text-center mb-5">
+                {successMessage}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="mt-6 text-gray-500 text-right">
         <p>{formattedDate}</p>
         <p>{formattedTime}</p>
