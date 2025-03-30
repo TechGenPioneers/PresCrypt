@@ -1,12 +1,13 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { GetDoctorById } from "../service/AdminService";
+import { useRouter } from "next/navigation";
 
 export default function DoctorDetails({ doctorID }) {
   const [doctor, setDoctor] = useState(null);
   const [dateTime, setDateTime] = useState(null);
-
+  const router = useRouter();
   useEffect(() => {
     const fetchDoctor = async () => {
       const getDoctor = await GetDoctorById(doctorID);
@@ -40,19 +41,51 @@ export default function DoctorDetails({ doctorID }) {
     hour12: true,
   });
 
-  if (!doctor) return <p className="text-center">Doctor not found.</p>;
+  if (!doctor) {
+    return (
+      <div className="text-center min-h-screen m-10 ">
+        <p className="mb-10 text-2xl text-red-400">Doctor not found.</p>
+        <Link href="/Admin/AdminDoctor">
+        <button 
+         className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
+          hover:bg-[#91B4B8] transition duration-300 cursor-pointer"
+        >
+          Go to Doctor List
+        </button>
+        </Link>
+      </div>
+    );
+  }  
+
+  const handleManageDoctor = () => {
+    localStorage.setItem("doctor", JSON.stringify(doctor));
+    router.push("/Admin/ManageDoctorPage");
+  };
 
   return (
     <div className="p-8 border-15 border-[#E9FAF2]">
       <h1 className="text-3xl font-bold mb-2">
-        {doctor.doctor.doctorId} - {doctor.doctor.firstName} {doctor.doctor.lastName}
+        {doctor.doctor.doctorId} - {doctor.doctor.firstName}{" "}
+        {doctor.doctor.lastName}
+        <span
+          className={`font-semibold text-lg flex items-center gap-2 ${
+            doctor.doctor.status ? "text-green-500" : "text-red-500"
+          }`}
+        >
+          <span
+            className={`w-3 h-3 rounded-full ${
+              doctor.doctor.status ? "bg-green-500" : "bg-red-500"
+            }`}
+          ></span>
+          {doctor.doctor.status ? "Active" : "Inactive"}
+        </span>
       </h1>
-      <p className="text-gray-500">{formattedDate}</p>
 
       <div className="grid col-span-1 justify-end">
         <button
           className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
           hover:bg-[#91B4B8] transition duration-300 "
+          onClick={handleManageDoctor}
         >
           Manage Doctor
         </button>
@@ -109,12 +142,6 @@ export default function DoctorDetails({ doctorID }) {
             </p>
           </div>
           <div className="flex gap-1.5 m-1">
-            <h1 className="font-semibold">Status:</h1>{" "}
-            <p className="text-gray-600">
-              {doctor.doctor.status ? "Active" : "Inactive"}
-            </p>
-          </div>
-          <div className="flex gap-1.5 m-1">
             <h1 className="font-semibold">Created At:</h1>{" "}
             <p className="text-gray-600">{doctor.doctor.createdAt}</p>
           </div>
@@ -134,16 +161,17 @@ export default function DoctorDetails({ doctorID }) {
 
         {/* Availability */}
         <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md w-2/3">
-  <h3 className="font-semibold mb-2">Availability:</h3>
-  <ul className="list-disc pl-5">
-    {doctor.availability.map((slot, index) => (
-      <li key={index} className="text-gray-700 pt-2">
-        <span className="font-bold">{slot.day}</span>: {slot.startTime} - {slot.endTime} at <span className="font-bold">{slot.hospitalName}</span>
-      </li>
-    ))}
-  </ul>
-</div>
-
+          <h3 className="font-semibold mb-2">Availability:</h3>
+          <ul className="list-disc pl-5">
+            {doctor.availability.map((slot, index) => (
+              <li key={index} className="text-gray-700 pt-2">
+                <span className="font-bold">{slot.day}</span>: {slot.startTime}{" "}
+                - {slot.endTime} at{" "}
+                <span className="font-bold">{slot.hospitalName}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className="mt-6 text-gray-500 text-right">

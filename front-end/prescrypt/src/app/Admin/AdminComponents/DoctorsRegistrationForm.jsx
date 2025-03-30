@@ -14,6 +14,7 @@ export default function DoctorRegistrationForm() {
     ContactNumber: "",
     NIC: "",
     Gender: "",
+    Description: "",
   });
   const [availableData, setAvailableData] = useState({
     availability: [],
@@ -162,7 +163,7 @@ export default function DoctorRegistrationForm() {
         startTime: "",
         endTime: "",
         HospitalId: "",
-        HospitalName:"",
+        HospitalName: "",
       });
 
       setNewDoctor({
@@ -174,6 +175,7 @@ export default function DoctorRegistrationForm() {
         ContactNumber: "",
         Gender: "",
         NIC: "",
+        Description: "",
       });
 
       //send new doctor details into backend
@@ -254,7 +256,7 @@ export default function DoctorRegistrationForm() {
                 value={newDoctor.LastName}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
@@ -264,7 +266,7 @@ export default function DoctorRegistrationForm() {
                 value={newDoctor.specialization}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
@@ -274,7 +276,7 @@ export default function DoctorRegistrationForm() {
                 value={newDoctor.SlmcLicense}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
@@ -284,7 +286,7 @@ export default function DoctorRegistrationForm() {
                 value={newDoctor.NIC}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
@@ -294,7 +296,7 @@ export default function DoctorRegistrationForm() {
                 value={newDoctor.ContactNumber}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
@@ -304,12 +306,12 @@ export default function DoctorRegistrationForm() {
                 value={newDoctor.Email}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
             </div>
             <div>
-              <label className="block font-semibold mb-2">Gender:</label>
+              <label className="block font-semibold mb-2 mt-1.5">Gender:</label>
               <div className="grid grid-cols-2 gap-2 items-center mt-2">
                 <div className="ml-3">
                   <input
@@ -334,7 +336,9 @@ export default function DoctorRegistrationForm() {
                     onChange={handleGenderChange}
                     className="mr-2 bg-[#007e8556] cursor-pointer"
                   />
-                  <label htmlFor="female" className="font-small text-[#5E6767]">Female</label>
+                  <label htmlFor="female" className="font-small text-[#5E6767]">
+                    Female
+                  </label>
                 </div>
               </div>
               {/* Availability */}
@@ -498,6 +502,17 @@ export default function DoctorRegistrationForm() {
               </tbody>
             </table>
           </div>
+          <textarea
+            name="Description"
+            placeholder="Description"
+            value={newDoctor.Description}
+            onChange={handleChange}
+            className="w-full  p-2 bg-white border border-gray-300 rounded-md
+  focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
+            required
+            rows="4" 
+          ></textarea>
+
           {/* Submit Button */}
           <div className="mt-5 w-[100%]">
             <p className="text-red-500 font-bold text-center mb-5">

@@ -23,6 +23,39 @@ const AddNewDoctor = async (doctors,schedule) => {
         throw error;
     }
 }
+
+//update doctor
+const UpdateDoctor = async (doctors,schedule) => {
+  const requestData = {
+      doctor: doctors,       
+      availability: schedule
+    };
+  console.log("Save Doctor.......................................",requestData)
+  try{
+      const response = await axios.patch(
+          AddDoctorURL,
+          requestData
+      );
+      console.log(response.data)
+      return response.data;
+  }
+  catch(error){
+      console.error("Failed to get the data",error);
+      throw error;
+  }
+}
+
+//delete doctor
+const DeleteDoctor = async (doctorId) => {
+  try{
+    const response = await axios.delete(`${AddDoctorURL}/${doctorId}`);
+    return response.data;
+  }catch(error){
+    console.error("Failed to delete the doctor",error);
+    throw error;
+  }
+}
+
 //get all doctors
 const GetDoctors = async () => {
     //get the doctors
@@ -56,4 +89,4 @@ const GetDoctorById = async (doctorId) => {
          throw error
        }
  }
-export{AddNewDoctor,GetDoctors,GetHospitals,GetDoctorById}
+export{AddNewDoctor,GetDoctors,GetHospitals,GetDoctorById,UpdateDoctor,DeleteDoctor}
