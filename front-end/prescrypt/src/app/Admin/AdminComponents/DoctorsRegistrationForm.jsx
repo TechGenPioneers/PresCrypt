@@ -1,32 +1,30 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AddNewDoctor } from "../service/AdminService";
+import { AddNewDoctor, GetHospitals } from "../service/AdminService";
 
 export default function DoctorRegistrationForm() {
   const [schedule, setSchedule] = useState([]);
   const [newDoctor, setNewDoctor] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
+    FirstName: "",
+    LastName: "",
+    Email: "",
     specialization: "",
-    slmcLicense: "",
-    contactNumber: "",
-    nic:"",
+    SlmcLicense: "",
+    ContactNumber: "",
+    NIC: "",
+    Gender: "",
+    Description: "",
   });
   const [availableData, setAvailableData] = useState({
     availability: [],
     startTime: "",
     endTime: "",
-    hospital: "",
+    HospitalId: "",
+    HospitalName: "",
   });
-
-  //set hospital
-  const Hospitals = [
-    "Asiri Hospital",
-    "Nawaloka Hospital",
-    "Lanka Hospital",
-    "Hemas",
-  ];
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(" ");
+  const [hospitalsData, setHospitalsData] = useState([]);
   const [input, setInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -35,7 +33,7 @@ export default function DoctorRegistrationForm() {
   //set error message
   const [errorMessage, setErrorMessage] = useState(" ");
   const [timeErrorMessage, setTimeErrorMessage] = useState(" ");
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewDoctor({ ...newDoctor, [name]: value });
@@ -50,6 +48,14 @@ export default function DoctorRegistrationForm() {
         : [...prev.availability, day],
     }));
   };
+  //handle gender
+  const handleGenderChange = (event) => {
+    setNewDoctor((prevDoctor) => ({
+      ...prevDoctor,
+      Gender: event.target.value,
+    }));
+  };
+
   //set available data
   const handleTime = (e) => {
     const { name, value } = e.target;
@@ -62,13 +68,15 @@ export default function DoctorRegistrationForm() {
       availableData.availability.length > 0 &&
       availableData.startTime &&
       availableData.endTime &&
-      availableData.hospital
+      availableData.HospitalId &&
+      availableData.HospitalName
     ) {
       const newSchedule = availableData.availability.map((day) => ({
         day,
         startTime: availableData.startTime,
         endTime: availableData.endTime,
-        hospital: availableData.hospital,
+        HospitalId: availableData.HospitalId,
+        HospitalName: availableData.HospitalName,
       }));
 
       // Check if start time is before end time
@@ -83,7 +91,7 @@ export default function DoctorRegistrationForm() {
             existing.day === newItem.day &&
             existing.startTime === newItem.startTime &&
             existing.endTime === newItem.endTime &&
-            existing.hospital === newItem.hospital
+            existing.HospitalId === newItem.HospitalId
         )
       );
 
@@ -93,7 +101,8 @@ export default function DoctorRegistrationForm() {
           availability: [],
           startTime: "",
           endTime: "",
-          hospital: "",
+          HospitalId: "",
+          HospitalName: "",
         });
         setErrorMessage("");
       } else {
@@ -121,10 +130,10 @@ export default function DoctorRegistrationForm() {
     }
 
     // Filter hospitals (avoid duplicates)
-    const filtered = Hospitals.filter(
+    const filtered = hospitalsData.filter(
       (hospital) =>
-        hospital.toLowerCase().includes(value.toLowerCase()) &&
-        availableData.hospital !== hospital // Prevent duplicate selection
+        hospital.hospitalName.toLowerCase().includes(value.toLowerCase()) &&
+        availableData.HospitalName !== hospital.hospitalName // Prevent duplicate selection
     );
 
     setSuggestions(filtered.length > 0 ? filtered : [`Use "${value}"`]);
@@ -132,11 +141,12 @@ export default function DoctorRegistrationForm() {
   };
 
   // Handle selecting a hospital
-  const handleSelectHospital = (value) => {
+  const handleSelectHospital = (value, Id) => {
     const hospitalName = value.replace('Use "', "").replace('"', "");
     setAvailableData((prev) => ({
       ...prev,
-      hospital: hospitalName,
+      HospitalName: hospitalName,
+      HospitalId: Id,
     }));
     setInput("");
     setShowSuggestions(false);
@@ -152,32 +162,36 @@ export default function DoctorRegistrationForm() {
       setAvailableData({
         availability: [],
         startTime: "",
-        endTime:"",
-        hospital: "",
+        endTime: "",
+        HospitalId: "",
+        HospitalName: "",
       });
 
       setNewDoctor({
-        firstName: "",
-        lastName: "",
-        email: "",
+        FirstName: "",
+        LastName: "",
+        Email: "",
         specialization: "",
-        slmcLicense: "",
-        contactNumber: "",
-        nic:"",
+        SlmcLicense: "",
+        ContactNumber: "",
+        Gender: "",
+        NIC: "",
+        Description: "",
       });
 
       //send new doctor details into backend
-      console.log("Before sending Data --->", newDoctor,schedule)
+      console.log("Before sending Data --->", newDoctor, schedule);
       try {
         const newDoctorDetails = await AddNewDoctor(newDoctor, schedule);
         console.log(newDoctorDetails);
-        alert("Doctor Registered Successfully!");
       } catch (err) {
         console.error("Failed to add the doctor", err);
         alert("Failed to add the doctor!", err);
       }
       setSchedule([]);
       setErrorMessage("");
+      setIsSubmitted(true);
+      setSuccessMessage("Doctor Registered Successfully!");
     } else {
       console.log("time slots empty");
       setErrorMessage("Please select available time");
@@ -185,10 +199,17 @@ export default function DoctorRegistrationForm() {
   };
 
   useEffect(() => {
-    const updateDateTime = () => setDateTime(new Date());
-    updateDateTime(); // Set initial time
-    const interval = setInterval(updateDateTime, 1000);
-    return () => clearInterval(interval);
+    const loadData = async () => {
+      const HospitalDetails = await GetHospitals();
+      console.log(HospitalDetails);
+      setHospitalsData(HospitalDetails); // Set doctor data as an array
+
+      const updateDateTime = () => setDateTime(new Date());
+      updateDateTime(); // Set initial time
+      const interval = setInterval(updateDateTime, 1000);
+      return () => clearInterval(interval);
+    };
+    loadData();
   }, []);
 
   // set date and time
@@ -215,6 +236,7 @@ export default function DoctorRegistrationForm() {
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">Doctor Registration</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
+      {!isSubmitted ? (
       <div className="mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-[100%]">
         <form onSubmit={handleSubmit}>
           {/* Text Inputs */}
@@ -222,9 +244,9 @@ export default function DoctorRegistrationForm() {
             <div>
               <input
                 type="text"
-                name="firstName"
+                name="FirstName"
                 placeholder="First Name"
-                value={newDoctor.firstName}
+                value={newDoctor.FirstName}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
@@ -232,12 +254,12 @@ export default function DoctorRegistrationForm() {
               />
               <input
                 type="text"
-                name="lastName"
+                name="LastName"
                 placeholder="Last Name"
-                value={newDoctor.lastName}
+                value={newDoctor.LastName}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
@@ -247,52 +269,83 @@ export default function DoctorRegistrationForm() {
                 value={newDoctor.specialization}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
                 type="text"
-                name="slmcLicense"
+                name="SlmcLicense"
                 placeholder="SLMC License Number"
-                value={newDoctor.slmcLicense}
+                value={newDoctor.SlmcLicense}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
                 type="text"
-                name="nic"
+                name="NIC"
                 placeholder="NIC"
-                value={newDoctor.nic}
+                value={newDoctor.NIC}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
                 type="text"
-                name="contactNumber"
+                name="ContactNumber"
                 placeholder="Contact Number"
-                value={newDoctor.contactNumber}
+                value={newDoctor.ContactNumber}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
               <input
                 type="email"
-                name="email"
+                name="Email"
                 placeholder="Email"
-                value={newDoctor.email}
+                value={newDoctor.Email}
                 onChange={handleChange}
                 className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
                 required
               />
             </div>
             <div>
+              <label className="block font-semibold mb-2 mt-1.5">Gender:</label>
+              <div className="grid grid-cols-2 gap-2 items-center mt-2">
+                <div className="ml-3">
+                  <input
+                    type="radio"
+                    id="male"
+                    name="Gender"
+                    value="Male"
+                    onChange={handleGenderChange}
+                    checked={newDoctor.Gender === "Male"}
+                    className="mr-2 bg-[#007e8556] cursor-pointer"
+                  />
+                  <label htmlFor="male" className="font-small text-[#5E6767]">
+                    Male
+                  </label>
+                </div>
 
+                <div className="ml-3">
+                  <input
+                    type="radio"
+                    id="female"
+                    name="Gender"
+                    value="Female"
+                    onChange={handleGenderChange}
+                    checked={newDoctor.Gender === "Female"}
+                    className="mr-2 bg-[#007e8556] cursor-pointer"
+                  />
+                  <label htmlFor="female" className="font-small text-[#5E6767]">
+                    Female
+                  </label>
+                </div>
+              </div>
               {/* Availability */}
               {/* checkboxes */}
               <label className="block font-semibold mb-2 mt-2">
@@ -324,19 +377,18 @@ export default function DoctorRegistrationForm() {
               </div>
 
               <div className="mb-4">
-                <div
-                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5"
-                >
+                <div className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5">
                   {/* Display Selected Hospital */}
-                  {availableData.hospital && (
+                  {availableData.HospitalId && (
                     <div className="bg-[#E9FAF2] text-[#09424D] px-2 rounded-md flex items-center ">
-                      {availableData.hospital}
+                      {availableData.HospitalName}
                       <span
                         className="ml-2 cursor-pointer text-red-400 font-bold "
                         onClick={() =>
                           setAvailableData((prev) => ({
                             ...prev,
-                            hospital: "",
+                            HospitalName: "",
+                            HospitalId: "",
                           }))
                         }
                       >
@@ -346,11 +398,11 @@ export default function DoctorRegistrationForm() {
                   )}
 
                   {/* Input Field */}
-                  {!availableData.hospital && (
+                  {!availableData.HospitalName && (
                     <input
                       type="text"
                       placeholder="Hospital"
-                      name="hospital"
+                      name="HospitalName"
                       value={input}
                       onChange={handleHospitalInputChange}
                       className="border-none outline-none flex-1"
@@ -366,9 +418,14 @@ export default function DoctorRegistrationForm() {
                       <div
                         key={index}
                         className="p-2 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => handleSelectHospital(hospital)}
+                        onClick={() =>
+                          handleSelectHospital(
+                            hospital.hospitalName,
+                            hospital.hospitalId
+                          )
+                        }
                       >
-                        {hospital}
+                        {hospital.hospitalName}
                       </div>
                     ))}
                   </div>
@@ -396,8 +453,8 @@ export default function DoctorRegistrationForm() {
                 />
               </div>
               <p className="text-red-500 font-bold text-center my-5">
-              {timeErrorMessage}
-            </p>
+                {timeErrorMessage}
+              </p>
               <div className="mt-3 w-[100%]">
                 <button
                   type="button"
@@ -418,7 +475,8 @@ export default function DoctorRegistrationForm() {
                   <th className="p-2">Day</th>
                   <th className="p-2">Start Time</th>
                   <th className="p-2">End Time</th>
-                  <th className="p-2">Hospital</th>
+                  <th className="p-2">Hospital Name</th>
+                  <th className="p-2">Hospital Id</th>
                   <th className="p-2">Action</th>
                 </tr>
               </thead>
@@ -433,7 +491,8 @@ export default function DoctorRegistrationForm() {
                     <td className="p-2 text-center">{slot.day}</td>
                     <td className="p-2 text-center">{slot.startTime}</td>
                     <td className="p-2 text-center">{slot.endTime}</td>
-                    <td className="p-2 text-center">{slot.hospital}</td>
+                    <td className="p-2 text-center">{slot.HospitalName}</td>
+                    <td className="p-2 text-center">{slot.HospitalId}</td>
                     <td className="p-2 text-center">
                       <button
                         type="button"
@@ -448,6 +507,17 @@ export default function DoctorRegistrationForm() {
               </tbody>
             </table>
           </div>
+          <textarea
+            name="Description"
+            placeholder="Description"
+            value={newDoctor.Description}
+            onChange={handleChange}
+            className="w-full  p-2 bg-white border border-gray-300 rounded-md
+  focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
+            required
+            rows="4" 
+          ></textarea>
+
           {/* Submit Button */}
           <div className="mt-5 w-[100%]">
             <p className="text-red-500 font-bold text-center mb-5">
@@ -462,6 +532,20 @@ export default function DoctorRegistrationForm() {
           </div>
         </form>
       </div>
+       ) : (
+        <div className="h-[500px] ">
+          <div className="h-[500px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
+            <h1 className="text-2xl font-bold text-center mb-2">
+              Add data status
+            </h1>
+            <div className="flex-grow flex items-center justify-center">
+              <p className="text-green-600 font-bold text-xl text-center mb-5">
+                {successMessage}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="mt-6 text-gray-500 text-right">
         <p>{formattedDate}</p>
         <p>{formattedTime}</p>

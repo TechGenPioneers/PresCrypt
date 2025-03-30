@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { MoveLeft } from "lucide-react";
 
 // Sample Data
@@ -62,12 +63,14 @@ const DoctorRequestDetails = () => {
       <p className="text-gray-500">{formattedDate}</p>
       <div className="mt-5 mb-10 justify-start">
         <button className="cursor-pointer">
+          <Link href="/Admin/DoctorRequest">
           <MoveLeft
             size={30}
             width={40}
             strokeWidth={4.5}
             absoluteStrokeWidth
           />
+          </Link>
         </button>
       </div>
       <div className="flex mt-6 space-x-6 justify-center">

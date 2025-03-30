@@ -1,42 +1,31 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { GetDoctors } from "../service/AdminService";
 
 const Doctors = () => {
-  const [dateTime, setDateTime] = useState(null);
+  const [dateTime, setDateTime] = useState(new Date()); // Initialize dateTime
   const [searchQuery, setSearchQuery] = useState("");
-  const [bookData, setBookData] = useState([]);
+  const [doctorData, setDoctorData] = useState([]); // Initialize as an array
 
-  //add useEffect to load Table
-  //   useEffect(() => {
-  //     const loadData = async () => {
-  //         const doctorDetails = await GetDoctors()
-  //         console.log(doctorDetails)
-  //         setBookData(doctorDetails)
-  //     }
-  //     loadData();
-  // }, [])
-  
-  // Sample Doctor Data
-
-  const doctors = [
-    { id: "D001", name: "Dr. Nimal Perera", specialty: "Cardiology" },
-    { id: "D002", name: "Dr. Hiruni Silva", specialty: "Neurology" },
-    { id: "D003", name: "Dr. Sunil Fernando", specialty: "Pediatrics" },
-    { id: "D004", name: "Dr. Kamal De Silva", specialty: "Dermatology" },
-    { id: "D005", name: "Dr. Sanduni Weerasinghe", specialty: "Oncology" },
-  ];
-
+  // UseEffect to load doctor data
   useEffect(() => {
-    const updateDateTime = () => setDateTime(new Date());
-    updateDateTime(); // Set initial time
-    const interval = setInterval(updateDateTime, 1000);
-    return () => clearInterval(interval);
+    const loadData = async () => {
+      const doctorDetails = await GetDoctors();
+      console.log(doctorDetails); 
+      setDoctorData(doctorDetails); // Set doctor data as an array
+
+      const updateDateTime = () => setDateTime(new Date());
+      updateDateTime(); // Set initial time
+      const interval = setInterval(updateDateTime, 1000);
+      return () => clearInterval(interval);
+    };
+    loadData();
   }, []);
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
-  // Date Formatting
+  // Date and Time Formatting
   const formattedDate = dateTime.toLocaleDateString("en-GB", {
     weekday: "long",
     day: "numeric",
@@ -44,7 +33,6 @@ const Doctors = () => {
     year: "numeric",
   });
 
-  // Time Formatting
   const formattedTime = dateTime.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
@@ -53,10 +41,10 @@ const Doctors = () => {
   });
 
   // Filtering doctors based on search input
-  const filteredDoctors = doctors.filter(
+  const filteredDoctors = doctorData.filter(
     (doctor) =>
-      doctor.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doctor.name.toLowerCase().includes(searchQuery.toLowerCase())
+      doctor.doctorId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      `${doctor.firstName} ${doctor.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -65,7 +53,7 @@ const Doctors = () => {
       <h1 className="text-2xl font-bold mb-2">Doctors</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
 
-      {/* Search Input  and Button*/}
+      {/* Search Input and Button */}
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <input
@@ -79,11 +67,9 @@ const Doctors = () => {
 
           <button
             className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
-          hover:bg-[#91B4B8] transition duration-300 "
+          hover:bg-[#91B4B8] transition duration-300"
           >
-            <Link href="/Admin/DoctorRegistrationForm">
-            Add New Doctor
-            </Link>
+            <Link href="/Admin/DoctorRegistrationForm">Add New Doctor</Link>
           </button>
         </div>
       </div>
@@ -95,48 +81,44 @@ const Doctors = () => {
             <table className="w-full border-collapse">
               <thead className="sticky top-0 bg-[#B5D9DB]">
                 <tr className="text-[#094A4D]">
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Doctor ID
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Doctor
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Specialty
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Action
-                  </th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Doctor ID</th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Doctor</th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Specialty</th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Action</th>
                 </tr>
               </thead>
 
               <tbody>
                 {filteredDoctors.map((doctor, index) => (
                   <tr
-                    key={doctor.id}
+                    key={doctor.doctorId}
                     className={`border-t ${
                       index % 2 === 0 ? "bg-[#E9FAF2]" : "bg-[#ffffff]"
                     }`}
                   >
-                    <td className="p-3 text-[#094A4D]">{doctor.id}</td>
+                    <td className="p-3 text-[#094A4D]">{doctor.doctorId}</td>
                     <td className="p-3 flex items-center space-x-3">
                       <img
-                        src="/profile2.png"
+                        src={doctor.profilePhoto || "/profile2.png"} // Use profilePhoto if available
                         alt="Avatar"
                         className="w-10 h-10 rounded-full"
                       />
+                      <div>
                       <span className="font-semibold text-[#094A4D]">
-                        {doctor.name}
+                        {doctor.firstName} {doctor.lastName}
                       </span>
+                        <p className="text-[#094A4D] text-sm">
+                          {doctor.gender}
+                        </p>
+                      </div>
                     </td>
-                    <td className="p-3 text-[#094A4D]">{doctor.specialty}</td>
+                    <td className="p-3 text-[#094A4D]">{doctor.specialization}</td>
                     <td className="p-3">
-                      <button
-                        onClick={() => router.push(`${doctor.id}`)}
-                        className="px-4 py-2 text-[#094A4D] cursor-pointer rounded "
-                      >
-                        View
-                      </button>
+                      <Link href={`/Admin/DoctorDetailPage/${doctor.doctorId}`}>
+                        <button className="px-4 py-2 text-[#094A4D] cursor-pointer rounded ">
+                          View
+                        </button>
+                      </Link>
                     </td>
                   </tr>
                 ))}
