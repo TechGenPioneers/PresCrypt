@@ -41,38 +41,45 @@ const DoctorRequest = () => {
       name: "Dr.Shenali",
       gender: "Female",
       date: "2025-03-01",
+      specialization: "Cardiologist",
     },
     {
       id: "R002",
       name: "Jane Doe",
       gender: "Female",
       date: "2025-02-15",
+      specialization: "Dermatologist",
     },
     {
       id: "R003",
       name: "Alice Smith",
       gender: "Female",
       date: "2025-01-20",
+      specialization: "Pediatrician",
     },
     {
       id: "R004",
       name: "Bob Brown",
       gender: "Male",
       date: "2025-03-10",
+      specialization: "Orthopedic Surgeon",
     },
     {
       id: "R005",
       name: "Charlie White",
       gender: "Male",
       date: "2025-02-05",
+      specialization: "Neurologist",
     },
     {
       id: "P006",
       name: "Diana Green",
       gender: "Female",
       date: "2025-02-25",
+      specialization: "Psychiatrist",
     },
   ];
+
   return (
     <div className="p-6 border-15 border-[#E9FAF2] bg-white ">
       {/* Title */}
@@ -91,6 +98,9 @@ const DoctorRequest = () => {
                   </th>
                   <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
                     Doctor
+                  </th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
+                  specialization
                   </th>
                   <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
                     Request Date
@@ -121,15 +131,15 @@ const DoctorRequest = () => {
                         </p>
                       </div>
                     </td>
+                    <td className="p-3 text-[#094A4D]">{request.specialization}</td>
                     <td className="p-3 text-[#094A4D]">{request.date}</td>
+                    
                     <td className="p-3">
                       <button
                         // onClick={() => router.push(`/Admin/DoctorRequestDetailPage/${request.id}`)}
                         className="px-4 py-2 text-[#094A4D] cursor-pointer rounded "
                       >
-                        <Link href="/Admin/DoctorRequestDetailPage">
-                        View
-                        </Link>
+                        <Link href="/Admin/DoctorRequestDetailPage">View</Link>
                       </button>
                     </td>
                   </tr>
