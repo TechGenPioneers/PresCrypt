@@ -121,6 +121,10 @@ export default function DoctorDetails({ doctorID }) {
 
           {/* Doctor Details */}
           <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Doctor Fee:</h1>{" "}
+            <p className="text-gray-600">Rs.{doctor.doctor.charge}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
             <h1 className="font-semibold">Gender:</h1>{" "}
             <p className="text-gray-600">{doctor.doctor.gender}</p>
           </div>
