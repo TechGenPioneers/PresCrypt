@@ -15,11 +15,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 const locations = [
-  { district: "Battaramulla", hospitals: ["Nawaloka Hospital", "Santa Dora Hospital"] },
-  { district: "Maharagama", hospitals: ["Asia Hospital"] },
-  { district: "Colombo", hospitals: ["Durdans Hospital", "Asiri Surgical Hospital"] },
-  { district: "Thalawathugoda", hospitals: ["Hemas Hospital"] },
-  { district: "Athurugiriya", hospitals: ["Hemas Hospital"] },
+  { district: "Ratnapura", hospitals: ["Aloka Hospital", "Kingsbury Hospital"] },
+  { district: "Negombo", hospitals: ["Asia Hospital", "Co-Operative Hospital"] },
+  { district: "Colombo", hospitals: ["Durdans Hospital", "Asiri Surgical Hospital", "Asiri Central Hospital", "Lanka Hospitals PLC", "Nawaloka Hospitals PLC","Durdans Hospital","Ninewells Hospital (Pvt) Ltd"] },
+  { district: "Kegalle", hospitals: ["Arogya Hospital", "Osro Hospital"] },
+  { district: "Gampaha", hospitals: ["Hemas Hospital", "Arogya Hospitals (Pvt) Ltd", "Browns Hospitals"] },
+  { district: "Kandy", hospitals: ["Suwasewana Hospitals Pvt Ltd","Asiri Hospital Kandy (Pvt) Ltd"] },
 ];
 
 const LocationDialog = ({ open, handleClose, onSelect }) => {

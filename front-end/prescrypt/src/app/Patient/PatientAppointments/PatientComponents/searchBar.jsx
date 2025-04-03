@@ -1,5 +1,5 @@
+import { useState, useEffect } from "react";
 import axios from "axios";
-import React, { useState } from "react";
 import SpecializationDialog from "../PatientComponents/specializationBox";
 import LocationDialog from "../PatientComponents/locationSelectBox.jsx";
 import { CircularProgress } from "@mui/material"; // Import MUI CircularProgress
@@ -10,6 +10,7 @@ const SearchBar = ({ setDoctors }) => {
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [loading, setLoading] = useState(false);
+  const [hospitalCharge, setHospitalCharge] = useState(""); // State to hold hospital charge
 
   // This function is triggered when the "Find my Doctor" button is clicked
   const handleFindDoctor = async () => {
@@ -17,9 +18,9 @@ const SearchBar = ({ setDoctors }) => {
       alert("Please select both specialization and location.");
       return;
     }
-  
-    setLoading(true);  // Show loading spinner when fetching data
-  
+
+    setLoading(true); // Show loading spinner when fetching data
+
     try {
       const response = await axios.get("https://localhost:7021/api/Doctor/search", {
         params: {
@@ -27,16 +28,53 @@ const SearchBar = ({ setDoctors }) => {
           hospitalName: selectedLocation,
         },
       });
-  
+
       console.log("Fetched doctors:", response.data); // Debugging: Check the response data
-      setDoctors(response.data);  // Pass the fetched doctor data to the parent component's setDoctors
+      setDoctors(response.data); // Pass the fetched doctor data to the parent component's setDoctors
+
+      // Check if response.data has at least one doctor
+      if (response.data && response.data.length > 0) {
+        // Set hospital charge from the first doctor in the response data
+        setHospitalCharge(response.data[0].charge);
+        localStorage.setItem("hospitalCharge", response.data[0].charge); // Store in localStorage
+      }
+
+      
     } catch (error) {
       console.error("Error fetching doctors:", error);
       alert("Failed to fetch doctor details. Please try again.");
     } finally {
-      setLoading(false);  // Hide loading spinner
+      setLoading(false); // Hide loading spinner
     }
   };
+
+  // Clear localStorage and reset selected specialization and location on page refresh
+  useEffect(() => {
+    localStorage.removeItem("selectedSpecialization");
+    localStorage.removeItem("selectedLocation");
+
+    setSelectedSpecialization("");
+    setSelectedLocation("");
+  }, []); // Empty dependency array to run only once when component mounts
+
+  // Save selected specialization and location to localStorage when they change
+  useEffect(() => {
+    if (selectedSpecialization) {
+      localStorage.setItem("selectedSpecialization", selectedSpecialization);
+    }
+  }, [selectedSpecialization]);
+
+  useEffect(() => {
+    if (selectedLocation) {
+      localStorage.setItem("selectedLocation", selectedLocation);
+    }
+  }, [selectedLocation]);
+
+  useEffect(() => {
+    if (hospitalCharge) {
+      localStorage.setItem("hospitalCharge", hospitalCharge);
+    }
+  }, [hospitalCharge]);
 
   return (
     <div className="bg-[#E8F4F2] p-6 rounded-md">
@@ -70,12 +108,12 @@ const SearchBar = ({ setDoctors }) => {
           </button>
         </div>
       </div>
-      
+
       <SpecializationDialog
         open={specializationOpen}
         handleClose={() => setSpecializationOpen(false)}
         onSelect={(spec) => {
-          setSelectedSpecialization(spec);
+          setSelectedSpecialization(spec); // Update state
           setSpecializationOpen(false);
         }}
       />
@@ -84,7 +122,7 @@ const SearchBar = ({ setDoctors }) => {
         open={locationOpen}
         handleClose={() => setLocationOpen(false)}
         onSelect={(loc) => {
-          setSelectedLocation(loc);
+          setSelectedLocation(loc); // Update state
           setLocationOpen(false);
         }}
       />
