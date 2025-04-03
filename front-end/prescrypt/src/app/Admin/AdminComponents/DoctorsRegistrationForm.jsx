@@ -14,6 +14,7 @@ export default function DoctorRegistrationForm() {
     NIC: "",
     Gender: "",
     Description: "",
+    Charge: 0.00,
   });
   const [availableData, setAvailableData] = useState({
     availability: [],
@@ -177,6 +178,7 @@ export default function DoctorRegistrationForm() {
         Gender: "",
         NIC: "",
         Description: "",
+        Charge: 0.00,
       });
 
       //send new doctor details into backend
@@ -314,7 +316,17 @@ export default function DoctorRegistrationForm() {
               />
             </div>
             <div>
-              <label className="block font-semibold mb-2 mt-1.5">Gender:</label>
+            <input
+                  type="text"
+                  name="Charge"
+                  placeholder="Doctor Fee"
+                  value={newDoctor.Charge}
+                  onChange={handleChange}
+                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
+                  required
+                />
+              <label className="block font-semibold mb-2 mt-4">Gender:</label>
               <div className="grid grid-cols-2 gap-2 items-center mt-2">
                 <div className="ml-3">
                   <input
@@ -348,7 +360,7 @@ export default function DoctorRegistrationForm() {
               </div>
               {/* Availability */}
               {/* checkboxes */}
-              <label className="block font-semibold mb-2 mt-2">
+              <label className="block font-semibold mb-2 mt-3">
                 Availability:
               </label>
               <div className="grid grid-cols-2 gap-2">
