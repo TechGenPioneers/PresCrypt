@@ -30,6 +30,7 @@ const SearchBar = ({ setDoctors }) => {
       });
 
       console.log("Fetched doctors:", response.data); // Debugging: Check the response data
+      setDoctors(response.data); // Pass the fetched doctor data to the parent component's setDoctors
 
       // Check if response.data has at least one doctor
       if (response.data && response.data.length > 0) {
@@ -38,7 +39,7 @@ const SearchBar = ({ setDoctors }) => {
         localStorage.setItem("hospitalCharge", response.data[0].charge); // Store in localStorage
       }
 
-      setDoctors(response.data); // Pass the fetched doctor data to the parent component's setDoctors
+      
     } catch (error) {
       console.error("Error fetching doctors:", error);
       alert("Failed to fetch doctor details. Please try again.");

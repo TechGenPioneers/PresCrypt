@@ -15,6 +15,7 @@ const AdminNavBar = ({ patientId = "P021" }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
   const [profileImage, setProfileImage] = useState("/profile.png"); // Default placeholder image
+  const [patientName, setPatientName]= useState("User");
 
   const navItems = [
     { text: "Dashboard", image: "/image11.png", link: "/Patient/PatientDashboard" },
@@ -59,7 +60,7 @@ const AdminNavBar = ({ patientId = "P021" }) => {
             className="w-full h-full object-cover"
           />
         </div>
-        {isExpanded && <div className="mt-1">Nimal Perera</div>}
+        {isExpanded && <div className="mt-1">{patientName}</div>}
       </div>
 
       {/* Navigation Icons */}

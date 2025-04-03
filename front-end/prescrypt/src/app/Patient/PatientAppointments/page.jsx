@@ -26,25 +26,20 @@ export default function Appointments() {
               <p className="text-gray-500">No appointments found. Try another search.</p>
             ) : (
               doctors.map((doctor, index) => (
-                doctor.availableDates.map((availableDate, dateIndex) => (
-                  doctor.availableTimes.map((availableTime, timeIndex) => (
+                doctor.availableDay.map((availableDay, dateIndex) => (
+                  doctor.availableTime.map((availableTime, timeIndex) => (
                     <BookingCard
                       key={`${index}-${dateIndex}-${timeIndex}`} // Unique key
-                      doctorName={doctor.doctorName} // Corrected property name
-                      appointmentDate={availableDate.split("T")[0]} // Extract YYYY-MM-DD
-                      appointmentTime={availableTime} // Display available time
+                      firstName={doctor.firstName} // Use `firstName` instead of `doctorName`
+                      lastname ={doctor.lastName} // Use `lastName` instead of `doctorLastName`
+                      appointmentDay={availableDay} // Directly use availableDay
+                      appointmentTime={availableTime} // Use availableTime
                       imageUrl="https://png.pngtree.com/png-clipart/20240323/original/pngtree-professional-doctor-with-stethoscope-png-image_14666123.png"
                     />
                   ))
                 ))
               ))
             )}
-
-            {/* {doctors.length > 0 && (
-              <button className="bg-green-500 text-white py-3 px-6 rounded-md mt-10">
-                Load more
-              </button>
-            )} */}
           </div>
         </div>
       </div>

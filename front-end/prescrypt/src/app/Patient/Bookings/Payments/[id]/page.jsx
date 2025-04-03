@@ -22,6 +22,7 @@ function PaymentClient({ id }) {
     const specialization = localStorage.getItem("selectedSpecialization");
     const charge= localStorage.getItem("selectedCharge");
     const hospitalCharge=localStorage.getItem("hospitalCharge");
+    
 
     if (storedData) {
       setAppointmentData(JSON.parse(storedData));
@@ -44,7 +45,7 @@ function PaymentClient({ id }) {
   return (
     <div>
       <Header/>
-      <h1>This is payment for: {id}</h1>
+      <h1>This is payment for</h1>
 
       {appointmentData ? (
         <div>
