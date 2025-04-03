@@ -24,6 +24,7 @@ export default function ManageDoctor({ doctorData }) {
     Gender: "",
     Description: "",
     Status: "",
+    Charge: 0.0,
   });
   const [availableData, setAvailableData] = useState({
     availability: [],
@@ -225,6 +226,7 @@ export default function ManageDoctor({ doctorData }) {
           NIC: "",
           Description: "",
           Status: "",
+          Charge: 0.0,
         });
         setIsSubmitted(true);
         setSuccessMessage("Doctor Updated Successfully!");
@@ -274,6 +276,7 @@ export default function ManageDoctor({ doctorData }) {
         NIC: doctorData.doctor.nic,
         Description: doctorData.doctor.description,
         Status: doctorData.doctor.status,
+        Charge: doctorData.doctor.charge,
       });
 
       setSchedule(
@@ -361,6 +364,9 @@ export default function ManageDoctor({ doctorData }) {
             </div>
             <div className="grid grid-cols-2 gap-10">
               <div>
+                <label className="block font-semibold mb-2 mt-5">
+                  First Name:
+                </label>
                 <input
                   type="text"
                   name="FirstName"
@@ -368,9 +374,12 @@ export default function ManageDoctor({ doctorData }) {
                   value={newDoctor.FirstName}
                   onChange={handleChange}
                   className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-1.5"
                   required
                 />
+                <label className="block font-semibold mb-2 mt-3">
+                  Last Name:
+                </label>
                 <input
                   type="text"
                   name="LastName"
@@ -378,9 +387,12 @@ export default function ManageDoctor({ doctorData }) {
                   value={newDoctor.LastName}
                   onChange={handleChange}
                   className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
                   required
                 />
+                <label className="block font-semibold mb-2 mt-3">
+                  Specialization:
+                </label>
                 <input
                   type="text"
                   name="specialization"
@@ -388,9 +400,12 @@ export default function ManageDoctor({ doctorData }) {
                   value={newDoctor.specialization}
                   onChange={handleChange}
                   className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
                   required
                 />
+                <label className="block font-semibold mb-2 mt-3">
+                  SLMC License:
+                </label>
                 <input
                   type="text"
                   name="SlmcLicense"
@@ -398,9 +413,10 @@ export default function ManageDoctor({ doctorData }) {
                   value={newDoctor.SlmcLicense}
                   onChange={handleChange}
                   className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
                   required
                 />
+                <label className="block font-semibold mb-2 mt-3">NIC:</label>
                 <input
                   type="text"
                   name="NIC"
@@ -408,9 +424,12 @@ export default function ManageDoctor({ doctorData }) {
                   value={newDoctor.NIC}
                   onChange={handleChange}
                   className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
                   required
                 />
+                <label className="block font-semibold mb-2 mt-3">
+                  Contact Number:
+                </label>
                 <input
                   type="text"
                   name="ContactNumber"
@@ -418,9 +437,12 @@ export default function ManageDoctor({ doctorData }) {
                   value={newDoctor.ContactNumber}
                   onChange={handleChange}
                   className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
                   required
                 />
+              </div>
+              <div>
+                <label className="block font-semibold mb-2 mt-5">E Mail:</label>
                 <input
                   type="email"
                   name="Email"
@@ -428,14 +450,23 @@ export default function ManageDoctor({ doctorData }) {
                   value={newDoctor.Email}
                   onChange={handleChange}
                   className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-1.5"
                   required
                 />
-              </div>
-              <div>
-                <label className="block font-semibold mb-2 mt-1.5">
-                  Gender:
+                <label className="block font-semibold mb-2 mt-3">
+                  Doctor Fee:
                 </label>
+                <input
+                  type="text"
+                  name="Charge"
+                  placeholder="Doctor Fee"
+                  value={newDoctor.Charge}
+                  onChange={handleChange}
+                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
+                  required
+                />
+                <label className="block font-semibold mb-2 mt-2">Gender:</label>
                 <div className="grid grid-cols-2 gap-2 items-center mt-2">
                   <div className="ml-3">
                     <input
