@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
+import PrescriptionModal from "./PrescriptionModal";
 import axiosInstance from "../utils/axiosInstance";
 import { MoreHorizontal } from "lucide-react";
 import { format } from "date-fns";
@@ -15,6 +16,9 @@ export default function AppointmentsPage() {
   const [loading, setLoading] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [noAppointments, setNoAppointments] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [prescriptionText, setPrescriptionText] = useState("");
+  const [prescriptionFile, setPrescriptionFile] = useState(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -77,6 +81,33 @@ export default function AppointmentsPage() {
     return age;
   };
 
+  //functions for modal control and prescription upload
+
+  const openPrescriptionModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closePrescriptionModal = () => {
+    setIsModalOpen(false);
+    setPrescriptionText(""); // Clear text input
+    setPrescriptionFile(null); // Clear file input
+  };
+
+  const handlePrescriptionSubmit = (e) => {
+    e.preventDefault();
+
+    // Handle file upload or text submission logic here
+    if (prescriptionFile) {
+      console.log("File uploaded:", prescriptionFile);
+    }
+
+    if (prescriptionText) {
+      console.log("Prescription text:", prescriptionText);
+    }
+
+    closePrescriptionModal(); // Close modal after submission
+  };
+
   return (
     <div className="flex flex-col min-h-screen ml-32">
       <div className="flex flex-1">
@@ -134,7 +165,9 @@ export default function AppointmentsPage() {
                       <tr>
                         <th className="px-4 py-2 text-left">Patient ID</th>
                         <th className="px-4 py-2 text-left">Patient</th>
-                        <th className="px-4 py-2 text-left">Appointment Time</th>
+                        <th className="px-4 py-2 text-left">
+                          Appointment Time
+                        </th>
                         <th className="px-4 py-2 text-left">Hospital</th>
                         <th className="px-4 py-2 text-left">Status</th>
                         <th className="px-4 py-2 text-left">Actions</th>
@@ -211,7 +244,10 @@ export default function AppointmentsPage() {
                                     <button className="block p-3 text-left w-full hover:bg-white cursor-pointer border-b border-[#094A4D]">
                                       Reschedule
                                     </button>
-                                    <button className="block p-3 text-left w-full hover:bg-white cursor-pointer">
+                                    <button
+                                      className="block p-3 text-left w-full hover:bg-white cursor-pointer"
+                                      onClick={openPrescriptionModal}
+                                    >
                                       Add Prescription
                                     </button>
                                   </div>
@@ -232,6 +268,13 @@ export default function AppointmentsPage() {
                 </div>
               </div>
             )}
+
+            {/* Modal for Prescription */}
+            <PrescriptionModal
+              isOpen={isModalOpen}
+              onClose={closePrescriptionModal}
+              onSubmit={handlePrescriptionSubmit}
+            />
           </div>
         </div>
       </div>
