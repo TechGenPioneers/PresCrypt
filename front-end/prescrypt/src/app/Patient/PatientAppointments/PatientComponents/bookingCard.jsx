@@ -4,7 +4,7 @@ import AppointmentCard from "./AppointmentCard";
 const BookingCard = ({ doctorId, firstName, lastName,appointmentTime, appointmentDay, imageUrl }) => {
   const [openDialog, setOpenDialog] = useState(false);
 
-  // Function to save the appointment data to localStorage
+
   const saveAppointmentToLocalStorage = () => {
     const appointmentData = {
       doctorId,

@@ -31,7 +31,7 @@ export default function Appointments() {
                     <BookingCard
                       key={`${index}-${dateIndex}-${timeIndex}`} // Unique key
                       firstName={doctor.firstName} // Use `firstName` instead of `doctorName`
-                      lastname ={doctor.lastName} // Use `lastName` instead of `doctorLastName`
+                      lastName ={doctor.lastName} // Use `lastName` instead of `doctorLastName`
                       appointmentDay={availableDay} // Directly use availableDay
                       appointmentTime={availableTime} // Use availableTime
                       imageUrl="https://png.pngtree.com/png-clipart/20240323/original/pngtree-professional-doctor-with-stethoscope-png-image_14666123.png"

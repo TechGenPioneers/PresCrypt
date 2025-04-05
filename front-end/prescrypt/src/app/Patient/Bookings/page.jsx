@@ -1,10 +1,10 @@
 import React from 'react'
-
+//import PaymentClient from '../Bookings/Payments/[id]/PaymentClient';
 function Booking() {
   return (
     <div>
-        <h1>This is the Hello Page</h1>
-
+        
+      
     </div>
   )
 }
