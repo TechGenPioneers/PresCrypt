@@ -10,7 +10,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { useRouter } from "next/navigation";
 
-const AppointmentCard = ({ doctorId, firstName, lastName, appointmentTime,appointmentDay, charge, imageUrl, open, handleClose, specialization }) => {
+const AppointmentCard = ({ doctorId, firstName, lastName, appointmentTime,appointmentDay, imageUrl, open, handleClose, specialization }) => {
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -67,10 +67,22 @@ const AppointmentCard = ({ doctorId, firstName, lastName, appointmentTime,appoin
   }, [open, doctorId]);
 
   // Handle booking
-  const handleBooking = (selectedDate) => {
-    localStorage.setItem("selectedAppointment", JSON.stringify({ doctorId, firstName, selectedDate, appointmentTime }));
+  // Handle booking function
+const handleBooking = (selectedDate) => {
+  // Ensure doctorDetails is populated and charge is available
+  if (doctorDetails) {
+    localStorage.setItem("selectedAppointment", JSON.stringify({
+      doctorId, 
+      firstName, 
+      lastName,  // Include last name if needed
+      charge: doctorDetails.charge,  // Access charge from the doctorDetails
+      selectedDate, 
+      appointmentTime
+    }));
     router.push(`/Patient/Bookings/Payments/${firstName}`);
-  };
+  }
+};
+
 
   return (
     <Dialog
