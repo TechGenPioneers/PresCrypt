@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 
 const PaymentAtLocation = ({
   totalCharge,
@@ -9,6 +10,30 @@ const PaymentAtLocation = ({
   doctorName,
   selectedMethod,
 }) => {
+  const [checkbox1Checked, setCheckbox1Checked] = useState(false);
+  const [checkbox2Checked, setCheckbox2Checked] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleCheckbox1Change = (event) => {
+    setCheckbox1Checked(event.target.checked);
+  };
+
+  const handleCheckbox2Change = (event) => {
+    setCheckbox2Checked(event.target.checked);
+  };
+
+  const handleConfirmBooking = () => {
+    if (!checkbox1Checked || !checkbox2Checked) {
+      alert("Please mark both confirmations before proceeding.");
+    } else {
+      setDialogOpen(true);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
   return (
     <div className="w-full max-w-[600px] p-10 border-2 border-[#B9E9EC] rounded-md">
       <h3 className="underline font-semibold text-lg mb-4">Appointment Summary</h3>
@@ -49,7 +74,7 @@ const PaymentAtLocation = ({
         <p className="text-xs text-justify text-gray-600 mt-2">
           Be sure to be on time confirming your booking. You can do your payment at the above location
           on the appointed date and get treatments from your doctor. Further details emailed once you
-          confirm the booking. After that provide it at the reception and do the payments.
+          confirm the booking. After that, provide it at the reception and do the payments.
         </p>
       </div>
 
@@ -57,19 +82,45 @@ const PaymentAtLocation = ({
       {selectedMethod === "location" && (
         <div className="mt-6 space-y-3 text-sm text-gray-700">
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="accent-green-600" />
+            <input
+              type="checkbox"
+              className="accent-green-600"
+              checked={checkbox1Checked}
+              onChange={handleCheckbox1Change}
+            />
             I confirm that I read the appointment summary and try to attend on time.
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="accent-green-600" />
-            I am aware that not attending to the appointment without prior notice to the hospital may affect to my future bookings with PresCrypt.
+            <input
+              type="checkbox"
+              className="accent-green-600"
+              checked={checkbox2Checked}
+              onChange={handleCheckbox2Change}
+            />
+            I am aware that not attending the appointment without prior notice to the hospital may affect my future bookings with PresCrypt.
           </label>
         </div>
       )}
 
-      <button className="mt-6 bg-[#D3F2F1] text-black border-2 border-black rounded-md py-2 px-4 w-full font-semibold">
+      <button
+        className="mt-6 bg-[#D3F2F1] text-black border-2 border-black rounded-md py-2 px-4 w-full font-semibold"
+        onClick={handleConfirmBooking}
+      >
         Confirm the Booking
       </button>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>Booking Confirmation</DialogTitle>
+        <DialogContent>
+          <p>Your appointment has been successfully confirmed!</p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
