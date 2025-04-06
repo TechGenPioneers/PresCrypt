@@ -1,67 +1,92 @@
-"use client"; // Client Component
-
-import { useEffect, useState } from "react";
-import Header from "../../../../components/header/header";
-import Footer from "../../../../components/footer/footer";
-import NavBar from "../../../PatientAppointments/PatientComponents/navBar";
-import PaymentView from "../PaymentComponents/PaymentView";
+import React, { useState } from "react";
 import PaymentAtLocation from "../PaymentComponents/paymentAtLocation";
 
-function PaymentClient({ id }) {
-  const [appointmentData, setAppointmentData] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState("Remote Clinic");
-  const [selectedSpecialization, setSelectedSpecialization] = useState("Psycho");
-  const [charge, setCharge] = useState("Free of Charge");
-  const [hospitalCharge, setHospitalCharge] = useState("Free of Charge");
-  const [selectedDate, setSelectedDate] = useState(null);
+const PaymentView = ({
+  hospitalCharge,
+  doctorCharge,
+  hospital,
+  specialization,
+  appointmentDate,
+  appointmentTime,
+  doctorName,
+}) => {
+  const onlineFee = 200.0;
+  const hospitalFee = parseFloat(hospitalCharge) || 0;
+  const doctorFee = parseFloat(doctorCharge) || 0;
 
-  useEffect(() => {
-    const storedData = localStorage.getItem("selectedAppointment");
-    const hospital = localStorage.getItem("selectedLocation");
-    const specialization = localStorage.getItem("selectedSpecialization");
-    const charge = localStorage.getItem("selectedCharge");
-    const hospitalCharge = localStorage.getItem("hospitalCharge");
-    const selectedDate = localStorage.getItem("selectedDate");
+  const totalCharge = hospitalFee + doctorFee + onlineFee;
 
-    if (storedData) {
-      setAppointmentData(JSON.parse(storedData));
-    }
-    if (hospital) {
-      setSelectedLocation(hospital);
-    }
-    if (specialization) {
-      setSelectedSpecialization(specialization);
-    }
-    if (charge) {
-      setCharge(charge);
-    }
-    if (hospitalCharge) {
-      setHospitalCharge(hospitalCharge);
-    }
-    if (selectedDate) {
-      setSelectedDate(selectedDate);
-    }
-  }, [id]);
+  // ✅ Track selected payment method
+  const [selectedMethod, setSelectedMethod] = useState(null); // 'location' or 'online'
+
+  const buttonBaseClass =
+    "border-2 rounded-md py-2 px-6 font-semibold transition-colors duration-200";
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <NavBar />
-      <Header />
-      <main className="flex-grow">
-        <div className="flex justify-between gap-8 max-w-6xl mx-auto p-8">
-          {/* Left Section for Payment View */}
-          <div className="flex-1">
-            <PaymentView />
+    <div className="p-6 flex flex-wrap justify-between gap-8 w-full max-w-6xl mx-auto">
+      {/* Left Section */}
+      <div className="flex flex-col space-y-10 flex-1 min-w-[280px] max-w-[450px]">
+        {/* Payment Options */}
+        <div className="flex flex-col space-y-4">
+          <button
+            className={`${buttonBaseClass} ${
+              selectedMethod === "location"
+                ? "bg-green-200 border-green-600 text-green-800"
+                : "bg-white border-black text-black hover:bg-green-100 hover:border-green-600 hover:text-green-700"
+            }`}
+            onClick={() => setSelectedMethod("location")}
+          >
+            Pay at the Location
+          </button>
+          <button
+            className={`${buttonBaseClass} ${
+              selectedMethod === "online"
+                ? "bg-green-200 border-green-600 text-green-800"
+                : "bg-white border-black text-black hover:bg-green-100 hover:border-green-600 hover:text-green-700"
+            }`}
+            onClick={() => setSelectedMethod("online")}
+          >
+            Online payment
+          </button>
+        </div>
+
+        {/* Amount Box */}
+        <div className="border-2 border-[#B9E9EC] rounded-md p-6">
+          <h3 className="text-lg font-semibold mb-4">Total Amount</h3>
+          <div className="flex justify-between mb-2">
+            <span>Doctor Fee</span>
+            <span>Rs. {doctorFee}.00</span>
           </div>
-          {/* Right Section for Payment at Location */}
-          <div className="flex-1">
-            <PaymentAtLocation />
+          <div className="flex justify-between mb-2">
+            <span>Hospital Fee</span>
+            <span>Rs. {hospitalFee}.00</span>
+          </div>
+          <div className="flex justify-between mb-4">
+            <span>Online Handling Fee (PresCrypt)</span>
+            <span>{onlineFee}.00</span>
+          </div>
+          <div className="flex justify-between font-bold text-blue-700 text-lg">
+            <span>Total charges</span>
+            <span>Rs. {totalCharge}.00</span>
           </div>
         </div>
-      </main>
-      <Footer />
+      </div>
+
+      {/* Right Section */}
+      <div className="flex-1 min-w-[300px] max-w-[450px]">
+        {/* PaymentAtLocation Component */}
+        <PaymentAtLocation
+          totalCharge={totalCharge}
+          hospital={hospital}
+          specialization={specialization}
+          appointmentDate={appointmentDate}
+          doctorName={doctorName}
+          appointmentTime={appointmentTime}
+          selectedMethod={selectedMethod}
+        />
+      </div>
     </div>
   );
-}
+};
 
-export default PaymentClient;
+export default PaymentView;
