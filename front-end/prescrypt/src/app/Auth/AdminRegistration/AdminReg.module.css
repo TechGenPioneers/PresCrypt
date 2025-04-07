@@ -1,0 +1,158 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #ffffff;
+  }
+  
+  .registerBox {
+    display: flex;
+    background: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 900px;
+    width: 90%;
+    height: auto;
+    padding: 30px;
+    border: 1px solid #d3d3d3;
+  }
+  
+  .formSection {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #027373;
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+    color: #434242;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .inputGroup {
+    width: 100%;
+    margin-bottom: 15px;
+    position: relative;
+  }
+  
+  .input,
+  .inputError {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d3d3d3;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    transition: border 0.3s ease-in-out;
+  }
+  
+  .inputError {
+    background-color: #fff3f3;
+  }
+  
+  .input:focus {
+    border: 1px solid #99a140;
+    box-shadow: 0 0 5px rgba(0, 126, 133, 0.3);
+  }
+  
+  .errorMessage {
+    font-size: 12px;
+    color: red;
+    margin-top: 2px;
+    text-align: left;
+  }
+  
+  .registerBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007e852b;
+    color: #007e85;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .registerBtn:hover {
+    background-color: #007e85;
+    color: white;
+  }
+  
+  .imageSection {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 100px;
+  }
+  
+  .imageSection img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .eyeIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+  }
+  
+  /* Dropdown Styles */
+  .dropdownContainer {
+    margin-bottom: 15px;
+    position: relative;
+  }
+  
+  .dropdownButton {
+    padding: 10px 16px;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    width: 100%;
+    text-align: left;
+  }
+  
+  .dropdownMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    margin-top: 8px;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  .dropdownItem {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .dropdownItem:hover {
+    background-color: #f0f0f0;
+  }
+  
