@@ -2,7 +2,6 @@ import styles from "./mainPage.module.css";
 import Image from "next/image";
 import Link from "next/link";
 
-
 export default function MainPage() {
   return (
     <div className={styles.container}>
@@ -16,6 +15,7 @@ export default function MainPage() {
             height={50}
           />
         </div>
+        {/* Default to patient role for the top login button */}
         <Link href="./Login">
           <button className={styles.loginBtn}>Login</button>
         </Link>
@@ -53,10 +53,10 @@ export default function MainPage() {
       <div className={styles.buttonSection}>
         <h3 className={styles.subtext}>Continue Your Journey As A</h3>
         <div className={styles.btnGroup}>
-          <Link href="./Login">
+          <Link href="./Login?role=patient">
             <button className={styles.patientBtn}>Patient</button>
           </Link>
-          <Link href="./Login">
+          <Link href="./Login?role=doctor">
             <button className={styles.doctorBtn}>Doctor</button>
           </Link>
         </div>
