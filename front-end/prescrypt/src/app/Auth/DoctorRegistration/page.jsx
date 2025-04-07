@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { X, Eye, EyeOff, ChevronDown, Search } from "lucide-react";
+import { X, Eye, EyeOff, ChevronDown, Search, Plus, Trash2 } from "lucide-react";
 import styles from "./doctorReg.module.css";
 
 export default function DoctorRegistration() {
@@ -18,12 +18,16 @@ export default function DoctorRegistration() {
     NIC: "",
     ContactNumber: "",
     Email: "",
-    Hospital: "",
-    DoctorCharge: "",
     Password: "",
     ConfirmPassword: "",
-    availability: [],
     role: "Doctor",
+    hospitalSchedules: [],
+  });
+
+  const [currentSchedule, setCurrentSchedule] = useState({
+    hospital: "",
+    charge: "",
+    availability: {},
   });
 
   const [errors, setErrors] = useState({});
@@ -32,13 +36,9 @@ export default function DoctorRegistration() {
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [selectedTime, setSelectedTime] = useState("SelectTime");
-  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPasswordFieldActive, setIsPasswordFieldActive] = useState(false);
-  
-  // New state for dropdowns
   const [showHospitalDropdown, setShowHospitalDropdown] = useState(false);
   const [hospitalSearchTerm, setHospitalSearchTerm] = useState("");
   const [showSpecializationDropdown, setShowSpecializationDropdown] = useState(false);
@@ -55,31 +55,33 @@ export default function DoctorRegistration() {
     "Sunday"
   ];
 
-  const timeSlots = [
-    "9:00 AM - 12:00 PM",
-    "1:00 PM - 5:00 PM",
-    "6:00 PM - 9:00 PM"
+  const timeOptions = [
+    "8:00 AM", "8:30 AM", "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", 
+    "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", 
+    "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", 
+    "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM", 
+    "8:00 PM", "8:30 PM", "9:00 PM"
   ];
 
-  const genderOptions = ["Male", "Female", "Other"];
+  const genderOptions = ["Male", "Female"];
 
   const hospitals = [
-    "None",
-    "National Hospital of Sri Lanka - Colombo",
-    "Lady Ridgeway Hospital - Colombo",
-    "Teaching Hospital Karapitiya - Galle",
-    "Kandy General Hospital - Kandy",
-    "Jaffna Teaching Hospital - Jaffna",
-    "Colombo South Teaching Hospital - Kalubowila",
-    "Teaching Hospital Anuradhapura",
-    "Teaching Hospital Kurunegala",
-    "Colombo North Teaching Hospital - Ragama",
-    "Base Hospital Awissawella",
-    "District General Hospital Negombo",
-    "Base Hospital Homagama",
-    "District General Hospital Gampaha",
-    "Base Hospital Panadura",
-    "District Hospital Moratuwa"
+    { id: 1, name: "None" },
+    { id: 2, name: "National Hospital of Sri Lanka - Colombo" },
+    { id: 3, name: "Lady Ridgeway Hospital - Colombo" },
+    { id: 4, name: "Teaching Hospital Karapitiya - Galle" },
+    { id: 5, name: "Kandy General Hospital - Kandy" },
+    { id: 6, name: "Jaffna Teaching Hospital - Jaffna" },
+    { id: 7, name: "Colombo South Teaching Hospital - Kalubowila" },
+    { id: 8, name: "Teaching Hospital Anuradhapura" },
+    { id: 9, name: "Teaching Hospital Kurunegala" },
+    { id: 10, name: "Colombo North Teaching Hospital - Ragama" },
+    { id: 11, name: "Base Hospital Awissawella" },
+    { id: 12, name: "District General Hospital Negombo" },
+    { id: 13, name: "Base Hospital Homagama" },
+    { id: 14, name: "District General Hospital Gampaha" },
+    { id: 15, name: "Base Hospital Panadura" },
+    { id: 16, name: "District Hospital Moratuwa" }
   ];
 
   const specializations = [
@@ -104,7 +106,7 @@ export default function DoctorRegistration() {
   ];
 
   const filteredHospitals = hospitalSearchTerm 
-    ? hospitals.filter(h => h.toLowerCase().includes(hospitalSearchTerm.toLowerCase()))
+    ? hospitals.filter(h => h.name.toLowerCase().includes(hospitalSearchTerm.toLowerCase()))
     : hospitals;
 
   const filteredSpecializations = specializationSearchTerm
@@ -116,12 +118,64 @@ export default function DoctorRegistration() {
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  const handleCheckboxChange = (day) => {
-    const updatedAvailability = formData.availability.includes(day) 
-      ? formData.availability.filter(d => d !== day)
-      : [...formData.availability, day];
-    
-    setFormData({ ...formData, availability: updatedAvailability });
+  const addHospitalSchedule = () => {
+    if (!currentSchedule.hospital || !currentSchedule.charge) {
+      setErrors({...errors, hospitalSchedule: "Please select a hospital and enter charge"});
+      return;
+    }
+
+    const hasAvailability = Object.values(currentSchedule.availability).some(
+      day => day && day.startTime && day.endTime
+    );
+
+    if (!hasAvailability) {
+      setErrors({...errors, hospitalSchedule: "Please add at least one available day with time slots"});
+      return;
+    }
+
+    setFormData({
+      ...formData,
+      hospitalSchedules: [...formData.hospitalSchedules, currentSchedule],
+    });
+
+    setCurrentSchedule({
+      hospital: "",
+      charge: "",
+      availability: {},
+    });
+
+    setErrors({...errors, hospitalSchedule: ""});
+  };
+
+  const removeHospitalSchedule = (index) => {
+    const updatedSchedules = [...formData.hospitalSchedules];
+    updatedSchedules.splice(index, 1);
+    setFormData({...formData, hospitalSchedules: updatedSchedules});
+  };
+
+  const handleDayAvailability = (day, isSelected) => {
+    setCurrentSchedule(prev => ({
+      ...prev,
+      availability: {
+        ...prev.availability,
+        [day]: isSelected 
+          ? { startTime: "", endTime: "" }
+          : undefined
+      }
+    }));
+  };
+
+  const updateDayTimeSlot = (day, field, value) => {
+    setCurrentSchedule(prev => ({
+      ...prev,
+      availability: {
+        ...prev.availability,
+        [day]: {
+          ...prev.availability[day],
+          [field]: value
+        }
+      }
+    }));
   };
 
   const handleFileUpload = (e) => {
@@ -134,7 +188,6 @@ export default function DoctorRegistration() {
     let newErrors = {};
     
     if (currentStep === 1) {
-      // First page validation
       if (!formData.FirstName.trim()) newErrors.FirstName = "First Name is required.";
       if (!formData.LastName.trim()) newErrors.LastName = "Last Name is required.";
       if (!formData.Gender) newErrors.Gender = "Gender is required.";
@@ -147,34 +200,25 @@ export default function DoctorRegistration() {
       if (!formData["NIC"]?.trim()) {
         newErrors["NIC"] = "NIC Number is required.";
       }
-      // Contact number validation
+      
       if (!formData.ContactNumber.trim()) {
         newErrors.ContactNumber = "Contact Number is required.";
       } else if (!/^\d{10}$/.test(formData.ContactNumber.replace(/\D/g, ''))) {
         newErrors.ContactNumber = "Please enter a valid 10-digit phone number.";
       }
       
-      // Email validation
       if (!formData.Email.trim()) {
         newErrors.Email = "Email is required.";
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.Email)) {
         newErrors.Email = "Invalid email format.";
       }
       
-      if (!formData.Hospital) newErrors.Hospital = "Hospital is required.";
-      
-      // Doctor charge validation
-      if (!formData.DoctorCharge) {
-        newErrors.DoctorCharge = "Doctor consultation charge is required.";
-      } else if (isNaN(parseFloat(formData.DoctorCharge)) || parseFloat(formData.DoctorCharge) <= 0) {
-        newErrors.DoctorCharge = "Please enter a valid charge amount.";
-      }
-    } else {
-      // Second page validation
-      if (formData.availability.length === 0) newErrors.availability = "Please select at least one day.";
       if (!uploadedFile) newErrors.uploadedFile = "Please upload your ID.";
+    } else {
+      if (formData.hospitalSchedules.length === 0) {
+        newErrors.hospitalSchedules = "Please add at least one hospital schedule";
+      }
       
-      // Password validation
       if (!formData.Password) {
         newErrors.Password = "Password is required.";
       } else if (formData.Password.length < 8) {
@@ -183,7 +227,6 @@ export default function DoctorRegistration() {
         newErrors.Password = "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.";
       }
       
-      // Confirm password validation
       if (!formData.ConfirmPassword) {
         newErrors.ConfirmPassword = "Please confirm your password.";
       } else if (formData.Password !== formData.ConfirmPassword) {
@@ -212,17 +255,15 @@ export default function DoctorRegistration() {
 
     setLoading(true);
     try {
-      // Create form data to handle file upload
       const formDataToSend = new FormData();
       for (const key in formData) {
-        if (key === 'availability') {
+        if (key === 'hospitalSchedules') {
           formDataToSend.append(key, JSON.stringify(formData[key]));
         } else {
           formDataToSend.append(key, formData[key]);
         }
       }
       
-      // Add other specialization if selected
       if (formData.Specialization === "Other") {
         formDataToSend.set("Specialization", otherSpecialization);
       }
@@ -407,7 +448,7 @@ export default function DoctorRegistration() {
                   {errors.Specialization && <p className={styles.errorMessage}>{errors.Specialization}</p>}
                 </div>
                 
-                {/* Other Specialization field - only shown when "Other" is selected */}
+                {/* Other Specialization field */}
                 {formData.Specialization === "Other" && (
                   <div className={styles.inputGroup}>
                     <input
@@ -472,73 +513,7 @@ export default function DoctorRegistration() {
                   {errors.Email && <p className={styles.errorMessage}>{errors.Email}</p>}
                 </div>
 
-                {/* Hospital Dropdown */}
-                <div className={styles.inputGroup}>
-                  <div className={styles.dropdownContainer}>
-                    <button 
-                      className={errors.Hospital ? `${styles.dropdownButton} ${styles.inputError}` : styles.dropdownButton} 
-                      onClick={() => setShowHospitalDropdown(!showHospitalDropdown)}
-                      type="button"
-                    >
-                      {formData.Hospital || "Select Hospital"}
-                      <ChevronDown size={18} className={styles.dropdownIcon} />
-                    </button>
-                    {showHospitalDropdown && (
-                      <div className={styles.dropdownMenu}>
-                        <div className={styles.searchContainer}>
-                          <input
-                            type="text"
-                            placeholder="Search hospitals..."
-                            value={hospitalSearchTerm}
-                            onChange={(e) => setHospitalSearchTerm(e.target.value)}
-                            className={styles.searchInput}
-                          />
-                          <Search size={16} className={styles.searchIcon} />
-                        </div>
-                        <div className={styles.dropdownList}>
-                          {filteredHospitals.map((hospital) => (
-                            <div
-                              key={hospital}
-                              className={styles.dropdownItem}
-                              onClick={() => {
-                                setFormData({ ...formData, Hospital: hospital });
-                                setShowHospitalDropdown(false);
-                              }}
-                            >
-                              {hospital}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  {errors.Hospital && <p className={styles.errorMessage}>{errors.Hospital}</p>}
-                </div>
-                
-                {/* Doctor Charge field */}
-                <div className={styles.inputGroup}>
-                  <div className={styles.chargeInputContainer}>
-                    <span className={styles.currencySymbol}>Rs.</span>
-                    <input
-                      type="number"
-                      name="DoctorCharge"
-                      placeholder="Consultation Charge"
-                      className={errors.DoctorCharge ? styles.inputError : styles.input}
-                      value={formData.DoctorCharge}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  {errors.DoctorCharge && <p className={styles.errorMessage}>{errors.DoctorCharge}</p>}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Professional Information & Authentication */}
-          {currentStep === 2 && (
-            <div className={styles.formColumns}>
-              {/* Left Column */}
-              <div className={styles.formColumn}>
+                {/* ID Upload Section */}
                 <div className={styles.idUploadSection}>
                   <div className={styles.uploadRow}>
                     <span className={styles.uploadLabel}>Copy of ID:</span>
@@ -558,58 +533,165 @@ export default function DoctorRegistration() {
                   )}
                   {errors.uploadedFile && <p className={styles.errorMessage}>{errors.uploadedFile}</p>}
                 </div>
-                
-                <div className={styles.availabilitySection}>
-                  <h3 className={styles.sectionTitle}>Availability:</h3>
-                  <div className={styles.checkboxGrid}>
-                    {daysOfWeek.map((day) => (
-                      <div key={day} className={styles.checkboxItem}>
-                        <label className={styles.checkboxLabel}>
-                          <input
-                            type="checkbox"
-                            checked={formData.availability.includes(day)}
-                            onChange={() => handleCheckboxChange(day)}
-                            className={styles.checkbox}
-                          />
-                          <span className={styles.checkboxText}>{day}</span>
-                        </label>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Hospital Schedules & Authentication */}
+          {currentStep === 2 && (
+            <div className={styles.formColumns}>
+              {/* Left Column - Hospital Schedules */}
+              <div className={styles.formColumn}>
+                <div className={styles.hospitalScheduleSection}>
+                  <h3 className={styles.sectionTitle}>Hospital Schedules</h3>
+                  
+                  {/* Current Hospital Schedule Form */}
+                  <div className={styles.scheduleForm}>
+                    <div className={styles.inputGroup}>
+                      <div className={styles.dropdownContainer}>
+                        <button 
+                          className={!currentSchedule.hospital ? `${styles.dropdownButton} ${styles.inputError}` : styles.dropdownButton} 
+                          onClick={() => setShowHospitalDropdown(!showHospitalDropdown)}
+                          type="button"
+                        >
+                          {currentSchedule.hospital || "Select Hospital"}
+                          <ChevronDown size={18} className={styles.dropdownIcon} />
+                        </button>
+                        {showHospitalDropdown && (
+                          <div className={styles.dropdownMenu}>
+                            <div className={styles.searchContainer}>
+                              <input
+                                type="text"
+                                placeholder="Search hospitals..."
+                                value={hospitalSearchTerm}
+                                onChange={(e) => setHospitalSearchTerm(e.target.value)}
+                                className={styles.searchInput}
+                              />
+                              <Search size={16} className={styles.searchIcon} />
+                            </div>
+                            <div className={styles.dropdownList}>
+                              {filteredHospitals.map((hospital) => (
+                                <div
+                                  key={hospital.id}
+                                  className={styles.dropdownItem}
+                                  onClick={() => {
+                                    setCurrentSchedule({...currentSchedule, hospital: hospital.name});
+                                    setShowHospitalDropdown(false);
+                                  }}
+                                >
+                                  {hospital.name}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                  {errors.availability && <p className={styles.errorMessage}>{errors.availability}</p>}
-                </div>
-                
-                <div className={styles.timeSlotSection}>
-                  <div className={styles.dropdownContainer}>
-                    <button 
-                      className={styles.dropdownButton} 
-                      onClick={() => setShowTimeDropdown(!showTimeDropdown)}
-                      type="button"
-                    >
-                      {selectedTime}
-                      <ChevronDown size={18} className={styles.dropdownIcon} />
-                    </button>
-                    {showTimeDropdown && (
-                      <div className={styles.dropdownMenu}>
-                        {timeSlots.map((time) => (
-                          <div
-                            key={time}
-                            className={styles.dropdownItem}
-                            onClick={() => {
-                              setSelectedTime(time);
-                              setShowTimeDropdown(false);
-                            }}
-                          >
-                            {time}
+                    </div>
+                    
+                    <div className={styles.inputGroup}>
+                      <div className={styles.chargeInputContainer}>
+                        <span className={styles.currencySymbol}>Rs.</span>
+                        <input
+                          type="number"
+                          placeholder="Consultation Charge"
+                          className={!currentSchedule.charge ? styles.inputError : styles.input}
+                          value={currentSchedule.charge}
+                          onChange={(e) => setCurrentSchedule({...currentSchedule, charge: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className={styles.availabilitySection}>
+                      <h4 className={styles.subSectionTitle}>Availability</h4>
+                      <div className={styles.checkboxGrid}>
+                        {daysOfWeek.map((day) => (
+                          <div key={day} className={styles.checkboxItem}>
+                            <label className={styles.checkboxLabel}>
+                              <input
+                                type="checkbox"
+                                checked={!!currentSchedule.availability[day]}
+                                onChange={(e) => handleDayAvailability(day, e.target.checked)}
+                                className={styles.checkbox}
+                              />
+                              <span className={styles.checkboxText}>{day}</span>
+                            </label>
+                            
+                            {currentSchedule.availability[day] && (
+                              <div className={styles.timeSlotContainer}>
+                                <select
+                                  value={currentSchedule.availability[day].startTime}
+                                  onChange={(e) => updateDayTimeSlot(day, 'startTime', e.target.value)}
+                                  className={styles.timeSelect}
+                                >
+                                  <option value="">Start Time</option>
+                                  {timeOptions.map(time => (
+                                    <option key={`${day}-start-${time}`} value={time}>{time}</option>
+                                  ))}
+                                </select>
+                                
+                                <span className={styles.timeSeparator}>to</span>
+                                
+                                <select
+                                  value={currentSchedule.availability[day].endTime}
+                                  onChange={(e) => updateDayTimeSlot(day, 'endTime', e.target.value)}
+                                  className={styles.timeSelect}
+                                >
+                                  <option value="">End Time</option>
+                                  {timeOptions.map(time => (
+                                    <option key={`${day}-end-${time}`} value={time}>{time}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
+                    </div>
+                    
+                    <button
+                      type="button"
+                      className={styles.addScheduleButton}
+                      onClick={addHospitalSchedule}
+                    >
+                      <Plus size={16} /> Add Hospital Schedule
+                    </button>
+                    
+                    {errors.hospitalSchedule && (
+                      <p className={styles.errorMessage}>{errors.hospitalSchedule}</p>
                     )}
+                  </div>
+                  
+                  {/* Display Added Schedules */}
+                  <div className={styles.addedSchedules}>
+                    {formData.hospitalSchedules.map((schedule, index) => (
+                      <div key={index} className={styles.scheduleCard}>
+                        <div className={styles.scheduleHeader}>
+                          <h4>{schedule.hospital}</h4>
+                          <button
+                            type="button"
+                            className={styles.deleteSchedule}
+                            onClick={() => removeHospitalSchedule(index)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                        <p>Charge: Rs. {schedule.charge}</p>
+                        <div className={styles.scheduleAvailability}>
+                          {Object.entries(schedule.availability)
+                            .filter(([_, times]) => times && times.startTime && times.endTime)
+                            .map(([day, times]) => (
+                              <div key={day} className={styles.scheduleDay}>
+                                <strong>{day}:</strong> {times.startTime} - {times.endTime}
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
               
-              {/* Right Column */}
+              {/* Right Column - Authentication */}
               <div className={styles.formColumn}>
                 {/* Password field with toggle visibility */}
                 <div className={styles.inputGroup}>
@@ -623,7 +705,6 @@ export default function DoctorRegistration() {
                       onChange={handleChange}
                       onFocus={() => setIsPasswordFieldActive(true)}
                       onBlur={(e) => {
-                        // Only set to false if neither password field has focus
                         if (document.activeElement !== e.target.form?.ConfirmPassword) {
                           setTimeout(() => setIsPasswordFieldActive(false), 100);
                         }
@@ -652,7 +733,6 @@ export default function DoctorRegistration() {
                       onChange={handleChange}
                       onFocus={() => setIsPasswordFieldActive(true)}
                       onBlur={(e) => {
-                        // Only set to false if neither password field has focus
                         if (document.activeElement !== e.target.form?.Password) {
                           setTimeout(() => setIsPasswordFieldActive(false), 100);
                         }
@@ -669,7 +749,7 @@ export default function DoctorRegistration() {
                   {errors.ConfirmPassword && <p className={styles.errorMessage}>{errors.ConfirmPassword}</p>}
                 </div>
                 
-                {/* Password Requirements - Only show when password fields are active */}
+                {/* Password Requirements */}
                 {isPasswordFieldActive && (
                   <div className={styles.passwordRequirements}>
                     <h4 className={styles.requirementsTitle}>Password Requirements:</h4>
