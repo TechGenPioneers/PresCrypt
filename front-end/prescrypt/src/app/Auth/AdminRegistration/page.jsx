@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
-import styles from "./patientReg.module.css";
+import styles from "./AdminReg.module.css";
 
 export default function PatientRegistration() {
   const router = useRouter();
@@ -14,9 +14,7 @@ export default function PatientRegistration() {
     email: "",
     password: "",
     confirmPassword: "",
-    contactNumber: "",
-    nic: "",
-    role: "Patient",
+    role: "Admin",
   });
 
   const [errors, setErrors] = useState({});
@@ -29,7 +27,10 @@ export default function PatientRegistration() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    // Clear the error for this field when the user starts typing
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: "" });
+    }
   };
 
   const validateForm = () => {
@@ -51,25 +52,33 @@ export default function PatientRegistration() {
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match.";
     }
-    if (!formData.contactNumber.trim()) newErrors.contactNumber = "Contact Number is required.";
-    if (!formData.nic.trim()) newErrors.nic = "NIC is required.";
-    if (!formData.role) newErrors.role = "Role is required.";
+    
+    // Set the errors state with the new errors
     setErrors(newErrors);
+    
     return Object.keys(newErrors).length === 0;
   };
 
   const handleRegister = async () => {
-    if (!validateForm()) return;
+    // Validate the form and check if there are any errors
+    if (!validateForm()) {
+      return; // Stop if validation fails
+    }
 
     setLoading(true);
     try {
-      const response = await fetch("https://localhost:7021/api/User/PatientRegistration", {
+      const response = await fetch("https://localhost:7021/api/User/AdminRegistration", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, status: "Active" }),
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Registration failed. Please try again.");
+      }
+      
       const data = await response.text();
-      if (!response.ok) throw new Error(data);
       alert("Registration Successful!");
       setFormData({
         FirstName: "",
@@ -77,14 +86,12 @@ export default function PatientRegistration() {
         email: "",
         password: "",
         confirmPassword: "",
-        contactNumber: "",
-        nic: "",
-        role: "",
+        role: "Admin",
       });
       setErrors({});
-      router.push("/Patient/PatientDashboard");
+      router.push("/Admin/AdminDashboard");
     } catch (err) {
-      setErrors({ general: err.message });
+      setErrors(prev => ({ ...prev, general: err.message }));
     } finally {
       setLoading(false);
     }
@@ -94,7 +101,7 @@ export default function PatientRegistration() {
     <div className={styles.container}>
       <div className={styles.registerBox}>
         <div className={styles.formSection}>
-        <div className={styles.logoContainer}>
+          <div className={styles.logoContainer}>
             <Image 
               src="/logo.png" 
               alt="PresCrypt Logo" 
@@ -109,7 +116,11 @@ export default function PatientRegistration() {
 
           {/* Role Dropdown */}
           <div className={styles.dropdownContainer}>
-            <button className={styles.dropdownButton} onClick={() => setShowRoleDropdown(!showRoleDropdown)}>
+            <button 
+              type="button"
+              className={styles.dropdownButton} 
+              onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+            >
               {formData.role || "Choose your Role"}
             </button>
             {showRoleDropdown && (
@@ -123,10 +134,12 @@ export default function PatientRegistration() {
                       setShowRoleDropdown(false);
                       if (role === "Doctor") {
                         router.push("/Auth/DoctorRegistration");
-                      } else if (role === "Admin") {
-                        router.push("/Auth/AdminRegistration");
+                      } else if (role === "Patient") {
+                        router.push("/Auth/PatientRegistration");
                       }
-                      setErrors({ ...errors, role: "" });
+                      if (errors.role) {
+                        setErrors({ ...errors, role: "" });
+                      }
                     }}
                   >
                     {role}
@@ -142,8 +155,6 @@ export default function PatientRegistration() {
             { name: "FirstName", placeholder: "First Name" },
             { name: "LastName", placeholder: "Last Name" },
             { name: "email", placeholder: "Email", type: "email" },
-            { name: "contactNumber", placeholder: "Contact Number" },
-            { name: "nic", placeholder: "NIC" },
           ].map(({ name, placeholder, type = "text" }) => (
             <div key={name} className={styles.inputGroup}>
               <input
@@ -159,12 +170,15 @@ export default function PatientRegistration() {
           ))}
 
           {/* Password Fields */}
-          {[{ name: "password", show: showPassword, setShow: setShowPassword }, { name: "confirmPassword", show: showConfirmPassword, setShow: setShowConfirmPassword }].map(({ name, show, setShow }) => (
+          {[
+            { name: "password", show: showPassword, setShow: setShowPassword, placeholder: "Password" },
+            { name: "confirmPassword", show: showConfirmPassword, setShow: setShowConfirmPassword, placeholder: "Confirm Password" }
+          ].map(({ name, show, setShow, placeholder }) => (
             <div key={name} className={styles.inputGroup} style={{ position: "relative" }}>
               <input
                 type={show ? "text" : "password"}
                 name={name}
-                placeholder={name === "password" ? "Password" : "Confirm Password"}
+                placeholder={placeholder}
                 className={errors[name] ? styles.inputError : styles.input}
                 value={formData[name]}
                 onChange={handleChange}
@@ -177,7 +191,12 @@ export default function PatientRegistration() {
           ))}
 
           {errors.general && <p className={styles.errorMessage}>{errors.general}</p>}
-          <button className={styles.registerBtn} onClick={handleRegister} disabled={loading}>
+          <button 
+            type="button"
+            className={styles.registerBtn} 
+            onClick={handleRegister} 
+            disabled={loading}
+          >
             {loading ? "Registering..." : "Create Account"}
           </button>
         </div>

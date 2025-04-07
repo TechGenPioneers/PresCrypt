@@ -1,11 +1,11 @@
 "use client"; // Required for event handlers in Next.js
 
-import { useState } from "react";
-import { useRouter } from "next/navigation"; // Import Next.js router
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation"; // Import useSearchParams
 import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react"; // Import icons
-import { loginPatient } from "../../../utils/api"; // Import API function
+import { loginPatient, loginDoctor } from "../../../utils/api"; // Import API functions for both roles
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,8 +13,18 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("patient"); // Default role
 
-  const router = useRouter(); // Initialize Next.js router
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Get the role from URL parameters when component mounts
+  useEffect(() => {
+    const roleParam = searchParams.get("role");
+    if (roleParam && (roleParam === "patient" || roleParam === "doctor")) {
+      setRole(roleParam);
+    }
+  }, [searchParams]);
 
   const handleLogin = async () => {
     setError(null);
@@ -25,13 +35,20 @@ export default function LoginPage() {
 
     try {
       setLoading(true);
-      const response = await loginPatient({ email, password });
+      
+      // Choose the appropriate login function based on role
+      const loginFunction = role === "doctor" ? loginDoctor : loginPatient;
+      const response = await loginFunction({ email, password });
 
       console.log("API Response:", response); // Debugging
 
       if (response && response.success) {
         console.log("Login successful:", response);
-        router.push("/Patient/PatientDashboard"); // Redirect
+        // Redirect to the appropriate dashboard based on role
+        const dashboardPath = role === "doctor" 
+          ? "/Doctor/DoctorDashboard" 
+          : "/Patient/PatientDashboard";
+        router.push(dashboardPath);
       } else {
         setError(response?.message || "Invalid credentials");
       }
@@ -43,13 +60,24 @@ export default function LoginPage() {
     }
   };
 
+  // Determine registration page URL based on role
+  const getRegistrationUrl = () => {
+    return role === "doctor" 
+      ? "/Auth/DoctorRegistration" 
+      : "/Auth/PatientRegistration";
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
       <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden max-w-3xl w-full">
         {/* Left: Form Section */}
         <div className="flex flex-col justify-center p-8 w-full md:w-1/2">
-          <h2 className="text-2xl font-bold text-teal-700 text-center mb-2">WELCOME BACK!</h2>
-          <p className="text-gray-600 text-center mb-6">YOUR HEALTH JOURNEY AWAITS!</p>
+          <h2 className="text-2xl font-bold text-teal-700 text-center mb-2">
+            WELCOME BACK!
+          </h2>
+          <p className="text-gray-600 text-center mb-6">
+            {role === "doctor" ? "READY TO HELP PATIENTS?" : "YOUR HEALTH JOURNEY AWAITS!"}
+          </p>
 
           <input
             type="email"
@@ -94,7 +122,7 @@ export default function LoginPage() {
           </button>
 
           <p className="text-gray-600 text-sm text-center mt-4">Not registered yet?</p>
-          <Link href="/Auth/PatientRegistration">
+          <Link href={getRegistrationUrl()}>
             <button className="w-full py-2 mt-2 border border-teal-500 text-teal-500 font-bold rounded-md hover:bg-teal-500 hover:text-white transition">
               Create an Account
             </button>
@@ -103,7 +131,12 @@ export default function LoginPage() {
 
         {/* Right: Image Section */}
         <div className="hidden md:flex justify-center items-center p-6 md:w-1/2">
-          <Image src="/loginimage.jpg" alt="Login Illustration" width={350} height={300} />
+          <Image 
+            src={role === "doctor" ? "/loginimage.jpg" : "/loginimage.jpg"} 
+            alt="Login Illustration" 
+            width={350} 
+            height={300} 
+          />
         </div>
       </div>
     </div>
