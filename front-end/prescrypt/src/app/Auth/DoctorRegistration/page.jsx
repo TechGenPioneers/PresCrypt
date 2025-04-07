@@ -3,21 +3,23 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { X, Eye, EyeOff } from "lucide-react";
+import { X, Eye, EyeOff, ChevronDown, Search } from "lucide-react";
 import styles from "./doctorReg.module.css";
 
 export default function DoctorRegistration() {
   const router = useRouter();
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     FirstName: "",
     LastName: "",
+    Gender: "",
     Specialization: "",
-    SMLCRegId: "",
     SMLCLicenseNumber: "",
     NIC: "",
     ContactNumber: "",
     Email: "",
     Hospital: "",
+    DoctorCharge: "",
     Password: "",
     ConfirmPassword: "",
     availability: [],
@@ -27,6 +29,7 @@ export default function DoctorRegistration() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const [showGenderDropdown, setShowGenderDropdown] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [selectedTime, setSelectedTime] = useState("SelectTime");
@@ -34,6 +37,13 @@ export default function DoctorRegistration() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPasswordFieldActive, setIsPasswordFieldActive] = useState(false);
+  
+  // New state for dropdowns
+  const [showHospitalDropdown, setShowHospitalDropdown] = useState(false);
+  const [hospitalSearchTerm, setHospitalSearchTerm] = useState("");
+  const [showSpecializationDropdown, setShowSpecializationDropdown] = useState(false);
+  const [specializationSearchTerm, setSpecializationSearchTerm] = useState("");
+  const [otherSpecialization, setOtherSpecialization] = useState("");
 
   const daysOfWeek = [
     "Monday", 
@@ -50,6 +60,56 @@ export default function DoctorRegistration() {
     "1:00 PM - 5:00 PM",
     "6:00 PM - 9:00 PM"
   ];
+
+  const genderOptions = ["Male", "Female", "Other"];
+
+  const hospitals = [
+    "None",
+    "National Hospital of Sri Lanka - Colombo",
+    "Lady Ridgeway Hospital - Colombo",
+    "Teaching Hospital Karapitiya - Galle",
+    "Kandy General Hospital - Kandy",
+    "Jaffna Teaching Hospital - Jaffna",
+    "Colombo South Teaching Hospital - Kalubowila",
+    "Teaching Hospital Anuradhapura",
+    "Teaching Hospital Kurunegala",
+    "Colombo North Teaching Hospital - Ragama",
+    "Base Hospital Awissawella",
+    "District General Hospital Negombo",
+    "Base Hospital Homagama",
+    "District General Hospital Gampaha",
+    "Base Hospital Panadura",
+    "District Hospital Moratuwa"
+  ];
+
+  const specializations = [
+    "General Medicine",
+    "Cardiology",
+    "Neurology",
+    "Pediatrics",
+    "Obstetrics & Gynecology",
+    "Ophthalmology",
+    "Orthopedics",
+    "Dermatology",
+    "Psychiatry",
+    "ENT (Ear, Nose, Throat)",
+    "Gastroenterology",
+    "Endocrinology",
+    "Nephrology",
+    "Oncology",
+    "Urology",
+    "Pulmonology",
+    "Rheumatology",
+    "Other"
+  ];
+
+  const filteredHospitals = hospitalSearchTerm 
+    ? hospitals.filter(h => h.toLowerCase().includes(hospitalSearchTerm.toLowerCase()))
+    : hospitals;
+
+  const filteredSpecializations = specializationSearchTerm
+    ? specializations.filter(s => s.toLowerCase().includes(specializationSearchTerm.toLowerCase()))
+    : specializations;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -73,51 +133,78 @@ export default function DoctorRegistration() {
   const validateForm = () => {
     let newErrors = {};
     
-    // Basic field validations
-    if (!formData.FirstName.trim()) newErrors.FirstName = "First Name is required.";
-    if (!formData.LastName.trim()) newErrors.LastName = "Last Name is required.";
-    if (!formData.Specialization.trim()) newErrors.Specialization = "Specialization is required.";
-    if (!formData.SMLCLicenseNumber.trim()) newErrors.SMLCLicenseNumber = "SMLC License Number is required.";
-    
-    if (!formData["NIC"]?.trim()) {
+    if (currentStep === 1) {
+      // First page validation
+      if (!formData.FirstName.trim()) newErrors.FirstName = "First Name is required.";
+      if (!formData.LastName.trim()) newErrors.LastName = "Last Name is required.";
+      if (!formData.Gender) newErrors.Gender = "Gender is required.";
+      if (!formData.Specialization) newErrors.Specialization = "Specialization is required.";
+      if (formData.Specialization === "Other" && !otherSpecialization.trim()) {
+        newErrors.otherSpecialization = "Please specify your specialization.";
+      }
+      if (!formData.SMLCLicenseNumber.trim()) newErrors.SMLCLicenseNumber = "SMLC License Number is required.";
+      
+      if (!formData["NIC"]?.trim()) {
         newErrors["NIC"] = "NIC Number is required.";
       }
-    // Contact number validation
-    if (!formData.ContactNumber.trim()) {
-      newErrors.ContactNumber = "Contact Number is required.";
-    } else if (!/^\d{10}$/.test(formData.ContactNumber.replace(/\D/g, ''))) {
-      newErrors.ContactNumber = "Please enter a valid 10-digit phone number.";
-    }
-    
-    // Email validation
-    if (!formData.Email.trim()) {
-      newErrors.Email = "Email is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.Email)) {
-      newErrors.Email = "Invalid email format.";
-    }
-    
-    if (!formData.Hospital.trim()) newErrors.Hospital = "Hospital is required.";
-    if (formData.availability.length === 0) newErrors.availability = "Please select at least one day.";
-    if (!uploadedFile) newErrors.uploadedFile = "Please upload your ID.";
-    
-    // Password validation
-    if (!formData.Password) {
-      newErrors.Password = "Password is required.";
-    } else if (formData.Password.length < 8) {
-      newErrors.Password = "Password must be at least 8 characters long.";
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/.test(formData.Password)) {
-      newErrors.Password = "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.";
-    }
-    
-    // Confirm password validation
-    if (!formData.ConfirmPassword) {
-      newErrors.ConfirmPassword = "Please confirm your password.";
-    } else if (formData.Password !== formData.ConfirmPassword) {
-      newErrors.ConfirmPassword = "Passwords do not match.";
+      // Contact number validation
+      if (!formData.ContactNumber.trim()) {
+        newErrors.ContactNumber = "Contact Number is required.";
+      } else if (!/^\d{10}$/.test(formData.ContactNumber.replace(/\D/g, ''))) {
+        newErrors.ContactNumber = "Please enter a valid 10-digit phone number.";
+      }
+      
+      // Email validation
+      if (!formData.Email.trim()) {
+        newErrors.Email = "Email is required.";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.Email)) {
+        newErrors.Email = "Invalid email format.";
+      }
+      
+      if (!formData.Hospital) newErrors.Hospital = "Hospital is required.";
+      
+      // Doctor charge validation
+      if (!formData.DoctorCharge) {
+        newErrors.DoctorCharge = "Doctor consultation charge is required.";
+      } else if (isNaN(parseFloat(formData.DoctorCharge)) || parseFloat(formData.DoctorCharge) <= 0) {
+        newErrors.DoctorCharge = "Please enter a valid charge amount.";
+      }
+    } else {
+      // Second page validation
+      if (formData.availability.length === 0) newErrors.availability = "Please select at least one day.";
+      if (!uploadedFile) newErrors.uploadedFile = "Please upload your ID.";
+      
+      // Password validation
+      if (!formData.Password) {
+        newErrors.Password = "Password is required.";
+      } else if (formData.Password.length < 8) {
+        newErrors.Password = "Password must be at least 8 characters long.";
+      } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/.test(formData.Password)) {
+        newErrors.Password = "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.";
+      }
+      
+      // Confirm password validation
+      if (!formData.ConfirmPassword) {
+        newErrors.ConfirmPassword = "Please confirm your password.";
+      } else if (formData.Password !== formData.ConfirmPassword) {
+        newErrors.ConfirmPassword = "Passwords do not match.";
+      }
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNextStep = () => {
+    if (validateForm()) {
+      setCurrentStep(2);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep(1);
+    window.scrollTo(0, 0);
   };
 
   const handleRegister = async () => {
@@ -134,6 +221,12 @@ export default function DoctorRegistration() {
           formDataToSend.append(key, formData[key]);
         }
       }
+      
+      // Add other specialization if selected
+      if (formData.Specialization === "Other") {
+        formDataToSend.set("Specialization", otherSpecialization);
+      }
+      
       if (uploadedFile) {
         formDataToSend.append("idDocument", uploadedFile);
       }
@@ -173,6 +266,11 @@ export default function DoctorRegistration() {
 
           <h2 className={styles.title}>JOIN US FOR A HEALTHIER TOMORROW!</h2>
           <p className={styles.subtitle}>Create your account</p>
+          <div className={styles.stepIndicator}>
+            <div className={`${styles.step} ${currentStep === 1 ? styles.activeStep : ''}`}>1</div>
+            <div className={styles.stepLine}></div>
+            <div className={`${styles.step} ${currentStep === 2 ? styles.activeStep : ''}`}>2</div>
+          </div>
 
           {/* Role Dropdown */}
           <div className={styles.dropdownContainer}>
@@ -181,7 +279,7 @@ export default function DoctorRegistration() {
               onClick={() => setShowRoleDropdown(!showRoleDropdown)}
             >
               {formData.role || "Choose your Role"}
-              <span className={styles.dropdownArrow}>›</span>
+              <ChevronDown size={18} className={styles.dropdownIcon} />
             </button>
             {showRoleDropdown && (
               <div className={styles.dropdownMenu}>
@@ -206,281 +304,430 @@ export default function DoctorRegistration() {
             )}
           </div>
 
-          {/* Input Fields - Two Column Layout */}
-          <div className={styles.formColumns}>
-            {/* Left Column */}
-            <div className={styles.formColumn}>
-              <div className={styles.inputGroup}>
-                <input
-                  type="text"
-                  name="FirstName"
-                  placeholder="FirstName"
-                  className={errors.FirstName ? styles.inputError : styles.input}
-                  value={formData.FirstName}
-                  onChange={handleChange}
-                />
-                {errors.FirstName && <p className={styles.errorMessage}>{errors.FirstName}</p>}
-              </div>
-              
-              <div className={styles.inputGroup}>
-                <input
-                  type="text"
-                  name="LastName"
-                  placeholder="LastName"
-                  className={errors.LastName ? styles.inputError : styles.input}
-                  value={formData.LastName}
-                  onChange={handleChange}
-                />
-                {errors.LastName && <p className={styles.errorMessage}>{errors.LastName}</p>}
-              </div>
-              
-              <div className={styles.inputGroup}>
-                <input
-                  type="text"
-                  name="Specialization"
-                  placeholder="Specialization"
-                  className={errors.Specialization ? styles.inputError : styles.input}
-                  value={formData.Specialization}
-                  onChange={handleChange}
-                />
-                {errors.Specialization && <p className={styles.errorMessage}>{errors.Specialization}</p>}
-              </div>
-              <div className={styles.inputGroup}>
-                <input
-                  type="text" 
-                  name="SMLCRegId"
-                  placeholder="SMLC Registration ID"
-                  className={errors.SMLCRegId ? styles.inputError : styles.input}
-                  value={formData.SMLCRegId}
-                  onChange={handleChange}
-                />  
-                {errors.SMLCRegId && <p className={styles.errorMessage}>{errors.SMLCRegId}</p>} 
-              </div>
-              <div className={styles.inputGroup}>
-                <input
-                  type="text"
-                  name="SMLCLicenseNumber"
-                  placeholder="SMLC License Number"
-                  className={errors.SMLCLicenseNumber ? styles.inputError : styles.input}
-                  value={formData.SMLCLicenseNumber}
-                  onChange={handleChange}
-                />
-                {errors.SMLCLicenseNumber && <p className={styles.errorMessage}>{errors.SMLCLicenseNumber}</p>}
-              </div>
-
-              <div className={styles.inputGroup}>
-                <input
-                  type="text"
-                  name="NIC"
-                  placeholder="NIC number"  
-                  
-                  className={errors.NIC ? styles.inputError : styles.input}
-                  value={formData.NIC}         
-                  onChange={handleChange}
-                />
-                {errors.NIC && <p className={styles.errorMessage}>{errors.NIC}</p>}
-              </div>
-              
-              <div className={styles.inputGroup}>
-                <input
-                  type="text"
-                  name="ContactNumber"
-                  placeholder="Contact Number"
-                  className={errors.ContactNumber ? styles.inputError : styles.input}
-                  value={formData.ContactNumber}
-                  onChange={handleChange}
-                />
-                {errors.ContactNumber && <p className={styles.errorMessage}>{errors.ContactNumber}</p>}
-              </div>
-              
-              <div className={styles.inputGroup}>
-                <input
-                  type="email"
-                  name="Email"
-                  placeholder="Email"
-                  className={errors.Email ? styles.inputError : styles.input}
-                  value={formData.Email}
-                  onChange={handleChange}
-                />
-                {errors.Email && <p className={styles.errorMessage}>{errors.Email}</p>}
-              </div>
-              
-              <div className={styles.inputGroup}>
-                <input
-                  type="text"
-                  name="Hospital"
-                  placeholder="Hospital"
-                  className={errors.Hospital ? styles.inputError : styles.input}
-                  value={formData.Hospital}
-                  onChange={handleChange}
-                />
-                {errors.Hospital && <p className={styles.errorMessage}>{errors.Hospital}</p>}
-              </div>
-              
-              {/* Password field with toggle visibility */}
-              <div className={styles.inputGroup}>
-                <div className={styles.passwordInputContainer}>
+          {/* Step 1: Personal Information */}
+          {currentStep === 1 && (
+            <div className={styles.formColumns}>
+              {/* Left Column */}
+              <div className={styles.formColumn}>
+                <div className={styles.inputGroup}>
                   <input
-                    type={showPassword ? "text" : "password"}
-                    name="Password"
-                    placeholder="Password"
-                    className={errors.Password ? styles.inputError : styles.input}
-                    value={formData.Password}
+                    type="text"
+                    name="FirstName"
+                    placeholder="First Name"
+                    className={errors.FirstName ? styles.inputError : styles.input}
+                    value={formData.FirstName}
                     onChange={handleChange}
-                    onFocus={() => setIsPasswordFieldActive(true)}
-                    onBlur={(e) => {
-                      // Only set to false if neither password field has focus
-                      if (document.activeElement !== e.target.form?.ConfirmPassword) {
-                        setTimeout(() => setIsPasswordFieldActive(false), 100);
-                      }
-                    }}
                   />
-                  <button
-                    type="button"
-                    className={styles.passwordToggle}
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                {errors.Password && <p className={styles.errorMessage}>{errors.Password}</p>}
-              </div>
-              
-              {/* Confirm Password field with toggle visibility */}
-              <div className={styles.inputGroup}>
-                <div className={styles.passwordInputContainer}>
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="ConfirmPassword"
-                    placeholder="Confirm Password"
-                    className={errors.ConfirmPassword ? styles.inputError : styles.input}
-                    value={formData.ConfirmPassword}
-                    onChange={handleChange}
-                    onFocus={() => setIsPasswordFieldActive(true)}
-                    onBlur={(e) => {
-                      // Only set to false if neither password field has focus
-                      if (document.activeElement !== e.target.form?.Password) {
-                        setTimeout(() => setIsPasswordFieldActive(false), 100);
-                      }
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className={styles.passwordToggle}
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                {errors.ConfirmPassword && <p className={styles.errorMessage}>{errors.ConfirmPassword}</p>}
-              </div>
-            </div>
-            
-            {/* Right Column */}
-            <div className={styles.formColumn}>
-              <div className={styles.idUploadSection}>
-                <div className={styles.uploadRow}>
-                  <span className={styles.uploadLabel}>Copy of ID:</span>
-                  <button 
-                    type="button" 
-                    className={styles.uploadButton}
-                    onClick={() => setShowUploadModal(true)}
-                  >
-                    Upload
-                  </button>
+                  {errors.FirstName && <p className={styles.errorMessage}>{errors.FirstName}</p>}
                 </div>
                 
-                {uploadedFile && (
-                  <div className={styles.fileInfo}>
-                    <span>File: {uploadedFile.name}</span>
+                <div className={styles.inputGroup}>
+                  <input
+                    type="text"
+                    name="LastName"
+                    placeholder="Last Name"
+                    className={errors.LastName ? styles.inputError : styles.input}
+                    value={formData.LastName}
+                    onChange={handleChange}
+                  />
+                  {errors.LastName && <p className={styles.errorMessage}>{errors.LastName}</p>}
+                </div>
+                
+                {/* Gender Dropdown */}
+                <div className={styles.inputGroup}>
+                  <div className={styles.dropdownContainer}>
+                    <button 
+                      className={errors.Gender ? `${styles.dropdownButton} ${styles.inputError}` : styles.dropdownButton} 
+                      onClick={() => setShowGenderDropdown(!showGenderDropdown)}
+                      type="button"
+                    >
+                      {formData.Gender || "Select Gender"}
+                      <ChevronDown size={18} className={styles.dropdownIcon} />
+                    </button>
+                    {showGenderDropdown && (
+                      <div className={styles.dropdownMenu}>
+                        {genderOptions.map((gender) => (
+                          <div
+                            key={gender}
+                            className={styles.dropdownItem}
+                            onClick={() => {
+                              setFormData({ ...formData, Gender: gender });
+                              setShowGenderDropdown(false);
+                            }}
+                          >
+                            {gender}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {errors.Gender && <p className={styles.errorMessage}>{errors.Gender}</p>}
+                </div>
+                
+                {/* Specialization Dropdown */}
+                <div className={styles.inputGroup}>
+                  <div className={styles.dropdownContainer}>
+                    <button 
+                      className={errors.Specialization ? `${styles.dropdownButton} ${styles.inputError}` : styles.dropdownButton} 
+                      onClick={() => setShowSpecializationDropdown(!showSpecializationDropdown)}
+                      type="button"
+                    >
+                      {formData.Specialization || "Select Specialization"}
+                      <ChevronDown size={18} className={styles.dropdownIcon} />
+                    </button>
+                    {showSpecializationDropdown && (
+                      <div className={styles.dropdownMenu}>
+                        <div className={styles.searchContainer}>
+                          <input
+                            type="text"
+                            placeholder="Search specializations..."
+                            value={specializationSearchTerm}
+                            onChange={(e) => setSpecializationSearchTerm(e.target.value)}
+                            className={styles.searchInput}
+                          />
+                          <Search size={16} className={styles.searchIcon} />
+                        </div>
+                        <div className={styles.dropdownList}>
+                          {filteredSpecializations.map((specialization) => (
+                            <div
+                              key={specialization}
+                              className={styles.dropdownItem}
+                              onClick={() => {
+                                setFormData({ ...formData, Specialization: specialization });
+                                setShowSpecializationDropdown(false);
+                              }}
+                            >
+                              {specialization}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {errors.Specialization && <p className={styles.errorMessage}>{errors.Specialization}</p>}
+                </div>
+                
+                {/* Other Specialization field - only shown when "Other" is selected */}
+                {formData.Specialization === "Other" && (
+                  <div className={styles.inputGroup}>
+                    <input
+                      type="text"
+                      placeholder="Specify your specialization"
+                      value={otherSpecialization}
+                      onChange={(e) => setOtherSpecialization(e.target.value)}
+                      className={errors.otherSpecialization ? styles.inputError : styles.input}
+                    />
+                    {errors.otherSpecialization && <p className={styles.errorMessage}>{errors.otherSpecialization}</p>}
                   </div>
                 )}
-                {errors.uploadedFile && <p className={styles.errorMessage}>{errors.uploadedFile}</p>}
               </div>
               
-              <div className={styles.availabilitySection}>
-                <h3 className={styles.sectionTitle}>Availability:</h3>
-                <div className={styles.checkboxGrid}>
-                  {daysOfWeek.map((day) => (
-                    <div key={day} className={styles.checkboxItem}>
-                      <label className={styles.checkboxLabel}>
-                        <input
-                          type="checkbox"
-                          checked={formData.availability.includes(day)}
-                          onChange={() => handleCheckboxChange(day)}
-                          className={styles.checkbox}
-                        />
-                        <span className={styles.checkboxText}>{day}</span>
-                      </label>
-                    </div>
-                  ))}
+              {/* Right Column */}
+              <div className={styles.formColumn}>
+                <div className={styles.inputGroup}>
+                  <input
+                    type="text"
+                    name="SMLCLicenseNumber"
+                    placeholder="SMLC License Number"
+                    className={errors.SMLCLicenseNumber ? styles.inputError : styles.input}
+                    value={formData.SMLCLicenseNumber}
+                    onChange={handleChange}
+                  />
+                  {errors.SMLCLicenseNumber && <p className={styles.errorMessage}>{errors.SMLCLicenseNumber}</p>}
                 </div>
-                {errors.availability && <p className={styles.errorMessage}>{errors.availability}</p>}
-              </div>
-              
-              <div className={styles.timeSlotSection}>
-                <div className={styles.dropdownContainer}>
-                  <button 
-                    className={styles.dropdownButton} 
-                    onClick={() => setShowTimeDropdown(!showTimeDropdown)}
-                  >
-                    {selectedTime}
-                    <span className={styles.dropdownArrow}>›</span>
-                  </button>
-                  {showTimeDropdown && (
-                    <div className={styles.dropdownMenu}>
-                      {timeSlots.map((time) => (
-                        <div
-                          key={time}
-                          className={styles.dropdownItem}
-                          onClick={() => {
-                            setSelectedTime(time);
-                            setShowTimeDropdown(false);
-                          }}
-                        >
-                          {time}
+
+                <div className={styles.inputGroup}>
+                  <input
+                    type="text"
+                    name="NIC"
+                    placeholder="NIC number"  
+                    className={errors.NIC ? styles.inputError : styles.input}
+                    value={formData.NIC}         
+                    onChange={handleChange}
+                  />
+                  {errors.NIC && <p className={styles.errorMessage}>{errors.NIC}</p>}
+                </div>
+                
+                <div className={styles.inputGroup}>
+                  <input
+                    type="text"
+                    name="ContactNumber"
+                    placeholder="Contact Number"
+                    className={errors.ContactNumber ? styles.inputError : styles.input}
+                    value={formData.ContactNumber}
+                    onChange={handleChange}
+                  />
+                  {errors.ContactNumber && <p className={styles.errorMessage}>{errors.ContactNumber}</p>}
+                </div>
+                
+                <div className={styles.inputGroup}>
+                  <input
+                    type="email"
+                    name="Email"
+                    placeholder="Email"
+                    className={errors.Email ? styles.inputError : styles.input}
+                    value={formData.Email}
+                    onChange={handleChange}
+                  />
+                  {errors.Email && <p className={styles.errorMessage}>{errors.Email}</p>}
+                </div>
+
+                {/* Hospital Dropdown */}
+                <div className={styles.inputGroup}>
+                  <div className={styles.dropdownContainer}>
+                    <button 
+                      className={errors.Hospital ? `${styles.dropdownButton} ${styles.inputError}` : styles.dropdownButton} 
+                      onClick={() => setShowHospitalDropdown(!showHospitalDropdown)}
+                      type="button"
+                    >
+                      {formData.Hospital || "Select Hospital"}
+                      <ChevronDown size={18} className={styles.dropdownIcon} />
+                    </button>
+                    {showHospitalDropdown && (
+                      <div className={styles.dropdownMenu}>
+                        <div className={styles.searchContainer}>
+                          <input
+                            type="text"
+                            placeholder="Search hospitals..."
+                            value={hospitalSearchTerm}
+                            onChange={(e) => setHospitalSearchTerm(e.target.value)}
+                            className={styles.searchInput}
+                          />
+                          <Search size={16} className={styles.searchIcon} />
                         </div>
-                      ))}
+                        <div className={styles.dropdownList}>
+                          {filteredHospitals.map((hospital) => (
+                            <div
+                              key={hospital}
+                              className={styles.dropdownItem}
+                              onClick={() => {
+                                setFormData({ ...formData, Hospital: hospital });
+                                setShowHospitalDropdown(false);
+                              }}
+                            >
+                              {hospital}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {errors.Hospital && <p className={styles.errorMessage}>{errors.Hospital}</p>}
+                </div>
+                
+                {/* Doctor Charge field */}
+                <div className={styles.inputGroup}>
+                  <div className={styles.chargeInputContainer}>
+                    <span className={styles.currencySymbol}>Rs.</span>
+                    <input
+                      type="number"
+                      name="DoctorCharge"
+                      placeholder="Consultation Charge"
+                      className={errors.DoctorCharge ? styles.inputError : styles.input}
+                      value={formData.DoctorCharge}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  {errors.DoctorCharge && <p className={styles.errorMessage}>{errors.DoctorCharge}</p>}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Professional Information & Authentication */}
+          {currentStep === 2 && (
+            <div className={styles.formColumns}>
+              {/* Left Column */}
+              <div className={styles.formColumn}>
+                <div className={styles.idUploadSection}>
+                  <div className={styles.uploadRow}>
+                    <span className={styles.uploadLabel}>Copy of ID:</span>
+                    <button 
+                      type="button" 
+                      className={styles.uploadButton}
+                      onClick={() => setShowUploadModal(true)}
+                    >
+                      Upload
+                    </button>
+                  </div>
+                  
+                  {uploadedFile && (
+                    <div className={styles.fileInfo}>
+                      <span>File: {uploadedFile.name}</span>
                     </div>
                   )}
+                  {errors.uploadedFile && <p className={styles.errorMessage}>{errors.uploadedFile}</p>}
+                </div>
+                
+                <div className={styles.availabilitySection}>
+                  <h3 className={styles.sectionTitle}>Availability:</h3>
+                  <div className={styles.checkboxGrid}>
+                    {daysOfWeek.map((day) => (
+                      <div key={day} className={styles.checkboxItem}>
+                        <label className={styles.checkboxLabel}>
+                          <input
+                            type="checkbox"
+                            checked={formData.availability.includes(day)}
+                            onChange={() => handleCheckboxChange(day)}
+                            className={styles.checkbox}
+                          />
+                          <span className={styles.checkboxText}>{day}</span>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  {errors.availability && <p className={styles.errorMessage}>{errors.availability}</p>}
+                </div>
+                
+                <div className={styles.timeSlotSection}>
+                  <div className={styles.dropdownContainer}>
+                    <button 
+                      className={styles.dropdownButton} 
+                      onClick={() => setShowTimeDropdown(!showTimeDropdown)}
+                      type="button"
+                    >
+                      {selectedTime}
+                      <ChevronDown size={18} className={styles.dropdownIcon} />
+                    </button>
+                    {showTimeDropdown && (
+                      <div className={styles.dropdownMenu}>
+                        {timeSlots.map((time) => (
+                          <div
+                            key={time}
+                            className={styles.dropdownItem}
+                            onClick={() => {
+                              setSelectedTime(time);
+                              setShowTimeDropdown(false);
+                            }}
+                          >
+                            {time}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              {/* Password Requirements - Only show when password fields are active */}
-              {isPasswordFieldActive && (
-                <div className={styles.passwordRequirements}>
-                  <h4 className={styles.requirementsTitle}>Password Requirements:</h4>
-                  <ul className={styles.requirementsList}>
-                    <li className={formData.Password.length >= 8 ? styles.metRequirement : styles.requirement}>
-                      At least 8 characters
-                    </li>
-                    <li className={/[A-Z]/.test(formData.Password) ? styles.metRequirement : styles.requirement}>
-                      At least 1 uppercase letter
-                    </li>
-                    <li className={/[a-z]/.test(formData.Password) ? styles.metRequirement : styles.requirement}>
-                      At least 1 lowercase letter
-                    </li>
-                    <li className={/\d/.test(formData.Password) ? styles.metRequirement : styles.requirement}>
-                      At least 1 number
-                    </li>
-                    <li className={/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(formData.Password) ? styles.metRequirement : styles.requirement}>
-                      At least 1 special character
-                    </li>
-                  </ul>
+              {/* Right Column */}
+              <div className={styles.formColumn}>
+                {/* Password field with toggle visibility */}
+                <div className={styles.inputGroup}>
+                  <div className={styles.passwordInputContainer}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="Password"
+                      placeholder="Password"
+                      className={errors.Password ? styles.inputError : styles.input}
+                      value={formData.Password}
+                      onChange={handleChange}
+                      onFocus={() => setIsPasswordFieldActive(true)}
+                      onBlur={(e) => {
+                        // Only set to false if neither password field has focus
+                        if (document.activeElement !== e.target.form?.ConfirmPassword) {
+                          setTimeout(() => setIsPasswordFieldActive(false), 100);
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className={styles.passwordToggle}
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {errors.Password && <p className={styles.errorMessage}>{errors.Password}</p>}
                 </div>
-              )}
+                
+                {/* Confirm Password field with toggle visibility */}
+                <div className={styles.inputGroup}>
+                  <div className={styles.passwordInputContainer}>
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="ConfirmPassword"
+                      placeholder="Confirm Password"
+                      className={errors.ConfirmPassword ? styles.inputError : styles.input}
+                      value={formData.ConfirmPassword}
+                      onChange={handleChange}
+                      onFocus={() => setIsPasswordFieldActive(true)}
+                      onBlur={(e) => {
+                        // Only set to false if neither password field has focus
+                        if (document.activeElement !== e.target.form?.Password) {
+                          setTimeout(() => setIsPasswordFieldActive(false), 100);
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className={styles.passwordToggle}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {errors.ConfirmPassword && <p className={styles.errorMessage}>{errors.ConfirmPassword}</p>}
+                </div>
+                
+                {/* Password Requirements - Only show when password fields are active */}
+                {isPasswordFieldActive && (
+                  <div className={styles.passwordRequirements}>
+                    <h4 className={styles.requirementsTitle}>Password Requirements:</h4>
+                    <ul className={styles.requirementsList}>
+                      <li className={formData.Password.length >= 8 ? styles.metRequirement : styles.requirement}>
+                        At least 8 characters
+                      </li>
+                      <li className={/[A-Z]/.test(formData.Password) ? styles.metRequirement : styles.requirement}>
+                        At least 1 uppercase letter
+                      </li>
+                      <li className={/[a-z]/.test(formData.Password) ? styles.metRequirement : styles.requirement}>
+                        At least 1 lowercase letter
+                      </li>
+                      <li className={/\d/.test(formData.Password) ? styles.metRequirement : styles.requirement}>
+                        At least 1 number
+                      </li>
+                      <li className={/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(formData.Password) ? styles.metRequirement : styles.requirement}>
+                        At least 1 special character
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
           
           {errors.general && <p className={styles.errorMessage}>{errors.general}</p>}
           
-          <button 
-            className={styles.registerBtn} 
-            onClick={handleRegister} 
-            disabled={loading}
-          >
-            {loading ? "Processing..." : "Request Verification"}
-          </button>
+          <div className={styles.buttonGroup}>
+            {currentStep === 2 && (
+              <button 
+                className={styles.backBtn} 
+                onClick={handlePrevStep}
+                type="button"
+              >
+                Back
+              </button>
+            )}
+            
+            {currentStep === 1 ? (
+              <button 
+                className={styles.nextBtn} 
+                onClick={handleNextStep}
+                type="button"
+              >
+                Next
+              </button>
+            ) : (
+              <button 
+                className={styles.registerBtn} 
+                onClick={handleRegister} 
+                disabled={loading}
+                type="button"
+              >
+                {loading ? "Processing..." : "Request Verification"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -493,6 +740,7 @@ export default function DoctorRegistration() {
               <button 
                 className={styles.closeButton} 
                 onClick={() => setShowUploadModal(false)}
+                type="button"
               >
                 <X size={20} />
               </button>
@@ -524,6 +772,5 @@ export default function DoctorRegistration() {
         </div>
       )}
     </div>
-
-  );}
-  
+  );
+}
