@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { X, Eye, EyeOff, ChevronDown, Search, Plus, Trash2 } from "lucide-react";
 import styles from "./doctorReg.module.css";
+import { useEffect } from "react";
 
 export default function DoctorRegistration() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function DoctorRegistration() {
 
   const [currentSchedule, setCurrentSchedule] = useState({
     hospital: "",
+    hospitalId: "",
     charge: "",
     availability: {},
   });
@@ -65,24 +67,24 @@ export default function DoctorRegistration() {
 
   const genderOptions = ["Male", "Female"];
 
-  const hospitals = [
-    { id: 1, name: "None" },
-    { id: 2, name: "National Hospital of Sri Lanka - Colombo" },
-    { id: 3, name: "Lady Ridgeway Hospital - Colombo" },
-    { id: 4, name: "Teaching Hospital Karapitiya - Galle" },
-    { id: 5, name: "Kandy General Hospital - Kandy" },
-    { id: 6, name: "Jaffna Teaching Hospital - Jaffna" },
-    { id: 7, name: "Colombo South Teaching Hospital - Kalubowila" },
-    { id: 8, name: "Teaching Hospital Anuradhapura" },
-    { id: 9, name: "Teaching Hospital Kurunegala" },
-    { id: 10, name: "Colombo North Teaching Hospital - Ragama" },
-    { id: 11, name: "Base Hospital Awissawella" },
-    { id: 12, name: "District General Hospital Negombo" },
-    { id: 13, name: "Base Hospital Homagama" },
-    { id: 14, name: "District General Hospital Gampaha" },
-    { id: 15, name: "Base Hospital Panadura" },
-    { id: 16, name: "District Hospital Moratuwa" }
-  ];
+  const [hospitals, setHospitals] = useState([]);
+
+  useEffect(() => {
+    const fetchHospitals = async () => {
+      try {
+        const response = await fetch("https://localhost:7021/api/User/GetAllHospitals");
+        if (!response.ok) {
+          throw new Error("Failed to fetch hospitals");
+        }
+        const data = await response.json();
+        setHospitals(data);
+      } catch (error) {
+        console.error("Error fetching hospitals:", error);
+      }
+    };
+
+    fetchHospitals();
+  }, []);
 
   const specializations = [
     "General Medicine",
@@ -106,7 +108,11 @@ export default function DoctorRegistration() {
   ];
 
   const filteredHospitals = hospitalSearchTerm 
-    ? hospitals.filter(h => h.name.toLowerCase().includes(hospitalSearchTerm.toLowerCase()))
+    ? hospitals.filter(h => 
+        h.hospitalName.toLowerCase().includes(hospitalSearchTerm.toLowerCase()) ||
+        h.city.toLowerCase().includes(hospitalSearchTerm.toLowerCase()) ||
+        h.address.toLowerCase().includes(hospitalSearchTerm.toLowerCase())
+      )
     : hospitals;
 
   const filteredSpecializations = specializationSearchTerm
@@ -140,6 +146,7 @@ export default function DoctorRegistration() {
 
     setCurrentSchedule({
       hospital: "",
+      hospitalId: "",
       charge: "",
       availability: {},
     });
@@ -544,14 +551,21 @@ export default function DoctorRegistration() {
               <div className={styles.formColumn}>
                 <div className={styles.hospitalScheduleSection}>
                   <h3 className={styles.sectionTitle}>Hospital Schedules</h3>
-                  
+
                   {/* Current Hospital Schedule Form */}
                   <div className={styles.scheduleForm}>
                     <div className={styles.inputGroup}>
                       <div className={styles.dropdownContainer}>
-                        <button 
-                          className={!currentSchedule.hospital ? `${styles.dropdownButton} ${styles.inputError}` : styles.dropdownButton} 
-                          onClick={() => setShowHospitalDropdown(!showHospitalDropdown)}
+                        <button
+                          className={
+                            !currentSchedule.hospital
+                              ? `${styles.dropdownButton} ${styles.inputError}`
+                              : styles.dropdownButton
+                          }
+                          onClick={() => {
+                            setShowHospitalDropdown(!showHospitalDropdown);
+                            setHospitalSearchTerm("");
+                          }}
                           type="button"
                         >
                           {currentSchedule.hospital || "Select Hospital"}
@@ -566,41 +580,63 @@ export default function DoctorRegistration() {
                                 value={hospitalSearchTerm}
                                 onChange={(e) => setHospitalSearchTerm(e.target.value)}
                                 className={styles.searchInput}
+                                autoFocus
                               />
                               <Search size={16} className={styles.searchIcon} />
                             </div>
                             <div className={styles.dropdownList}>
-                              {filteredHospitals.map((hospital) => (
-                                <div
-                                  key={hospital.id}
-                                  className={styles.dropdownItem}
-                                  onClick={() => {
-                                    setCurrentSchedule({...currentSchedule, hospital: hospital.name});
-                                    setShowHospitalDropdown(false);
-                                  }}
-                                >
-                                  {hospital.name}
+                              {filteredHospitals.length > 0 ? (
+                                filteredHospitals.map((hospital) => (
+                                  <div
+                                    key={hospital.hospitalId}
+                                    className={styles.dropdownItem}
+                                    onClick={() => {
+                                      setCurrentSchedule({
+                                        ...currentSchedule,
+                                        hospital: hospital.hospitalName,
+                                        hospitalId: hospital.hospitalId,
+                                      });
+                                      setShowHospitalDropdown(false);
+                                    }}
+                                  >
+                                    <div className={styles.hospitalName}>{hospital.hospitalName}</div>
+                                    <div className={styles.hospitalDetails}>
+                                      <span>{hospital.city}</span>
+                                      
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                <div className={styles.noResults}>
+                                  No hospitals found matching "{hospitalSearchTerm}"
                                 </div>
-                              ))}
+                              )}
                             </div>
                           </div>
                         )}
                       </div>
+                      {!currentSchedule.hospital && errors.hospitalSchedule && (
+                        <p className={styles.errorMessage}>Please select a hospital</p>
+                      )}
                     </div>
-                    
+
                     <div className={styles.inputGroup}>
                       <div className={styles.chargeInputContainer}>
                         <span className={styles.currencySymbol}>Rs.</span>
                         <input
                           type="number"
                           placeholder="Consultation Charge"
-                          className={!currentSchedule.charge ? styles.inputError : styles.input}
+                          className={
+                            !currentSchedule.charge ? styles.inputError : styles.input
+                          }
                           value={currentSchedule.charge}
-                          onChange={(e) => setCurrentSchedule({...currentSchedule, charge: e.target.value})}
+                          onChange={(e) =>
+                            setCurrentSchedule({ ...currentSchedule, charge: e.target.value })
+                          }
                         />
                       </div>
                     </div>
-                    
+
                     <div className={styles.availabilitySection}>
                       <h4 className={styles.subSectionTitle}>Availability</h4>
                       <div className={styles.checkboxGrid}>
@@ -615,30 +651,38 @@ export default function DoctorRegistration() {
                               />
                               <span className={styles.checkboxText}>{day}</span>
                             </label>
-                            
+
                             {currentSchedule.availability[day] && (
                               <div className={styles.timeSlotContainer}>
                                 <select
                                   value={currentSchedule.availability[day].startTime}
-                                  onChange={(e) => updateDayTimeSlot(day, 'startTime', e.target.value)}
+                                  onChange={(e) =>
+                                    updateDayTimeSlot(day, "startTime", e.target.value)
+                                  }
                                   className={styles.timeSelect}
                                 >
                                   <option value="">Start Time</option>
-                                  {timeOptions.map(time => (
-                                    <option key={`${day}-start-${time}`} value={time}>{time}</option>
+                                  {timeOptions.map((time) => (
+                                    <option key={`${day}-start-${time}`} value={time}>
+                                      {time}
+                                    </option>
                                   ))}
                                 </select>
-                                
+
                                 <span className={styles.timeSeparator}>to</span>
-                                
+
                                 <select
                                   value={currentSchedule.availability[day].endTime}
-                                  onChange={(e) => updateDayTimeSlot(day, 'endTime', e.target.value)}
+                                  onChange={(e) =>
+                                    updateDayTimeSlot(day, "endTime", e.target.value)
+                                  }
                                   className={styles.timeSelect}
                                 >
                                   <option value="">End Time</option>
-                                  {timeOptions.map(time => (
-                                    <option key={`${day}-end-${time}`} value={time}>{time}</option>
+                                  {timeOptions.map((time) => (
+                                    <option key={`${day}-end-${time}`} value={time}>
+                                      {time}
+                                    </option>
                                   ))}
                                 </select>
                               </div>
@@ -647,7 +691,7 @@ export default function DoctorRegistration() {
                         ))}
                       </div>
                     </div>
-                    
+
                     <button
                       type="button"
                       className={styles.addScheduleButton}
@@ -655,12 +699,12 @@ export default function DoctorRegistration() {
                     >
                       <Plus size={16} /> Add Hospital Schedule
                     </button>
-                    
+
                     {errors.hospitalSchedule && (
                       <p className={styles.errorMessage}>{errors.hospitalSchedule}</p>
                     )}
                   </div>
-                  
+
                   {/* Display Added Schedules */}
                   <div className={styles.addedSchedules}>
                     {formData.hospitalSchedules.map((schedule, index) => (
@@ -690,8 +734,6 @@ export default function DoctorRegistration() {
                   </div>
                 </div>
               </div>
-              
-              {/* Right Column - Authentication */}
               <div className={styles.formColumn}>
                 {/* Password field with toggle visibility */}
                 <div className={styles.inputGroup}>
