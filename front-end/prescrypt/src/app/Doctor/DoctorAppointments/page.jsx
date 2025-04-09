@@ -3,9 +3,8 @@ import React, { useState, useEffect } from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
-import PrescriptionModal from "./PrescriptionModal";
+import PatientViewModal from "./PatientViewModal";
 import axiosInstance from "../utils/axiosInstance";
-import { MoreHorizontal } from "lucide-react";
 import { format } from "date-fns";
 
 export default function AppointmentsPage() {
@@ -16,42 +15,69 @@ export default function AppointmentsPage() {
   const [loading, setLoading] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [noAppointments, setNoAppointments] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [prescriptionText, setPrescriptionText] = useState("");
-  const [prescriptionFile, setPrescriptionFile] = useState(null);
+  const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
       setLoading(true);
       try {
-        const formattedDate = format(new Date(selectedDate), "yyyy-MM-dd");
-        console.log("Formatted Date:", formattedDate);
+        const formattedDate = selectedDate
+          ? format(new Date(selectedDate), "yyyy-MM-dd")
+          : "";
+        console.log("Fetching appointments with:", {
+          doctorId: "D002",
+          date: formattedDate,
+        });
 
-        const response = await axiosInstance.get(
-          `/api/Appointments/date/${formattedDate}?doctorId=D1` // replace with dynamic doc id
+        // Fetch appointments
+        const appointmentsResponse = await axiosInstance.get(
+          `/Appointments/by-doctor/D002${
+            formattedDate ? `?date=${formattedDate}` : ""
+          }`
         );
-        setAppointments(response.data);
+        console.log("Appointments Response data:", appointmentsResponse.data);
 
-        const availabilityResponse = await axiosInstance.get(
-          `/api/Appointments/availability/${formattedDate}?doctorId=D1` // replace with dynamic doc id
-        );
-        setAvailability(availabilityResponse.data);
-
-        if (response.data.length === 0) {
-          setNoAppointments(true);
-        } else {
+        if (appointmentsResponse.data && appointmentsResponse.data.length > 0) {
+          setAppointments(appointmentsResponse.data);
           setNoAppointments(false);
+        } else {
+          setAppointments([]);
+          setNoAppointments(true);
+        }
+
+        // Fetch availability - updated with better error handling
+        if (formattedDate) {
+          try {
+            const availabilityResponse = await axiosInstance.get(
+              `/Appointments/availability/${formattedDate}`,
+              {
+                params: {
+                  doctorId: "D002", //replace with dynamic doctor id
+                },
+              }
+            );
+            console.log("Availability data:", availabilityResponse.data);
+            setAvailability(availabilityResponse.data || []);
+          } catch (error) {
+            if (error.response?.status === 404) {
+              // Handle "no availability" case gracefully
+              setAvailability([]);
+            } else {
+              console.error("Error fetching availability:", error);
+              // Optionally show error to user
+            }
+          }
         }
       } catch (error) {
-        console.error(
-          "Error fetching appointments:",
-          error.response || error.message
-        );
-        setNoAppointments(true); // Show no appointments message on error
+        console.error("Error fetching appointments:", error);
+        setAppointments([]);
+        setNoAppointments(true);
       } finally {
         setLoading(false);
       }
     };
+
     fetchAppointments();
   }, [selectedDate]);
 
@@ -64,13 +90,12 @@ export default function AppointmentsPage() {
   };
 
   const calculateAge = (dob) => {
-    const birthDate = new Date(dob); // Parse the DOB string into a Date object
-    const today = new Date(); // Get the current date
+    if (!dob) return 0;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
 
-    let age = today.getFullYear() - birthDate.getFullYear(); // Calculate the difference in years
-    const monthDifference = today.getMonth() - birthDate.getMonth(); // Check if the birthday has occurred this year
-
-    // If the birthday hasn't occurred yet this year, subtract 1 from the age
     if (
       monthDifference < 0 ||
       (monthDifference === 0 && today.getDate() < birthDate.getDate())
@@ -81,31 +106,33 @@ export default function AppointmentsPage() {
     return age;
   };
 
-  //functions for modal control and prescription upload
-
-  const openPrescriptionModal = () => {
-    setIsModalOpen(true);
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+    const [hours, minutes] = timeString.split(":");
+    const date = new Date();
+    date.setHours(parseInt(hours, 10));
+    date.setMinutes(parseInt(minutes, 10));
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
-  const closePrescriptionModal = () => {
-    setIsModalOpen(false);
-    setPrescriptionText(""); // Clear text input
-    setPrescriptionFile(null); // Clear file input
+  const handleViewClick = (patient) => {
+    setSelectedPatient(patient);
+    setIsPatientModalOpen(true);
   };
 
-  const handlePrescriptionSubmit = (e) => {
-    e.preventDefault();
-
-    // Handle file upload or text submission logic here
-    if (prescriptionFile) {
-      console.log("File uploaded:", prescriptionFile);
+  const getGenderFullName = (genderChar) => {
+    switch (genderChar) {
+      case "M":
+        return "Male";
+      case "F":
+        return "Female";
+      default:
+        return "Other";
     }
-
-    if (prescriptionText) {
-      console.log("Prescription text:", prescriptionText);
-    }
-
-    closePrescriptionModal(); // Close modal after submission
   };
 
   return (
@@ -118,7 +145,7 @@ export default function AppointmentsPage() {
 
             {/* Date and Time Selection */}
             <div className="flex">
-              <div className="my-10 ml-10 p-3 pl-5 bg-[#E9FAF2] text-[#094A4D] w-45 shadow-lg rounded-[20px]">
+              <div className="my-10 ml-10 p-3 pl-5 bg-[#E9FAF2] text-[#094A4D] w-50 shadow-lg rounded-[20px]">
                 <label className="font-semibold">Date: </label>
                 <input
                   type="date"
@@ -126,25 +153,17 @@ export default function AppointmentsPage() {
                   onChange={handleDateChange}
                 />
               </div>
-              <div className="my-10 ml-10 p-3 pl-5 bg-[#E9FAF2] text-[#094A4D] w-45 shadow-lg rounded-[20px]">
+              <div className="my-10 ml-10 p-3 pl-5 bg-[#E9FAF2] text-[#094A4D] w-50 shadow-lg rounded-[20px]">
                 <label className="font-semibold">Time: </label>
                 {loading ? (
                   <div>Loading availability...</div>
                 ) : availability.length > 0 ? (
-                  availability.map((avail) => {
-                    const timeString = avail.availableTime.split(".")[0];
-                    return (
-                      <div key={avail.availabilityId}>
-                        {new Date(
-                          `1970-01-01T${timeString}`
-                        ).toLocaleTimeString([], {
-                          hour: "numeric",
-                          minute: "2-digit",
-                          hour12: true,
-                        })}
-                      </div>
-                    );
-                  })
+                  availability.map((avail) => (
+                    <div key={avail.availabilityId}>
+                      {formatTime(avail.availableStartTime)} -{" "}
+                      {formatTime(avail.availableEndTime)}
+                    </div>
+                  ))
                 ) : (
                   <div>No available times found.</div>
                 )}
@@ -164,13 +183,12 @@ export default function AppointmentsPage() {
                     <thead className="text-[#094A4D] sticky top-0 bg-[#0064694e]">
                       <tr>
                         <th className="px-4 py-2 text-left">Patient ID</th>
-                        <th className="px-4 py-2 text-left">Patient</th>
-                        <th className="px-4 py-2 text-left">
-                          Appointment Time
-                        </th>
-                        <th className="px-4 py-2 text-left">Hospital</th>
-                        <th className="px-4 py-2 text-left">Status</th>
-                        <th className="px-4 py-2 text-left">Actions</th>
+                        <th className="py-2 text-left">Patient</th>
+                        <th className="px-8 py-2 text-left">Date</th>
+                        <th className="px-4 py-2 text-left">Time</th>
+                        <th className="py-2 text-left">Hospital</th>
+                        <th className="px-8 py-2 text-left">Status</th>
+                        <th className="px-4 py-2 text-left">Action</th>
                       </tr>
                     </thead>
                   </table>
@@ -179,21 +197,18 @@ export default function AppointmentsPage() {
                     <table className="w-full table-auto sm:table-fixed min-w-full">
                       <tbody>
                         {appointments.length > 0 ? (
-                          appointments.map((appointment, index) => (
+                          appointments.map((appointment) => (
                             <tr
-                              key={appointment.id || index} // Use index as a fallback
+                              key={appointment.appointmentId}
                               className="border-b border-[#094A4D] relative odd:bg-[#E9FAF2]"
                             >
                               <td className="px-4 py-2">
                                 {appointment.patientId}
                               </td>
-                              <td className="px-4 py-2">
+                              <td className="py-2">
                                 <div className="flex items-center space-x-3">
                                   <img
-                                    src={
-                                      appointment.profilePictureUrl ||
-                                      "/profile.png"
-                                    }
+                                    src={`data:image/jpeg;base64,${appointment.profileImage}`}
                                     alt="Profile"
                                     width={50}
                                     height={50}
@@ -204,61 +219,44 @@ export default function AppointmentsPage() {
                                       {appointment.patientName}
                                     </span>
                                     <span className="text-sm text-gray-600">
-                                      {appointment.gender},{" "}
+                                      {getGenderFullName(appointment.gender)},{" "}
                                       {calculateAge(appointment.dob)} yrs
                                     </span>
                                   </div>
                                 </div>
                               </td>
-                              <td className="px-4 py-2">
-                                {new Date(appointment.time).toLocaleTimeString(
-                                  [],
-                                  {
-                                    hour: "numeric",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                  }
-                                )}
+                              <td className="px-8 py-2">
+                                {new Date(appointment.date).toLocaleString([], {
+                                  year: "numeric",
+                                  month: "numeric",
+                                  day: "numeric",
+                                })}
                               </td>
                               <td className="px-4 py-2">
-                                {appointment.hospital}
+                                {formatTime(appointment.time)}
                               </td>
-                              <td className="px-4 py-2">
+                              <td className="py-2">
+                                {appointment.hospitalName}
+                              </td>
+                              <td className="px-8 py-2">
                                 {appointment.status}
                               </td>
-                              <td className="relative">
+                              <td>
                                 <button
-                                  onClick={() =>
-                                    toggleMenu(appointment.appointmentId)
-                                  }
-                                  className="p-2"
-                                  aria-label="Open menu"
+                                  onClick={() => handleViewClick(appointment)}
+                                  className="block p-3 text-left w-full cursor-pointer font-semibold text-[#094A4D] hover:underline"
                                 >
-                                  <MoreHorizontal
-                                    size={20}
-                                    className="cursor-pointer"
-                                  />
+                                  View
                                 </button>
-                                {openMenuId === appointment.appointmentId && (
-                                  <div className="absolute w-50 bg-[#E9FAF2] border border-[#094A4D] shadow-2xl p-2 z-50 mt-[-20px] ml-[30px] text-[#094A4D] transition-opacity duration-200">
-                                    <button className="block p-3 text-left w-full hover:bg-white cursor-pointer border-b border-[#094A4D]">
-                                      Reschedule
-                                    </button>
-                                    <button
-                                      className="block p-3 text-left w-full hover:bg-white cursor-pointer"
-                                      onClick={openPrescriptionModal}
-                                    >
-                                      Add Prescription
-                                    </button>
-                                  </div>
-                                )}
                               </td>
                             </tr>
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="5" className="px-4 py-2 text-center">
-                              No appointments found
+                            <td colSpan="6" className="px-4 py-2 text-center">
+                              {noAppointments
+                                ? "No appointments found"
+                                : "Select a date to view appointments"}
                             </td>
                           </tr>
                         )}
@@ -269,11 +267,11 @@ export default function AppointmentsPage() {
               </div>
             )}
 
-            {/* Modal for Prescription */}
-            <PrescriptionModal
-              isOpen={isModalOpen}
-              onClose={closePrescriptionModal}
-              onSubmit={handlePrescriptionSubmit}
+            {/* Modal for Patient View */}
+            <PatientViewModal
+              isOpen={isPatientModalOpen}
+              onClose={() => setIsPatientModalOpen(false)}
+              patient={selectedPatient}
             />
           </div>
         </div>
