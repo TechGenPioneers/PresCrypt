@@ -5,7 +5,7 @@ import {
   DeleteDoctor,
   GetHospitals,
   UpdateDoctor,
-} from "../service/AdminService";
+} from "../service/AdminDoctorService";
 import { useRouter } from "next/navigation";
 
 export default function ManageDoctor({ doctorData }) {

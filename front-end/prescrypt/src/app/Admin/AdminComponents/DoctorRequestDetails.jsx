@@ -3,38 +3,37 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MoveLeft } from "lucide-react";
+import { GetRequestById } from "../service/AdminDoctorRequestService";
 
-// Sample Data
-const doctors = {
-  D001: {
-    name: "Shenali Perera",
-    gender: "Female",
-    specialty: "Cardiology",
-    hospital: "Nawaloka Hospital",
-    date: "2025-02-25",
-    telephone: "077 7777777",
-    email: "shenali@gmail.com",
-    availability: [
-      "Monday 4.00 PM - 6.00 PM",
-      "Wednesday 4.00 PM - 6.00 PM",
-      "Sunday 4.00 PM - 6.00 PM",
-    ],
-  },
-};
 
-const DoctorRequestDetails = () => {
-  const id = "D001";
+
+const DoctorRequestDetails = (requestID) => {
   const router = useRouter();
-  const [doctor, setDoctor] = useState(null);
+  const [request, setRequest] = useState(null);
   const [dateTime, setDateTime] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission (e.g., send `message` to backend)
+    console.log('Rejection reason:', message);
+    setShowModal(false); // Close modal after submit
+  };
+
 
   useEffect(() => {
-    setDoctor(doctors[id]);
+    const fetchRequest = async () => {
+      const getRequest = await GetRequestById(requestID);
+      setRequest(getRequest);
+      console.log("Doctor:", getRequest);
+    };
+    fetchRequest();
     const updateDateTime = () => setDateTime(new Date());
     updateDateTime(); // Set initial time
     const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
-  }, [id]);
+  }, [requestID]);
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
@@ -105,7 +104,7 @@ const DoctorRequestDetails = () => {
 
       <div className="flex mt-6 space-x-6 justify-center">
         <div className="grid grid-cols-2 gap-10">
-          <button className="bg-red-500 text-white py-2 px-5 rounded-xl hover:bg-red-400 cursor-pointer ">
+          <button className="bg-red-700 text-white py-2 px-5 rounded-xl hover:bg-red-900 cursor-pointer " onClick={() => setShowModal(true)}>
             Cancel Request
           </button>
           <button className="bg-[rgba(0,126,133,0.7)] text-[#094A4D] py-2 px-5 rounded-xl hover:bg-[rgba(0,126,133,0.4)] cursor-pointer">
@@ -113,7 +112,42 @@ const DoctorRequestDetails = () => {
           </button>
         </div>
       </div>
-
+{/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[90%] max-w-xl h-auto  shadow-xl">
+            <h2 className="text-xl font-semibold mb-4 text-[#094A4D]">Cancel Request</h2>
+            <form onSubmit={handleSubmit}>
+              <label className="block mb-2 text-sm text-gray-700">
+              Reason for Cancellation:
+              </label>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md mb-4"
+                rows="4"
+                placeholder="Enter your message..."
+                required
+              ></textarea>
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-white bg-red-900 hover:bg-red-700 cursor-pointer"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       <div className="mt-6 text-gray-500 text-right">
         <p>{formattedDate}</p>
         <p>{formattedTime}</p>

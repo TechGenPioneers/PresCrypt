@@ -4,6 +4,7 @@ import Footer from '@/app/Components/footer/Footer';
 import DoctorRequestDetails from '../AdminComponents/DoctorRequestDetails';
 
 const DoctorRequestDetailPage = () => {
+  const { requestID } = useParams(); 
     return (
         <div>
       <div className="flex">
@@ -11,7 +12,7 @@ const DoctorRequestDetailPage = () => {
           <AdminNavBar />
         </div>
         <div className="w-full">
-          <DoctorRequestDetails/>
+          <DoctorRequestDetails requestID={requestID}/>
         </div>
       </div>
       <div>

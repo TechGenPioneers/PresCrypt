@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { GetDoctorById } from "../service/AdminService";
+import { GetDoctorById } from "../service/AdminDoctorService";
 import { useRouter } from "next/navigation";
 
 export default function DoctorDetails({ doctorID }) {

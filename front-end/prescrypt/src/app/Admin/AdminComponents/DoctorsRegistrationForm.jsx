@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AddNewDoctor, GetHospitals } from "../service/AdminService";
+import { AddNewDoctor, GetHospitals } from "../service/AdminDoctorService";
 
 export default function DoctorRegistrationForm() {
   const [schedule, setSchedule] = useState([]);
