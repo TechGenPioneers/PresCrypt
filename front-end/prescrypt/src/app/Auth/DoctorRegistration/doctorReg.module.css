@@ -765,3 +765,81 @@
 .scheduleCard {
   animation: fadeIn 0.3s ease-out forwards;
 }
+/* Success Message Styles */
+.successContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 2rem;
+}
+
+.successContent {
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.successIcon {
+  color: #4BB543;
+  margin-bottom: 1.5rem;
+}
+
+.successTitle {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.successMessage {
+  font-size: 1.2rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.successDetails {
+  font-size: 1rem;
+  color: #7f8c8d;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.requestIdBox {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  display: inline-block;
+}
+
+.requestIdLabel {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.requestIdValue {
+  font-family: monospace;
+  color: #2c3e50;
+}
+
+.successButton {
+  background: #4BB543;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 1rem;
+}
+
+.successButton:hover {
+  background: #3a9a33;
+}
