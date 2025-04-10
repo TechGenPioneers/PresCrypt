@@ -12,13 +12,17 @@ export const registerPatient = async (patientData) => {
   }
 };
 
-// Patient Login
-export const loginPatient = async (loginData) => {
+// Common Login for all roles
+export const loginUser = async (loginData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/Patient/Login`, loginData);
+    const response = await axios.post(`${API_BASE_URL}/User/Login`, loginData, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Login failed");
+    return error.response?.data || { success: false, message: "Login failed" };
   }
 };
 
