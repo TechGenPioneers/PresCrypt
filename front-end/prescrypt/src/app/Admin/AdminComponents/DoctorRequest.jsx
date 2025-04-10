@@ -119,7 +119,7 @@ const DoctorRequest = () => {
 
                     <td className="p-3 space-x-3">
                       <button className="px-4 py-2 text-[#094A4D] cursor-pointer rounded">
-                      <Link href={`/Admin/DoctorDetailPage/${request.requestId}`}>View</Link>
+                      <Link href={`/Admin/DoctorRequestDetailPage/${request.requestId}`}>View</Link>
                       </button>
                     </td>
                   </tr>

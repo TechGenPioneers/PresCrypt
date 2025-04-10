@@ -1,10 +1,18 @@
+"use client";
 import React from 'react';
-import AdminNavBar from '../AdminComponents/AdminNavBar';
 import Footer from '@/app/Components/footer/Footer';
-import DoctorRequestDetails from '../AdminComponents/DoctorRequestDetails';
+import DoctorRequestDetails from '../../AdminComponents/DoctorRequestDetails';
+import { useParams } from "next/navigation"; 
+import AdminNavBar from '../../AdminComponents/AdminNavBar';
 
 const DoctorRequestDetailPage = () => {
-  const { requestID } = useParams(); 
+  const { requestId } = useParams(); 
+  console.log("RequestID:", requestId);
+
+  if (!requestId) {
+    return <div>Loading...</div>; // You can show a loading message while waiting for the query
+  }
+
     return (
         <div>
       <div className="flex">
@@ -12,7 +20,7 @@ const DoctorRequestDetailPage = () => {
           <AdminNavBar />
         </div>
         <div className="w-full">
-          <DoctorRequestDetails requestID={requestID}/>
+          <DoctorRequestDetails requestId={requestId}/>
         </div>
       </div>
       <div>

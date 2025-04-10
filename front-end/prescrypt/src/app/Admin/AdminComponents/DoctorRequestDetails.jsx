@@ -3,37 +3,56 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MoveLeft } from "lucide-react";
-import { GetRequestById } from "../service/AdminDoctorRequestService";
+import { GetRequestById, SendMail } from "../service/AdminDoctorRequestService";
 
-
-
-const DoctorRequestDetails = (requestID) => {
+const DoctorRequestDetails = ({ requestId }) => {
   const router = useRouter();
   const [request, setRequest] = useState(null);
   const [dateTime, setDateTime] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const [mail, setMail] = useState({
+    Receptor: "",
+    reason: "",
+  });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission (e.g., send `message` to backend)
-    console.log('Rejection reason:', message);
+    const updatedMail = {
+      ...mail,
+      Receptor: request.request.email,  // Dynamically add email
+    };
+
+    console.log("Rejection reason:", updatedMail); 
+
+    console.log("Rejection reason:", mail);
+    try {
+      const sent = await SendMail(updatedMail);
+      console.log(sent);
+    } catch (err) {
+      console.error("Failed to send mail", err);
+      alert("Failed to send mail!", err);
+    }
+    setMail({ Receptor: "", reason: "" });
+
     setShowModal(false); // Close modal after submit
   };
 
-
   useEffect(() => {
     const fetchRequest = async () => {
-      const getRequest = await GetRequestById(requestID);
+      const getRequest = await GetRequestById(requestId);
       setRequest(getRequest);
-      console.log("Doctor:", getRequest);
+      console.log("Request:", getRequest);
     };
+
     fetchRequest();
+
     const updateDateTime = () => setDateTime(new Date());
     updateDateTime(); // Set initial time
     const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
-  }, [requestID]);
+  }, [requestId]);
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
@@ -53,77 +72,157 @@ const DoctorRequestDetails = (requestID) => {
     hour12: true,
   });
 
-  if (!doctor) return <p className="text-center">Request not found.</p>;
+  if (!request) {
+    return (
+      <div className="h-[650px] p-8 border-15 border-[#E9FAF2]">
+        <h1 className="text-3xl font-bold mb-2"> Doctor Request</h1>
+        <div className="h-[400px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
+          <div className="flex-grow flex items-center justify-center">
+            <p className="text-red-400 font-bold text-xl text-center mb-5">
+              Request not found
+            </p>
+          </div>
+          <Link href="/Admin/DoctorRequestPage">
+            <button
+              className="w-full ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
+          hover:bg-[#91B4B8] transition duration-300 cursor-pointer"
+            >
+              Go to Doctor Request List
+            </button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="p-8 border-15 border-[#E9FAF2]">
       <h1 className="text-3xl font-bold mb-2">
-        Doctor Request - {doctor.name}
+        Doctor Request - {request.request.requestId} -{" "}
+        {request.request.firstName} {request.request.lastName}
+        <span
+          className={`font-semibold text-lg flex items-center gap-2 ${
+            request.request.requestStatus === "Approved"
+              ? "text-green-500"
+              : request.request.requestStatus === "Rejected"
+              ? "text-red-500"
+              : "text-yellow-500"
+          }`}
+        >
+          <span
+            className={`w-3 h-3 rounded-full ${
+              request.request.requestStatus === "Approved"
+                ? "bg-green-500"
+                : request.request.requestStatus === "Rejected"
+                ? "bg-red-500"
+                : "bg-yellow-500"
+            }`}
+          ></span>
+          {request.request.requestStatus}
+        </span>
       </h1>
-      <p className="text-gray-500">{formattedDate}</p>
-      <div className="mt-5 mb-10 justify-start">
-        <button className="cursor-pointer">
-          <Link href="/Admin/DoctorRequest">
-          <MoveLeft
-            size={30}
-            width={40}
-            strokeWidth={4.5}
-            absoluteStrokeWidth
-          />
-          </Link>
-        </button>
-      </div>
-      <div className="flex mt-6 space-x-6 justify-center">
-        {/* Availability */}
-        <div className="bg-[rgb(233,250,242)] p-6 rounded-lg shadow-md w-2/3">
-          <div className="grid grid-cols-2 space-x-2">
-            <div>
-              <h2 className="text-lg">{doctor.name}</h2>
-              <p className="text-gray-600 mt-1">{doctor.gender}</p>
-              <p className="text-gray-600 mt-1">{doctor.specialty}</p>
-              <p className="text-gray-600 mt-1">{doctor.hospital}</p>
 
-              <div className="mt-8">
-                <p className="text-gray-600">{doctor.telephone}</p>
-                <p className="text-gray-600">{doctor.email}</p>
-              </div>
+      <div className="flex mt-6 space-x-6">
+        {/* Profile Card */}
+        <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 text-left">
+          {/* Doctor Name */}
+          <div className="text-center">
+            <h2 className="text-lg font-bold">
+              {request.request.firstName} {request.request.lastName}
+            </h2>
+          </div>
+
+          {/* Doctor Details */}
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Doctor Fee:</h1>{" "}
+            <p className="text-gray-600">Rs.{request.request.charge}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Gender:</h1>{" "}
+            <p className="text-gray-600">{request.request.gender}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Contact:</h1>
+            <p className="text-gray-600">{request.request.contactNumber}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Specialization:</h1>{" "}
+            <p className="text-gray-600">{request.request.specialization}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">SLMC License:</h1>
+            <p className="text-gray-600">{request.request.slmcLicense}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Email:</h1>{" "}
+            <p className="text-gray-600">{request.request.email}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">NIC:</h1>
+            <p className="text-gray-600">{request.request.nic}</p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Email Verified:</h1>{" "}
+            <p className="text-gray-600">
+              {request.request.emailVerified ? "Verified" : "Not Verified"}
+            </p>
+          </div>
+          <div className="flex gap-1.5 m-1">
+            <h1 className="font-semibold">Requested At:</h1>{" "}
+            <p className="text-gray-600">{request.request.createdAt}</p>
+          </div>
+          {(request.request.requestStatus === "Approved" ||
+            request.request.requestStatus === "Rejected") && (
+            <div className="flex gap-1.5 m-1">
+              <h1 className="font-semibold">Checked At:</h1>
+              <p className="text-gray-600">{request.request.checkedAt}</p>
             </div>
-            <div>
-              <h3 className="font-semibold">Availability:</h3>
-              {doctor.availability.map((time, index) => (
-                <p key={index} className="text-gray-700 pt-10 pl-5">
-                  {time}
-                </p>
-              ))}
-              <div className="text-end mt-7">
-                <p className="text-gray-600"> Requested Date:{doctor.date}</p>
-              </div>
-            </div>
+          )}
+        </div>
+
+        {/* Availability */}
+        <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md w-2/3">
+          <h3 className="font-semibold mb-2">Availability:</h3>
+          <ul className="list-disc pl-5">
+            {request.requestAvailability.map((slot, index) => (
+              <li key={index} className="text-gray-700 pt-2">
+                <span className="font-bold">{slot.availableDay}</span>:{" "}
+                {slot.availableStartTime} - {slot.availableEndTime} at{" "}
+                <span className="font-bold">{slot.hospitalName}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      {request.request.requestStatus === "Pending" && (
+        <div className="flex mt-6 space-x-6 justify-center">
+          <div className="grid grid-cols-2 gap-10">
+            <button
+              className="bg-red-700 text-white py-2 px-5 rounded-xl hover:bg-red-900 cursor-pointer"
+              onClick={() => setShowModal(true)}
+            >
+              Cancel Request
+            </button>
+            <button className="bg-[rgba(0,126,133,0.7)] text-[#094A4D] py-2 px-5 rounded-xl hover:bg-[rgba(0,126,133,0.4)] cursor-pointer">
+              Confirm Registration
+            </button>
           </div>
         </div>
-      </div>
+      )}
 
-      <div className="flex mt-6 space-x-6 justify-center">
-        <div className="grid grid-cols-2 gap-10">
-          <button className="bg-red-700 text-white py-2 px-5 rounded-xl hover:bg-red-900 cursor-pointer " onClick={() => setShowModal(true)}>
-            Cancel Request
-          </button>
-          <button className="bg-[rgba(0,126,133,0.7)] text-[#094A4D] py-2 px-5 rounded-xl hover:bg-[rgba(0,126,133,0.4)] cursor-pointer">
-            Confirm Registration
-          </button>
-        </div>
-      </div>
-{/* Modal */}
+      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-xl p-6 w-[90%] max-w-xl h-auto  shadow-xl">
-            <h2 className="text-xl font-semibold mb-4 text-[#094A4D]">Cancel Request</h2>
+            <h2 className="text-xl font-semibold mb-4 text-[#094A4D]">
+              Cancel Request
+            </h2>
             <form onSubmit={handleSubmit}>
               <label className="block mb-2 text-sm text-gray-700">
-              Reason for Cancellation:
+                Reason for Cancellation:
               </label>
               <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                value={mail.reason}
+                onChange={(e) => setMail({ ...mail, reason: e.target.value })}
                 className="w-full p-2 border border-gray-300 rounded-md mb-4"
                 rows="4"
                 placeholder="Enter your message..."
