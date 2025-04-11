@@ -19,6 +19,8 @@ const DoctorRequestDetails = ({ requestId }) => {
 
   const [mail, setMail] = useState({
     Receptor: "",
+    FirstName:"",
+    LastName:"",
     reason: "",
   });
 
@@ -33,7 +35,9 @@ const DoctorRequestDetails = ({ requestId }) => {
     setIsLoading(true);
     const updatedMail = {
       ...mail,
-      Receptor: request.request.email, // Dynamically add email
+      Receptor: request.request.email, 
+      FirstName: request.request.firstName,
+      LastName: request.request.lastName,
     };
 
     console.log("Rejection reason:", updatedMail);
