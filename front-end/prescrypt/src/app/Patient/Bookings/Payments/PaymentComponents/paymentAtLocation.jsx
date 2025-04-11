@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
+import axios from "axios"; // <- Don't forget to install axios if not already
 
 const PaymentAtLocation = ({
   totalCharge,
@@ -7,6 +14,9 @@ const PaymentAtLocation = ({
   specialization,
   appointmentDate,
   appointmentTime,
+  doctorId,
+  patientId,
+  hospitalId,
   doctorName,
   selectedMethod,
 }) => {
@@ -22,16 +32,38 @@ const PaymentAtLocation = ({
     setCheckbox2Checked(event.target.checked);
   };
 
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = async () => {
     if (!checkbox1Checked || !checkbox2Checked) {
       alert("Please mark both confirmations before proceeding.");
-    } else {
-      setDialogOpen(true);
+      return;
+    }
+
+    const appointmentData = {
+      patientId: patientId || "P021",
+      doctorId: doctorId || "D009",
+      hospitalId: hospitalId || "H027",
+      date: appointmentDate,
+      time: appointmentTime,
+      charge: totalCharge,
+      status: "Pending",
+      typeOfAppointment: "Consultation",
+    };
+
+    try {
+      await axios.post("https://localhost:7021/api/Appointments", appointmentData);
+      setDialogOpen(true); // Show success dialog
+      setCheckbox1Checked(false); // Reset checkboxes
+      setCheckbox2Checked(false);
+    } catch (error) {
+      console.error("Appointment creation failed:", error);
+      alert("Failed to confirm booking. Please try again.");
     }
   };
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
+    // Redirect after closing the dialog
+    window.location.href = "http://localhost:3000/Patient/PatientAppointments";
   };
 
   return (
@@ -78,7 +110,6 @@ const PaymentAtLocation = ({
         </p>
       </div>
 
-      {/* ✅ Show this only if user selected 'location' */}
       {selectedMethod === "location" && (
         <div className="mt-6 space-y-3 text-sm text-gray-700">
           <label className="flex items-center gap-2">
@@ -109,7 +140,6 @@ const PaymentAtLocation = ({
         Confirm the Booking
       </button>
 
-      {/* Confirmation Dialog */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Booking Confirmation</DialogTitle>
         <DialogContent>
