@@ -3,7 +3,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MoveLeft } from "lucide-react";
-import { GetRequestById, SendMail } from "../service/AdminDoctorRequestService";
+import {
+  GetRequestById,
+  RejectRequest,
+  SendMail,
+} from "../service/AdminDoctorRequestService";
+import { Spinner } from "@material-tailwind/react";
 
 const DoctorRequestDetails = ({ requestId }) => {
   const router = useRouter();
@@ -11,41 +16,55 @@ const DoctorRequestDetails = ({ requestId }) => {
   const [dateTime, setDateTime] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [mail, setMail] = useState({
     Receptor: "",
     reason: "",
   });
 
+  const fetchRequest = async () => {
+    const getRequest = await GetRequestById(requestId);
+    setRequest(getRequest);
+    console.log("Request:", getRequest);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const updatedMail = {
       ...mail,
-      Receptor: request.request.email,  // Dynamically add email
+      Receptor: request.request.email, // Dynamically add email
     };
 
-    console.log("Rejection reason:", updatedMail); 
+    console.log("Rejection reason:", updatedMail);
 
     console.log("Rejection reason:", mail);
     try {
       const sent = await SendMail(updatedMail);
       console.log(sent);
+      if (sent != null) {
+        try {
+          const response = await RejectRequest(
+            request.request.requestId,
+            mail.reason
+          );
+          console.log(response);
+        } catch (error) {
+          alert("failed to reject");
+        }
+      }
     } catch (err) {
       console.error("Failed to send mail", err);
       alert("Failed to send mail!", err);
     }
+    setIsLoading(false);
     setMail({ Receptor: "", reason: "" });
-
+    fetchRequest();
     setShowModal(false); // Close modal after submit
   };
 
   useEffect(() => {
-    const fetchRequest = async () => {
-      const getRequest = await GetRequestById(requestId);
-      setRequest(getRequest);
-      console.log("Request:", getRequest);
-    };
-
     fetchRequest();
 
     const updateDateTime = () => setDateTime(new Date());
@@ -177,6 +196,12 @@ const DoctorRequestDetails = ({ requestId }) => {
               <p className="text-gray-600">{request.request.checkedAt}</p>
             </div>
           )}
+          {request.request.requestStatus === "Rejected" && (
+            <div className="flex gap-1.5 m-1">
+              <h1 className="font-semibold">Reason:</h1>
+              <p className="text-gray-600">{request.request.reason}</p>
+            </div>
+          )}
         </div>
 
         {/* Availability */}
@@ -247,6 +272,15 @@ const DoctorRequestDetails = ({ requestId }) => {
           </div>
         </div>
       )}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+            <p className="mb-4 text-lg font-semibold text-[rgba(0,126,133,0.7)]">Please wait...</p>
+            <Spinner className="h-10 w-10 text-[rgba(0,126,133,0.7)]"/>
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 text-gray-500 text-right">
         <p>{formattedDate}</p>
         <p>{formattedTime}</p>

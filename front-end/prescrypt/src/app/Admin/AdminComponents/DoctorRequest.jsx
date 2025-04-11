@@ -58,9 +58,9 @@ const DoctorRequest = () => {
 
       {/* Table */}
       <div className="overflow-x-auto mt-10 h-[400px]">
+      <h3 className="text-2xl font-bold mb-2">{title}</h3>
         <div className="rounded-lg overflow-hidden">
           <div className="max-h-100 overflow-y-auto">
-            <h3 className="text-2xl font-bold mb-2">{title}</h3>
             <table className="w-full mt-5 border-collapse">
               <thead>
                 <tr className="bg-[#006369] text-[#094A4D]">
@@ -113,8 +113,8 @@ const DoctorRequest = () => {
                       {statusFilter === "Pending"
                         ? request.createdAt
                         : statusFilter === "Approved"
-                        ? request.approvedAt
-                        : request.rejectedAt}
+                        ? request.checkedAt
+                        : request.checkedAt}
                     </td>
 
                     <td className="p-3 space-x-3">

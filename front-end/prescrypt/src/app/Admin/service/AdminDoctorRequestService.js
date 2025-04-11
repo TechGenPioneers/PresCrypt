@@ -45,5 +45,23 @@ const GetRequestById = async (requestId) => {
       throw error; // Rethrow error for handling upstream (in handleSubmit)
     }
   };
-  
- export{GetDoctorRequest,GetRequestById,SendMail}
+  //update doctor
+const RejectRequest = async (requestId,reason) => {
+  const rejectData = {
+    requestId,       
+    reason
+  };
+  try{
+      const response = await axios.patch(
+        DoctorRequestURL,
+        rejectData
+    );
+      console.log(response.data)
+      return response.data;
+  }
+  catch(error){
+      console.error("Failed to get the data",error);
+      throw error;
+  }
+}
+ export{GetDoctorRequest,GetRequestById,SendMail,RejectRequest}
