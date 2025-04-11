@@ -213,10 +213,12 @@ export default function DoctorConfirmForm({ requestId }) {
       } catch (err) {
         console.error("Failed to add the doctor", err);
         alert("Failed to add the doctor!");
+        setIsLoading(false);
       }
     } else {
       console.log("Time slots empty");
       setErrorMessage("Please select available time");
+      setIsLoading(false);
     }
   };
 

@@ -188,6 +188,7 @@ export default function ManageDoctor({ doctorData }) {
     } catch (error) {
       setErrorMessage("Failed to delete the Doctor!");
       console.error("Failed to delete the doctor", error);
+      setIsLoading(false);
     }
   };
 
@@ -239,11 +240,13 @@ export default function ManageDoctor({ doctorData }) {
         setIsLoading(false);
       } catch (err) {
         console.error("Failed to add the doctor", err);
-        alert("Failed to add the doctor!");
+        setErrorMessage("Failed to add the doctor!");
+        setIsLoading(false);
       }
     } else {
       console.log("Time slots empty");
       setErrorMessage("Please select available time");
+      setIsLoading(false);
     }
   };
 

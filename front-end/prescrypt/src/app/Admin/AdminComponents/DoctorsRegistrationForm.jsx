@@ -190,6 +190,7 @@ export default function DoctorRegistrationForm() {
         const newDoctorDetails = await AddNewDoctor(newDoctor, schedule);
         console.log(newDoctorDetails);
       } catch (err) {
+        setIsLoading(false);
         console.error("Failed to add the doctor", err);
         alert("Failed to add the doctor!", err);
       }
@@ -199,9 +200,12 @@ export default function DoctorRegistrationForm() {
       setSuccessMessage("Doctor Registered Successfully!");
       setIsLoading(false);
     } else {
+      setIsLoading(false);
       console.log("time slots empty");
       setErrorMessage("Please select available time");
+      
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {

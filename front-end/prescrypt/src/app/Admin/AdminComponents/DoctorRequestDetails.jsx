@@ -19,8 +19,8 @@ const DoctorRequestDetails = ({ requestId }) => {
 
   const [mail, setMail] = useState({
     Receptor: "",
-    FirstName:"",
-    LastName:"",
+    FirstName: "",
+    LastName: "",
     reason: "",
   });
 
@@ -35,7 +35,7 @@ const DoctorRequestDetails = ({ requestId }) => {
     setIsLoading(true);
     const updatedMail = {
       ...mail,
-      Receptor: request.request.email, 
+      Receptor: request.request.email,
       FirstName: request.request.firstName,
       LastName: request.request.lastName,
     };
@@ -75,6 +75,14 @@ const DoctorRequestDetails = ({ requestId }) => {
     const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
   }, [requestId]);
+
+  const isWithin7Days = (dateString) => {
+    const rejectedDate = new Date(dateString);
+    const today = new Date();
+    const diffTime = today - rejectedDate;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= 7;
+  };
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
@@ -142,7 +150,21 @@ const DoctorRequestDetails = ({ requestId }) => {
           {request.request.requestStatus}
         </span>
       </h1>
-
+      <div className="grid col-span-1 justify-end">
+        {request.request.requestStatus === "Rejected" &&
+          isWithin7Days(request.request.checkedAt) && (
+            <button
+              className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
+          hover:bg-[#91B4B8] transition duration-300 cursor-pointer"
+            >
+              <Link
+                href={`/Admin/RegistrationConfirmPage/${request.request.requestId}`}
+              >
+                Manage
+              </Link>
+            </button>
+          )}
+      </div>
       <div className="flex mt-6 space-x-6">
         {/* Profile Card */}
         <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 text-left">
@@ -152,7 +174,6 @@ const DoctorRequestDetails = ({ requestId }) => {
               {request.request.firstName} {request.request.lastName}
             </h2>
           </div>
-
           {/* Doctor Details */}
           <div className="flex gap-1.5 m-1">
             <h1 className="font-semibold">Doctor Fee:</h1>{" "}
@@ -231,8 +252,11 @@ const DoctorRequestDetails = ({ requestId }) => {
               Cancel Request
             </button>
             <button className="bg-[rgba(0,126,133,0.7)] text-[#094A4D] py-2 px-5 rounded-xl hover:bg-[rgba(0,126,133,0.4)] cursor-pointer">
-            <Link href={`/Admin/RegistrationConfirmPage/${request.request.requestId}`}>
-              Confirm Registration</Link>
+              <Link
+                href={`/Admin/RegistrationConfirmPage/${request.request.requestId}`}
+              >
+                Confirm Registration
+              </Link>
             </button>
           </div>
         </div>
@@ -279,8 +303,10 @@ const DoctorRequestDetails = ({ requestId }) => {
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <p className="mb-4 text-lg font-semibold text-[rgba(0,126,133,0.7)]">Please wait...</p>
-            <Spinner className="h-10 w-10 text-[rgba(0,126,133,0.7)]"/>
+            <p className="mb-4 text-lg font-semibold text-[rgba(0,126,133,0.7)]">
+              Please wait...
+            </p>
+            <Spinner className="h-10 w-10 text-[rgba(0,126,133,0.7)]" />
           </div>
         </div>
       )}
