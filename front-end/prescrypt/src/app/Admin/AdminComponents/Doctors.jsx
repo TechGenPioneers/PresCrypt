@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { GetDoctors } from "../service/AdminService";
+import { GetDoctors } from "../service/AdminDoctorService";
 
 const Doctors = () => {
   const [dateTime, setDateTime] = useState(new Date()); // Initialize dateTime
