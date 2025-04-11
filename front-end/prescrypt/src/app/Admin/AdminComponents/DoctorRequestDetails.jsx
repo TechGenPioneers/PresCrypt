@@ -15,7 +15,6 @@ const DoctorRequestDetails = ({ requestId }) => {
   const [request, setRequest] = useState(null);
   const [dateTime, setDateTime] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const [mail, setMail] = useState({
@@ -169,7 +168,7 @@ const DoctorRequestDetails = ({ requestId }) => {
           </div>
           <div className="flex gap-1.5 m-1">
             <h1 className="font-semibold">SLMC License:</h1>
-            <p className="text-gray-600">{request.request.slmcLicense}</p>
+            <p className="text-gray-600">{request.request.slmcRegId}</p>
           </div>
           <div className="flex gap-1.5 m-1">
             <h1 className="font-semibold">Email:</h1>{" "}
@@ -228,7 +227,8 @@ const DoctorRequestDetails = ({ requestId }) => {
               Cancel Request
             </button>
             <button className="bg-[rgba(0,126,133,0.7)] text-[#094A4D] py-2 px-5 rounded-xl hover:bg-[rgba(0,126,133,0.4)] cursor-pointer">
-              Confirm Registration
+            <Link href={`/Admin/RegistrationConfirmPage/${request.request.requestId}`}>
+              Confirm Registration</Link>
             </button>
           </div>
         </div>

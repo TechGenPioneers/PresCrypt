@@ -1,21 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  DeleteDoctor,
-  GetHospitals,
-  UpdateDoctor,
-} from "../service/AdminDoctorService";
 import { useRouter } from "next/navigation";
+import { AddNewDoctor, GetHospitals } from "../service/AdminDoctorService";
+import { GetRequestById } from "../service/AdminDoctorRequestService";
 import { Spinner } from "@material-tailwind/react";
 
-export default function ManageDoctor({ doctorData }) {
+export default function DoctorConfirmForm({ requestId }) {
   const [schedule, setSchedule] = useState([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [request, setRequest] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [doctorId, setDoctorId] = useState();
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [newDoctor, setNewDoctor] = useState({
-    DoctorId: "",
+    RequestId: "",
     FirstName: "",
     LastName: "",
     Email: "",
@@ -69,14 +66,6 @@ export default function ManageDoctor({ doctorData }) {
     setNewDoctor((prevDoctor) => ({
       ...prevDoctor,
       Gender: event.target.value,
-    }));
-  };
-
-  //handle status
-  const handleStatusChange = (event) => {
-    setNewDoctor((prevDoctor) => ({
-      ...prevDoctor,
-      Status: event.target.value === "true", // Convert string back to boolean
     }));
   };
 
@@ -176,24 +165,10 @@ export default function ManageDoctor({ doctorData }) {
     setShowSuggestions(false);
   };
 
-  // Handle form delete
-  const handleDeleteDoctor = async (e) => {
-    try {
-      setIsLoading(true);
-      const deleteDoctor = await DeleteDoctor(newDoctor.DoctorId);
-      console.log(deleteDoctor);
-      setIsSubmitted(true);
-      setIsLoading(false);
-      setSuccessMessage("Doctor Deleted Successfully!");
-    } catch (error) {
-      setErrorMessage("Failed to delete the Doctor!");
-      console.error("Failed to delete the doctor", error);
-    }
-  };
-
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission
     setIsLoading(true);
+    e.preventDefault(); // Prevent default form submission
+
     // Check if schedule has data
     if (schedule.length > 0) {
       try {
@@ -203,10 +178,8 @@ export default function ManageDoctor({ doctorData }) {
         console.log("Before sending Data --->", newDoctor, schedule);
 
         // Uncomment the code to actually send the data
-        const newDoctorDetails = await UpdateDoctor(newDoctor, schedule);
+        const newDoctorDetails = await AddNewDoctor(newDoctor, schedule);
         console.log(newDoctorDetails);
-
-        setDoctorId(newDoctor.DoctorId);
 
         // Reset state after successful submission
         setAvailableData({
@@ -219,7 +192,7 @@ export default function ManageDoctor({ doctorData }) {
         });
 
         setNewDoctor({
-          DoctorId: "",
+          RequestId: "",
           FirstName: "",
           LastName: "",
           Email: "",
@@ -233,7 +206,7 @@ export default function ManageDoctor({ doctorData }) {
           Charge: 0.0,
         });
         setIsSubmitted(true);
-        setSuccessMessage("Doctor Updated Successfully!");
+        setSuccessMessage("Doctor Added Successfully!");
         setSchedule([]); // Reset schedule
         setErrorMessage(""); // Clear any error message
         setIsLoading(false);
@@ -247,55 +220,64 @@ export default function ManageDoctor({ doctorData }) {
     }
   };
 
-  const handleBack = () => {
-    console.log("clicked back", doctorId);
-    router.push(`/Admin/DoctorDetailPage/${doctorId}`);
+  const fetchRequest = async () => {
+    const getRequest = await GetRequestById(requestId);
+    setRequest(getRequest);
+    console.log("Request:", getRequest);
   };
+  const loadData = async () => {
+    const HospitalDetails = await GetHospitals();
+    console.log(HospitalDetails);
+    setHospitalsData(HospitalDetails); // Set hospital data
+
+    const updateDateTime = () => setDateTime(new Date());
+    updateDateTime(); // Set initial time
+    const interval = setInterval(updateDateTime, 1000);
+    return () => clearInterval(interval);
+  };
+  useEffect(() => {
+    const load = async () => {
+      await loadData();
+      await fetchRequest();
+      console.log("RequestId:", requestId);
+    };
+
+    load();
+  }, [requestId]); // ✅ Only re-run when requestId changes
 
   useEffect(() => {
-    const loadData = async () => {
-      const HospitalDetails = await GetHospitals();
-      console.log(HospitalDetails);
-      setHospitalsData(HospitalDetails); // Set hospital data
-
-      const updateDateTime = () => setDateTime(new Date());
-      updateDateTime(); // Set initial time
-      const interval = setInterval(updateDateTime, 1000);
-      return () => clearInterval(interval);
-    };
-    loadData();
-
-    console.log("ManageDoctor page: ", doctorData);
-
-    // Set the newDoctor state based on the received doctorData prop
-    if (doctorData && doctorData.doctor) {
+    if (request && request.request) {
       setNewDoctor({
-        DoctorId: doctorData.doctor.doctorId,
-        FirstName: doctorData.doctor.firstName,
-        LastName: doctorData.doctor.lastName,
-        Email: doctorData.doctor.email,
-        specialization: doctorData.doctor.specialization,
-        SlmcLicense: doctorData.doctor.slmcLicense,
-        ContactNumber: doctorData.doctor.contactNumber,
-        Gender: doctorData.doctor.gender,
-        NIC: doctorData.doctor.nic,
-        Description: doctorData.doctor.description,
-        Status: doctorData.doctor.status,
-        Charge: doctorData.doctor.charge,
+        RequestId: request.request.requestId,
+        FirstName: request.request.firstName,
+        LastName: request.request.lastName,
+        Email: request.request.email,
+        specialization: request.request.specialization,
+        SlmcLicense: request.request.slmcRegId,
+        ContactNumber: request.request.contactNumber,
+        Gender: request.request.gender,
+        NIC: request.request.nic,
+        Status: request.request.status,
+        Charge: request.request.charge,
       });
 
-      setSchedule(
-        doctorData.availability.map((avail) => ({
-          day: avail.day,
-          startTime: avail.startTime,
-          endTime: avail.endTime,
-          HospitalId: avail.hospitalId,
-          HospitalName: avail.hospitalName,
-          AvailabilityId: avail.availabilityId,
-        }))
-      );
+      if (
+        request.requestAvailability &&
+        request.requestAvailability.length > 0
+      ) {
+        setSchedule(
+          request.requestAvailability.map((avail) => ({
+            day: avail.availableDay,
+            startTime: avail.availableStartTime,
+            endTime: avail.availableEndTime,
+            HospitalId: avail.hospitalId,
+            HospitalName: avail.hospitalName,
+            AvailabilityId: avail.availabilityRequestId,
+          }))
+        );
+      }
     }
-  }, [doctorData]);
+  }, [request]); // ✅ This effect only runs when request changes
 
   // set date and time
   if (!dateTime) return null;
@@ -320,53 +302,13 @@ export default function ManageDoctor({ doctorData }) {
     <div className="p-6 bg-white rounded-lg shadow-md border-15 border-[#E9FAF2]">
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">
-        Doctor Manage - {newDoctor.DoctorId} - {newDoctor.FirstName}{" "}
-        {newDoctor.LastName}
+        Doctor Registration Form - {newDoctor.FirstName} {newDoctor.LastName}
       </h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
       {!isSubmitted ? (
         <div className="mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-[100%]">
           <form onSubmit={handleSubmit}>
             {/* Text Inputs */}
-            <div className="justify-center flex items-center mb-4">
-              <label className="block font-semibold mb-2 mt-2">
-                Active Status:
-              </label>
-              <div className="grid grid-cols-2 gap-2 items-center mt-2">
-                <div className="ml-3">
-                  <input
-                    type="radio"
-                    id="active"
-                    name="Status"
-                    value="true"
-                    onChange={handleStatusChange}
-                    checked={newDoctor.Status == true}
-                    className="mr-2 bg-[#007e8556] cursor-pointer"
-                  />
-                  <label htmlFor="Active" className="font-small text-[#5E6767]">
-                    Active
-                  </label>
-                </div>
-
-                <div className="ml-3">
-                  <input
-                    type="radio"
-                    id="inactive"
-                    name="Status"
-                    value="false"
-                    onChange={handleStatusChange}
-                    checked={newDoctor.Status == false}
-                    className="mr-2 bg-[#007e8556] cursor-pointer"
-                  />
-                  <label
-                    htmlFor="Inactive"
-                    className="font-small text-[#5E6767]"
-                  >
-                    Inactive
-                  </label>
-                </div>
-              </div>
-            </div>
             <div className="grid grid-cols-2 gap-10">
               <div>
                 <label className="block font-semibold mb-2 mt-5">
@@ -684,19 +626,15 @@ export default function ManageDoctor({ doctorData }) {
             <p className="text-red-500 font-bold text-center mb-5">
               {errorMessage}
             </p>
-            <div className="mt-5 flex space-x-5">
-              <button
-                type="button"
-                onClick={handleDeleteDoctor}
-                className=" bg-red-800 text-white p-2 w-[100%] rounded-lg hover:bg-red-700 cursor-pointer"
-              >
-                Delete Doctor
-              </button>
+            <div className="mt-5 w-[100%]">
+              <p className="text-red-500 font-bold text-center mb-5">
+                {errorMessage}
+              </p>
               <button
                 type="submit"
                 className=" bg-[#007e8556] text-[#006369] p-2 w-[100%] rounded-lg hover:bg-[#007e8589] cursor-pointer"
               >
-                Update Doctor
+                Register
               </button>
             </div>
           </form>
@@ -704,34 +642,25 @@ export default function ManageDoctor({ doctorData }) {
       ) : (
         <div className="h-[500px] ">
           <div className="h-[500px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
-            <h1 className="text-2xl font-bold text-center mb-2">
-              Update Status
-            </h1>
+            <h1 className="text-2xl font-bold text-center mb-2">Add Status</h1>
             <div className="flex-grow flex items-center justify-center">
               <p className="text-green-600 font-bold text-xl text-center mb-5">
                 {successMessage}
               </p>
             </div>
-            <div className="justify-center">
-              <button
-                className="ml-1 mt-10 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
-      hover:bg-[#91B4B8] transition duration-300 cursor-pointer w-full"
-                onClick={handleBack}
-              >
-                Back to Doctor Details
-              </button>
-            </div>
           </div>
         </div>
       )}
       {isLoading && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center">
-                <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-                  <p className="mb-4 text-lg font-semibold text-[rgba(0,126,133,0.7)]">Please wait...</p>
-                  <Spinner className="h-10 w-10 text-[rgba(0,126,133,0.7)]"/>
-                </div>
-              </div>
-            )}
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+            <p className="mb-4 text-lg font-semibold text-[rgba(0,126,133,0.7)]">
+              Please wait...
+            </p>
+            <Spinner className="h-10 w-10 text-[rgba(0,126,133,0.7)]" />
+          </div>
+        </div>
+      )}
       <div className="mt-6 text-gray-500 text-right">
         <p>{formattedDate}</p>
         <p>{formattedTime}</p>

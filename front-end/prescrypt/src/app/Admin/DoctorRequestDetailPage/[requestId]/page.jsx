@@ -10,7 +10,12 @@ const DoctorRequestDetailPage = () => {
   console.log("RequestID:", requestId);
 
   if (!requestId) {
-    return <div>Loading...</div>; // You can show a loading message while waiting for the query
+   <div className="fixed inset-0 z-50 flex items-center justify-center">
+             <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+               <p className="mb-4 text-lg font-semibold text-[rgba(0,126,133,0.7)]">Please wait...</p>
+               <Spinner className="h-10 w-10 text-[rgba(0,126,133,0.7)]"/>
+             </div>
+           </div>
   }
 
     return (
