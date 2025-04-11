@@ -57,8 +57,8 @@ const DoctorRequest = () => {
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
 
       {/* Table */}
-      <div className="overflow-x-auto mt-10 h-[400px]">
-      <h3 className="text-2xl font-bold mb-2">{title}</h3>
+      <h3 className="text-2xl font-bold mb-1 mt-10">{title}</h3>
+      <div className="overflow-x-auto  h-[400px]">
         <div className="rounded-lg overflow-hidden">
           <div className="max-h-100 overflow-y-auto">
             <table className="w-full mt-5 border-collapse">
