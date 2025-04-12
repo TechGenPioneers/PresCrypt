@@ -16,9 +16,7 @@
     "@material-tailwind/react": "^2.1.10",
     "@hugeicons/react": "^1.0.5",
     "@mui/icons-material": "^6.4.7",
-    "@mui/material": "^6.4.7",
     "@mui/x-date-pickers": "^7.27.3",
-    "@mui/icons-material": "^6.4.7",
     "@mui/material": "^6.4.7",
 
     "@tailwindcss/postcss": "^4.0.0",
