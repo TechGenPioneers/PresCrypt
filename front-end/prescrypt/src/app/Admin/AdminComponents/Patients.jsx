@@ -1,20 +1,48 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import { useState, useEffect } from "react";
+import { GetPatients } from "../service/AdminPatientService";
 const Patients = () => {
   const [dateTime, setDateTime] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [patients, setPatients] = useState([]);
+
+  const getPatients = async () => {
+    try {
+      const patients = await GetPatients();
+      setPatients(patients);
+      console.log(patients);
+    } catch (error) {
+      console.error("Failed to get the data", error);
+    }
+  };
 
   useEffect(() => {
     const updateDateTime = () => {
       setDateTime(new Date());
     };
-
+    getPatients();
     updateDateTime(); // Set initial value
     const interval = setInterval(updateDateTime, 1000); // Update every second
 
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
+
+  function calculateAge(dobString) {
+    const dob = new Date(dobString);
+    const today = new Date();
+  
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    const dayDiff = today.getDate() - dob.getDate();
+  
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--; // Birthday hasn't occurred yet this year
+    }
+  
+    return age;
+  }
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
@@ -34,62 +62,11 @@ const Patients = () => {
     hour12: true,
   });
 
-  const patients = [
-    {
-      id: "P001",
-      name: "John Doe",
-      gender: "Male",
-      age: 32,
-      doctor: "Dr. Smith",
-      lastVisit: "2025-03-01",
-    },
-    {
-      id: "P002",
-      name: "Jane Doe",
-      gender: "Female",
-      age: 28,
-      doctor: "Dr. Johnson",
-      lastVisit: "2025-02-15",
-    },
-    {
-      id: "P003",
-      name: "Alice Smith",
-      gender: "Female",
-      age: 45,
-      doctor: "Dr. Lee",
-      lastVisit: "2025-01-20",
-    },
-    {
-      id: "P004",
-      name: "Bob Brown",
-      gender: "Male",
-      age: 50,
-      doctor: "Dr. Turner",
-      lastVisit: "2025-03-10",
-    },
-    {
-      id: "P005",
-      name: "Charlie White",
-      gender: "Male",
-      age: 37,
-      doctor: "Dr. Baker",
-      lastVisit: "2025-02-05",
-    },
-    {
-      id: "P006",
-      name: "Diana Green",
-      gender: "Female",
-      age: 42,
-      doctor: "Dr. Moore",
-      lastVisit: "2025-02-25",
-    },
-  ];
-
   // Filtered patients based on search query (searching by id or name)
   const filteredPatients = patients.filter(
     (patient) =>
-      patient.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.name.toLowerCase().includes(searchQuery.toLowerCase())
+      patient.patientId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
   );
   return (
     <div className="p-6 border-15 border-[#E9FAF2] bg-white ">
@@ -122,10 +99,16 @@ const Patients = () => {
                     Patient
                   </th>
                   <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Doctor
+                    Last Appointment
                   </th>
                   <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Last Visit
+                    Last Appointment Status
+                  </th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
+                    Last Login
+                  </th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
+                    Action
                   </th>
                 </tr>
               </thead>
@@ -139,22 +122,63 @@ const Patients = () => {
                       index % 2 === 0 ? "bg-[#E9FAF2]" : "bg-[#ffffff]"
                     }`}
                   >
-                    <td className="p-3 text-[#094A4D]">{patient.id}</td>
+                    <td className="p-3 text-[#094A4D]">{patient.patientId}</td>
                     <td className="p-3 flex items-center space-x-3">
                       <img
-                        src="/profile2.png"
+                        src={patient.profileImage || "/profile2.png"} // Use profilePhoto if available
                         alt="Avatar"
                         className="w-10 h-10 rounded-full"
                       />
                       <div>
-                        <p className="font-semibold text-[#094A4D]">{patient.name}</p>
+                        <p className="font-semibold text-[#094A4D]">
+                          {patient.firstName} {patient.lastName}
+                        </p>
                         <p className="text-[#094A4D] text-sm">
-                          {patient.gender} • {patient.age}
+                          {patient.gender} • {calculateAge(patient.dob)} years
                         </p>
                       </div>
                     </td>
-                    <td className="p-3 text-[#094A4D]">{patient.doctor}</td>
-                    <td className="p-3 text-[#094A4D]">{patient.lastVisit}</td>
+                    <td className="p-3  items-center space-x-3">
+                      <div>
+                        <p className="font-semibold text-[#094A4D]">
+                          {patient.lastAppointmentDoctorName}
+                        </p>
+                        <p className="text-[#094A4D] text-sm">
+                          {patient.lastAppointmentDoctorID} •{" "}
+                          {patient.lastAppointmentDate}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="p-3 text-[#094A4D]">
+                      <span
+                        className={` text-md flex items-center gap-2 ${
+                          patient.status === "Completed"
+                            ? "text-green-500"
+                            : patient.status === "Cancelled"
+                            ? "text-red-500"
+                            : "text-yellow-500"
+                        }`}
+                      >
+                        <span
+                          className={`w-3 h-3 rounded-full ${
+                            patient.status === "Completed"
+                              ? "bg-green-500"
+                              : patient.status === "Cancelled"
+                              ? "bg-red-500"
+                              : "bg-yellow-500"
+                          }`}
+                        ></span>
+                        {patient.status}
+                      </span>
+                    </td>
+                    <td className="p-3 text-[#094A4D]">{patient.lastLogin}</td>
+                    <td className="p-3 space-x-3">
+                      <button className="px-4 py-2 text-[#094A4D] cursor-pointer rounded">
+                        <Link href={`/Admin/PatientDetailsPage/${patient.patientId}`}>
+                        View
+                        </Link>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

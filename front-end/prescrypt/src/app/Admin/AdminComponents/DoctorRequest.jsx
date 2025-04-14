@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { GetDoctorRequest } from "../service/AdminDoctorRequestService";
 const DoctorRequest = () => {
