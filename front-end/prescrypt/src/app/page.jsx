@@ -3,7 +3,8 @@ import React from "react";
 import Header from "./Components/header/Header";
 import Footer from "./Components/footer/Footer";
 import styles from "./page.module.css";
-import Link from "next/link";  
+import Link from "next/link";
+import Link from "next/link";
 
 
 
@@ -19,6 +20,12 @@ export default function Home() {
       </p>
       <div className={styles.actions}>
         {/* Use Next.js Link for routing */}
+          <Link href="/Auth/MainPage" passHref legacyBehavior>
+            <a className={styles.card}>
+              <h2>Welcome &rarr;</h2>
+              <p>go to the main page</p>
+            </a>
+          </Link>
         <Link href="/Patient/PatientProfile" passHref legacyBehavior>
           <a className={styles.card}>
             <h2>Profile &rarr;</h2>
@@ -38,11 +45,17 @@ export default function Home() {
           </a>
         </Link>
         <Link href="/Patient/PatientDashboard" passHref legacyBehavior>
-<a className={styles.card}>
-  <h2>Dashboard &rarr;</h2>
-  <p>Access your dashboard for quick updates.</p>
-</a>
-</Link>
+          <a className={styles.card}>
+            <h2>Dashboard &rarr;</h2>
+            <p>Access your dashboard for quick updates.</p>
+          </a>
+          </Link>
+          <Link href="/Auth/MainPage" passHref legacyBehavior>
+            <a className={styles.card}>
+              <h2>Welcome &rarr;</h2>
+              <p>go to the main page</p>
+            </a>
+          </Link>
       </div>
     </main>
     <Footer />
