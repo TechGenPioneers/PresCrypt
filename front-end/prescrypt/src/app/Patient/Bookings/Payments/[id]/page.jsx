@@ -35,7 +35,7 @@ function PaymentClient({ id }) {
         {appointmentData && (
           <PaymentView
             hospitalCharge={hospitalCharge}
-            doctorCharge={charge}
+            doctorCharge={appointmentData.charge}
             hospital={selectedLocation}
             specialization={selectedSpecialization}
             appointmentDate={appointmentData.selectedDate}

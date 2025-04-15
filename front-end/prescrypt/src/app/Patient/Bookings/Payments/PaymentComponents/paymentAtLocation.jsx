@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,7 +6,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import axios from "axios"; // <- Don't forget to install axios if not already
+import axios from "axios";
 
 const PaymentAtLocation = ({
   totalCharge,
@@ -23,21 +23,98 @@ const PaymentAtLocation = ({
   const [checkbox1Checked, setCheckbox1Checked] = useState(false);
   const [checkbox2Checked, setCheckbox2Checked] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [payhereReady, setPayhereReady] = useState(false);
 
-  const handleCheckbox1Change = (event) => {
-    setCheckbox1Checked(event.target.checked);
-  };
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://www.payhere.lk/lib/payhere.js";
+    script.async = true;
+    script.onload = () => {
+      setPayhereReady(true);
+      console.log("PayHere script loaded.");
+    };
+    document.body.appendChild(script);
 
-  const handleCheckbox2Change = (event) => {
-    setCheckbox2Checked(event.target.checked);
-  };
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  // Reset checkboxes when method changes
+  useEffect(() => {
+    setCheckbox1Checked(false);
+    setCheckbox2Checked(false);
+  }, [selectedMethod]);
+
+  const handleCheckbox1Change = (e) => setCheckbox1Checked(e.target.checked);
+  const handleCheckbox2Change = (e) => setCheckbox2Checked(e.target.checked);
 
   const handleConfirmBooking = async () => {
-    if (!checkbox1Checked || !checkbox2Checked) {
-      alert("Please mark both confirmations before proceeding.");
-      return;
-    }
+    if (selectedMethod === "location") {
+      if (!checkbox1Checked || !checkbox2Checked) {
+        alert("Please mark both confirmations before proceeding.");
+        return;
+      }
+      handleCreateAppointment();
+    } else if (selectedMethod === "online") {
+      if (!payhereReady) {
+        alert("Payment gateway not ready yet. Please try again in a few seconds.");
+        return;
+      }
 
+      setLoading(true);
+      try {
+        const res = await fetch("/api/payhere-process");
+        const obj = await res.json();
+
+        window.payhere.onCompleted = function (orderId) {
+          console.log("Payment completed. OrderID:", orderId);
+          handleCreateAppointment();
+        };
+
+        window.payhere.onDismissed = function () {
+          console.log("Payment dismissed");
+        };
+
+        window.payhere.onError = function (error) {
+          console.error("Payment error:", error);
+        };
+
+        const payment = {
+          sandbox: true,
+          merchant_id: obj.merchant_id,
+          return_url: "http://localhost:3000",
+          cancel_url: "http://localhost:3000",
+          notify_url: "http://sample.com/notify",
+          order_id: obj.order_id,
+          items: obj.items,
+          amount: obj.amount,
+          currency: obj.currency,
+          hash: obj.hash,
+          first_name: obj.first_name,
+          last_name: obj.last_name,
+          email: obj.email,
+          phone: obj.phone,
+          address: obj.address,
+          city: obj.city,
+          country: obj.country,
+          delivery_address: "No. 46, Galle road, Kalutara South",
+          delivery_city: "Kalutara",
+          delivery_country: "Sri Lanka",
+        };
+
+        window.payhere.startPayment(payment);
+      } catch (err) {
+        console.error("Payment init error:", err);
+        alert("Failed to load payment gateway.");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleCreateAppointment = async () => {
     const appointmentData = {
       patientId: patientId || "P021",
       doctorId: doctorId || "D009",
@@ -51,8 +128,8 @@ const PaymentAtLocation = ({
 
     try {
       await axios.post("https://localhost:7021/api/Appointments", appointmentData);
-      setDialogOpen(true); // Show success dialog
-      setCheckbox1Checked(false); // Reset checkboxes
+      setDialogOpen(true);
+      setCheckbox1Checked(false);
       setCheckbox2Checked(false);
     } catch (error) {
       console.error("Appointment creation failed:", error);
@@ -62,7 +139,6 @@ const PaymentAtLocation = ({
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    // Redirect after closing the dialog
     window.location.href = "http://localhost:3000/Patient/PatientAppointments";
   };
 
@@ -70,65 +146,28 @@ const PaymentAtLocation = ({
     <div className="w-full max-w-[600px] p-10 border-2 border-[#B9E9EC] rounded-md">
       <h3 className="underline font-semibold text-lg mb-4">Appointment Summary</h3>
       <div className="space-y-2 text-sm">
-        <div className="flex justify-between">
-          <span>PaymentID</span>
-          <span>PA21-345</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Total bill payment for the appointment</span>
-          <span>Rs. {totalCharge}.00</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Doctor’s Name</span>
-          <span>Dr. {doctorName}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Specialization</span>
-          <span>{specialization}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Venue</span>
-          <span>{hospital}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Building/Room</span>
-          <span>TBD - Ask From the Reception</span>
-        </div>
-        <div className="flex justify-between mb-2">
-          <span>Date</span>
-          <span>{appointmentDate}</span>
-        </div>
-        <div className="flex justify-between mb-2">
-          <span>Time</span>
-          <span>{appointmentTime}</span>
-        </div>
-
+        <div className="flex justify-between"><span>PaymentID</span><span>PA21-345</span></div>
+        <div className="flex justify-between"><span>Total bill payment</span><span>Rs. {totalCharge}.00</span></div>
+        <div className="flex justify-between"><span>Doctor</span><span>Dr. {doctorName}</span></div>
+        <div className="flex justify-between"><span>Specialization</span><span>{specialization}</span></div>
+        <div className="flex justify-between"><span>Venue</span><span>{hospital}</span></div>
+        <div className="flex justify-between"><span>Building/Room</span><span>TBD</span></div>
+        <div className="flex justify-between"><span>Date</span><span>{appointmentDate}</span></div>
+        <div className="flex justify-between"><span>Time</span><span>{appointmentTime}</span></div>
         <p className="text-xs text-justify text-gray-600 mt-2">
-          Be sure to be on time confirming your booking. You can do your payment at the above location
-          on the appointed date and get treatments from your doctor. Further details emailed once you
-          confirm the booking. After that, provide it at the reception and do the payments.
+          Be on time confirming your booking. You can pay online or at the location and get treatments.
         </p>
       </div>
 
       {selectedMethod === "location" && (
         <div className="mt-6 space-y-3 text-sm text-gray-700">
           <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="accent-green-600"
-              checked={checkbox1Checked}
-              onChange={handleCheckbox1Change}
-            />
-            I confirm that I read the appointment summary and try to attend on time.
+            <input type="checkbox" className="accent-green-600" checked={checkbox1Checked} onChange={handleCheckbox1Change} />
+            I confirm that I read the appointment summary and will attend on time.
           </label>
           <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="accent-green-600"
-              checked={checkbox2Checked}
-              onChange={handleCheckbox2Change}
-            />
-            I am aware that not attending the appointment without prior notice to the hospital may affect my future bookings with PresCrypt.
+            <input type="checkbox" className="accent-green-600" checked={checkbox2Checked} onChange={handleCheckbox2Change} />
+            I’m aware that not attending without notice may affect future bookings.
           </label>
         </div>
       )}
@@ -136,8 +175,9 @@ const PaymentAtLocation = ({
       <button
         className="mt-6 bg-[#D3F2F1] text-black border-2 border-black rounded-md py-2 px-4 w-full font-semibold"
         onClick={handleConfirmBooking}
+        disabled={loading}
       >
-        Confirm the Booking
+        {loading ? "Processing..." : "Confirm the Booking"}
       </button>
 
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>
@@ -146,9 +186,7 @@ const PaymentAtLocation = ({
           <p>Your appointment has been successfully confirmed!</p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Close
-          </Button>
+          <Button onClick={handleCloseDialog} color="primary">Close</Button>
         </DialogActions>
       </Dialog>
     </div>

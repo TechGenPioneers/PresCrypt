@@ -13,11 +13,9 @@ const PaymentView = ({
   const onlineFee = 200.0;
   const hospitalFee = parseFloat(hospitalCharge) || 0;
   const doctorFee = parseFloat(doctorCharge) || 0;
-
   const totalCharge = hospitalFee + doctorFee + onlineFee;
 
-  // ✅ Track selected payment method
-  const [selectedMethod, setSelectedMethod] = useState(null); // 'location' or 'online'
+  const [selectedMethod, setSelectedMethod] = useState(null);
 
   const buttonBaseClass =
     "border-2 rounded-md py-2 px-6 font-semibold transition-colors duration-200";
@@ -26,7 +24,6 @@ const PaymentView = ({
     <div className="p-6 flex flex-wrap justify-between gap-8 w-full max-w-6xl mx-auto">
       {/* Left Section */}
       <div className="flex flex-col space-y-10 flex-1 min-w-[280px] max-w-[450px]">
-        {/* Payment Options */}
         <div className="flex flex-col space-y-4">
           <button
             className={`${buttonBaseClass} ${
@@ -50,7 +47,6 @@ const PaymentView = ({
           </button>
         </div>
 
-        {/* Amount Box */}
         <div className="border-2 border-[#B9E9EC] rounded-md p-6">
           <h3 className="text-lg font-semibold mb-4">Total Amount</h3>
           <div className="flex justify-between mb-2">
@@ -74,7 +70,6 @@ const PaymentView = ({
 
       {/* Right Section */}
       <div className="flex-1 min-w-[300px] max-w-[450px]">
-        {/* PaymentAtLocation Component */}
         <PaymentAtLocation
           totalCharge={totalCharge}
           hospital={hospital}
