@@ -3,9 +3,9 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogTitle,
   IconButton,
   Typography,
+  Box,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -15,41 +15,53 @@ const PaymentConfirmation = ({ open, handleClose, email }) => {
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth="xs"
+      maxWidth="sm"
       fullWidth
       sx={{
         "& .MuiDialog-paper": {
-          borderRadius: "30px",
-          padding: "20px",
+          borderRadius: "40px",
+          padding: "40px 20px",
           border: "2px solid #4CAF50",
-          backgroundColor: "#fff",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+          backgroundColor: "#f6ffff", // light background tint
+          boxShadow: "0px 6px 30px rgba(0, 0, 0, 0.15)",
         },
       }}
     >
-      {/* Close Button */}
       <IconButton
         onClick={handleClose}
-        sx={{ position: "absolute", top: 8, right: 8 }}
+        sx={{ position: "absolute", top: 16, right: 16 }}
       >
-        <CloseIcon />
+        <CloseIcon fontSize="large" />
       </IconButton>
 
-      {/* Success Icon */}
-      <DialogContent className="flex flex-col items-center text-center px-6 pt-6 pb-4">
-        <CheckCircleOutlineIcon sx={{ fontSize: 60, color: "#2E7D32" }} />
+      <DialogContent className="flex flex-col items-center text-center">
+        <CheckCircleOutlineIcon sx={{ fontSize: 100, color: "#2E7D32" }} />
+
+        <Box
+          sx={{
+            backgroundColor: "#00796B",
+            color: "white",
+            borderRadius: "12px",
+            padding: "16px 24px",
+            marginTop: "24px",
+            maxWidth: "500px",
+            textAlign: "center",
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: "bold", fontSize: "1.25rem" }}
+          >
+            Your appointment has been successfully booked
+          </Typography>
+        </Box>
 
         <Typography
-          variant="h6"
-          className="font-bold mt-4"
-          sx={{ color: "#00695C" }}
+          variant="body1"
+          sx={{ marginTop: "16px", color: "#555", maxWidth: "500px" }}
         >
-          Your appointment has been successfully booked
-        </Typography>
-
-        <Typography variant="body2" className="mt-2 text-gray-600">
-          We have sent an email to <strong>{email}</strong> with more
-          appointment confirmation details.
+          We have sent an email to <strong>{email}</strong> with more appointment
+          confirmation details.
         </Typography>
       </DialogContent>
     </Dialog>

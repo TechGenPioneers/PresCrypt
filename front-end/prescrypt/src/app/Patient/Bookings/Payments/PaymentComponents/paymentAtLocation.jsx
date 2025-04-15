@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-} from "@mui/material";
 import axios from "axios";
+import PaymentConfirmation from "./PaymentConfirmation"; // Import the confirmation component
 
 const PaymentAtLocation = ({
   totalCharge,
@@ -19,12 +13,13 @@ const PaymentAtLocation = ({
   hospitalId,
   doctorName,
   selectedMethod,
+  email = "user@example.com", // email passed as a prop or default
 }) => {
   const [checkbox1Checked, setCheckbox1Checked] = useState(false);
   const [checkbox2Checked, setCheckbox2Checked] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [payhereReady, setPayhereReady] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -41,7 +36,6 @@ const PaymentAtLocation = ({
     };
   }, []);
 
-  // Reset checkboxes when method changes
   useEffect(() => {
     setCheckbox1Checked(false);
     setCheckbox2Checked(false);
@@ -128,17 +122,17 @@ const PaymentAtLocation = ({
 
     try {
       await axios.post("https://localhost:7021/api/Appointments", appointmentData);
-      setDialogOpen(true);
       setCheckbox1Checked(false);
       setCheckbox2Checked(false);
+      setConfirmationOpen(true);
     } catch (error) {
       console.error("Appointment creation failed:", error);
       alert("Failed to confirm booking. Please try again.");
     }
   };
 
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
+  const handleCloseConfirmation = () => {
+    setConfirmationOpen(false);
     window.location.href = "http://localhost:3000/Patient/PatientAppointments";
   };
 
@@ -180,15 +174,12 @@ const PaymentAtLocation = ({
         {loading ? "Processing..." : "Confirm the Booking"}
       </button>
 
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>Booking Confirmation</DialogTitle>
-        <DialogContent>
-          <p>Your appointment has been successfully confirmed!</p>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">Close</Button>
-        </DialogActions>
-      </Dialog>
+      {/* Success Dialog */}
+      <PaymentConfirmation
+        open={confirmationOpen}
+        handleClose={handleCloseConfirmation}
+        email={email}
+      />
     </div>
   );
 };

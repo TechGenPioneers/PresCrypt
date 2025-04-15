@@ -6,6 +6,7 @@ export async function GET() {
     const order_id = Math.floor(Math.random() * 1000000000).toString();
     const merchant_secret = process.env.PAYHERE_MERCHANT_SECRET;
     const currency = "LKR";
+    const item= "Booking for Mr. Chathurika Perera";
     const first_name = "Dewmin";
     const last_name = "Deniyegedara";
     const email = "dewminkasmitha30@gmail.com";
@@ -37,7 +38,7 @@ export async function GET() {
       .toUpperCase();
   
     const responseData = {
-      items: "Booking for Mr. Chathurika Perera",
+      items: item,
       first_name: first_name,
       last_name: last_name,
       email: email,
