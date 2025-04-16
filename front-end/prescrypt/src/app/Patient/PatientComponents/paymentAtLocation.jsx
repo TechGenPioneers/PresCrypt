@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import PaymentConfirmation from "./PaymentConfirmation"; // Import the confirmation component
+import PaymentConfirmation from "./paymentConfirmation"; // Import the confirmation component
 
 const PaymentAtLocation = ({
   totalCharge,
