@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Header from "../../../../components/header/header";
 import Footer from "../../../../components/footer/footer";
-import NavBar from "../../../PatientAppointments/PatientComponents/navBar";
-import PaymentView from "../PaymentComponents/PaymentView";
+import NavBar from "../../../PatientComponents/navBar";
+import PaymentView from "../../../PatientComponents/paymentView";
 
 function PaymentClient({ id }) {
   const [appointmentData, setAppointmentData] = useState(null);
