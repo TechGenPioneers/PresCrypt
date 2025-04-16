@@ -30,30 +30,46 @@ const AppointmentCard = ({
 
   // 🔁 Get next 4 Tuesdays
   useEffect(() => {
-    const getNextTuesdays = async () => {
+    const getNextAvailableDates = async (dayName) => {
+      const daysOfWeek = {
+        Sunday: 0,
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 6,
+      };
+  
       const today = new Date();
-      let firstTuesday = new Date(today);
-      const daysUntilTuesday = (9 - today.getDay()) % 7;
-      firstTuesday.setDate(
-        today.getDate() + (daysUntilTuesday === 0 ? 7 : daysUntilTuesday)
-      );
-
-      const tuesdays = [];
+      const targetDay = daysOfWeek[dayName];
+      if (targetDay === undefined) return;
+  
+      const currentDay = today.getDay();
+      const daysUntilTarget =
+        (targetDay - currentDay + 7) % 7 || 7; // Ensure not 0 (i.e., push to next week)
+  
+      const firstAvailableDate = new Date(today);
+      firstAvailableDate.setDate(today.getDate() + daysUntilTarget);
+  
+      const nextDates = [];
       for (let i = 0; i < 4; i++) {
-        let date = new Date(firstTuesday);
-        date.setDate(firstTuesday.getDate() + i * 7 + 1);
-        tuesdays.push(date.toISOString().split("T")[0]);
+        const nextDate = new Date(firstAvailableDate);
+        nextDate.setDate(firstAvailableDate.getDate() + i * 7);
+        nextDates.push(nextDate.toISOString().split("T")[0]);
       }
-
-      setAppointmentDates(tuesdays);
-
-      // ✅ Fetch counts
-      const counts = await fetchAppointmentCounts(tuesdays);
+  
+      setAppointmentDates(nextDates);
+  
+      // Fetch counts
+      const counts = await fetchAppointmentCounts(nextDates);
       setAppointmentCounts(counts);
     };
-
-    getNextTuesdays();
-  }, []);
+  
+    if (appointmentDay) {
+      getNextAvailableDates(appointmentDay);
+    }
+  }, [appointmentDay]);
 
   // 🔁 Fetch appointment counts by date
   const fetchAppointmentCounts = async (dates) => {
@@ -171,7 +187,10 @@ const AppointmentCard = ({
         </div>
 
         {/* Content */}
-        <DialogContent className="p-6 flex flex-col items-center bg-white max-h-[80vh] overflow-y-auto scrollbar-none">
+        <DialogContent
+  className="p-6 flex flex-col items-center bg-white overflow-y-auto"
+  sx={{ maxHeight: '70vh' }}
+>
           {loading ? (
             <CircularProgress />
           ) : error ? (
@@ -203,12 +222,12 @@ const AppointmentCard = ({
                 {appointmentDates.map((date, index) => (
                   <div
                     key={index}
-                    className="flex flex-col items-center w-full bg-green-100 p-3 rounded-lg shadow"
+                    className="flex flex-col items-center w-full border border-green-700 bg-[#E8F4F2]  p-3 rounded-lg shadow"
                   >
-                    <p className="bg-[#E8F4F2] font-semibold">
+                    <p className=" font-semibold">
                       {date} {appointmentDay}
                     </p>
-                    <p className="text-sm text-gray-700 mt-1">
+                    <p className="text-sm  mt-1">
                       Active Appointments:{" "}
                       {appointmentCounts[date] !== undefined
                         ? appointmentCounts[date]
@@ -216,7 +235,7 @@ const AppointmentCard = ({
                     </p>
                     <button
                       onClick={() => handleBooking(date)}
-                      className="bg-teal-700 text-white py-2 px-4 rounded-full shadow-md hover:bg-teal-800 transition mt-2"
+                      className="border border-green-700 text-green-700 font-semibold px-4 py-1 rounded-full hover:bg-green-50 ml-2 mt-6 "
                     >
                       Book this Slot
                     </button>
