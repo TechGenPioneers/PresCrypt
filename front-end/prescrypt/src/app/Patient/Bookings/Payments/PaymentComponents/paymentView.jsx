@@ -43,7 +43,7 @@ const PaymentView = ({
             }`}
             onClick={() => setSelectedMethod("online")}
           >
-            Online payment
+            Online Payment
           </button>
         </div>
 

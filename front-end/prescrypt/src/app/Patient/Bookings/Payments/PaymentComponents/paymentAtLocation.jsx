@@ -13,7 +13,7 @@ const PaymentAtLocation = ({
   hospitalId,
   doctorName,
   selectedMethod,
-  email = "user@example.com", // email passed as a prop or default
+  email = "dewminkasmitha30@gmail.com", // email passed as a prop or default
 }) => {
   const [checkbox1Checked, setCheckbox1Checked] = useState(false);
   const [checkbox2Checked, setCheckbox2Checked] = useState(false);
@@ -59,8 +59,27 @@ const PaymentAtLocation = ({
 
       setLoading(true);
       try {
-        const res = await fetch("/api/payhere-process");
+        const res = await fetch("/api/payhere-process", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: totalCharge,
+            item: `Booking for Dr. ${doctorName} on ${appointmentDate}`,
+            first_name: "Dewmin",
+            last_name: "Deniyegedara",
+            email: email,
+            phone: "0771234567",
+            address: "Colombo 07",
+            city: "Colombo",
+            country: "Sri Lanka",
+          }),
+        });
+        
         const obj = await res.json();
+        
+      
 
         window.payhere.onCompleted = function (orderId) {
           console.log("Payment completed. OrderID:", orderId);
