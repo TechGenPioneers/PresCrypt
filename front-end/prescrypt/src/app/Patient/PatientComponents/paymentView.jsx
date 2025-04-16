@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PaymentAtLocation from "../PaymentComponents/paymentAtLocation";
+import PaymentAtLocation from "./paymentAtLocation";
 
 const PaymentView = ({
   hospitalCharge,

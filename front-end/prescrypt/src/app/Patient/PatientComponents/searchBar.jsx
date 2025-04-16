@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import SpecializationDialog from "../PatientComponents/specializationBox";
-import LocationDialog from "../PatientComponents/locationSelectBox.jsx";
+import SpecializationDialog from "./specializationBox";
+import LocationDialog from "./locationSelectBox.jsx";
 import { CircularProgress } from "@mui/material"; // Import MUI CircularProgress
 
 const SearchBar = ({ setDoctors }) => {
