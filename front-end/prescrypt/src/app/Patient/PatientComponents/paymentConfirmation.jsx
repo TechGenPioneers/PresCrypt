@@ -10,6 +10,8 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
+
+
 const PaymentConfirmation = ({ open, handleClose, email }) => {
   return (
     <Dialog

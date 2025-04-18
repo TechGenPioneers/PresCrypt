@@ -150,7 +150,7 @@ const AppointmentCard = ({
           appointmentTime,
         })
       );
-      router.push(`/Patient/Bookings/Payments/${firstName}`);
+      router.push(`/Patient/Bookings/Payments/${doctorId}`);
     }
   };
 
