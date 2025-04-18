@@ -4,9 +4,6 @@ import Header from "./Components/header/Header";
 import Footer from "./Components/footer/Footer";
 import styles from "./page.module.css";
 import Link from "next/link";
-import Link from "next/link";
-
-
 
 export default function Home() {
   return (
