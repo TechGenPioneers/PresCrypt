@@ -1,0 +1,156 @@
+/* Overall Page Container */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #ffffff;
+}
+
+/* Registration Box */
+.registerBox {
+  display: flex;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 900px;
+  width: 90%;
+  height: auto;
+  padding: 30px;
+  border: 1px solid #d3d3d3;
+}
+
+/* Form Section */
+.formSection {
+  flex: 1;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.logo {
+  align-self: center;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #027373;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #434242;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Input Fields */
+.inputGroup {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #f9f9f9;
+  transition: border 0.3s ease-in-out;
+}
+
+.input:focus {
+  border: 1px solid #99a140;
+  box-shadow: 0 0 5px rgba(0, 126, 133, 0.3);
+  
+}
+
+/* Error Styling */
+.inputError {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #fff3f3;
+  transition: border 0.3s ease-in-out;
+}
+
+.errorMessage {
+  font-size: 12px; /* Smaller font size */
+  color: red;
+  margin-top: 2px; /* Space between input and error */
+  text-align: left;
+}
+
+/* Register Button */
+.registerBtn {
+  width: 100%;
+  padding: 12px;
+  background-color: #007E852B;
+  color: #007E85;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.registerBtn:hover {
+  background-color: #007E85;
+  color: white;
+}
+
+/* Right Side - Image Section */
+.imageSection {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 100px;
+}
+
+.imageSection img {
+  max-width: 100%;
+  height: auto;
+}
+/* Password Input Group */
+.passwordInputGroup {
+  position: relative;
+  width: 100%;
+}
+
+.passwordInput {
+  width: 100%;
+  padding: 12px;
+  padding-right: 40px; /* Make space for the eye icon */
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #f9f9f9;
+  transition: border 0.3s ease-in-out;
+}
+
+.passwordInput:focus {
+  border: 1px solid #99a140;
+  box-shadow: 0 0 5px rgba(0, 126, 133, 0.3);
+}
+
+/* Eye Icon */
+.eyeIcon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6c757d;
+}

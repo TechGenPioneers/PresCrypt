@@ -1,15 +1,15 @@
 "use client";
-import React from "react";
-import AdminNavBar from "../../AdminComponents/AdminNavBar";
-import Footer from "@/app/Components/footer/Footer";
-import DoctorDetails from "../../AdminComponents/DoctorDetails";
+import React from 'react';
+import Footer from '@/app/Components/footer/Footer';
 import { useParams } from "next/navigation"; 
+import AdminNavBar from '../../AdminComponents/AdminNavBar';
+import PatientDetails from '../../AdminComponents/PatientDetails';
 
-const DoctorDetailPage = () => {
-  const { doctorId } = useParams(); // Access the dynamic parameter
+const PatientDetailsPage = () => {
+  const { patientId } = useParams(); 
+  console.log("patientId:", patientId);
 
-  // Check if doctorId is available
-  if (!doctorId) {
+  if (!patientId) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
               <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
                 <p className="mb-4 text-lg font-semibold text-[rgba(0,126,133,0.7)]">Please wait...</p>
@@ -18,21 +18,21 @@ const DoctorDetailPage = () => {
             </div>
   }
 
-  return (
-    <div>
+    return (
+        <div>
       <div className="flex">
         <div className="w-27">
           <AdminNavBar />
         </div>
         <div className="w-full">
-          <DoctorDetails doctorID={doctorId} /> {/* Pass doctorId to DoctorDetails */}
+          <PatientDetails patientId={patientId}/>
         </div>
       </div>
       <div>
-        <Footer />
+          <Footer />
       </div>
     </div>
-  );
+    );
 };
 
-export default DoctorDetailPage;
+export default PatientDetailsPage;

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { cacheTag } from 'next/dist/server/use-cache/cache-tag';
 
 const AddDoctorURL = "https://localhost:7021/api/AdminDoctor"
 

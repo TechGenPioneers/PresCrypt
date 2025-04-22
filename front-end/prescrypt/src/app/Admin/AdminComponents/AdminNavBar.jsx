@@ -17,7 +17,7 @@ const AdminNavBar = () => {
   const navItems = [
     { text: "Dashboard", image: "/image11.png",link: "/Admin/AdminDashboard"}, 
     { text: "Patients", image: "/image12.png",link: "/Admin/AdminPatient" },
-    { text: "Requests", image: "/image27.png", link: "/Admin/DoctorRequest" },
+    { text: "Requests", image: "/image27.png", link: "/Admin/DoctorRequestPage" },
     { text: "Doctors", image: "/image19.png",link: "/Admin/AdminDoctor" },
     { text: "Reports", image: "/image20.png" },
   ];

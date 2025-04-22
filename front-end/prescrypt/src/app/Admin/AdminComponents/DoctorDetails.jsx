@@ -1,15 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { GetDoctorById } from "../service/AdminService";
+import { GetDoctorById } from "../service/AdminDoctorService";
 import { useRouter } from "next/navigation";
 
 export default function DoctorDetails({ doctorID }) {
   const [doctor, setDoctor] = useState(null);
   const [dateTime, setDateTime] = useState(null);
-  const [isDoctorNull, setIsDoctorNull] = useState(false);
   const router = useRouter();
   useEffect(() => {
+
     const fetchDoctor = async () => {
       const getDoctor = await GetDoctorById(doctorID);
       setDoctor(getDoctor);
@@ -17,7 +17,6 @@ export default function DoctorDetails({ doctorID }) {
     };
 
     fetchDoctor();
-
     const updateDateTime = () => setDateTime(new Date());
     updateDateTime(); // Set initial time
     const interval = setInterval(updateDateTime, 1000);

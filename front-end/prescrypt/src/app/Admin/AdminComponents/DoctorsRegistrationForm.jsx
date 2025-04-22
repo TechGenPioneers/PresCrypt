@@ -1,9 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AddNewDoctor, GetHospitals } from "../service/AdminService";
+import { AddNewDoctor, GetHospitals } from "../service/AdminDoctorService";
+import { Spinner } from "@material-tailwind/react";
 
 export default function DoctorRegistrationForm() {
   const [schedule, setSchedule] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [newDoctor, setNewDoctor] = useState({
     FirstName: "",
     LastName: "",
@@ -155,6 +157,7 @@ export default function DoctorRegistrationForm() {
 
   //form submit
   const handleSubmit = async (e) => {
+    setIsLoading(true);
     e.preventDefault();
 
     if (schedule.length > 0) {
@@ -187,6 +190,7 @@ export default function DoctorRegistrationForm() {
         const newDoctorDetails = await AddNewDoctor(newDoctor, schedule);
         console.log(newDoctorDetails);
       } catch (err) {
+        setIsLoading(false);
         console.error("Failed to add the doctor", err);
         alert("Failed to add the doctor!", err);
       }
@@ -194,10 +198,14 @@ export default function DoctorRegistrationForm() {
       setErrorMessage("");
       setIsSubmitted(true);
       setSuccessMessage("Doctor Registered Successfully!");
+      setIsLoading(false);
     } else {
+      setIsLoading(false);
       console.log("time slots empty");
       setErrorMessage("Please select available time");
+      
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -555,6 +563,16 @@ export default function DoctorRegistrationForm() {
                 {successMessage}
               </p>
             </div>
+          </div>
+        </div>
+      )}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+            <p className="mb-4 text-lg font-semibold text-[rgba(0,126,133,0.7)]">
+              Please wait...
+            </p>
+            <Spinner className="h-10 w-10 text-[rgba(0,126,133,0.7)]" />
           </div>
         </div>
       )}
