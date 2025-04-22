@@ -52,7 +52,7 @@ const BookingCard = ({ doctorId, firstName, lastName,appointmentTime, appointmen
 
       {/* Dialog Component */}
       <AppointmentCard
-        doctorId="D002"
+        doctorId={doctorId}
         firstName={firstName}
         lastName={lastName}
         appointmentTime={appointmentTime}

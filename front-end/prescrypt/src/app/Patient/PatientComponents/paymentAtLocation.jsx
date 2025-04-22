@@ -130,7 +130,7 @@ const PaymentAtLocation = ({
   const handleCreateAppointment = async () => {
     const appointmentData = {
       patientId: patientId || "P021",
-      doctorId: doctorId || "D009",
+      doctorId: doctorId || "D008",
       hospitalId: hospitalId || "H027",
       date: appointmentDate,
       time: appointmentTime,

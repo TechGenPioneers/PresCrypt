@@ -30,6 +30,7 @@ export default function Appointments() {
                   doctor.availableTime.map((availableTime, timeIndex) => (
                     <BookingCard
                       key={`${index}-${dateIndex}-${timeIndex}`} // Unique key
+                      doctorId={doctor.doctorId} // Use `doctorId` instead of `doctorDoctorId`
                       firstName={doctor.firstName} // Use `firstName` instead of `doctorName`
                       lastName ={doctor.lastName} // Use `lastName` instead of `doctorLastName`
                       appointmentDay={availableDay} // Directly use availableDay
