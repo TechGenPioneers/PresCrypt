@@ -314,7 +314,7 @@ export default function DoctorRegistration() {
 
   const handleSuccessClose = () => {
     setRegistrationSuccess(null);
-    router.push("/Auth/Login");
+    router.push("/Auth/login");
   };
 
   return (
@@ -384,6 +384,7 @@ export default function DoctorRegistration() {
                         } else if (role === "Admin") {
                           router.push("/Auth/AdminRegistration");
                         }
+                        
                       }}
                     >
                       {role}
@@ -597,6 +598,7 @@ export default function DoctorRegistration() {
                       </div>
                     )}
                     {errors.uploadedFile && <p className={styles.errorMessage}>{errors.uploadedFile}</p>}
+                   
                   </div>
                 </div>
               </div>
@@ -861,6 +863,12 @@ export default function DoctorRegistration() {
 
             {errors.general && <p className={styles.errorMessage}>{errors.general}</p>}
 
+            <p className={`${styles.loginRedirect} text-center text-gray-600 mb-4`}>
+                      Already registered?{" "}
+                      <a href="/Auth/login" className={`${styles.loginLink} text-green-500 hover:underline`}>
+                        Log in here
+                      </a>
+                    </p>
             <div className={styles.buttonGroup}>
               {currentStep === 2 && (
                 <button
@@ -880,6 +888,7 @@ export default function DoctorRegistration() {
                 >
                   Next
                 </button>
+                
               ) : (
                 <button
                   className={styles.registerBtn}

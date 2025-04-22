@@ -105,34 +105,37 @@ export default function PatientRegistration() {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.registerBox}>
+    <div className={`${styles.container} flex flex-col items-center justify-center min-h-screen bg-gray-100`}>
+      <div className={`${styles.registerBox} bg-white shadow-md rounded-lg p-8 flex flex-col md:flex-row`}>
         {/* Left Side - Registration Form */}
-        <div className={styles.formSection}>
-        <div className={styles.logoContainer}>
+        <div className={`${styles.formSection} flex-1`}>
+          <div className={`${styles.logoContainer} flex justify-center mb-6`}>
             <Image 
               src="/logo.png" 
               alt="PresCrypt Logo" 
               width={130}
               height={40}
-              className={styles.logo}
+              className="object-contain"
             />
           </div>
         
-          <h2 className={styles.title}>JOIN US FOR A HEALTHIER TOMORROW!</h2>
-          <p className={styles.subtitle}>Create your account</p>
+          <h2 className={`${styles.title} text-2xl font-bold text-center text-gray-800 mb-2`}>JOIN US FOR A HEALTHIER TOMORROW!</h2>
+          <p className={`${styles.subtitle} text-center text-gray-600 mb-6`}>Create your account</p>
 
           {/* Role Dropdown */}
-          <div className={styles.dropdownContainer}>
-            <button className={styles.dropdownButton} onClick={() => setShowRoleDropdown(!showRoleDropdown)}>
+          <div className={`${styles.dropdownContainer} relative mb-4`}>
+            <button
+              className={`${styles.dropdownButton} w-full bg-gray-200 text-gray-700 py-2 px-4 rounded focus:outline-none`}
+              onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+            >
               {formData.role || "Choose your Role"}
             </button>
             {showRoleDropdown && (
-              <div className={styles.dropdownMenu}>
+              <div className={`${styles.dropdownMenu} absolute w-full bg-white border border-gray-300 rounded mt-1`}>
                 {["Patient", "Doctor", "Admin"].map((role) => (
                   <div
                     key={role}
-                    className={styles.dropdownItem}
+                    className={`${styles.dropdownItem} px-4 py-2 hover:bg-gray-100 cursor-pointer`}
                     onClick={() => {
                       setFormData({ ...formData, role });
                       setShowRoleDropdown(false);
@@ -149,7 +152,7 @@ export default function PatientRegistration() {
                 ))}
               </div>
             )}
-            {errors.role && <p className={styles.errorMessage}>{errors.role}</p>}
+            {errors.role && <p className={`${styles.errorMessage} text-red-500 text-sm mt-1`}>{errors.role}</p>}
           </div>
 
           {/* Input Fields */}
@@ -160,82 +163,59 @@ export default function PatientRegistration() {
             { name: "contactNumber", placeholder: "Contact Number" },
             { name: "nic", placeholder: "NIC" },
           ].map(({ name, placeholder, type = "text" }) => (
-            <div key={name} className={styles.inputGroup}>
+            <div key={name} className={`${styles.inputGroup} mb-4`}>
               <input
                 type={type}
                 name={name}
                 placeholder={placeholder}
-                className={errors[name] ? styles.inputError : styles.input}
+                className={`w-full bg-gray-100 border ${errors[name] ? "border-red-500" : "border-gray-300"} rounded py-2 px-4 focus:outline-none`}
                 value={formData[name]}
                 onChange={handleChange}
               />
-              {errors[name] && <p className={styles.errorMessage}>{errors[name]}</p>}
+              {errors[name] && <p className={`${styles.errorMessage} text-red-500 text-sm mt-1`}>{errors[name]}</p>}
             </div>
           ))}
 
           {/* Password Fields */}
           {[{ name: "password", show: showPassword, setShow: setShowPassword }, { name: "confirmPassword", show: showConfirmPassword, setShow: setShowConfirmPassword }].map(({ name, show, setShow }) => (
-            <div key={name} className={styles.inputGroup} style={{ position: "relative" }}>
+            <div key={name} className={`${styles.inputGroup} mb-4 relative`}>
               <input
                 type={show ? "text" : "password"}
                 name={name}
                 placeholder={name === "password" ? "Password" : "Confirm Password"}
-                className={errors[name] ? styles.inputError : styles.input}
+                className={`w-full bg-gray-100 border ${errors[name] ? "border-red-500" : "border-gray-300"} rounded py-2 px-4 focus:outline-none`}
                 value={formData[name]}
                 onChange={handleChange}
               />
-              <span className={styles.eyeIcon} onClick={() => setShow(!show)}>
+              <span
+                className={`${styles.eyeIcon} absolute right-3 top-2.5 cursor-pointer`}
+                onClick={() => setShow(!show)}
+              >
                 {show ? <EyeOff size={20} /> : <Eye size={20} />}
               </span>
-              {errors[name] && <p className={styles.errorMessage}>{errors[name]}</p>}
+              {errors[name] && <p className={`${styles.errorMessage} text-red-500 text-sm mt-1`}>{errors[name]}</p>}
             </div>
           ))}
 
-          {errors.general && <p className={styles.errorMessage}>{errors.general}</p>}
-          <button className={styles.registerBtn} onClick={handleRegister} disabled={loading}>{loading ? "Registering..." : "Create Account"}</button>
-          <div className={styles.inputGroup}>
-            <input type="text" name="fullName" placeholder="Full Name" className={errors.fullName ? styles.inputError : styles.input} value={formData.fullName} onChange={handleChange} />
-            {errors.fullName && <p className={styles.errorMessage}>{errors.fullName}</p>}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <input type="email" name="email" placeholder="Email" className={errors.email ? styles.inputError : styles.input} value={formData.email} onChange={handleChange} />
-            {errors.email && <p className={styles.errorMessage}>{errors.email}</p>}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <input type="password" name="password" placeholder="Password" className={errors.password ? styles.inputError : styles.input} value={formData.password} onChange={handleChange} />
-            {errors.password && <p className={styles.errorMessage}>{errors.password}</p>}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <input type="password" name="confirmPassword" placeholder="Confirm Password" className={errors.confirmPassword ? styles.inputError : styles.input} value={formData.confirmPassword} onChange={handleChange} />
-            {errors.confirmPassword && <p className={styles.errorMessage}>{errors.confirmPassword}</p>}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <input type="text" name="contactNumber" placeholder="Contact Number" className={errors.contactNumber ? styles.inputError : styles.input} value={formData.contactNumber} onChange={handleChange} />
-            {errors.contactNumber && <p className={styles.errorMessage}>{errors.contactNumber}</p>}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <input type="text" name="nic" placeholder="NIC" className={errors.nic ? styles.inputError : styles.input} value={formData.nic} onChange={handleChange} />
-            {errors.nic && <p className={styles.errorMessage}>{errors.nic}</p>}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <input type="text" name="bloodGroup" placeholder="Blood Group" className={errors.bloodGroup ? styles.inputError : styles.input} value={formData.bloodGroup} onChange={handleChange} />
-            {errors.bloodGroup && <p className={styles.errorMessage}>{errors.bloodGroup}</p>}
-          </div>
-
-          {errors.general && <p className={styles.errorMessage}>{errors.general}</p>}
-
-          <button className={styles.registerBtn} onClick={handleRegister} disabled={loading}>
+          {errors.general && <p className={`${styles.errorMessage} text-red-500 text-sm mb-4`}>{errors.general}</p>}
+          
+          
+          <button
+            className={`${styles.registerBtn} w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none`}
+            onClick={handleRegister}
+            disabled={loading}
+          >
             {loading ? "Registering..." : "Create Account"}
           </button>
+          <p className={`${styles.loginRedirect} text-center text-gray-600 mb-4`}>
+            Already registered?{" "}
+            <a href="/Auth/login" className={`${styles.loginLink} text-green-500 hover:underline`}>
+              Log in here
+            </a>
+          </p>
         </div>
 
-        <div className={styles.imageSection}>
+        <div className={`${styles.imageSection} flex-1 hidden md:flex justify-center items-center`}>
           <Image src="/registerImage.jpg" alt="Doctor and Patient Illustration" width={320} height={330} />
         </div>
       </div>
