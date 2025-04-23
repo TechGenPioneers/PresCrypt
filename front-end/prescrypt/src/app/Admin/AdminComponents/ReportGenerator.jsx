@@ -1,5 +1,90 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { GetAllDetails } from "../service/AdminReportService";
+
+const SearchableDropdown = ({
+  options,
+  value,
+  onChange,
+  disabled,
+  placeholder,
+}) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showOptions, setShowOptions] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const filteredOptions = options.filter((opt) =>
+    opt.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const selectedLabel = options.find((opt) => opt.value === value)?.label;
+
+  const handleSelect = (val) => {
+    onChange(val);
+    setShowOptions(false);
+    setSearchTerm("");
+  };
+
+  const handleClear = () => {
+    onChange("");
+    setSearchTerm("");
+  };
+
+  // 👉 Close on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowOptions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={dropdownRef} className="relative w-full">
+      <input
+        type="text"
+        value={selectedLabel || searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onFocus={() => !disabled && setShowOptions(true)}
+        disabled={disabled}
+        placeholder={placeholder}
+        className={`w-full pr-10 p-2 text-[#09424D] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
+          disabled ? "opacity-65 cursor-not-allowed" : ""
+        }`}
+      />
+
+      {value && !disabled && (
+        <button
+          type="button"
+          onClick={handleClear}
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 cursor-pointer"
+        >
+          &times;
+        </button>
+      )}
+
+      {showOptions && !disabled && (
+        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-y-auto shadow-md">
+          {filteredOptions.map((opt) => (
+            <li
+              key={opt.value}
+              onMouseDown={() => handleSelect(opt.value)}
+              className="px-4 py-2 hover:bg-[#CEE4E6] cursor-pointer"
+            >
+              {opt.label}
+            </li>
+          ))}
+          {filteredOptions.length === 0 && (
+            <li className="px-4 py-2 text-gray-500">No results found</li>
+          )}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 export default function ReportGenerator() {
   const [toDate, setToDate] = useState("");
@@ -11,14 +96,92 @@ export default function ReportGenerator() {
   const [dateTime, setDateTime] = useState(null);
 
   const handleGenerate = () => {
-    console.log({ toDate, fromDate, doctor, specialty, patient, reportType });
+    let finalDoctor = doctor;
+    let finalPatient = patient;
+    let finalFromDate = fromDate;
+    let finalToDate = toDate;
+    let finalSpecialty = specialty;
+
+    if (doctor === "all" || patient === "all") {
+      finalFromDate = "";
+      finalToDate = "";
+      setFromDate("");
+      setToDate("");
+    }
+
+    if (reportType === "doctor" || doctor === "all") {
+      finalPatient = "";
+      setPatient("");
+    }
+
+    if (reportType === "patient" || patient === "all") {
+      finalDoctor = "";
+      setDoctor("");
+    }
+
+    if (reportType === "patient" || doctor === "all" || patient === "all") {
+      finalSpecialty = "";
+      setSpecialty("");
+    }
+
+    console.log({
+      fromDate: finalFromDate,
+      toDate: finalToDate,
+      doctor: finalDoctor,
+      patient: finalPatient,
+      specialty: finalSpecialty,
+      reportType,
+    });
   };
+  const [doctorOptions, setDoctorOptions] = useState([]);
+const [patientOptions, setPatientOptions] = useState([]);
+const [specialtyOptions, setSpecialtyOptions] = useState([]);
+
+const GetAllData = async () => {
+  try {
+    const response = await GetAllDetails(); // Make sure GetAllDetails returns a Promise
+    console.log("response:", response);
+
+    // Set doctor options
+    const doctors = [
+      { value: "all", label: "All Doctors" },
+      ...response.doctors.map((doc) => ({
+        value: doc.doctorId,
+        label: `${doc.doctorId} - Dr. ${doc.firstName} ${doc.lastName}`,
+      })),
+    ];
+
+    // Set patient options
+    const patients = [
+      { value: "all", label: "All Patients" },
+      ...response.patients.map((pat) => ({
+        value: pat.patientId,
+        label: `${pat.patientId} - ${pat.firstName} ${pat.lastName}`,
+      })),
+    ];
+
+    // Set specialty options
+    const specialties = response.specialty.map((s) => ({
+      value: s.toLowerCase(),
+      label: s,
+    }));
+
+    // Update states
+    setDoctorOptions(doctors);
+    setPatientOptions(patients);
+    setSpecialtyOptions(specialties);
+  } catch (err) {
+    console.error("Failed to get the data", err);
+  }
+};
+
 
   useEffect(() => {
     const updateDateTime = () => {
       setDateTime(new Date());
     };
     updateDateTime();
+    GetAllData();
     const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -39,94 +202,93 @@ export default function ReportGenerator() {
     hour12: true,
   });
 
+  const reportTypeOptions = [
+    { value: "summary", label: "Summary" },
+    { value: "detailed", label: "Detailed" },
+    { value: "Revenue", label: "Revenue Report" },
+    { value: "Appointment", label: "Appointment Report" },
+    { value: "Activity", label: "User Activity Report" },
+    { value: "doctor", label: "Doctor" },
+    { value: "patient", label: "Patient" },
+  ];
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md border-15 border-[#E9FAF2]">
-      <h1 className="text-2xl font-bold mb-2">Report</h1>
+      <h1 className="text-2xl font-bold mb-2">Reports</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
 
-      <div className="mt-10 flex justify-center">
+      <div className="mt-10 flex justify-center ">
         <div className="max-w-md md:max-w-md lg:max-w-lg xl:max-w-xl w-full">
-          <div className="bg-[#E9FAF2] p-6 shadow-md rounded-lg">
+          <div className="bg-[#E9FAF2] p-6 shadow-md rounded-lg px-30">
             <div className="flex flex-col gap-4 mb-4">
-              <label className="block font-semibold">Select Date:</label>
+              <label className="block font-semibold text-[#09424D]">
+                Select Date:
+              </label>
+              <label className="-m-2 text-[#09424D]">To Date:</label>
               <input
                 type="date"
                 name="toDate"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
-                className="w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6]"
+                disabled={doctor === "all" || patient === "all"}
+                className={`w-full p-2 text-[#09424D] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
+                  doctor === "all" || patient === "all"
+                    ? "opacity-65 cursor-not-allowed"
+                    : ""
+                }`}
                 required
               />
+              <label className="-m-2 text-[#09424D]">From Date:</label>
               <input
                 type="date"
                 name="fromDate"
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
-                className="w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mb-10"
+                disabled={doctor === "all" || patient === "all"}
+                className={`w-full p-2 text-[#09424D] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
+                  doctor === "all" || patient === "all"
+                    ? "opacity-65 cursor-not-allowed"
+                    : ""
+                }`}
                 required
               />
             </div>
 
             <div className="flex flex-col gap-4 mb-4">
-              {/* Patient Select */}
-              <select
+              <SearchableDropdown
+                options={patientOptions}
                 value={patient}
-                onChange={(e) => setPatient(e.target.value)}
-                disabled={reportType === "doctor"}
-                className={`w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
-                  reportType === "doctor" ? "opacity-65 cursor-not-allowed" : ""
-                }`}
-              >
-                <option value="">-- Select Patient --</option>
-                <option value="all">All Patients</option>
-                <option value="patient_1">Patient 1</option>
-              </select>
+                onChange={setPatient}
+                disabled={reportType === "doctor" || doctor === "all"}
+                placeholder="-- Select Patient --"
+              />
 
-              {/* Doctor Select */}
-              <select
+              <SearchableDropdown
+                options={doctorOptions}
                 value={doctor}
-                onChange={(e) => setDoctor(e.target.value)}
-                disabled={reportType === "patient"}
-                className={`w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
-                  reportType === "patient"
-                    ? "opacity-65 cursor-not-allowed"
-                    : ""
-                }`}
-              >
-                <option value="">-- Select Doctor --</option>
-                <option value="all">All Doctors</option>
-                <option value="dr_smith">Dr. Smith</option>
-                <option value="dr_john">Dr. John</option>
-              </select>
+                onChange={setDoctor}
+                disabled={reportType === "patient" || patient === "all"}
+                placeholder="-- Select Doctor --"
+              />
 
-              {/* Specialty Select */}
-              <select
+              <SearchableDropdown
+                options={specialtyOptions}
                 value={specialty}
-                onChange={(e) => setSpecialty(e.target.value)}
-                disabled={reportType === "patient"}
-                className={`w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
-                  reportType === "patient"
-                    ? "opacity-65 cursor-not-allowed"
-                    : ""
-                }`}
-              >
-                <option value="">-- Select Specialty --</option>
-                <option value="cardiology">Cardiology</option>
-                <option value="neurology">Neurology</option>
-              </select>
+                onChange={setSpecialty}
+                disabled={
+                  reportType === "patient" ||
+                  doctor === "all" ||
+                  patient === "all"
+                }
+                placeholder="-- Select Specialty --"
+              />
 
-              {/* Report Type */}
-              <select
+              <SearchableDropdown
+                options={reportTypeOptions}
                 value={reportType}
-                onChange={(e) => setReportType(e.target.value)}
-                className="w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6]"
-              >
-                <option value="">Select a Report Type</option>
-                <option value="summary">Summary</option>
-                <option value="detailed">Detailed</option>
-                <option value="doctor">Doctor</option>
-                <option value="patient">Patient</option>
-              </select>
+                onChange={setReportType}
+                placeholder="-- Select Specialty --"
+              />
             </div>
           </div>
           <div className="flex justify-end">
