@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Calendar } from "lucide-react";
+import DatePicker from "react-datepicker";
+import { format } from 'date-fns';
+import "react-datepicker/dist/react-datepicker.css";
 import styles from "./patientReg.module.css";
 
 export default function PatientRegistration() {
@@ -16,6 +19,7 @@ export default function PatientRegistration() {
     confirmPassword: "",
     contactNumber: "",
     address: "",
+    dob: null,
     role: "Patient",
   });
 
@@ -32,6 +36,11 @@ export default function PatientRegistration() {
 
     // Clear error as user types
     setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  const handleDateChange = (date) => {
+    setFormData({ ...formData, dob: date });
+    setErrors({ ...errors, dob: "" });
   };
 
   const validateForm = () => {
@@ -55,6 +64,7 @@ export default function PatientRegistration() {
     }
     if (!formData.contactNumber.trim()) newErrors.contactNumber = "Contact Number is required.";
     if (!formData.address.trim()) newErrors.address = "Address is required.";
+    if (!formData.dob) newErrors.dob = "Date of Birth is required.";
     if (!formData.role) newErrors.role = "Role is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Return true if no errors
@@ -76,6 +86,7 @@ export default function PatientRegistration() {
           confirmPassword: formData.confirmPassword,
           contactNumber: formData.contactNumber,
           address: formData.address,
+          dob: formData.dob?.toISOString().split('T')[0],
           status: "Active",
         }),
       });
@@ -92,7 +103,8 @@ export default function PatientRegistration() {
         confirmPassword: "",
         contactNumber: "",
         address: "",
-        role: "",
+        dob: null,
+        role: "Patient",
       });
       setErrors({});
       router.push("/Patient/PatientDashboard");
@@ -109,15 +121,15 @@ export default function PatientRegistration() {
         {/* Left Side - Registration Form */}
         <div className={`${styles.formSection} flex-1`}>
           <div className={`${styles.logoContainer} flex justify-center mb-6`}>
-            <Image 
-              src="/logo.png" 
-              alt="PresCrypt Logo" 
+            <Image
+              src="/logo.png"
+              alt="PresCrypt Logo"
               width={130}
               height={40}
               className="object-contain"
             />
           </div>
-        
+
           <h2 className={`${styles.title} text-2xl font-bold text-center text-gray-800 mb-2`}>JOIN US FOR A HEALTHIER TOMORROW!</h2>
           <p className={`${styles.subtitle} text-center text-gray-600 mb-6`}>Create your account</p>
 
@@ -130,7 +142,7 @@ export default function PatientRegistration() {
               {formData.role || "Choose your Role"}
             </button>
             {showRoleDropdown && (
-              <div className={`${styles.dropdownMenu} absolute w-full bg-white border border-gray-300 rounded mt-1`}>
+              <div className={`${styles.dropdownMenu} absolute w-full bg-white border border-gray-300 rounded mt-1 z-10`}>
                 {["Patient", "Doctor", "Admin"].map((role) => (
                   <div
                     key={role}
@@ -174,6 +186,50 @@ export default function PatientRegistration() {
             </div>
           ))}
 
+          {/* Date of Birth */}
+          <div className={`${styles.inputGroup} mb-4`}>
+            <div className="relative">
+               <label htmlFor="dob" className="block text-gray-0 mb-2">Date of Birth</label>
+              <DatePicker
+                selected={formData.dob}
+                onChange={handleDateChange}
+                PlaceholderText="Date of Birth"
+                className={`w-full bg-gray-100 border ${errors.dob ? "border-red-500" : "border-gray-300"
+                  } rounded-lg py-2 pl-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
+                dateFormat="MMMM d, yyyy"
+                showYearDropdown
+                showMonthDropdown
+                dropdownMode="select"
+                maxDate={new Date()}
+                minDate={new Date(1900, 0, 1)}
+                yearDropdownItemNumber={100}
+                scrollableYearDropdown
+                withPortal
+                isClearable
+                clearButtonClassName="text-gray-400 hover:text-gray-600"
+                todayButton="Today"
+                popperClassName="shadow-lg rounded-lg border border-gray-200"
+                popperPlacement="bottom-start"
+                customInput={
+                  <div className="relative">
+                    <input
+                      className={`w-full bg-gray-100 border ${errors.dob ? "border-red-500" : "border-gray-300"
+                        } rounded-lg py-2 pl-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                      value={formData.dob ? format(formData.dob, 'MMMM d, yyyy') : ''}
+                      readOnly
+                    />
+                    <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  </div>
+                }
+              />
+              {errors.dob && (
+                <p className={`${styles.errorMessage} text-red-500 text-sm mt-1`}>
+                  {errors.dob}
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* Address Textarea */}
           <div className="mb-4">
             <textarea
@@ -209,8 +265,7 @@ export default function PatientRegistration() {
           ))}
 
           {errors.general && <p className={`${styles.errorMessage} text-red-500 text-sm mb-4`}>{errors.general}</p>}
-          
-          
+
           <button
             className={`${styles.registerBtn} w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none`}
             onClick={handleRegister}
