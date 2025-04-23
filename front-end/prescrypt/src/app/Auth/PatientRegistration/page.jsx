@@ -15,7 +15,7 @@ export default function PatientRegistration() {
     password: "",
     confirmPassword: "",
     contactNumber: "",
-    nic: "",
+    address: "",
     role: "Patient",
   });
 
@@ -54,7 +54,7 @@ export default function PatientRegistration() {
       newErrors.confirmPassword = "Passwords do not match.";
     }
     if (!formData.contactNumber.trim()) newErrors.contactNumber = "Contact Number is required.";
-    if (!formData.nic.trim()) newErrors.nic = "NIC is required.";
+    if (!formData.address.trim()) newErrors.address = "Address is required.";
     if (!formData.role) newErrors.role = "Role is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Return true if no errors
@@ -70,13 +70,12 @@ export default function PatientRegistration() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fullName: formData.fullName,
+          fullName: `${formData.FirstName} ${formData.LastName}`,
           email: formData.email.toLowerCase(),
           password: formData.password,
           confirmPassword: formData.confirmPassword,
           contactNumber: formData.contactNumber,
-          nic: formData.nic,
-          bloodGroup: formData.bloodGroup,
+          address: formData.address,
           status: "Active",
         }),
       });
@@ -92,7 +91,7 @@ export default function PatientRegistration() {
         password: "",
         confirmPassword: "",
         contactNumber: "",
-        nic: "",
+        address: "",
         role: "",
       });
       setErrors({});
@@ -161,7 +160,6 @@ export default function PatientRegistration() {
             { name: "LastName", placeholder: "Last Name" },
             { name: "email", placeholder: "Email", type: "email" },
             { name: "contactNumber", placeholder: "Contact Number" },
-            { name: "nic", placeholder: "NIC" },
           ].map(({ name, placeholder, type = "text" }) => (
             <div key={name} className={`${styles.inputGroup} mb-4`}>
               <input
@@ -175,6 +173,19 @@ export default function PatientRegistration() {
               {errors[name] && <p className={`${styles.errorMessage} text-red-500 text-sm mt-1`}>{errors[name]}</p>}
             </div>
           ))}
+
+          {/* Address Textarea */}
+          <div className="mb-4">
+            <textarea
+              name="address"
+              placeholder="Address"
+              rows="3"
+              className={`w-full bg-gray-100 border ${errors.address ? "border-red-500" : "border-gray-300"} rounded py-2 px-4 focus:outline-none resize-none`}
+              value={formData.address}
+              onChange={handleChange}
+            />
+            {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+          </div>
 
           {/* Password Fields */}
           {[{ name: "password", show: showPassword, setShow: setShowPassword }, { name: "confirmPassword", show: showConfirmPassword, setShow: setShowConfirmPassword }].map(({ name, show, setShow }) => (
