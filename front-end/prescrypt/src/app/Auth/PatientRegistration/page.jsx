@@ -19,7 +19,7 @@ export default function PatientRegistration() {
     confirmPassword: "",
     contactNumber: "",
     address: "",
-    dob: null,
+    dob: "",
     role: "Patient",
   });
 
@@ -80,14 +80,15 @@ export default function PatientRegistration() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fullName: `${formData.FirstName} ${formData.LastName}`,
+          FirstName: formData.FirstName,
+          LastName: formData.LastName,
           email: formData.email.toLowerCase(),
           password: formData.password,
           confirmPassword: formData.confirmPassword,
           contactNumber: formData.contactNumber,
           address: formData.address,
           dob: formData.dob?.toISOString().split('T')[0],
-          status: "Active",
+          status: true,
         }),
       });
 
@@ -103,11 +104,11 @@ export default function PatientRegistration() {
         confirmPassword: "",
         contactNumber: "",
         address: "",
-        dob: null,
+        dob: "",
         role: "Patient",
       });
       setErrors({});
-      router.push("/Patient/PatientDashboard");
+      router.push("../Patient/PatientDashboard");
     } catch (err) {
       setErrors({ general: err.message });
     } finally {
