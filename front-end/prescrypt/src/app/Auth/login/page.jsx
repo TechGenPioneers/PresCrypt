@@ -48,7 +48,7 @@ export default function LoginPage() {
       // Handle DoctorPending case
       if (response.message?.includes("pending approval")) {
         setError("Your registration is not confirmed yet. We will reach out to you soon.");
-        setTimeout(() => router.push("/Auth/login"), 3000);
+        setTimeout(() => router.push("/"), 3000);
         return;
       }
 
@@ -163,4 +163,3 @@ export default function LoginPage() {
     </div>
   );
 }
-  
