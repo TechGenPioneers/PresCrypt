@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://localhost:7021/api"; 
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://localhost:7021/api";
 
 // Patient Registration
 export const registerPatient = async (patientData) => {
@@ -10,12 +10,12 @@ export const registerPatient = async (patientData) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patientData),
     });
-
+    
     if (!response.ok) {
       const errorMessage = await response.text();
       throw new Error(errorMessage || "Registration failed");
     }
-
+    
     return await response.json();
   } catch (error) {
     throw new Error(error.message || "An error occurred");
@@ -25,20 +25,41 @@ export const registerPatient = async (patientData) => {
 // Common Login for all roles
 export const loginUser = async (loginData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/Patient/Login`, {
+    const response = await fetch(`${API_BASE_URL}/User/Login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(loginData),
     });
-
+    
+    // Parse the JSON response regardless of success or failure
+    const data = await response.json();
+    
+    // If response is not ok, we still want to return the data for proper handling
     if (!response.ok) {
-      const errorMessage = await response.text();
-      throw new Error(errorMessage || "Login failed");
+      // If the error contains user info (like for pending doctors), return it
+      if (data.user) {
+        return {
+          success: false,
+          message: data.message || "Login failed",
+          user: data.user
+        };
+      }
+      // Otherwise return the error message
+      return {
+        success: false,
+        message: data.message || "Login failed"
+      };
     }
-
-    return await response.json();
+    
+    // Success case
+    return data;
   } catch (error) {
-    return error.response?.data || { success: false, message: "Login failed" };
+    console.error("Login error:", error);
+    // Handle network errors or JSON parsing errors
+    return { 
+      success: false, 
+      message: "Login service unavailable. Please try again later." 
+    };
   }
 };
 
