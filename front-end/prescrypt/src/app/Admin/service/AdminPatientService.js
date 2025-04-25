@@ -25,4 +25,23 @@ const GetPatientById = async (patientId) => {
     }
   }
 
- export {GetPatients, GetPatientById}
+   //change patient status
+const ChangePatientStatus = async (patientId,status) => {
+  const changePatient = {
+    patientId: patientId,
+    status: status
+  };
+  try{
+    const response = await axios.patch(
+      AddPatientURL,
+      changePatient
+    );
+    console.log("response:", response.data);
+    return response.data;
+  }catch(error){
+    console.error("Failed to get the data",error);
+    throw error
+  }
+}
+
+ export {GetPatients, GetPatientById,ChangePatientStatus}
