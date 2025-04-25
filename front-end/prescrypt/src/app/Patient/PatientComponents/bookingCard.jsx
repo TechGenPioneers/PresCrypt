@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import AppointmentCard from "./AppointmentCard";
+import AppointmentCard from "./appointmentCard";
 
 const BookingCard = ({ doctorId, firstName, lastName,appointmentTime, appointmentDay, imageUrl }) => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -52,7 +52,7 @@ const BookingCard = ({ doctorId, firstName, lastName,appointmentTime, appointmen
 
       {/* Dialog Component */}
       <AppointmentCard
-        doctorId="D002"
+        doctorId={doctorId}
         firstName={firstName}
         lastName={lastName}
         appointmentTime={appointmentTime}

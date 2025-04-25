@@ -18,6 +18,7 @@ const specializations = [
   { name: "Orthopedics", icon: <FaBone /> },
   { name: "Cancer Diseases", icon: <FaRibbon /> },
   { name: "Gynaecology", icon: <FaVenus /> },
+  {name:"Nephrology", icon:<FaVenus/>},
   { name: "Psychotherapy", icon: <FaBrain /> },
   { name: "Injury Care", icon: <FaAmbulance /> },
   { name: "Cardiology", icon: <FaHeartbeat /> },
