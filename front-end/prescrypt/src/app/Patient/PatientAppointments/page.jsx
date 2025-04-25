@@ -2,10 +2,10 @@
 import React, { useState } from "react";
 import Header from "../../Components/Header/Header";
 import Footer from "../../Components/Footer/Footer";
-import Nav from "./PatientComponents/navBar";
-import CustomCalendar from "./PatientComponents/calender";
-import SearchBar from "../../Patient/PatientAppointments/PatientComponents/searchBar";
-import BookingCard from "../../Patient/PatientAppointments/PatientComponents/bookingCard";
+import Nav from "../PatientComponents/navBar";
+import CustomCalendar from "../PatientComponents/calender";
+import SearchBar from "../PatientComponents/searchBar";
+import BookingCard from "../PatientComponents/bookingCard";
 
 export default function Appointments() {
   const [date, setDate] = useState(new Date());
@@ -30,6 +30,7 @@ export default function Appointments() {
                   doctor.availableTime.map((availableTime, timeIndex) => (
                     <BookingCard
                       key={`${index}-${dateIndex}-${timeIndex}`} // Unique key
+                      doctorId={doctor.doctorId} // Use `doctorId` instead of `doctorDoctorId`
                       firstName={doctor.firstName} // Use `firstName` instead of `doctorName`
                       lastName ={doctor.lastName} // Use `lastName` instead of `doctorLastName`
                       appointmentDay={availableDay} // Directly use availableDay
