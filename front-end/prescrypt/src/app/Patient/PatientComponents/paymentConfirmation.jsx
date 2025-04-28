@@ -10,10 +10,39 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import axios from "axios"; // install axios if not already installed
 
+const PaymentConfirmation = ({
+  open,
+  handleClose,
+  email,
+  patientId,
+  doctorName,
+  appointmentDate,
+  appointmentTime,
+  hospitalName,
+}) => {
 
+  useEffect(() => {
+    if (open) {
+      const sendNotification = async () => {
+        try {
+          const notificationData = {
+            patientId,
+            title: "Appointment Booking",
+            message: `Your appointment with Dr. ${doctorName} has been successfully scheduled on ${appointmentDate} at ${appointmentTime} at ${hospitalName}.`,
+          };
 
-const PaymentConfirmation = ({ open, handleClose, email }) => {
+          await axios.post("https://localhost:7021/api/PatientNotification/send", notificationData); 
+        } catch (error) {
+          console.error("Failed to send notification", error);
+        }
+      };
+
+      sendNotification();
+    }
+  }, [open, patientId, doctorName, appointmentDate, appointmentTime, hospitalName]);
+
   return (
     <Dialog
       open={open}
