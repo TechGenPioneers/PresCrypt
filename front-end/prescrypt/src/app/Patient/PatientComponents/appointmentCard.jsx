@@ -75,7 +75,7 @@ const AppointmentCard = ({
   const fetchAppointmentCounts = async (dates) => {
     try {
       const response = await fetch(
-        "https://localhost:7021/api/Appointments/count-by-dates",
+        "https://localhost:7021/api/Appointments/count-by-dates", //api calls should be added to the services folder as a server side data fetching
         {
           method: "POST",
           headers: {

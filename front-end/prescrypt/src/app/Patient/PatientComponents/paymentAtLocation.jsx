@@ -9,7 +9,7 @@ const PaymentAtLocation = ({
   appointmentDate,
   appointmentTime,
   doctorId,
-  patientId,
+  patientId ="P021",
   hospitalId,
   doctorName,
   selectedMethod,
@@ -195,10 +195,16 @@ const PaymentAtLocation = ({
 
       {/* Success Dialog */}
       <PaymentConfirmation
-        open={confirmationOpen}
-        handleClose={handleCloseConfirmation}
-        email={email}
-      />
+  open={confirmationOpen}
+  handleClose={handleCloseConfirmation}
+  email={email}
+  patientId={patientId}
+  doctorName={doctorName}
+  appointmentDate={appointmentDate}
+  appointmentTime={appointmentTime}
+  hospitalName={hospital}
+/>
+
     </div>
   );
 };
