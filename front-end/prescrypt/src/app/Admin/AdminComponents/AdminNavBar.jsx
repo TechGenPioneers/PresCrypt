@@ -19,7 +19,7 @@ const AdminNavBar = () => {
     { text: "Patients", image: "/image12.png",link: "/Admin/AdminPatient" },
     { text: "Requests", image: "/image27.png", link: "/Admin/DoctorRequestPage" },
     { text: "Doctors", image: "/image19.png",link: "/Admin/AdminDoctor" },
-    { text: "Reports", image: "/image20.png" },
+    { text: "Reports", image: "/image20.png",link: "/Admin/AdminReportGeneratorPage" },
   ];
 
   return (
