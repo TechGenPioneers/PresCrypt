@@ -1,3 +1,4 @@
+"use client";
 import styles from "./mainPage.module.css";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,7 +17,8 @@ export default function MainPage() {
             height={50}
           />
         </div>
-        <Link href="./Login">
+        {/* Default to patient role for the top login button */}
+        <Link href="./login">
           <button className={styles.loginBtn}>Login</button>
         </Link>
       </header>
@@ -53,15 +55,24 @@ export default function MainPage() {
       <div className={styles.buttonSection}>
         <h3 className={styles.subtext}>Continue Your Journey As A</h3>
         <div className={styles.btnGroup}>
-          <Link href="./Login">
-            <button className={styles.patientBtn}>Patient</button>
+          <Link href="./PatientRegistration">
+            <button
+              className={styles.patientBtn}
+              
+            >
+              Patient
+            </button>
           </Link>
-          <Link href="./Login">
-            <button className={styles.doctorBtn}>Doctor</button>
+          <Link href="./DoctorRegistration">
+            <button
+              className={styles.doctorBtn}
+              
+            >
+              Doctor
+            </button>
           </Link>
         </div>
       </div>
-     
     </div>
   );
 }
