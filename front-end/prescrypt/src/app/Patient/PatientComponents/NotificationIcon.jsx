@@ -41,12 +41,15 @@ export default function NotificationIcon({ userId = "P021" }) {
         console.log("Connected to SignalR hub");
 
         newConnection.on("ReceiveNotification", (msg) => {
+          console.log("New Notification",msg);
           setNotifications(prev => [
             {
+
+              id:msg.id,
               title: msg.title,
               message: msg.message,
               isRead: false,
-              id: Date.now()
+              
             },
             ...prev
           ]);
@@ -67,7 +70,15 @@ export default function NotificationIcon({ userId = "P021" }) {
 
   const handleMarkAsRead = async (id) => {
     try {
-      await axios.post(`https://localhost:7021/api/PatientNotification/mark-as-read`, { id });
+      await axios.post(
+        "https://localhost:7021/api/PatientNotification/mark-as-read",
+        id, 
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
       setNotifications(prev =>
         prev.map(n => n.id === id ? { ...n, isRead: true } : n)
       );
@@ -96,6 +107,7 @@ export default function NotificationIcon({ userId = "P021" }) {
             width: 450,
             padding: 10,
             borderRadius: 16,
+            overflowY: 'auto',
           },
         }}
       >
