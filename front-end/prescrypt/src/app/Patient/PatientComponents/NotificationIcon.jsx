@@ -1,28 +1,27 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CheckIcon from "@mui/icons-material/Check";
-import ListItemText from "@mui/material/ListItemText";
-import Typography from "@mui/material/Typography";
 import axios from "axios";
-import { useRouter } from "next/navigation"; // <-- important for routing
 
-export default function NotificationIcon({ userId }) {
-  const router = useRouter(); // <-- initialize router
+export default function NotificationIcon({ userId = "P021" }) {
   const [connection, setConnection] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  // Fetch all notifications from DB
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get(`https://localhost:7192/api/Notification/${userId}`);
+      const res = await axios.get(`https://localhost:7021/api/PatientNotification/${userId}`);
       setNotifications(res.data);
     } catch (err) {
       console.error("Failed to fetch notifications", err);
@@ -30,27 +29,30 @@ export default function NotificationIcon({ userId }) {
   };
 
   useEffect(() => {
-    fetchNotifications(); // Load existing notifications
+    fetchNotifications();
 
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`https://localhost:7192/notificationHub?userId=${userId || "P001"}`)
+      .withUrl(`https://localhost:7021/patientNotificationHub?userId=${userId}`)
       .withAutomaticReconnect()
       .build();
 
-    newConnection
-      .start()
+    newConnection.start()
       .then(() => {
         console.log("Connected to SignalR hub");
 
         newConnection.on("ReceiveNotification", (msg) => {
-          console.log("New notification received:", msg);
-          setNotifications((prev) => [
-            { message: msg, isRead: false, id: Date.now() },
-            ...prev,
+          setNotifications(prev => [
+            {
+              title: msg.title,
+              message: msg.message,
+              isRead: false,
+              id: Date.now()
+            },
+            ...prev
           ]);
         });
       })
-      .catch((err) => console.error("SignalR connection failed:", err));
+      .catch(err => console.error("SignalR connection failed:", err));
 
     setConnection(newConnection);
 
@@ -61,22 +63,16 @@ export default function NotificationIcon({ userId }) {
 
   const handleClose = () => {
     setAnchorEl(null);
-
-    // Go back to previous URL when menu closes
-    router.back();
   };
 
-  const handleMarkAsRead = async (index, notification) => {
+  const handleMarkAsRead = async (id) => {
     try {
-      await axios.post(`https://localhost:7192/api/Notification/mark-as-read`, {
-        id: notification.id,
-      });
-
-      setNotifications((prev) =>
-        prev.map((n, i) => (i === index ? { ...n, isRead: true } : n))
+      await axios.post(`https://localhost:7021/api/PatientNotification/mark-as-read`, { id });
+      setNotifications(prev =>
+        prev.map(n => n.id === id ? { ...n, isRead: true } : n)
       );
     } catch (err) {
-      console.error("Failed to mark as read", err);
+      console.error("Failed to mark notification as read", err);
     }
   };
 
@@ -84,7 +80,7 @@ export default function NotificationIcon({ userId }) {
 
   return (
     <>
-      <IconButton color="inherit">
+      <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
         <Badge badgeContent={unreadCount} color="error">
           <NotificationsIcon />
         </Badge>
@@ -96,45 +92,80 @@ export default function NotificationIcon({ userId }) {
         onClose={handleClose}
         PaperProps={{
           style: {
-            maxHeight: 300,
-            width: '320px',
+            maxHeight: 400,
+            width: 450,
+            padding: 10,
+            borderRadius: 16,
           },
         }}
       >
+        <Box display="flex" alignItems="center" px={1} mb={1}>
+          <Typography variant="h6" fontWeight="bold">
+            Notifications
+          </Typography>
+        </Box>
+
         {notifications.length === 0 ? (
-          <MenuItem disabled>No notifications</MenuItem>
+          <Box p={2}>
+            <Typography variant="body2" color="text.secondary" textAlign="center">
+              No notifications
+            </Typography>
+          </Box>
         ) : (
-          notifications.map((n, index) => (
-            <MenuItem
-              key={n.id || index}
-              divider
-              sx={{
-                bgcolor: n.isRead ? "white" : "#f5f5f5",
-              }}
+          notifications.map((n) => (
+            <Box
+              key={n.id}
+              bgcolor={n.isRead ? "#f9f9f9" : "#E8F4F2"}
+              borderRadius={2}
+              border="1px solid #ccc"
+              p={2}
+              mb={1}
+              display="flex"
+              flexDirection="column"
+              gap={1}
+              position="relative"
             >
-              <ListItemText
-                primary={
-                  <Typography
-                    variant="body2"
-                    fontWeight={n.isRead ? "normal" : "bold"}
-                  >
-                    {n.message}
-                  </Typography>
-                }
-              />
+              <Typography variant="body1" fontWeight="bold">
+                {n.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {n.message}
+              </Typography>
+
+              {/* Show Accept/Deny buttons if needed */}
+              {n.title.includes('wants to access your profile') && (
+                <Box display="flex" gap={1} mt={1}>
+                  <Button variant="contained" color="primary" size="small">
+                    Accept
+                  </Button>
+                  <Button variant="outlined" color="error" size="small">
+                    Deny
+                  </Button>
+                </Box>
+              )}
+
+              {/* Mark as read button */}
               {!n.isRead && (
                 <IconButton
                   size="small"
-                  onClick={() => handleMarkAsRead(index, n)}
+                  onClick={() => handleMarkAsRead(n.id)}
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    backgroundColor: "#fff",
+                    "&:hover": {
+                      backgroundColor: "#e0e0e0",
+                    },
+                  }}
                 >
                   <CheckIcon fontSize="small" />
                 </IconButton>
               )}
-            </MenuItem>
+            </Box>
           ))
         )}
       </Menu>
     </>
   );
 }
-

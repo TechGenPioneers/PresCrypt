@@ -45,13 +45,13 @@ export default function Header({ patientId = "P021" }) {
 
       {/* Right Icons (bell and profile) */}
      {/* Right Icons (Notification + Profile) */}
-<div className="flex justify-end space-x-4 items-center">
+<div className="flex justify-end space-x-12 items-center">
   {/* Notification Icon with Popup */}
   <NotificationIcon userId={patientId} />
 
   {/* Profile Image with Link */}
   <Link href="/Patient/PatientProfile">
-    <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-gray-300 hover:ring-2 ring-green-400 transition">
+    <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-gray-300 hover:ring-2 ring-green-400 transition ml-6">
       <img
         src={profileImage}
         alt="User"
