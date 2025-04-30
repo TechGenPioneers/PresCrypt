@@ -4,51 +4,98 @@ import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import axiosInstance from "../utils/axiosInstance";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
+import MedicalHistoryModal from "./Modals/MedicalHistoryModal";
+import RequestAccessModal from "./Modals/RequestAccessModal";
 
 export default function Page() {
-  const Title = "Prescriptions"; // Dynamic title for each page
+  const Title = "Prescriptions";
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
-  const [doctorId, setDoctorId] = useState(1); // You can dynamically set this based on logged-in doctor
-  const [searchTerm, setSearchTerm] = useState(""); // To store the search term
+  const [doctorId, setDoctorId] = useState("D002");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState(null);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [showMedicalHistory, setShowMedicalHistory] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(true); // Assume access is granted for now
 
-  // Fetch recent appointments when the component mounts or when searchTerm changes
   useEffect(() => {
-    const fetchRecentAppointments = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        // First API call for fetching recent appointments (without search term)
-        const defaultResponse = await axiosInstance.get(
-          `/api/appointments/recent/${doctorId}`
+        const res = await axiosInstance.get(
+          `/Appointments/recent-by-doctor/${doctorId}`
         );
-
-        if (defaultResponse.status === 200) {
-          setAppointments(defaultResponse.data); // Set the appointments data
-        } else {
-          console.log("No recent appointments found.");
-        }
-
-        // If there's a search term
-        if (searchTerm) {
-          const searchResponse = await axiosInstance.get(
-            `/api/appointments/recent/${doctorId}?patientId=${searchTerm}`
-          );
-
-          if (searchResponse.status === 200) {
-            setAppointments(searchResponse.data); // Set the searched data
-          } else {
-            console.log("No appointments found for the given patient ID.");
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
+        setAppointments(res.data.length === 0 ? [] : res.data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
+    fetchData();
+  }, [doctorId]);
 
-    fetchRecentAppointments();
-  }, [doctorId, searchTerm]);
-  // Re-fetch when doctorId or searchTerm changes
+  const handleViewClick = (appointment) => {
+    setSelectedPatient(appointment);
+    if (accessGranted) {
+      setShowMedicalHistory(true);
+    } else {
+      setShowRequestModal(true);
+    }
+  };
+
+  const handleRequestAccess = (reason) => {
+    // In a real implementation, this would send a request to backend
+    console.log("Access requested for:", selectedPatient.patientId);
+    console.log("Reason:", reason);
+    // For now, we'll simulate access being granted
+    setAccessGranted(true);
+    setShowRequestModal(false);
+    setShowMedicalHistory(true);
+  };
+
+  const closeModals = () => {
+    setShowMedicalHistory(false);
+    setShowRequestModal(false);
+    setSelectedPatient(null);
+  };
+
+  const getGenderFullName = (genderChar) => {
+    switch (genderChar) {
+      case "M":
+        return "Male";
+      case "F":
+        return "Female";
+      default:
+        return "Other";
+    }
+  };
+
+  const calculateAge = (dob) => {
+    if (!dob) return 0;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
+  const filteredAppointments = searchTerm
+    ? appointments.filter(
+        (appointment) =>
+          appointment.patientId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          appointment.patientName.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : appointments;
 
   return (
     <div className="flex flex-col min-h-screen ml-32">
@@ -58,14 +105,14 @@ export default function Page() {
           <div className="bg-white h-full w-full">
             <DateTimeDisplay title={Title} />
 
-            {/* Search input for Patient ID */}
+            {/* Search input for Patient ID or Name */}
             <div className="p-12">
               <input
                 type="text"
-                placeholder="Enter Patient Id..."
+                placeholder="Search by Patient ID or Name..."
                 className="w-full p-3 border-none bg-[#E9FAF2] shadow-lg rounded-[10px] focus:outline-none"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)} // Update searchTerm state as the user types
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
@@ -78,72 +125,83 @@ export default function Page() {
               // Display the table of recent appointments
               <div className="pl-12 pb-8 pr-12">
                 <div className="overflow-hidden rounded-lg">
-                  <table className="w-full table-auto sm:table-fixed min-w-full">
-                    <thead className="text-[#094A4D] sticky top-0 bg-[#0064694e]">
-                      <tr>
-                        <th className="px-4 py-2 text-left">Patient ID</th>
-                        <th className="px-4 py-2 text-left">Patient</th>
-                        <th className="px-4 py-2 text-left">Last View</th>
-                        <th className="px-4 py-2 text-left">Hospital</th>
-                        <th className="px-4 py-2 text-left">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {appointments.length > 0
-                        ? appointments.map((appointment, index) => (
-                            <tr
-                              key={appointment.id || index} // Use index as a fallback
-                              className="border-b border-[#094A4D] relative odd:bg-[#E9FAF2]"
-                            >
-                              <td className="px-4 py-2">
-                                {appointment.patientId}
-                              </td>
-                              <td className="px-4 py-2">
-                                <div className="flex items-center space-x-3">
-                                  <img
-                                    src={
-                                      appointment.profilePictureUrl ||
-                                      "/profile.png"
-                                    }
-                                    alt="Profile"
-                                    width={50}
-                                    height={50}
-                                    className="rounded-full"
-                                  />
-                                  <div className="flex flex-col">
-                                    <span className="font-semibold">
-                                      {appointment.patientName}
-                                    </span>
-                                    <span className="text-sm text-gray-600">
-                                      {appointment.gender}
-                                    </span>
-                                  </div>
+                  {filteredAppointments.length === 0 ? (
+                    <div className="text-center p-4 text-lg text-gray-600">
+                      {searchTerm
+                        ? "No appointments found matching your search."
+                        : "No recent appointments found."}
+                    </div>
+                  ) : (
+                    <table className="w-full table-auto sm:table-fixed min-w-full">
+                      <thead className="text-[#094A4D] sticky top-0 bg-[#0064694e]">
+                        <tr>
+                          <th className="px-4 py-2 text-left">Patient ID</th>
+                          <th className="px-4 py-2 text-left">Patient</th>
+                          <th className="px-4 py-2 text-left">Last View</th>
+                          <th className="px-4 py-2 text-left">Hospital</th>
+                          <th className="px-4 py-2 text-left">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredAppointments.map((appointment, index) => (
+                          <tr
+                            key={appointment.id || index}
+                            className="border-b border-[#094A4D] relative odd:bg-[#E9FAF2]"
+                          >
+                            <td className="px-4 py-2">
+                              {appointment.patientId}
+                            </td>
+                            <td className="px-4 py-2">
+                              <div className="flex items-center space-x-3">
+                                <img
+                                  src={`data:image/jpeg;base64,${appointment.profileImage}`}
+                                  alt="Profile"
+                                  width={50}
+                                  height={50}
+                                  className="rounded-full"
+                                />
+                                <div className="flex flex-col">
+                                  <span className="font-semibold">
+                                    {appointment.patientName}
+                                  </span>
+                                  <span className="text-sm text-gray-600">
+                                    {getGenderFullName(appointment.gender)},{" "}
+                                    {calculateAge(appointment.dob)} yrs
+                                  </span>
                                 </div>
-                              </td>
-                              <td className="px-4 py-2">
-                                {new Date(appointment.date).toLocaleString([], {
-                                  year: "numeric",
-                                  month: "numeric",
-                                  day: "numeric",
-                                  hour: "numeric",
+                              </div>
+                            </td>
+                            <td className="px-4 py-2">
+                              {new Date(appointment.date).toLocaleDateString(
+                                "en-US"
+                              )}{" "}
+                              <span className="text-sm text-gray-600">
+                                {new Date(
+                                  `1970-01-01T${appointment.time}`
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
                                   minute: "2-digit",
                                   hour12: true,
                                 })}
-                              </td>
-                              <td className="px-4 py-2">
-                                {appointment.hospital}
-                              </td>
-                              <td className="px-4 py-2">
-                                <button className="font-medium cursor-pointer">
-                                  View
-                                </button>
-                              </td>
-                            </tr>
-                          ))
-                        : null}
-                      {/* No message, just no rows if no appointments */}
-                    </tbody>
-                  </table>
+                              </span>
+                            </td>
+
+                            <td className="px-4 py-2">
+                              {appointment.hospitalName}
+                            </td>
+                            <td className="px-4 py-2">
+                              <button 
+                                className="font-medium cursor-pointer text-[#094A4D] hover:underline"
+                                onClick={() => handleViewClick(appointment)}
+                              >
+                                View
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               </div>
             )}
@@ -151,6 +209,23 @@ export default function Page() {
         </div>
       </div>
       <Footer />
+
+      {/* Medical History Modal */}
+      <MedicalHistoryModal
+        isOpen={showMedicalHistory}
+        onClose={closeModals}
+        patient={selectedPatient}
+        getGenderFullName={getGenderFullName}
+        calculateAge={calculateAge}
+      />
+
+      {/* Request Access Modal */}
+      <RequestAccessModal
+        isOpen={showRequestModal}
+        onClose={closeModals}
+        patient={selectedPatient}
+        onRequestSubmit={handleRequestAccess}
+      />
     </div>
   );
 }
