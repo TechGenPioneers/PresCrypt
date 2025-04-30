@@ -22,22 +22,29 @@ export default function page() {
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      // Fetch both past and future patients simultaneously
       const [pastResponse, futureResponse] = await Promise.all([
-        axiosInstance.get(`/DoctorPatient/patient-details/${doctorId}?type=past`),
+        axiosInstance.get(`/DoctorPatient/patient-details/${doctorId}?type=past`)
+          .catch(err => {
+            if (err.response?.status === 404) {
+              return { data: [] }; //as empty data
+            }
+            throw err;
+          }),
         axiosInstance.get(`/DoctorPatient/patient-details/${doctorId}?type=future`)
+          .catch(err => {
+            if (err.response?.status === 404) {
+              return { data: [] };
+            }
+            throw err;
+          })
       ]);
-      
+    
       setAllPatients({
-        past: pastResponse.data,
-        future: futureResponse.data
+        past: pastResponse.data || [],
+        future: futureResponse.data || []
       });
-      
-      // Initially show past patients
-      setFilteredPatients(pastResponse.data);
-      setNoPatients(pastResponse.data.length === 0 && futureResponse.data.length === 0);
     } catch (error) {
-      console.error("Error fetching patients:", error);
+      console.error("Error:", error);
       setNoPatients(true);
     } finally {
       setLoading(false);
@@ -48,12 +55,12 @@ export default function page() {
     fetchPatients();
   }, []);
 
-  // Update filtered patients when patientType or searchTerm changes
+  //filtered patients
   useEffect(() => {
     let patientsToFilter = patientType === "past" ? allPatients.past : allPatients.future;
     
     if (searchTerm) {
-      // If there's a search term, search through all patients regardless of type
+      // earch through all patients regardless of type
       patientsToFilter = [...allPatients.past, ...allPatients.future].filter(
         (p) =>
           p.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
