@@ -48,6 +48,7 @@ export default function NotificationIcon({ userId = "P021" }) {
               id:msg.id,
               title: msg.title,
               message: msg.message,
+              date:msg.createdAt,
               isRead: false,
               
             },
@@ -138,7 +139,7 @@ export default function NotificationIcon({ userId = "P021" }) {
               position="relative"
             >
               <Typography variant="body1" fontWeight="bold">
-                {n.title}
+                {n.title }   
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {n.message}
