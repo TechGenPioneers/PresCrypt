@@ -41,16 +41,16 @@ export default function NotificationIcon({ userId = "P021" }) {
         console.log("Connected to SignalR hub");
 
         newConnection.on("ReceiveNotification", (msg) => {
-          console.log("New Notification",msg);
+          console.log("New Notification", msg);
           setNotifications(prev => [
             {
-
-              id:msg.id,
+              id: msg.id,
               title: msg.title,
               message: msg.message,
-              date:msg.createdAt,
+              date: msg.createdAt,
               isRead: false,
-              
+              type: msg.type,
+              doctorId: msg.doctorId || null
             },
             ...prev
           ]);
@@ -73,7 +73,7 @@ export default function NotificationIcon({ userId = "P021" }) {
     try {
       await axios.post(
         "https://localhost:7021/api/PatientNotification/mark-as-read",
-        id, 
+        id,
         {
           headers: {
             "Content-Type": "application/json"
@@ -85,6 +85,22 @@ export default function NotificationIcon({ userId = "P021" }) {
       );
     } catch (err) {
       console.error("Failed to mark notification as read", err);
+    }
+  };
+
+  const handleResponse = async (id, doctorId, accepted) => {
+    try {
+      await axios.post("https://localhost:7021/api/PatientNotification/respond-request", {
+        notificationId: id,
+        doctorId: doctorId,
+        accepted: accepted
+      });
+
+      setNotifications(prev =>
+        prev.map(n => n.id === id ? { ...n, isRead: true } : n)
+      );
+    } catch (err) {
+      console.error("Failed to respond to request", err);
     }
   };
 
@@ -139,25 +155,34 @@ export default function NotificationIcon({ userId = "P021" }) {
               position="relative"
             >
               <Typography variant="body1" fontWeight="bold">
-                {n.title }   
+                {n.title}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {n.message}
               </Typography>
 
-              {/* Show Accept/Deny buttons if needed */}
-              {n.title.includes('wants to access your profile') && (
+              {/* Accept/Deny buttons for Request type */}
+              {n.type === "Request" && (
                 <Box display="flex" gap={1} mt={1}>
-                  <Button variant="contained" color="primary" size="small">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={() => handleResponse(n.id, n.doctorId, true)}
+                  >
                     Accept
                   </Button>
-                  <Button variant="outlined" color="error" size="small">
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    onClick={() => handleResponse(n.id, n.doctorId, false)}
+                  >
                     Deny
                   </Button>
                 </Box>
               )}
 
-              {/* Mark as read button */}
               {!n.isRead && (
                 <IconButton
                   size="small"
