@@ -90,8 +90,35 @@ const PaymentAtLocation = ({
           console.log("Payment dismissed");
         };
 
-        window.payhere.onError = function (error) {
-          console.error("Payment error:", error);
+        window.payhere.onError = async function (error) {
+          console.error("Payment error:", error);//this should be implemented using a service
+        
+          try {
+            // 1. Send Email Notification
+            const emailPayload = {
+              receptor: email, // use passed prop
+              title: "Payment Failed",
+              message: `Your online payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospital} has failed. Please try again or choose to pay at the location.`,
+            };
+        
+            await axios.post("https://localhost:7021/api/PatientEmail", emailPayload);
+        
+            // 2. Send In-App Notification
+            const notificationPayload = {
+              patientId,
+              title: "Payment Failed",
+              type: "Payment",
+              message: `Online payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospital} has failed.`,
+            };
+        
+            await axios.post("https://localhost:7021/api/PatientNotification/send", notificationPayload);
+        
+            console.log("Payment failure email and notification sent.");
+          } catch (notifyError) {
+            console.error("Failed to send failure email or notification", notifyError);
+          }
+        
+          alert("Payment failed. Please try again or select pay at location.");
         };
 
         const payment = {

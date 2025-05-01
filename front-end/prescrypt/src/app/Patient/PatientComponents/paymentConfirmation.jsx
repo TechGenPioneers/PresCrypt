@@ -21,28 +21,42 @@ const PaymentConfirmation = ({
   appointmentDate,
   appointmentTime,
   hospitalName,
+  patientEmail= 'dewminkasmitha30@gmail.com' //for testing
 }) => {
 
   useEffect(() => {
     if (open) {
       const sendNotification = async () => {
         try {
-          const notificationData = {
+          // 1. Send Email Notification
+          const emailPayload = {
+            receptor: patientEmail,
+            title: "Appointment Booked",
+            message: `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospitalName} is confirmed now. You have agreed to our terms and conditions to pay at the location services. If you pay online please ignore this message. You can find the payment details as follows.`,
+          };
+  
+          await axios.post("https://localhost:7021/api/PatientEmail", emailPayload);
+  
+          // 2. Send In-App Notification
+          const notificationPayload = {
             patientId,
             title: "Appointment Booking",
+            type: "Appointment",
             message: `Your appointment with Dr. ${doctorName} has been successfully scheduled on ${appointmentDate} at ${appointmentTime} at ${hospitalName}.`,
           };
-
-          await axios.post("https://localhost:7021/api/PatientNotification/send", notificationData); 
+  
+          await axios.post("https://localhost:7021/api/PatientNotification/send", notificationPayload);
+  
+          console.log("Both email and notification sent successfully");
         } catch (error) {
-          console.error("Failed to send notification", error);
+          console.error("Failed to send email or notification", error);
         }
       };
-
+  
       sendNotification();
     }
-  }, [open, patientId, doctorName, appointmentDate, appointmentTime, hospitalName]);
-
+  }, [open, patientId, patientEmail, doctorName, appointmentDate, appointmentTime, hospitalName]);
+  
   return (
     <Dialog
       open={open}

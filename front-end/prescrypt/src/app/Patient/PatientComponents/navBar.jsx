@@ -13,7 +13,7 @@ const AdminNavBar = ({ patientId = "P021" }) => {
     { text: "Dashboard", icon: "/image11.png", link: "/Patient/PatientDashboard" },
     { text: "Profile", icon: "/image12.png", link: "/Patient/PatientProfile" },
     { text: "Appointments", icon: "/image27.png", link: "/Patient/PatientAppointments" },
-    { text: "Health Records", icon: "/image19.png", link: "/Patient/PatientRecords" },
+    { text: "Health Records", icon: "/image19.png", link: "/Patient/PatientHealthRecords" },
     { text: "Chat with doctor", icon: "/image20.png", link: "/Patient/PatientChat" },
   ];
 
