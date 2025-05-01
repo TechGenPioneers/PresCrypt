@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { loginUser } from "../../../utils/api";
+import axios from "axios";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");

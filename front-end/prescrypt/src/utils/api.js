@@ -25,44 +25,36 @@ export const registerPatient = async (patientData) => {
 // Common Login for all roles
 export const loginUser = async (loginData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/User/Login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(loginData),
-    });
-    
-    // Parse the JSON response regardless of success or failure
-    const data = await response.json();
-    
-    // If response is not ok, we still want to return the data for proper handling
-    if (!response.ok) {
+    const response = await axios.post(`${API_BASE_URL}/User/Login`, loginData);
+    return response.data; // Axios stores response data in `data`
+  } catch (error) {
+    console.error("Login error:", error);
+
+    if (error.response) {
+      const data = error.response.data;
+
       // If the error contains user info (like for pending doctors), return it
       if (data.user) {
         return {
           success: false,
           message: data.message || "Login failed",
-          user: data.user
+          user: data.user,
         };
       }
-      // Otherwise return the error message
+
       return {
         success: false,
-        message: data.message || "Login failed"
+        message: data.message || "Login failed",
       };
     }
-    
-    // Success case
-    return data;
-  } catch (error) {
-    console.error("Login error:", error);
-    // Handle network errors or JSON parsing errors
-    return { 
-      success: false, 
-      message: "Login service unavailable. Please try again later." 
+
+    // If it's a network or unknown error
+    return {
+      success: false,
+      message: "Login service unavailable. Please try again later.",
     };
   }
 };
-
 // Forgot Password (Send Reset Email)
 export const forgotPassword = async (data) => {
   try {
