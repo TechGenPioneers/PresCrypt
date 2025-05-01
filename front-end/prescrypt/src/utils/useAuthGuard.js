@@ -1,36 +1,41 @@
-"use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import jwt_decode from "jwt-decode";
 
-export default function useAuthGuard(allowedRoles = []) {
+const useAuthGuard = (expectedRole) => {
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const userRole = localStorage.getItem("userRole");
+
     if (!token) {
-      router.push("/Auth/MainPage"); // Not logged in
+      // No token → redirect to login
+      router.push("/Auth/login");
       return;
     }
 
     try {
       const decoded = jwt_decode(token);
-      const now = Date.now() / 1000;
+      const currentTime = Date.now() / 1000;
 
-      if (decoded.exp < now) {
+      if (decoded.exp < currentTime) {
         // Token expired
         localStorage.removeItem("token");
-        router.push("/Auth/MainPage");
+        localStorage.removeItem("userRole");
+        router.push("/Auth/login?expired=true");
         return;
       }
 
-      if (!allowedRoles.includes(decoded.role)) {
-        // Role not allowed
-        router.push("/Auth/MainPage");
+      if (userRole !== expectedRole) {
+        // Wrong role
+        router.push("/Auth/login?unauthorized=true");
       }
-    } catch (err) {
-      console.error("Invalid token", err);
-      router.push("/Auth/MainPage");
+    } catch (error) {
+      console.error("Invalid token", error);
+      router.push("/Auth/login");
     }
   }, []);
-}
+};
+
+export default useAuthGuard;
