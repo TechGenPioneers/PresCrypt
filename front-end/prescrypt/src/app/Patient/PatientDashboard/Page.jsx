@@ -6,40 +6,14 @@ import Header from "../../Components/header/Header";
 import Link from "next/link"; // Import the Link component
 import Image from "next/image";
 import React from "react";
+import { useEffect } from "react";
+import useAuthGuard from "../../utils/useAuthGuard";
 
 
 export default function Home() {
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      // No token, redirect to login
-      router.push("/Auth/Login");
-      return;
-    }
-
-    try {
-      const decoded = jwtDecode(token);
-      const isExpired = decoded.exp * 1000 < Date.now(); // Convert exp to ms
-
-      if (isExpired) {
-        // Token expired
-        router.push("/Auth/Login?sessionExpired=true");
-        return;
-      }
-
-      // Optional: You can also check role
-      if (decoded.role !== "Patient") {
-        router.push("/Auth/Login");
-      }
-
-    } catch (err) {
-      console.error("Invalid token format:", err);
-      router.push("/Auth/Login");
-    }
-  }, []);
+  useAuthGuard(["Patient"]); // Only allow patients
   return (
     <div>
       <div className=" min-h-screen">
