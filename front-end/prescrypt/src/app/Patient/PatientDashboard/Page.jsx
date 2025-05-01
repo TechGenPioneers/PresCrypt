@@ -11,8 +11,6 @@ import useAuthGuard from "../../utils/useAuthGuard";
 
 
 export default function Home() {
-  const router = useRouter();
-
   useAuthGuard(["Patient"]); // Only allow patients
   return (
     <div>
