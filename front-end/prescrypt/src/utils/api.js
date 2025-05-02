@@ -10,48 +10,58 @@ export const registerPatient = async (patientData) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patientData),
     });
-    
+
     if (!response.ok) {
       const errorMessage = await response.text();
       throw new Error(errorMessage || "Registration failed");
     }
-    
+
     return await response.json();
   } catch (error) {
     throw new Error(error.message || "An error occurred");
   }
 };
 
-// Common Login for all roles
 export const loginUser = async (loginData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/User/Login`, loginData);
-    return response.data; // Axios stores response data in `data`
-  } catch (error) {
-    console.error("Login error:", error);
+    const response = await axios.post(`${API_BASE_URL}/User/Login`, loginData, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      validateStatus: (status) => status < 500 // Don't throw for 400 errors
+    });
 
-    if (error.response) {
-      const data = error.response.data;
+    console.log('Full response:', response); // Debug response
 
-      // If the error contains user info (like for pending doctors), return it
-      if (data.user) {
-        return {
-          success: false,
-          message: data.message || "Login failed",
-          user: data.user,
-        };
-      }
-
+    // Successful login (2xx status)
+    if (response.data.token) {
       return {
-        success: false,
-        message: data.message || "Login failed",
+        success: true,
+        token: response.data.token,
+        user: response.data.user
       };
     }
 
-    // If it's a network or unknown error
+    // Handle special cases (like pending approval)
+    if (response.data.message?.includes("pending approval")) {
+      return {
+        success: false,
+        message: response.data.message,
+        user: response.data.user
+      };
+    }
+
+    // Default error case
     return {
       success: false,
-      message: "Login service unavailable. Please try again later.",
+      message: response.data.message || "Login failed"
+    };
+
+  } catch (error) {
+    console.error('Login error details:', error.response?.data || error.message);
+    return {
+      success: false,
+      message: error.response?.data?.message || "Login service unavailable"
     };
   }
 };
