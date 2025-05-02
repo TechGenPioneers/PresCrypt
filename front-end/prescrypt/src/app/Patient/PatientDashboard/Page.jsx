@@ -7,11 +7,12 @@ import Link from "next/link"; // Import the Link component
 import Image from "next/image";
 import React from "react";
 import { useEffect } from "react";
-import useAuthGuard from "../../utils/useAuthGuard";
+import useAuthGuard from "@/utils/useAuthGuard";
+
 
 
 export default function Home() {
-  useAuthGuard(["Patient"]); // Only allow patients
+ useAuthGuard(["Patient"]);
   return (
     <div>
       <div className=" min-h-screen">

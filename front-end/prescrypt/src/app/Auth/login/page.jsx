@@ -31,26 +31,26 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setNotification(null);
-  
+
     if (!email || !password) {
       setError("Email and Password are required.");
       return;
     }
-  
+
     try {
       setLoading(true);
       const response = await loginUser({ email, password });
-  
+
       console.log("Full Login Response:", response); // Debugging
-  
+
       if (!response) {
         setError("No response from server.");
         return;
       }
-  
+
       // Check for doctor pending case first
       if (
-        (response.user?.role === "DoctorPending") || 
+        (response.user?.role === "DoctorPending") ||
         (response.user?.role === "Doctor" && response.user?.emailVerified === false) ||
         (response.message?.toLowerCase().includes("pending approval")) ||
         (response.message?.toLowerCase().includes("not verified"))
@@ -58,24 +58,35 @@ export default function LoginPage() {
         showPendingNotification();
         return;
       }
-      
+
       // Handle general login failures
       if (!response.success) {
         setError(response.message || "Invalid email or password.");
         return;
       }
-  
+
       // If login successful
       localStorage.setItem("token", response.token);
       localStorage.setItem("userId", response.user?.id);
       localStorage.setItem("userRole", response.user?.role);
       localStorage.setItem("userEmail", response.user?.username);
-  
+      const res = await fetch("/api/set-cookie", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: response.token, role: response.user?.role }),
+      });
+
+      if (!res.ok) {
+        console.error("Failed to set secure cookie");
+      }
+
       // Debug stored values
       console.log("Stored User Role:", response.user?.role);
-  
+
       // Redirect based on exact role from backend
-      switch(response.user?.role) {
+      switch (response.user?.role) {
         case "Patient":
           router.push("/Patient/PatientDashboard");
           break;
@@ -91,7 +102,7 @@ export default function LoginPage() {
         default:
           router.push("/Auth/MainPage");
       }
-  
+
     } catch (err) {
       console.error("Login Error Details:", err);
       setError("Login failed. Please try again.");
@@ -105,7 +116,7 @@ export default function LoginPage() {
       type: "pending",
       message: "Your doctor account is pending approval. Please wait for confirmation."
     });
-    
+
     // Redirect after showing notification
     setTimeout(() => router.push("/Auth/MainPage"), 3000);
   };
@@ -113,6 +124,7 @@ export default function LoginPage() {
   const getRegistrationUrl = () => {
     return role === "doctor" ? "/Auth/DoctorRegistration" : "/Auth/PatientRegistration";
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
@@ -122,7 +134,7 @@ export default function LoginPage() {
             <div className="flex items-center">
               <div className="py-1">
                 <svg className="fill-current h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+                  <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z" />
                 </svg>
               </div>
               <div>
