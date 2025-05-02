@@ -3,14 +3,14 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 
-
 export default function useAuthGuard(expectedRole) {
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
+    let logoutTimeout;
+
     const verifyAuth = () => {
-      // Skip auth check for public routes
       if (pathname.startsWith('/Auth')) return;
 
       const token = localStorage.getItem('token');
@@ -23,18 +23,25 @@ export default function useAuthGuard(expectedRole) {
 
       try {
         const decoded = jwtDecode(token);
-        console.log("Decoded Exp:", new Date(decoded.exp * 1000)); 
         const currentTime = Date.now() / 1000;
 
         if (decoded.exp < currentTime) {
-          localStorage.clear(); // Clear expired token and role
+          localStorage.clear();
           router.replace(`/Auth/login?redirect=${encodeURIComponent(pathname)}`);
           return;
         }
 
+        // Auto logout when token expires
+        const timeLeft = decoded.exp * 1000 - Date.now();
+        logoutTimeout = setTimeout(() => {
+          localStorage.clear();
+          router.replace(`/Auth/login?redirect=${encodeURIComponent(pathname)}`);
+        }, timeLeft);
+
         if (expectedRole && !expectedRole.includes(role)) {
           router.replace('/Auth/MainPage');
         }
+
       } catch (error) {
         console.error("Invalid token:", error);
         localStorage.clear();
@@ -43,5 +50,9 @@ export default function useAuthGuard(expectedRole) {
     };
 
     verifyAuth();
+
+    return () => {
+      if (logoutTimeout) clearTimeout(logoutTimeout);
+    };
   }, [pathname, router, expectedRole]);
 }
