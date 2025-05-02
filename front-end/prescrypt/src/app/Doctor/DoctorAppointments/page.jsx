@@ -1,22 +1,44 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import PatientViewModal from "./PatientViewModal";
+import RescheduleModal from "./RescheduleModal";
 import axiosInstance from "../utils/axiosInstance";
 import { format } from "date-fns";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
 
 export default function AppointmentsPage() {
   const Title = "Appointments";
   const [appointments, setAppointments] = useState([]);
   const [availability, setAvailability] = useState([]);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [loading, setLoading] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [noAppointments, setNoAppointments] = useState(false);
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
+  const calendarRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+        setShowCalendar(false);
+      }
+    };
+
+    if (showCalendar) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showCalendar]);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -25,18 +47,12 @@ export default function AppointmentsPage() {
         const formattedDate = selectedDate
           ? format(new Date(selectedDate), "yyyy-MM-dd")
           : "";
-        console.log("Fetching appointments with:", {
-          doctorId: "D002",
-          date: formattedDate,
-        });
 
-        // Fetch appointments
         const appointmentsResponse = await axiosInstance.get(
           `/Appointments/by-doctor/D002${
             formattedDate ? `?date=${formattedDate}` : ""
           }`
         );
-        console.log("Appointments Response data:", appointmentsResponse.data);
 
         if (appointmentsResponse.data && appointmentsResponse.data.length > 0) {
           setAppointments(appointmentsResponse.data);
@@ -46,26 +62,23 @@ export default function AppointmentsPage() {
           setNoAppointments(true);
         }
 
-        // Fetch availability - updated with better error handling
+        // Fetch availability
         if (formattedDate) {
           try {
             const availabilityResponse = await axiosInstance.get(
               `/Appointments/availability/${formattedDate}`,
               {
                 params: {
-                  doctorId: "D002", //replace with dynamic doctor id
+                  doctorId: "D002",
                 },
               }
             );
-            console.log("Availability data:", availabilityResponse.data);
             setAvailability(availabilityResponse.data || []);
           } catch (error) {
             if (error.response?.status === 404) {
-              // Handle "no availability" case gracefully
               setAvailability([]);
             } else {
               console.error("Error fetching availability:", error);
-              // Optionally show error to user
             }
           }
         }
@@ -81,12 +94,13 @@ export default function AppointmentsPage() {
     fetchAppointments();
   }, [selectedDate]);
 
-  const handleDateChange = (e) => {
-    setSelectedDate(e.target.value);
-  };
-
   const toggleMenu = (id) => {
     setOpenMenuId(openMenuId === id ? null : id);
+  };
+
+  const handleDateSelect = (date) => {
+    setSelectedDate(date);
+    setShowCalendar(false); // close after select
   };
 
   const calculateAge = (dob) => {
@@ -95,14 +109,12 @@ export default function AppointmentsPage() {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDifference = today.getMonth() - birthDate.getMonth();
-
     if (
       monthDifference < 0 ||
       (monthDifference === 0 && today.getDate() < birthDate.getDate())
     ) {
       age--;
     }
-
     return age;
   };
 
@@ -143,40 +155,78 @@ export default function AppointmentsPage() {
           <div className="bg-white h-full w-full">
             <DateTimeDisplay title={Title} />
 
-            {/* Date and Time Selection */}
             <div className="flex">
-              <div className="my-10 ml-10 p-3 pl-5 bg-[#E9FAF2] text-[#094A4D] w-50 shadow-lg rounded-[20px]">
+              {/* Date Picker Section */}
+              <div
+                className="relative my-10 ml-12 p-3 pl-5 bg-[#E9FAF2] text-[#094A4D] w-50 shadow-lg rounded-[20px]"
+                ref={calendarRef}
+              >
                 <label className="font-semibold">Date: </label>
-                <input
-                  type="date"
-                  value={selectedDate || ""}
-                  onChange={handleDateChange}
-                />
+                <div>
+                  <button
+                    className="py-2 text-[#094A4D] cursor-pointer"
+                    onClick={() => setShowCalendar(!showCalendar)}
+                  >
+                    {selectedDate
+                      ? format(selectedDate, "yyyy-MM-dd")
+                      : "Select Date"}
+                  </button>
+                  {showCalendar && (
+                    <div className="absolute z-10 mt-2 rounded bg-white shadow-lg">
+                      <DayPicker
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={handleDateSelect}
+                        className="p-3"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="my-10 ml-10 p-3 pl-5 bg-[#E9FAF2] text-[#094A4D] w-50 shadow-lg rounded-[20px]">
-                <label className="font-semibold">Time: </label>
+
+              {/* Time Section */}
+              <div className="my-10 ml-10 p-3 pl-5 bg-[#E9FAF2] text-[#094A4D] shadow-lg rounded-[20px]">
+                <label className="font-semibold block mb-2">Time: </label>
                 {loading ? (
                   <div>Loading availability...</div>
                 ) : availability.length > 0 ? (
-                  availability.map((avail) => (
-                    <div key={avail.availabilityId}>
-                      {formatTime(avail.availableStartTime)} -{" "}
-                      {formatTime(avail.availableEndTime)}
-                    </div>
-                  ))
+                  <div className="flex flex-row gap-8">
+                    {" "}
+                    {/* Horizontal layout with spacing */}
+                    {availability.map((avail) => (
+                      <div key={avail.availabilityId} className="flex flex-col">
+                        <div className="font-medium whitespace-nowrap">
+                          {formatTime(avail.availableStartTime)} -{" "}
+                          {formatTime(avail.availableEndTime)}
+                        </div>
+                        <div className="text-sm text-gray-600 whitespace-nowrap">
+                          {avail.hospitalName || "Hospital not specified"}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <div>No available times found.</div>
                 )}
               </div>
+
+              {/* Reschedule Button */}
+              <div className="ml-auto mr-12 flex items-center">
+                <button
+                  className="bg-[#094A4D] text-white px-4 py-2 rounded-[12px] shadow-md hover:bg-[#072f30] cursor-pointer"
+                  onClick={() => setIsRescheduleModalOpen(true)}
+                >
+                  Reschedule
+                </button>
+              </div>
             </div>
 
-            {/* Loading State */}
+            {/* Appointment Table */}
             {loading ? (
               <div className="flex justify-center items-center h-40">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#094A4D]"></div>
               </div>
             ) : (
-              /* Appointment Table */
               <div className="pl-12 pb-8 pr-12">
                 <div className="overflow-hidden rounded-lg">
                   <table className="w-full table-auto sm:table-fixed min-w-full">
@@ -192,7 +242,6 @@ export default function AppointmentsPage() {
                       </tr>
                     </thead>
                   </table>
-                  {/* Scrollable Table Body */}
                   <div className="overflow-y-auto max-h-[330px]">
                     <table className="w-full table-auto sm:table-fixed min-w-full">
                       <tbody>
@@ -226,11 +275,9 @@ export default function AppointmentsPage() {
                                 </div>
                               </td>
                               <td className="px-8 py-2">
-                                {new Date(appointment.date).toLocaleString([], {
-                                  year: "numeric",
-                                  month: "numeric",
-                                  day: "numeric",
-                                })}
+                                {new Date(
+                                  appointment.date
+                                ).toLocaleDateString()}
                               </td>
                               <td className="px-4 py-2">
                                 {formatTime(appointment.time)}
@@ -253,7 +300,7 @@ export default function AppointmentsPage() {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="6" className="px-4 py-2 text-center">
+                            <td colSpan="7" className="px-4 py-2 text-center">
                               {noAppointments
                                 ? "No appointments found"
                                 : "Select a date to view appointments"}
@@ -267,11 +314,15 @@ export default function AppointmentsPage() {
               </div>
             )}
 
-            {/* Modal for Patient View */}
+            {/* Modal */}
             <PatientViewModal
               isOpen={isPatientModalOpen}
               onClose={() => setIsPatientModalOpen(false)}
               patient={selectedPatient}
+            />
+            <RescheduleModal
+              isOpen={isRescheduleModalOpen}
+              onClose={() => setIsRescheduleModalOpen(false)}
             />
           </div>
         </div>
