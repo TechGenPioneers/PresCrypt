@@ -1,41 +1,47 @@
-import { useEffect } from "react";
-import { useRouter } from "next/router";
-import jwt_decode from "jwt-decode";
+'use client';
+import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { jwtDecode } from 'jwt-decode';
 
-const useAuthGuard = (expectedRole) => {
+
+export default function useAuthGuard(expectedRole) {
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userRole = localStorage.getItem("userRole");
+    const verifyAuth = () => {
+      // Skip auth check for public routes
+      if (pathname.startsWith('/Auth')) return;
 
-    if (!token) {
-      // No token → redirect to login
-      router.push("/Auth/login");
-      return;
-    }
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('userRole');
 
-    try {
-      const decoded = jwt_decode(token);
-      const currentTime = Date.now() / 1000;
-
-      if (decoded.exp < currentTime) {
-        // Token expired
-        localStorage.removeItem("token");
-        localStorage.removeItem("userRole");
-        router.push("/Auth/login?expired=true");
+      if (!token || !role) {
+        router.replace(`/Auth/login?redirect=${encodeURIComponent(pathname)}`);
         return;
       }
 
-      if (userRole !== expectedRole) {
-        // Wrong role
-        router.push("/Auth/login?unauthorized=true");
-      }
-    } catch (error) {
-      console.error("Invalid token", error);
-      router.push("/Auth/login");
-    }
-  }, []);
-};
+      try {
+        const decoded = jwtDecode(token);
+        console.log("Decoded Exp:", new Date(decoded.exp * 1000)); 
+        const currentTime = Date.now() / 1000;
 
-export default useAuthGuard;
+        if (decoded.exp < currentTime) {
+          localStorage.clear(); // Clear expired token and role
+          router.replace(`/Auth/login?redirect=${encodeURIComponent(pathname)}`);
+          return;
+        }
+
+        if (expectedRole && !expectedRole.includes(role)) {
+          router.replace('/Auth/MainPage');
+        }
+      } catch (error) {
+        console.error("Invalid token:", error);
+        localStorage.clear();
+        router.replace(`/Auth/login?redirect=${encodeURIComponent(pathname)}`);
+      }
+    };
+
+    verifyAuth();
+  }, [pathname, router, expectedRole]);
+}
