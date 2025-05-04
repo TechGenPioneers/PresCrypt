@@ -9,8 +9,6 @@ import React from "react";
 import { useEffect } from "react";
 import useAuthGuard from "@/utils/useAuthGuard";
 
-
-
 export default function Home() {
  useAuthGuard(["Patient"]);
   return (

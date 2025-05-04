@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { FaUser, FaEnvelope, FaBirthdayCake, FaPhone, FaMapMarkerAlt, FaEdit, FaPlus } from 'react-icons/fa';
 import Header from '@/app/Components/header/Header';
-import Sidebar from '@/app/Patient/PatientAppointments/PatientComponents/navBar'
+import Sidebar from '@/app/Patient/PatientComponents/navBar'
 
 const HealthRecord = () => {
   const patientData = {
