@@ -36,9 +36,9 @@ const AdminNavBar = ({ patientId = "P021" }) => {
         const response = await axios.get(
           `https://localhost:7021/api/Patient/profileNavbarDetails/${patientId}`,
         );
-        const { firstName, lastName, createdAt } = response.data;
+        const { name, createdAt } = response.data;
 
-        setPatientName(`${firstName} ${lastName}`);
+        setPatientName(`${name}`);
 
         const date = new Date(createdAt);
         const formattedDate = date.toLocaleDateString("en-US", {
