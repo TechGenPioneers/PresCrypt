@@ -9,6 +9,7 @@ import axiosInstance from "../utils/axiosInstance";
 import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { FaCalendarAlt } from "react-icons/fa";
 
 export default function AppointmentsPage() {
   const Title = "Appointments";
@@ -164,12 +165,13 @@ export default function AppointmentsPage() {
                 <label className="font-semibold">Date: </label>
                 <div>
                   <button
-                    className="py-2 text-[#094A4D] cursor-pointer"
+                    className="py-2 text-[#094A4D] cursor-pointer flex items-center gap-2"
                     onClick={() => setShowCalendar(!showCalendar)}
                   >
                     {selectedDate
                       ? format(selectedDate, "yyyy-MM-dd")
                       : "Select Date"}
+                    <FaCalendarAlt className="ml-8"/>
                   </button>
                   {showCalendar && (
                     <div className="absolute z-10 mt-2 rounded bg-white shadow-lg">
