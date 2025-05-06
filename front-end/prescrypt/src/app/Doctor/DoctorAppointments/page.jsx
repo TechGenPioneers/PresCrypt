@@ -6,8 +6,9 @@ import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import PatientViewModal from "./PatientViewModal";
 import axiosInstance from "../utils/axiosInstance";
 import { format } from "date-fns";
-
+import useAuthGuard from "@/utils/useAuthGuard";
 export default function AppointmentsPage() {
+  useAuthGuard(["Doctor"]);
   const Title = "Appointments";
   const [appointments, setAppointments] = useState([]);
   const [availability, setAvailability] = useState([]);

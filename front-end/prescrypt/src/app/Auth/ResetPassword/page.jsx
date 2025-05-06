@@ -1,92 +1,100 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // Get URL parameters
-import { resetPassword } from "../../../utils/api"; // API call
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import InputField from '../components/InputField';
+import SubmitButton from '../components/SubmitButton';
+import CardLayout from '../components/CardLayout';
+import Alert from '../components/Alert';
+import axios from 'axios';
 
 export default function ResetPasswordPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams(); // Get query params
-  const token = searchParams.get("token");
-  const email = searchParams.get("email");
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+  const email = searchParams.get('email');
 
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  useEffect(() => {
-    if (!token || !email) {
-      setError("Invalid or expired reset link.");
-    }
-  }, [token, email]);
+  const validateForm = () => {
+    const newErrors = {};
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
 
-  const handleResetPassword = async () => {
-    setError(null);
-
-    if (!newPassword || !confirmPassword) {
-      setError("Both fields are required.");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
+    if (!formData.newPassword) {
+      newErrors.newPassword = 'Password is required.';
+    } else if (!passwordPattern.test(formData.newPassword)) {
+      newErrors.newPassword = 'Must be 6+ chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char.';
     }
 
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please re-enter your password.';
+    } else if (formData.newPassword !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: '' });
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
     setLoading(true);
-    try {
-      const response = await resetPassword({ email, token, newPassword });
+    setMessage('');
 
-      if (response.success) {
-        setSuccess(true);
-        setTimeout(() => router.push("/Auth/Login"), 3000); // Redirect after success
-      } else {
-        setError(response.message || "Failed to reset password.");
-      }
+    try {
+      const response = await axios.post('/api/user/ResetPassword', {
+        Email: email,
+        Token: token,
+        NewPassword: formData.newPassword
+      });
+
+      setMessage(response.data.message);
     } catch (err) {
-      setError("Error occurred. Please try again.");
+      setErrors({ submit: err.response?.data?.message || 'Failed to reset password. Please try again.' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold text-center text-teal-700 mb-4">Reset Password</h2>
+    <CardLayout>
+      <h2 className="text-2xl font-semibold text-center text-gray-800">Change Your Password</h2>
+      <p className="text-sm text-gray-600 text-center mb-4">
+        Enter a new password below to change your password.
+      </p>
 
-        {error && <p className="text-red-500 text-sm text-center mb-3">{error}</p>}
-        {success ? (
-          <p className="text-green-500 text-sm text-center">Password reset successful! Redirecting...</p>
-        ) : (
-          <>
-            <input
-              type="password"
-              placeholder="New Password"
-              className="w-full px-4 py-2 mb-3 border border-gray-300 rounded-md"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              className="w-full px-4 py-2 mb-3 border border-gray-300 rounded-md"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            <button
-              className="w-full py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition"
-              onClick={handleResetPassword}
-              disabled={loading}
-            >
-              {loading ? "Resetting Password..." : "Reset Password"}
-            </button>
-          </>
-        )}
-      </div>
-    </div>
+      <InputField
+        type="password"
+        name="newPassword"
+        placeholder="New password"
+        value={formData.newPassword}
+        onChange={handleChange}
+        error={errors.newPassword}
+      />
+
+      <InputField
+        type="password"
+        name="confirmPassword"
+        placeholder="Re-enter new password"
+        value={formData.confirmPassword}
+        onChange={handleChange}
+        error={errors.confirmPassword}
+      />
+
+      {errors.submit && <Alert type="error" message={errors.submit} />}
+      {message && <Alert type="success" message={message} />}
+
+      <SubmitButton onClick={handleSubmit} text="Reset password" loading={loading} />
+    </CardLayout>
   );
 }

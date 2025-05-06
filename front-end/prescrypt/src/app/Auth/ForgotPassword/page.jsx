@@ -1,71 +1,53 @@
-"use client";
+'use client';
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { forgotPassword } from "../../../utils/api"; // Backend API function
+import InputField from "../components/InputField";
+import SubmitButton from "../components/SubmitButton";
+import CardLayout from "../components/CardLayout";
+import Alert from "../components/Alert";
 
-export default function ForgotPassword() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  
-  const router = useRouter();  
 
-  const handleResetRequest = async () => {
-    setError(null);
+  const handleSubmit = async () => {
+    setError("");
     setMessage("");
+
     if (!email) {
-      setError("Email is required.");
+      setError("Please enter your email.");
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await forgotPassword({ email });
-
-      if (response && response.success) {
-        setMessage("Password reset link sent to your email.");
-      } else {
-        setError(response?.message || "User not found.");
-      }
+      // TODO: Replace with real API call
+      await new Promise((r) => setTimeout(r, 1500));
+      setMessage("Reset link sent to your email.");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to send reset link.");
+      setError("Failed to send reset link.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <div className="bg-white shadow-lg rounded-lg max-w-md w-full p-6">
-        <h2 className="text-2xl font-bold text-teal-700 text-center">Forgot Password?</h2>
-        <p className="text-gray-600 text-center mb-6">Enter your email to receive a reset link.</p>
+    <CardLayout>
+      <h2 className="text-2xl font-semibold text-center text-teal-700">Forgot Password</h2>
+      <p className="text-center text-sm text-gray-600 mb-4">Enter your email to reset your password.</p>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full px-4 py-2 mb-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-400 focus:outline-none"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+      <InputField
+        type="email"
+        placeholder="Enter your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-        {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
-        {message && <p className="text-green-500 text-sm mb-3">{message}</p>}
+      {error && <Alert type="error" message={error} />}
+      {message && <Alert type="success" message={message} />}
 
-        <button
-          className="w-full py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition disabled:opacity-50"
-          onClick={handleResetRequest}
-          disabled={loading}
-        >
-          {loading ? "Sending..." : "Send Reset Link"}
-        </button>
-
-        <p className="text-sm text-center text-gray-600 mt-4">
-          <Link href="/Auth/login" className="text-teal-600 hover:underline">Back to Login</Link>
-        </p>
-      </div>
-    </div>
+      <SubmitButton onClick={handleSubmit} text="Send Reset Link" loading={loading} />
+    </CardLayout>
   );
 }
