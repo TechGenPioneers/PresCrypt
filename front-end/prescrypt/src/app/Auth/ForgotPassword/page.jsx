@@ -14,24 +14,36 @@ export default function ForgotPasswordPage() {
   const handleSubmit = async () => {
     setError("");
     setMessage("");
-
+  
     if (!email) {
       setError("Please enter your email.");
       return;
     }
-
+  
     setLoading(true);
     try {
-      // TODO: Replace with real API call
-      await new Promise((r) => setTimeout(r, 1500));
-      setMessage("Reset link sent to your email.");
+      const response = await fetch("https://localhost:7021/api/User/ForgotPassword", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email })
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to send reset link.");
+      }
+  
+      const data = await response.json();
+      setMessage(data.message || "Reset link sent to your email.");
     } catch (err) {
-      setError("Failed to send reset link.");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <CardLayout>
       <h2 className="text-2xl font-semibold text-center text-teal-700">Forgot Password</h2>
