@@ -32,7 +32,7 @@ const SearchableDropdown = ({
     setSearchTerm("");
   };
 
-  // 👉 Close on outside click
+  //  Close on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -57,7 +57,6 @@ const SearchableDropdown = ({
           disabled ? "opacity-65 cursor-not-allowed" : ""
         }`}
       />
-
       {value && !disabled && (
         <button
           type="button"
@@ -67,7 +66,6 @@ const SearchableDropdown = ({
           &times;
         </button>
       )}
-
       {showOptions && !disabled && (
         <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-y-auto shadow-md">
           {filteredOptions.map((opt) => (
@@ -122,17 +120,17 @@ export default function ReportGenerator() {
       setToDate("");
     }
 
-    if (reportType === "doctor" || doctor === "all") {
+    if (doctor === "all") {
       finalPatient = "";
       setPatient("");
     }
 
-    if (reportType === "patient" || patient === "all") {
+    if (patient === "all") {
       finalDoctor = "";
       setDoctor("");
     }
 
-    if (reportType === "patient" || doctor === "all" || patient === "all") {
+    if (doctor === "all" || patient === "all") {
       finalSpecialty = "";
       setSpecialty("");
     }
@@ -257,7 +255,9 @@ export default function ReportGenerator() {
   ];
 
   const filteredReportTypeOptions =
-    doctor === "all" || patient === "all" || (patient==="" && specialty !=="") // Show only "summary" and "detailed" 
+    doctor === "all" ||
+    patient === "all" ||
+    (patient === "" && specialty !== "") // Show only "summary" and "detailed"
       ? reportTypeOptions.filter((option) => option.value === "summary")
       : doctor && patient // If both doctor and patient have values
       ? reportTypeOptions.filter(
@@ -328,7 +328,12 @@ export default function ReportGenerator() {
                 options={patientOptions}
                 value={patient}
                 onChange={setPatient}
-                disabled={reportType === "doctor" || doctor === "all"}
+                disabled={
+                  doctor === "all" ||
+                  (reportType === "detailed" && doctor !== "") ||
+                  (reportType === "summary" && doctor !== "") ||
+                  (reportType === "summary" && specialty !== "")
+                }
                 placeholder="-- Select Patient --"
               />
 
@@ -336,7 +341,12 @@ export default function ReportGenerator() {
                 options={doctorOptions}
                 value={doctor}
                 onChange={setDoctor}
-                disabled={patient === "all" || specialty != ""}
+                disabled={
+                  patient === "all" ||
+                  specialty != "" ||
+                  (reportType === "detailed" && patient !== "") ||
+                  (reportType === "summary" && patient !== "")
+                }
                 placeholder="-- Select Doctor --"
               />
 
