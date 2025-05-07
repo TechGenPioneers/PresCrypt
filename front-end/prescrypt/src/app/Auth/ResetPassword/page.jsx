@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import InputField from '../components/InputField';
+import { Eye, EyeOff } from 'lucide-react';
 import SubmitButton from '../components/SubmitButton';
 import CardLayout from '../components/CardLayout';
 import Alert from '../components/Alert';
@@ -20,6 +20,8 @@ export default function ResetPasswordPage() {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
@@ -73,23 +75,49 @@ export default function ResetPasswordPage() {
         Enter a new password below to change your password.
       </p>
 
-      <InputField
-        type="password"
-        name="newPassword"
-        placeholder="New password"
-        value={formData.newPassword}
-        onChange={handleChange}
-        error={errors.newPassword}
-      />
+      {/* New Password Field */}
+      <div className="relative mb-4">
+        <input
+          type={showPassword ? 'text' : 'password'}
+          name="newPassword"
+          placeholder="New password"
+          value={formData.newPassword}
+          onChange={handleChange}
+          className={`w-full p-3 pr-10 border rounded-lg focus:outline-none focus:ring-2 ${
+            errors.newPassword ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-500'
+          }`}
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+        >
+          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+        </button>
+        {errors.newPassword && <p className="text-sm text-red-500 mt-1">{errors.newPassword}</p>}
+      </div>
 
-      <InputField
-        type="password"
-        name="confirmPassword"
-        placeholder="Re-enter new password"
-        value={formData.confirmPassword}
-        onChange={handleChange}
-        error={errors.confirmPassword}
-      />
+      {/* Confirm Password Field */}
+      <div className="relative mb-4">
+        <input
+          type={showConfirm ? 'text' : 'password'}
+          name="confirmPassword"
+          placeholder="Re-enter new password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          className={`w-full p-3 pr-10 border rounded-lg focus:outline-none focus:ring-2 ${
+            errors.confirmPassword ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-500'
+          }`}
+        />
+        <button
+          type="button"
+          onClick={() => setShowConfirm(!showConfirm)}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+        >
+          {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+        </button>
+        {errors.confirmPassword && <p className="text-sm text-red-500 mt-1">{errors.confirmPassword}</p>}
+      </div>
 
       {errors.submit && <Alert type="error" message={errors.submit} />}
       {message && <Alert type="success" message={message} />}
