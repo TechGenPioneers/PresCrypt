@@ -32,7 +32,7 @@ const SearchableDropdown = ({
     setSearchTerm("");
   };
 
-  // 👉 Close on outside click
+  //  Close on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -57,7 +57,6 @@ const SearchableDropdown = ({
           disabled ? "opacity-65 cursor-not-allowed" : ""
         }`}
       />
-
       {value && !disabled && (
         <button
           type="button"
@@ -67,7 +66,6 @@ const SearchableDropdown = ({
           &times;
         </button>
       )}
-
       {showOptions && !disabled && (
         <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-y-auto shadow-md">
           {filteredOptions.map((opt) => (
@@ -122,17 +120,17 @@ export default function ReportGenerator() {
       setToDate("");
     }
 
-    if (reportType === "doctor" || doctor === "all") {
+    if (doctor === "all") {
       finalPatient = "";
       setPatient("");
     }
 
-    if (reportType === "patient" || patient === "all") {
+    if (patient === "all") {
       finalDoctor = "";
       setDoctor("");
     }
 
-    if (reportType === "patient" || doctor === "all" || patient === "all") {
+    if (doctor === "all" || patient === "all") {
       finalSpecialty = "";
       setSpecialty("");
     }
@@ -257,7 +255,9 @@ export default function ReportGenerator() {
   ];
 
   const filteredReportTypeOptions =
-    doctor === "all" || patient === "all" // Show only "summary" and "detailed" if doctor or patient is "all"
+    doctor === "all" ||
+    patient === "all" ||
+    (patient === "" && specialty !== "") // Show only "summary" and "detailed"
       ? reportTypeOptions.filter((option) => option.value === "summary")
       : doctor && patient // If both doctor and patient have values
       ? reportTypeOptions.filter(
@@ -328,7 +328,12 @@ export default function ReportGenerator() {
                 options={patientOptions}
                 value={patient}
                 onChange={setPatient}
-                disabled={reportType === "doctor" || doctor === "all"}
+                disabled={
+                  doctor === "all" ||
+                  (reportType === "detailed" && doctor !== "") ||
+                  (reportType === "summary" && doctor !== "") ||
+                  (reportType === "summary" && specialty !== "")
+                }
                 placeholder="-- Select Patient --"
               />
 
@@ -336,7 +341,12 @@ export default function ReportGenerator() {
                 options={doctorOptions}
                 value={doctor}
                 onChange={setDoctor}
-                disabled={patient === "all" || specialty != ""}
+                disabled={
+                  patient === "all" ||
+                  specialty != "" ||
+                  (reportType === "detailed" && patient !== "") ||
+                  (reportType === "summary" && patient !== "")
+                }
                 placeholder="-- Select Doctor --"
               />
 
@@ -357,7 +367,7 @@ export default function ReportGenerator() {
                 options={filteredReportTypeOptions}
                 value={reportType}
                 onChange={setReportType}
-                placeholder="-- Select Specialty --"
+                placeholder="-- Select Report Type --"
                 required
               />
             </div>
@@ -405,7 +415,7 @@ export default function ReportGenerator() {
                 {/* Text alignment adjusted */}
               </header>
 
-              {/* Shared Info */}
+              {/* summary Info for all doctors*/}
               {reportType === "summary" &&
                 patient === "" &&
                 doctor === "all" && (
@@ -487,6 +497,90 @@ export default function ReportGenerator() {
                   </>
                 )}
 
+              {/* summary Info for all doctors same specialists*/}
+              {reportType === "summary" &&
+                patient === "" &&
+                doctor === "" &&
+                specialty !== "" && (
+                  <>
+                    <h2 className="text-lg font-bold mb-2 text-left">
+                      Summary Report
+                    </h2>
+                    <p>
+                      <strong>Doctor: {specialty} - All Doctors</strong>
+                    </p>
+                    <div className="overflow-x-auto my-5 mb-5">
+                      <table className="table-auto w-full border-collapse border">
+                        <thead>
+                          <tr>
+                            <th className="border px-4 py-2 text-left">
+                              Doctor ID
+                            </th>
+                            <th className="border px-4 py-2 text-left">Name</th>
+                            <th className="border px-4 py-2 text-left">
+                              Specialization
+                            </th>
+                            <th className="border px-4 py-2 text-left">
+                              SLMC License
+                            </th>
+                            <th className="border px-4 py-2 text-left">NIC</th>
+                            <th className="border px-4 py-2 text-left">
+                              Charge
+                            </th>
+                            <th className="border px-4 py-2 text-left">
+                              Contact Number
+                            </th>
+                            <th className="border px-4 py-2 text-left">
+                              Gender
+                            </th>
+                            <th className="border px-4 py-2 text-left">
+                              Email
+                            </th>
+                            <th className="border px-4 py-2 text-left">
+                              Status
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reportData.doctorList.map((doctor) => (
+                            <tr key={doctor.doctorId}>
+                              <td className="border px-4 py-2">
+                                {doctor.doctorId}
+                              </td>
+                              <td className="border px-4 py-2">
+                                {doctor.firstName} {doctor.lastName}
+                              </td>
+                              <td className="border px-4 py-2">
+                                {doctor.specialization}
+                              </td>
+                              <td className="border px-4 py-2">
+                                {doctor.slmcLicense}
+                              </td>
+                              <td className="border px-4 py-2">{doctor.nic}</td>
+                              <td className="border px-4 py-2">
+                                Rs.{doctor.charge}
+                              </td>
+                              <td className="border px-4 py-2">
+                                {doctor.contactNumber}
+                              </td>
+                              <td className="border px-4 py-2">
+                                {doctor.gender}
+                              </td>
+                              <td className="border px-4 py-2">
+                                {doctor.email}
+                              </td>
+                              <td className="border px-4 py-2">
+                                {doctor.status ? "Active" : "Inactive"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
+
+              {/* summary Info for all patients*/}
               {reportType === "summary" &&
                 patient === "all" &&
                 doctor === "" && (
@@ -546,6 +640,7 @@ export default function ReportGenerator() {
                   </>
                 )}
 
+              {/* summary Info for patient*/}
               {reportType === "summary" && patient !== "" && doctor === "" && (
                 <>
                   <h2 className="text-lg font-bold mb-2 text-left">
@@ -629,7 +724,7 @@ export default function ReportGenerator() {
                   </div>
                 </>
               )}
-
+              {/* summary Info for doctor*/}
               {reportType === "summary" && patient === "" && doctor !== "" && (
                 <>
                   <h2 className="text-lg font-bold mb-2 text-left">
