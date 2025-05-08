@@ -1,36 +1,48 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
+  IconButton,
   List,
   ListItemButton,
   ListItemText,
   TextField,
-  IconButton,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-
-const locations = [
-  { district: "Ratnapura", hospitals: ["Aloka Hospital", "Kingsbury Hospital", "The Ceylon Hospital"] },
-  { district: "Negombo", hospitals: ["Asia Hospital", "Co-Operative Hospital"] },
-  { district: "Colombo", hospitals: ["Durdans Hospital", "Asiri Surgical Hospital", "Asiri Central Hospital", "Lanka Hospitals PLC", "Nawaloka Hospitals PLC","Durdans Hospital","Ninewells Hospital (Pvt) Ltd"] },
-  { district: "Kegalle", hospitals: ["Arogya Hospital", "Osro Hospital"] },
-  { district: "Gampaha", hospitals: ["Hemas Hospital", "Arogya Hospitals (Pvt) Ltd", "Browns Hospitals"] },
-  { district: "Kandy", hospitals: ["Suwasewana Hospitals Pvt Ltd","Asiri Hospital Kandy (Pvt) Ltd","Surgical Care Hospital"] },
-];
+import axios from "axios";
 
 const LocationDialog = ({ open, handleClose, onSelect }) => {
   const [search, setSearch] = useState("");
+  const [locations, setLocations] = useState([]);
+
+  useEffect(() => {
+    if (open) {
+      const fetchHospitals = async () => {
+        try {
+          const response = await axios.get("https://localhost:7021/api/Hospital/locations"); // Replace with actual URL if different
+          const data = response.data;
+          const formatted = Object.entries(data).map(([city, hospitals]) => ({
+            district: city,
+            hospitals,
+          }));
+          setLocations(formatted);
+        } catch (error) {
+          console.error("Error fetching hospital data", error);
+        }
+      };
+
+      fetchHospitals();
+    }
+  }, [open]);
 
   const filteredLocations = locations
     .map(({ district, hospitals }) => {
       const districtMatch = district.toLowerCase().includes(search.toLowerCase());
-      const filteredHospitals = hospitals.filter((hospital) =>
-        hospital.toLowerCase().includes(search.toLowerCase())
+      const filteredHospitals = hospitals.filter(h =>
+        h.toLowerCase().includes(search.toLowerCase())
       );
 
       return {
@@ -41,7 +53,18 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
     .filter(({ hospitals }) => hospitals.length > 0);
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" sx={{ "& .MuiDialog-paper": { border: "2px solid #4CAF50", borderRadius: "30px" } }} >
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="sm"
+      sx={{
+        "& .MuiDialog-paper": {
+          border: "2px solid #4CAF50",
+          borderRadius: "30px",
+        },
+      }}
+    >
       {/* Header */}
       <div className="flex justify-between items-center px-5 py-3 border-b border-gray-300">
         <IconButton onClick={handleClose} className="text-gray-500">
@@ -49,8 +72,8 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
         </IconButton>
       </div>
 
-      {/* Search Bar */}
       <DialogContent className="min-h-[300px] flex flex-col">
+        {/* Search */}
         <TextField
           fullWidth
           variant="outlined"
@@ -61,26 +84,32 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
         />
 
         {/* Title */}
-        <div>
-          <h6 className="text-xs font-semibold relative top-4 mb-6 text-green-800">
-            Available Locations
-          </h6>
-        </div>
+        <Typography
+          variant="subtitle2"
+          className="text-green-800 font-semibold mb-6"
+        >
+          Available Locations
+        </Typography>
 
-        {/* Locations List */}
+        {/* Hospital List */}
         <div className="flex-grow overflow-y-auto">
           <List>
             {filteredLocations.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No results found</p>
+              <p className="text-gray-500 text-center py-4">
+                No results found
+              </p>
             ) : (
               filteredLocations.map(({ district, hospitals }, index) => (
                 <div key={index} className="mb-5">
-                  {/* District Name */}
-                  <Typography variant="h6" className="font-semibold text-gray-700 mb-2 pl-3">
+                  {/* City/District Heading */}
+                  <Typography
+                    variant="h6"
+                    className="font-semibold text-gray-700 mb-2 pl-3"
+                  >
                     {district.toUpperCase()}
                   </Typography>
 
-                  {/* Hospitals List */}
+                  {/* Hospitals under city */}
                   {hospitals.map((hospital, i) => (
                     <ListItemButton
                       key={i}
@@ -88,7 +117,10 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
                       className="flex items-center space-x-3 border rounded-[20px] border-green-700 px-6 py-4 mb-2 shadow-sm hover:bg-gray-100"
                     >
                       <LocationOnIcon className="text-green-500 text-xl" />
-                      <ListItemText primary={hospital} className="font-medium" />
+                      <ListItemText
+                        primary={hospital}
+                        className="font-medium"
+                      />
                     </ListItemButton>
                   ))}
                 </div>
