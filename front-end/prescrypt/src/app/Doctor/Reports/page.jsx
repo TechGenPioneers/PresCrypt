@@ -1,9 +1,12 @@
+"use client";
 import React from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay"; 
+import useAuthGuard from "@/utils/useAuthGuard"; 
 
 export default function page() {
+  useAuthGuard("Doctor"); 
   const Title = "Generate Reports"; // Dynamic title for each page
 
   return (

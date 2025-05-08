@@ -26,47 +26,60 @@ export default function LoginPage() {
     }
   }, [searchParams]);
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setError(null);
-  setNotification(null);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setNotification(null);
 
-  if (!email || !password) {
-    setError("Email and Password are required.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-    const response = await loginUser({ email, password });
-    console.log("Login Response:", response); // Debugging
-
-    if (!response) {
-      setError("No response from server.");
+    if (!email || !password) {
+      setError("Email and Password are required.");
       return;
     }
 
-    // Handle pending/not verified cases
-    if (response.user?.role === "DoctorPending" || 
-        (response.user?.role === "Doctor" && !response.user?.emailVerified)) {
-      showPendingNotification();
-      return;
+    try {
+      setLoading(true);
+      const response = await loginUser({ email, password });
+
+      if (!response) {
+        setError("No response from server.");
+        return;
+      }
+
+      if (
+        (response.user?.role === "DoctorPending") ||
+        (response.user?.role === "Doctor" && response.user?.emailVerified === false) ||
+        (response.message?.toLowerCase().includes("pending approval")) ||
+        (response.message?.toLowerCase().includes("not verified"))
+      ) {
+        showPendingNotification();
+        return;
+      }
+
+      if (!response.success) {
+        setError(response.message || "Invalid email or password.");
+        return;
+      }
+
+      // Store basic info
+      localStorage.setItem("userEmail", response.user?.username);
+
+      if (response.requires2FA && role === "Admin") {
+        // Redirect to 2FA verification page
+        router.push(`/Auth/Verify2FA?email=${encodeURIComponent(email)}`);
+        return;
+      }
+
+      // If no 2FA required, complete login
+      await completeLogin(response);
+
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (!response.success) {
-      setError(response.message || "Invalid credentials");
-      return;
-    }
-
-   
-
-  } catch (err) {
-    console.error("Login error:", err);
-    setError("Login failed. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
   const completeLogin = async (response) => {
     localStorage.setItem("token", response.token);
     localStorage.setItem("userId", response.user?.id);

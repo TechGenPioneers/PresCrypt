@@ -1,4 +1,4 @@
-
+"use client";
 import React from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";

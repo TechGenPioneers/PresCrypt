@@ -17,7 +17,7 @@ export default function useAuthGuard(expectedRole) {
       const role = localStorage.getItem('userRole');
 
       if (!token || !role) {
-        router.replace(`/Auth/login?redirect=${encodeURIComponent(pathname)}`);
+        router.replace(`/Auth/login`);
         return;
       }
 
@@ -27,7 +27,7 @@ export default function useAuthGuard(expectedRole) {
 
         if (decoded.exp < currentTime) {
           localStorage.clear();
-          router.replace(`/Auth/login?redirect=${encodeURIComponent(pathname)}`);
+          router.replace(`/Auth/login`);
           return;
         }
 
@@ -35,7 +35,7 @@ export default function useAuthGuard(expectedRole) {
         const timeLeft = decoded.exp * 1000 - Date.now();
         logoutTimeout = setTimeout(() => {
           localStorage.clear();
-          router.replace(`/Auth/login?redirect=${encodeURIComponent(pathname)}`);
+          router.replace(`/Auth/login`);
         }, timeLeft);
 
         if (expectedRole && !expectedRole.includes(role)) {
@@ -45,7 +45,7 @@ export default function useAuthGuard(expectedRole) {
       } catch (error) {
         console.error("Invalid token:", error);
         localStorage.clear();
-        router.replace(`/Auth/login?redirect=${encodeURIComponent(pathname)}`);
+        router.replace(`/Auth/login`);
       }
     };
 

@@ -34,10 +34,10 @@ export function middleware(req) {
 
 export const config = {
   matcher: [
+    "/Admin/:path*",
+    "/Doctor/:path*",
+    "/Patient/:path*",
     "/login",
     "/register",
-    "/AdminDashboard",
-    "/DoctorDashboard",
-    "/PatientDashboard",
   ],
 };

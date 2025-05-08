@@ -70,7 +70,7 @@ export default function Verify2FA() {
         <button
           onClick={handleVerify}
           disabled={loading}
-          className="w-full bg-teal-800 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+          className="w-full bg-teal-800 text-white p-2 rounded hover:bg-teal-600 disabled:bg-gray-400"
         >
           {loading ? "Verifying..." : "Verify"}
         </button>
