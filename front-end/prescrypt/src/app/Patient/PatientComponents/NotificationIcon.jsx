@@ -32,7 +32,7 @@ export default function NotificationIcon({ userId = "P021" }) {
     fetchNotifications();
 
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`https://localhost:7021/patientNotificationHub?userId=${userId}`)
+      .withUrl(`https://localhost:7021/patientNotificationHub?patientId=${userId}`)
       .withAutomaticReconnect()
       .build();
 
