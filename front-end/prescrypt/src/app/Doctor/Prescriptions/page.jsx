@@ -4,8 +4,10 @@ import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import axiosInstance from "../utils/axiosInstance";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
+import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as a Doctor
 
 export default function Page() {
+  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const Title = "Prescriptions"; // Dynamic title for each page
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);

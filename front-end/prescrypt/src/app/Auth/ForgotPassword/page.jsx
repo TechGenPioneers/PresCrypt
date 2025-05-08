@@ -60,6 +60,14 @@ export default function ForgotPasswordPage() {
       {message && <Alert type="success" message={message} />}
 
       <SubmitButton onClick={handleSubmit} text="Send Reset Link" loading={loading} />
+      <div className="mt-4 text-center">
+        <a
+          href="/Auth/login"
+          className="text-green-800 hover:text-teal-500 text-sm font-medium"
+        >
+          ← Back to Login
+        </a>
+      </div>
     </CardLayout>
   );
 }

@@ -3,8 +3,10 @@ import React from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay"; // Import the DateTimeDisplay component
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function page() {
+  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const Title = "Dashboard"; // Dynamic title for each page
 
   return (
