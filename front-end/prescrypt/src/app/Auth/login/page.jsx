@@ -60,14 +60,7 @@ export default function LoginPage() {
         return;
       }
 
-      // Store basic info
-      localStorage.setItem("userEmail", response.user?.username);
-
-      if (response.requires2FA && role === "Admin") {
-        // Redirect to 2FA verification page
-        router.push(`/Auth/Verify2FA?email=${encodeURIComponent(email)}`);
-        return;
-      }
+      
 
       // If no 2FA required, complete login
       await completeLogin(response);

@@ -1,20 +1,61 @@
 "use client";
 import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
+
 
 const AdminNavBar = ({ patientId = "P021" }) => {
   const [profileImage, setProfileImage] = useState("/profile.png");
   const [patientName, setPatientName] = useState("Patient Profile");
   const [joinDate, setJoinDate] = useState("31 December 1999");
-
+  const router = useRouter();
+  const handleLogout = async () => {
+    try {
+      // 1) Call backend to clear server cookies (optional if you're not using them)
+      await axios.post(
+        "https://localhost:7021/api/User/logout",
+        null,
+        { withCredentials: true }
+      );
+    } catch (err) {
+      console.warn("Backend logout failed (may not be using cookies):", err);
+    }
+  
+    // 2) Clear client storage
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    // —and any other related items, e.g.:
+    // localStorage.removeItem("role");
+  
+    // 3) Redirect to login
+    router.push("/Auth/login");
+  };
+  
+  
   const navItems = [
-    { text: "Dashboard", icon: "/image11.png", link: "/Patient/PatientDashboard" },
+    {
+      text: "Dashboard",
+      icon: "/image11.png",
+      link: "/Patient/PatientDashboard",
+    },
     { text: "Profile", icon: "/image12.png", link: "/Patient/PatientProfile" },
-    { text: "Appointments", icon: "/image27.png", link: "/Patient/PatientAppointments" },
-    { text: "Health Records", icon: "/image19.png", link: "/Patient/PatientRecords" },
-    { text: "Chat with doctor", icon: "/image20.png", link: "/Patient/PatientChat" },
+    {
+      text: "Appointments",
+      icon: "/image27.png",
+      link: "/Patient/PatientAppointments",
+    },
+    {
+      text: "Health Records",
+      icon: "/image19.png",
+      link: "/Patient/PatientRecords",
+    },
+    {
+      text: "Chat with doctor",
+      icon: "/image20.png",
+      link: "/Patient/PatientChat",
+    },
   ];
 
   useEffect(() => {
@@ -24,7 +65,9 @@ const AdminNavBar = ({ patientId = "P021" }) => {
           `https://localhost:7021/api/Patient/profileImage/${patientId}`,
           { responseType: "arraybuffer" }
         );
-        const base64Image = Buffer.from(response.data, "binary").toString("base64");
+        const base64Image = Buffer.from(response.data, "binary").toString(
+          "base64"
+        );
         setProfileImage(`data:image/jpeg;base64,${base64Image}`);
       } catch (error) {
         console.error("Error fetching profile image:", error);
@@ -34,7 +77,7 @@ const AdminNavBar = ({ patientId = "P021" }) => {
     const fetchPatientDetails = async () => {
       try {
         const response = await axios.get(
-          `https://localhost:7021/api/Patient/profileNavbarDetails/${patientId}`,
+          `https://localhost:7021/api/Patient/profileNavbarDetails/${patientId}`
         );
         const { firstName, lastName, createdAt } = response.data;
 
@@ -54,6 +97,7 @@ const AdminNavBar = ({ patientId = "P021" }) => {
 
     fetchProfileImage();
     fetchPatientDetails();
+    
   }, [patientId]);
 
   return (
@@ -80,7 +124,11 @@ const AdminNavBar = ({ patientId = "P021" }) => {
         {navItems.map((item, index) => (
           <Link key={index} href={item.link} passHref>
             <div className="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-[#E9FAF2] hover:border-[#047857] transition-all cursor-pointer w-full">
-              <img src={item.icon} alt={item.text} className="w-5 h-5 shrink-0" />
+              <img
+                src={item.icon}
+                alt={item.text}
+                className="w-5 h-5 shrink-0"
+              />
               <span className="ml-4 text-sm text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                 {item.text}
               </span>
@@ -91,7 +139,10 @@ const AdminNavBar = ({ patientId = "P021" }) => {
 
       {/* Logout Button */}
       <div className="px-3 pb-6">
-        <button className="flex items-center w-full p-3 rounded-lg border border-red-600 text-red-600 hover:bg-red-50 transition-all">
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full p-3 rounded-lg border border-red-600 text-red-600 hover:bg-red-50 transition-all cursor-pointer"
+        >
           <LogOut className="w-5 h-5 shrink-0" />
           <span className="ml-4 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
             Logout
