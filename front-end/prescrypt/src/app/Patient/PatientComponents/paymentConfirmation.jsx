@@ -16,6 +16,7 @@ const PaymentConfirmation = ({
   open,
   handleClose,
   email,
+  totalCharge,
   patientId,
   doctorName,
   appointmentDate,
@@ -28,15 +29,37 @@ const PaymentConfirmation = ({
     if (open) {
       const sendNotification = async () => {
         try {
-          // 1. Send Email Notification
+          const pdfPayload = {
+            patientId,
+            doctorName,
+            hospitalName,
+            appointmentDate,
+            appointmentTime,
+            totalCharge,
+          };
+      
+          const pdfResponse = await axios.post("https://localhost:7021/api/PatientPDF/generate", pdfPayload, {
+            responseType: "blob",
+          });
+      
+          const pdfBlob = new Blob([pdfResponse.data], { type: "application/pdf" });
+          const pdfBase64 = await blobToBase64(pdfBlob);
+          
+      
+          // 1. Send Email Notification with PDF attachment
           const emailPayload = {
             receptor: patientEmail,
             title: "Appointment Booked",
-            message: `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospitalName} is confirmed now. You have agreed to our terms and conditions to pay at the location services. If you pay online please ignore this message. You can find the payment details as follows.`,
+            message: `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospitalName} is confirmed now. Please find the attached details.`,
+            attachment: {
+              fileName: "AppointmentConfirmation.pdf",
+              contentType: "application/pdf",
+              base64Content: pdfBase64,
+            },
           };
-  
+      
           await axios.post("https://localhost:7021/api/PatientEmail", emailPayload);
-  
+      
           // 2. Send In-App Notification
           const notificationPayload = {
             patientId,
@@ -44,14 +67,21 @@ const PaymentConfirmation = ({
             type: "Appointment",
             message: `Your appointment with Dr. ${doctorName} has been successfully scheduled on ${appointmentDate} at ${appointmentTime} at ${hospitalName}.`,
           };
-  
+      
           await axios.post("https://localhost:7021/api/PatientNotification/send", notificationPayload);
-  
-          console.log("Both email and notification sent successfully");
+      
+          console.log("PDF generated, email sent, notification posted");
         } catch (error) {
-          console.error("Failed to send email or notification", error);
+          console.error("Error during notification flow:", error);
         }
       };
+      
+      const blobToBase64 = async (blob) => {
+        const buffer = await blob.arrayBuffer();
+        const binary = new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '');
+        return btoa(binary);
+      };
+      
   
       sendNotification();
     }

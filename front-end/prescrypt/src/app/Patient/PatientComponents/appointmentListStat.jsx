@@ -1,3 +1,5 @@
+
+
 const AppointmentListStat = ({ patientName, age, location, imageUrl, total, accepted, cancelled }) => {
   return (
     <div className="mb-6">
@@ -24,7 +26,7 @@ const AppointmentListStat = ({ patientName, age, location, imageUrl, total, acce
             Total Appointments: <span className="font-bold">{total}</span>
           </div>
           <div className="bg-green-50 text-green-800 px-4 py-2 rounded-md shadow-sm text-sm font-medium">
-            Accepted Appointments: <span className="font-bold">{accepted}</span>
+            Completed Appointments: <span className="font-bold">{accepted}</span>
           </div>
           <div className="bg-red-50 text-red-800 px-4 py-2 rounded-md shadow-sm text-sm font-medium">
             Cancelled Appointments: <span className="font-bold">{cancelled}</span>

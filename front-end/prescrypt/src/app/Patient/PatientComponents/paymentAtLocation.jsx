@@ -158,7 +158,7 @@ const PaymentAtLocation = ({
     const appointmentData = {
       patientId: patientId || "P021",
       doctorId: doctorId || "D008",
-      hospitalId: hospitalId || "H027",
+      hospitalId: hospitalId || "H027",  //hospital id and doctodid is not passing correctly
       date: appointmentDate,
       time: appointmentTime,
       charge: totalCharge,
@@ -225,6 +225,7 @@ const PaymentAtLocation = ({
   open={confirmationOpen}
   handleClose={handleCloseConfirmation}
   email={email}
+  totalCharge={totalCharge}
   patientId={patientId}
   doctorName={doctorName}
   appointmentDate={appointmentDate}
