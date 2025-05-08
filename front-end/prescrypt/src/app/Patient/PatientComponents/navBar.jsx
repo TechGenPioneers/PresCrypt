@@ -16,7 +16,6 @@ const AdminNavBar = ({ patientId = "P021" }) => {
     if (!ok) return;
 
     try {
-      // 1) Call backend to clear server cookies (optional if you're not using them)
       await axios.post(
         "https://localhost:7021/api/User/logout",
         null,
@@ -26,13 +25,9 @@ const AdminNavBar = ({ patientId = "P021" }) => {
       console.warn("Backend logout failed (may not be using cookies):", err);
     }
   
-    // 2) Clear client storage
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
-    // —and any other related items, e.g.:
-    // localStorage.removeItem("role");
-  
-    // 3) Redirect to login
+   
     router.push("/Auth/login");
   };
   
