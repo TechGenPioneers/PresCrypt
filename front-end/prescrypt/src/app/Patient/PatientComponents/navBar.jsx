@@ -12,6 +12,9 @@ const AdminNavBar = ({ patientId = "P021" }) => {
   const [joinDate, setJoinDate] = useState("31 December 1999");
   const router = useRouter();
   const handleLogout = async () => {
+    const ok = window.confirm("Are you sure you want to log out?");
+    if (!ok) return;
+
     try {
       // 1) Call backend to clear server cookies (optional if you're not using them)
       await axios.post(
