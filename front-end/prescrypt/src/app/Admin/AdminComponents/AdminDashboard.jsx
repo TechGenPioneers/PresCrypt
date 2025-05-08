@@ -12,6 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import AdminNotification from "./AdminNotification";
 
 const data = [
   { day: "Mon", total: 50, completed: 45, missed: 5 },
@@ -25,12 +26,6 @@ const data = [
 
 const AdminDashboard = () => {
   const [dateTime, setDateTime] = useState(null);
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-
-  // Toggle function to show or hide the Notification bar
-  const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
-  };
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -78,7 +73,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Search & Add Doctor */}
-          <div className="grid grid-cols-3 ml-10 gap-20 mb-6 ">
+          <div className="grid grid-cols-2 ml-10 gap-20 mb-6 ">
             <button className="flex items-center cursor-pointer justify-center bg-[#E9FAF2] p-5 rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.5)] hover:bg-gray-100 transition">
               <img src="/image22.png" className="w-6 h-6 mr-2 text-[#006369] " />
               Search Patients
@@ -86,10 +81,6 @@ const AdminDashboard = () => {
             <button className="flex items-center cursor-pointer justify-center bg-[#E9FAF2] p-5 rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.5)] hover:bg-gray-100 transition">
               <img src="/image27.png" className="w-6 h-6 mr-2 text-[#006369]" />
               Doctor Request
-            </button>
-            <button className="flex items-center cursor-pointer justify-center bg-[#E9FAF2] p-5 rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.5)] hover:bg-gray-100 transition">
-              <img src="/image21.png" className="w-6 h-6 mr-2 text-[#006369]" />
-              Add New Doctor
             </button>
           </div>
 
@@ -154,55 +145,7 @@ const AdminDashboard = () => {
         {/* Notifications */}
         {/* Button to toggle the Notification Bar */}
         <aside className="w-100 bg-[#CEE4E6] p-5 shadow-md relative">
-          <div className="relative">
-            {/* Notification Button */}
-            <div className="pb-9">
-              <button
-                onClick={toggleSidebar}
-                className="p-3 fixed right-5 top-5 focus:outline-none cursor-pointer flex items-center bg-white shadow-lg rounded-full transition-transform transform hover:scale-110"
-              >
-                <Bell className="w-6 h-6 text-gray-700" />
-              </button>
-            </div>
-
-            {/* Notification Sidebar */}
-            <div
-              className={`fixed top-16 right-0 h-[70%] bg-[#CEE4E6] text-[#094A4D] w-64 sm:w-1/2 md:w-1/3 lg:w-1/4 rounded-lg shadow-lg p-5 transition-all duration-500 ease-in-out transform ${
-                isSidebarVisible
-                  ? "translate-x-0 opacity-100"
-                  : "translate-x-full opacity-0"
-              }`}
-            >
-              {/* Sidebar Header */}
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold flex items-center">
-                  <Bell className="w-5 h-5 mr-2" /> Notifications
-                </h3>
-                <button
-                  onClick={toggleSidebar}
-                  className="text-gray-700 text-lg cursor-pointer"
-                >
-                  ✖
-                </button>
-              </div>
-
-              {/* Notification Messages */}
-              <div className="space-y-3">
-                <p className="bg-gray-100 text-gray-800 p-2 rounded-2xl shadow border-2 border-gray-400 justify-center">
-                  New patient - Nimal Perera registered
-                </p>
-                <p className="bg-gray-100 text-gray-800 p-3 rounded-2xl shadow border-2 border-gray-400">
-                  New sign-up from doctor - Hiruni Perera
-                </p>
-                <p className="bg-gray-100 text-gray-800 p-3 rounded-2xl shadow border-2 border-gray-400">
-                  Usage reports available for last month
-                </p>
-                <p className="bg-gray-100 text-gray-800 p-3 rounded-2xl shadow border-2 border-gray-400">
-                  New sign-up from doctor - Sunil Perera
-                </p>
-              </div>
-            </div>
-          </div>
+          <AdminNotification/>
 
           {/* Total Counts */}
           <div className="mt-15 p-7 bg-white">
