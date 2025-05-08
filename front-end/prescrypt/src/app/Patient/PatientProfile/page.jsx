@@ -1,12 +1,14 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // Import useRouter
 import { FaUser, FaEnvelope, FaBirthdayCake, FaPhone, FaMapMarkerAlt, FaEdit, FaPlus } from 'react-icons/fa';
 import Header from '@/app/Components/header/Header';
 import Sidebar from '@/app/Patient/PatientComponents/navBar';
 import axios from 'axios';
 
 const HealthRecord = () => {
+  const router = useRouter(); // Initialize router
   const [patientData, setPatientData] = useState(null);
   const [healthData, setHealthData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -165,6 +167,15 @@ const HealthRecord = () => {
     }
   };
 
+  // Navigation functions for the buttons
+  const navigateToPersonalInfo = () => {
+    router.push('/Patient/PatientProfile/PersonalInfo');
+  };
+
+  const navigateToHealthInfo = () => {
+    router.push('/Patient/PatientProfile/HealthInfo');
+  };
+
   // Show loading state
   if (loading) {
     return (
@@ -315,14 +326,20 @@ const HealthRecord = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons - Updated with navigation functions */}
               <div className="space-y-3 mt-4">
-                <button className="w-full bg-white rounded-xl shadow-sm py-3.5 px-4 flex items-center justify-center space-x-2 hover:bg-gray-50 border border-gray-100">
+                <button 
+                  onClick={navigateToPersonalInfo}
+                  className="w-full bg-white rounded-xl shadow-sm py-3.5 px-4 flex items-center justify-center space-x-2 hover:bg-gray-50 border border-gray-100 transition duration-200"
+                >
                   <FaEdit className="w-5 h-5 text-gray-700" />
                   <span className="text-sm font-semibold text-gray-700">Edit your profile</span>
                 </button>
 
-                <button className="w-full bg-white rounded-xl shadow-sm py-3.5 px-4 flex items-center justify-center space-x-2 hover:bg-gray-50 border border-gray-100">
+                <button 
+                  onClick={navigateToHealthInfo}
+                  className="w-full bg-white rounded-xl shadow-sm py-3.5 px-4 flex items-center justify-center space-x-2 hover:bg-gray-50 border border-gray-100 transition duration-200"
+                >
                   <FaPlus className="w-5 h-5 text-gray-700" />
                   <span className="text-sm font-semibold text-gray-700">Add more Health Data</span>
                 </button>

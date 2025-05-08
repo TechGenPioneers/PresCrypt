@@ -34,7 +34,7 @@ const AdminNavBar = ({ patientId = "P021" }) => {
     const fetchPatientDetails = async () => {
       try {
         const response = await axios.get(
-          `https://localhost:7021/api/Patient/profileNavbarDetails/${patientId}`,
+          `https://localhost:5213/api/Patient/profileNavbarDetails/${patientId}`,
         );
         const { firstName, lastName, createdAt } = response.data;
 
