@@ -6,7 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { loginUser } from "../../../utils/api";
-import axios from "axios";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,13 +15,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("patient");
   const [notification, setNotification] = useState(null);
-  
-  // 2FA states
-  const [show2FAField, setShow2FAField] = useState(false);
-  const [twoFACode, setTwoFACode] = useState("");
-  const [twoFAError, setTwoFAError] = useState("");
-  const [twoFALoading, setTwoFALoading] = useState(false);
-  const [loginResponse, setLoginResponse] = useState(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -34,87 +26,47 @@ export default function LoginPage() {
     }
   }, [searchParams]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setNotification(null);
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError(null);
+  setNotification(null);
 
-    if (!email || !password) {
-      setError("Email and Password are required.");
+  if (!email || !password) {
+    setError("Email and Password are required.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const response = await loginUser({ email, password });
+    console.log("Login Response:", response); // Debugging
+
+    if (!response) {
+      setError("No response from server.");
       return;
     }
 
-    try {
-      setLoading(true);
-      const response = await loginUser({ email, password });
-
-      if (!response) {
-        setError("No response from server.");
-        return;
-      }
-
-      if (
-        (response.user?.role === "DoctorPending") ||
-        (response.user?.role === "Doctor" && response.user?.emailVerified === false) ||
-        (response.message?.toLowerCase().includes("pending approval")) ||
-        (response.message?.toLowerCase().includes("not verified"))
-      ) {
-        showPendingNotification();
-        return;
-      }
-
-      if (!response.success) {
-        setError(response.message || "Invalid email or password.");
-        return;
-      }
-
-      // Store basic info
-      localStorage.setItem("userEmail", response.user?.username);
-      setLoginResponse(response);
-
-      if (response.requires2FA && role === "admin") {
-        setShow2FAField(true);
-        return;
-      }
-
-      // If no 2FA required, complete login
-      await completeLogin(response);
-
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Login failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handle2FAVerify = async () => {
-    setTwoFAError("");
-    if (!twoFACode) {
-      setTwoFAError("Please enter the verification code");
+    // Handle pending/not verified cases
+    if (response.user?.role === "DoctorPending" || 
+        (response.user?.role === "Doctor" && !response.user?.emailVerified)) {
+      showPendingNotification();
       return;
     }
 
-    setTwoFALoading(true);
-    try {
-      const res = await axios.post("/api/verify-2fa", {
-        email,
-        code: twoFACode,
-      });
-
-      if (res.data.success) {
-        await completeLogin(loginResponse);
-      } else {
-        setTwoFAError("Invalid verification code");
-      }
-    } catch (err) {
-      console.error("2FA verification error:", err);
-      setTwoFAError("Verification failed. Please try again.");
-    } finally {
-      setTwoFALoading(false);
+    if (!response.success) {
+      setError(response.message || "Invalid credentials");
+      return;
     }
-  };
 
+   
+
+  } catch (err) {
+    console.error("Login error:", err);
+    setError("Login failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
   const completeLogin = async (response) => {
     localStorage.setItem("token", response.token);
     localStorage.setItem("userId", response.user?.id);
@@ -216,30 +168,6 @@ export default function LoginPage() {
             >
               {loading ? "Logging in..." : "Login"}
             </button>
-
-            {/* 2FA Field - Only shown for admin after initial login */}
-            {show2FAField && role === "admin" && (
-              <div className="mt-4">
-                <div className="relative w-full mb-2">
-                  <input
-                    type="text"
-                    placeholder="Enter 2FA Code"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-400 focus:outline-none"
-                    value={twoFACode}
-                    onChange={(e) => setTwoFACode(e.target.value)}
-                  />
-                </div>
-                {twoFAError && <p className="text-red-500 text-sm mb-2">{twoFAError}</p>}
-                <button
-                  type="button"
-                  onClick={handle2FAVerify}
-                  className="w-full py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition disabled:opacity-50"
-                  disabled={twoFALoading}
-                >
-                  {twoFALoading ? "Verifying..." : "Verify Code"}
-                </button>
-              </div>
-            )}
           </form>
 
           <p className="text-gray-600 text-sm text-center mt-4">Not registered yet?</p>
