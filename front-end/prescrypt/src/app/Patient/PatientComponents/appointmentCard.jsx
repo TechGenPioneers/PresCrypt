@@ -28,50 +28,61 @@ const AppointmentCard = ({
   const [appointmentCounts, setAppointmentCounts] = useState({});
   const router = useRouter();
 
-  // 🔁 Get next 4 Tuesdays
+  // 🔁 Get next 4 slots for each available day
   useEffect(() => {
+    const daysOfWeek = {
+      Sunday: 0,
+      Monday: 1,
+      Tuesday: 2,
+      Wednesday: 3,
+      Thursday: 4,
+      Friday: 5,
+      Saturday: 6,
+    };
+
     const getNextAvailableDates = async (dayName) => {
-      const daysOfWeek = {
-        Sunday: 0,
-        Monday: 1,
-        Tuesday: 2,
-        Wednesday: 3,
-        Thursday: 4,
-        Friday: 5,
-        Saturday: 6,
-      };
-  
       const today = new Date();
       const targetDay = daysOfWeek[dayName];
       if (targetDay === undefined) return;
-  
+
       const currentDay = today.getDay();
       const daysUntilTarget =
-        (targetDay - currentDay + 7) % 7 || 7; // Ensure not 0 (i.e., push to next week)
-  
+        (targetDay - currentDay + 7) % 7 || 7;
+
       const firstAvailableDate = new Date(today);
       firstAvailableDate.setDate(today.getDate() + daysUntilTarget);
-  
+
       const nextDates = [];
       for (let i = 0; i < 4; i++) {
         const nextDate = new Date(firstAvailableDate);
         nextDate.setDate(firstAvailableDate.getDate() + i * 7);
-        nextDates.push(nextDate.toISOString().split("T")[0]);
+        nextDates.push({
+          date: nextDate.toISOString().split("T")[0],
+          day: dayName,
+        });
       }
-  
-      setAppointmentDates(nextDates);
-  
-      // Fetch counts
-      const counts = await fetchAppointmentCounts(nextDates);
-      setAppointmentCounts(counts);
+
+      setAppointmentDates((prev) => {
+        const combined = [...prev, ...nextDates];
+        const unique = Array.from(
+          new Map(combined.map((d) => [d.date, d])).values()
+        );
+        return unique.sort((a, b) => a.date.localeCompare(b.date));
+      });
+
+      const counts = await fetchAppointmentCounts(
+        nextDates.map((d) => d.date)
+      );
+      setAppointmentCounts((prev) => ({ ...prev, ...counts }));
     };
-  
+
     if (appointmentDay) {
-      getNextAvailableDates(appointmentDay);
+      const daysArray = appointmentDay.split(",").map((d) => d.trim());
+      daysArray.forEach(getNextAvailableDates);
     }
   }, [appointmentDay]);
 
-  // 🔁 Fetch appointment counts by date
+  // 🔁 Fetch appointment counts
   const fetchAppointmentCounts = async (dates) => {
     try {
       const response = await fetch(
@@ -81,33 +92,28 @@ const AppointmentCard = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            doctorId,
-            dates,
-          }),
+          body: JSON.stringify({ doctorId, dates }),
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to fetch appointment counts");
       }
-  
-      const rawData = await response.json(); // e.g., { "2025-04-23T00:00:00": 2 }
-  
-      // 🔁 Normalize keys to 'YYYY-MM-DD'
+
+      const rawData = await response.json();
+
       const normalizedData = {};
       for (const dateTime in rawData) {
         const dateOnly = new Date(dateTime).toISOString().split("T")[0];
         normalizedData[dateOnly] = rawData[dateTime];
       }
-  
+
       return normalizedData;
     } catch (error) {
       console.error(error);
       return {};
     }
   };
-  
 
   // 🔁 Fetch doctor details
   useEffect(() => {
@@ -136,7 +142,7 @@ const AppointmentCard = ({
     }
   }, [open, doctorId]);
 
-  // 🔁 Handle booking
+  // 🔁 Booking handler
   const handleBooking = (selectedDate) => {
     if (doctorDetails) {
       localStorage.setItem(
@@ -188,28 +194,23 @@ const AppointmentCard = ({
 
         {/* Content */}
         <DialogContent
-  className="p-6 flex flex-col items-center bg-white overflow-y-auto"
-  sx={{ maxHeight: '70vh' }}
->
+          className="p-6 flex flex-col items-center bg-white overflow-y-auto"
+          sx={{ maxHeight: "70vh" }}
+        >
           {loading ? (
             <CircularProgress />
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : doctorDetails ? (
             <>
-              {/* Doctor Image */}
               <img
                 src={doctorDetails.imageUrl || "/path/to/default-image.jpg"}
                 alt="Doctor"
                 className="w-28 h-28 rounded-full object-cover mb-4 border-4 border-gray-200 shadow-md"
               />
-
-              {/* Specialization */}
               <div className="bg-teal-100 text-teal-700 py-1 px-4 rounded-full mb-4">
                 {specialization || doctorDetails.specialization}
               </div>
-
-              {/* Description */}
               <Typography
                 variant="body1"
                 className="text-gray-800 text-center mb-6"
@@ -219,15 +220,15 @@ const AppointmentCard = ({
 
               {/* Appointment Dates */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full text-center mt-6">
-                {appointmentDates.map((date, index) => (
+                {appointmentDates.map(({ date, day }, index) => (
                   <div
                     key={index}
-                    className="flex flex-col items-center w-full border border-green-700 bg-[#E8F4F2]  p-3 rounded-lg shadow"
+                    className="flex flex-col items-center w-full border border-green-700 bg-[#E8F4F2] p-3 rounded-lg shadow"
                   >
-                    <p className=" font-semibold">
-                      {date} {appointmentDay}
+                    <p className="font-semibold">
+                      {date} ({day})
                     </p>
-                    <p className="text-sm  mt-1">
+                    <p className="text-sm mt-1">
                       Active Appointments:{" "}
                       {appointmentCounts[date] !== undefined
                         ? appointmentCounts[date]
@@ -235,7 +236,7 @@ const AppointmentCard = ({
                     </p>
                     <button
                       onClick={() => handleBooking(date)}
-                      className="border border-green-700 text-green-700 font-semibold px-4 py-1 rounded-full hover:bg-green-50 ml-2 mt-6 "
+                      className="border border-green-700 text-green-700 font-semibold px-4 py-1 rounded-full hover:bg-green-50 ml-2 mt-6"
                     >
                       Book this Slot
                     </button>
@@ -243,7 +244,6 @@ const AppointmentCard = ({
                 ))}
               </div>
 
-              {/* Price Info */}
               <Typography
                 variant="body2"
                 className="text-gray-600 text-center mt-10 px-4"

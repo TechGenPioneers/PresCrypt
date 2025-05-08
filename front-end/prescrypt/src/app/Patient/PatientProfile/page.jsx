@@ -7,6 +7,7 @@ import Header from '@/app/Components/header/Header';
 import Sidebar from '@/app/Patient/PatientComponents/navBar';
 import axios from 'axios';
 
+
 const HealthRecord = () => {
   const router = useRouter(); // Initialize router
   const [patientData, setPatientData] = useState(null);

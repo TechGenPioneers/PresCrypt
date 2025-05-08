@@ -1,173 +1,235 @@
-/* Center the login container */
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #f4f6f9; /* Light gray background */
+  min-height: 100vh;
+  background: #f4f6f8;
+  padding: 2rem;
 }
 
-/* Login Box */
-.loginBox {
+.registerBox {
   display: flex;
-  background: white;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  flex-direction: row;
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  max-width: 900px;
-  width: 80%;
-  height: 500px;
+  max-width: 1000px;
+  width: 100%;
 }
 
-/* Form Section */
 .formSection {
   flex: 1;
-  padding: 40px;
+  padding: 2.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
+.imageSection {
+  flex: 1;
+  background-color: #e6f0f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
 .title {
-  font-size: 24px;
+  font-size: 1.8rem;
   font-weight: bold;
-  color: #1d3557; /* Dark Blue */
+  color: #1a202c;
+  margin-bottom: 0.5rem;
   text-align: center;
 }
 
 .subtitle {
-  font-size: 14px;
-  color: #457b9d; /* Lighter Blue */
+  color: #4a5568;
+  margin-bottom: 1.5rem;
   text-align: center;
-  margin-bottom: 20px;
+}
+
+.inputGroup {
+  margin-bottom: 1rem;
+  position: relative;
 }
 
 .input {
   width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border 0.2s;
 }
 
+.input:focus {
+  border-color: #3182ce;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.inputError {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e53e3e;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
 
 .errorMessage {
-  color: #d32f2f; 
-  padding: 10px;
-  border-radius: 5px;
-  text-align: center;
-  font-size: 14px;
-  margin-top: 6px;
-  animation: fadeIn 0.7s ease-in-out;
+  color: #e53e3e;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-/* Forgot Password */
-.forgotPassword {
-  text-align: right;
-  font-size: 12px;
-  color: #1d3557;
-  text-decoration: none;
-  margin-bottom: 20px;
-}
-
-/* Login Button */
-.loginBtn {
-  width: 100%;
-  padding: 12px;
-  background-color: #007E852B;
-  color: #006369;
+.registerBtn {
+  background-color: #3182ce;
+  color: white;
   font-weight: bold;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
   border: none;
-  border-radius: 5px;
-  font-size: 16px;
+  margin-top: 1rem;
   cursor: pointer;
-  position: relative;
-  transition: all 0.3s ease-in-out;
-}
-
-/* Add Loading Animation */
-.loginBtn.loading {
-  pointer-events: none; /* Prevent clicking */
-  background-color: #007E85;
-  color: white;
-}
-
-.loginBtn.loading::after {
-  content: "";
-  position: absolute;
-  right: 15px;
-  width: 15px;
-  height: 15px;
-  border: 2px solid white;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loginBtn:hover {
-  background-color: #007E85;
-  color: white;
-}
-
-/* Not Registered Section */
-.notRegistered {
-  text-align: center;
-  font-size: 14px;
-  color: #1d3557;
-  margin-top: 15px;
-}
-
-/* Create Account Button */
-.createAccountBtn {
+  transition: background 0.2s;
   width: 100%;
-  margin-top: 12px;
-  padding: 8px;
-  background-color: transparent;
-  color: #1d3557;
-  border: 0.5px solid #007E85; /* Thinner border */
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 500;
+}
+
+.registerBtn:hover {
+  background-color: #2b6cb0;
+}
+
+.registerBtn:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.dropdownContainer {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.dropdownButton {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 0.5rem;
+  background-color: white;
+  text-align: left;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-
-.createAccountBtn:hover {
-  background-color: #007E85;
-  color: white;
-  transform: scale(1.02); /* Slight hover effect */
-}
-
-/* Image Section */
-.imageSection {
-  flex: 1;
-  background: #ffffff;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 20px;
 }
 
-.imageSection img {
-  max-width: 100%;
+.dropdownButton::after {
+  content: '›';
+  transform: rotate(90deg);
+  font-size: 1.2rem;
+  color: #a0aec0;
+}
+
+.dropdownMenu {
+  position: absolute;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #cbd5e0;
+  border-radius: 0.5rem;
+  margin-top: 0.25rem;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdownItem {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: #edf2f7;
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #718096;
+}
+
+/* Custom styling to match the image */
+.registerBtn {
+  background-color: #a5d6d9;
+  color: #2c5282;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.registerBtn:hover {
+  background-color: #8bc8cb;
+}
+
+/* Logo styling */
+.logo {
+  margin-bottom: 2rem;
+  width: 150px;
   height: auto;
-  border-radius: 10px;
+}
+
+/* Footer styling */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #edf2f7;
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.footerLinks {
+  display: flex;
+  gap: 1rem;
+}
+
+.footerLink {
+  color: #4a5568;
+  cursor: pointer;
+}
+
+.footerLink:hover {
+  color: #3182ce;
+  text-decoration: underline;
+}
+
+/* Copyright text */
+.copyright {
+  font-size: 0.75rem;
+  color: #718096;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .registerBox {
+    flex-direction: column;
+  }
+  
+  .imageSection {
+    padding: 1rem;
+    order: -1;
+    max-height: 250px;
+  }
+  
+  .formSection {
+    padding: 1.5rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
 }

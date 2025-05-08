@@ -13,7 +13,7 @@ const AdminNavBar = ({ patientId = "P021" }) => {
     { text: "Dashboard", icon: "/image11.png", link: "/Patient/PatientDashboard" },
     { text: "Profile", icon: "/image12.png", link: "/Patient/PatientProfile" },
     { text: "Appointments", icon: "/image27.png", link: "/Patient/PatientAppointments" },
-    { text: "Health Records", icon: "/image19.png", link: "/Patient/PatientRecords" },
+    { text: "Health Records", icon: "/image19.png", link: "/Patient/PatientHealthRecords" },
     { text: "Chat with doctor", icon: "/image20.png", link: "/Patient/PatientChat" },
   ];
 
@@ -36,9 +36,9 @@ const AdminNavBar = ({ patientId = "P021" }) => {
         const response = await axios.get(
           `https://localhost:5213/api/Patient/profileNavbarDetails/${patientId}`,
         );
-        const { firstName, lastName, createdAt } = response.data;
+        const { name, createdAt } = response.data;
 
-        setPatientName(`${firstName} ${lastName}`);
+        setPatientName(`${name}`);
 
         const date = new Date(createdAt);
         const formattedDate = date.toLocaleDateString("en-US", {
