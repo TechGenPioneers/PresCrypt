@@ -9,6 +9,7 @@ import Image from "next/image";
 import React from "react";
 import { useEffect } from "react";
 import useAuthGuard from "@/utils/useAuthGuard";
+import Chatbot from "../ChatbotComponents/chatbot";
 
 export default function Home() {
  useAuthGuard(["Patient"]);
@@ -17,6 +18,7 @@ export default function Home() {
       <Header/>
       <NavBar/>
       <PatientDashboard />
+      <Chatbot />
       <Footer/>
     </div>
   );
