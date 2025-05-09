@@ -5,7 +5,7 @@ export default function ChatButton({ onClick }) {
     <div className="fixed bottom-6 right-6 z-50">
       <button
         onClick={onClick}
-        className="bg-teal-800 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center"
+        className="bg-teal-700 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center"
         aria-label="Open chat"
       >
         <svg

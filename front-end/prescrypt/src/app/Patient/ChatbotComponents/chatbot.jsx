@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import ChatHeader from "./ChatHeader";
-import  MessageList from "./messageList";
+import ChatHeader from "./chatHeader";
+import MessageList from "./messageList";
 import MessageInput from "./messageInput";
 import ChatButton from "./chatButton";
 
@@ -71,7 +71,7 @@ export default function Chatbot() {
 
       {/* Chat Panel */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-96 md:max-w-md bg-white shadow-xl z-50 transform transition-transform duration-500 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-96 md:w-1/2 lg:w-2/5 xl:w-1/3 max-w-xl bg-white shadow-xl z-50 transform transition-transform duration-500 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
