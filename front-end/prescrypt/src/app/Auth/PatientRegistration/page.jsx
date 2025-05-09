@@ -88,7 +88,7 @@ export default function PatientRegistration() {
           contactNumber: formData.contactNumber,
           address: formData.address,
           dob: formData.dob?.toISOString().split('T')[0],
-          status: true,
+          status: 'Active',
         }),
       });
 

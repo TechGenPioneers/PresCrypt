@@ -30,26 +30,23 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setNotification(null);
-  
+
     if (!email || !password) {
       setError("Email and Password are required.");
       return;
     }
-  
+
     try {
       setLoading(true);
       const response = await loginUser({ email, password });
-  
-      console.log("Full Login Response:", response); // Debugging
-  
+
       if (!response) {
         setError("No response from server.");
         return;
       }
-  
-      // Check for doctor pending case first
+
       if (
-        (response.user?.role === "DoctorPending") || 
+        (response.user?.role === "DoctorPending") ||
         (response.user?.role === "Doctor" && response.user?.emailVerified === false) ||
         (response.message?.toLowerCase().includes("pending approval")) ||
         (response.message?.toLowerCase().includes("not verified"))
@@ -57,45 +54,48 @@ export default function LoginPage() {
         showPendingNotification();
         return;
       }
-      
-      // Handle general login failures
+
       if (!response.success) {
         setError(response.message || "Invalid email or password.");
         return;
       }
-  
-      // If login successful
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("userId", response.user?.id);
-      localStorage.setItem("userRole", response.user?.role);
-      localStorage.setItem("userEmail", response.user?.username);
-  
-      // Debug stored values
-      console.log("Stored User Role:", response.user?.role);
-  
-      // Redirect based on exact role from backend
-      switch(response.user?.role) {
-        case "Patient":
-          router.push("/Patient/PatientDashboard");
-          break;
-        case "Doctor":
-          router.push("/Doctor/DoctorDashboard");
-          break;
-        case "Admin":
-          router.push("/Admin/AdminDashboard");
-          break;
-        case "DoctorPending":
-          showPendingNotification();
-          break;
-        default:
-          router.push("/Auth/MainPage");
-      }
-  
+
+      
+
+      // If no 2FA required, complete login
+      await completeLogin(response);
+
     } catch (err) {
-      console.error("Login Error Details:", err);
+      console.error("Login error:", err);
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const completeLogin = async (response) => {
+    localStorage.setItem("token", response.token);
+    localStorage.setItem("userId", response.user?.id);
+    localStorage.setItem("userRole", response.user?.role);
+
+    await fetch("/api/set-cookie", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: response.token, role: response.user?.role }),
+    });
+
+    switch (response.user?.role) {
+      case "Patient":
+        router.push("/Patient/PatientDashboard");
+        break;
+      case "Doctor":
+        router.push("/Doctor/DoctorDashboard");
+        break;
+      case "Admin":
+        router.push("/Admin/AdminDashboard");
+        break;
+      default:
+        router.push("/Auth/MainPage");
     }
   };
 
@@ -104,8 +104,7 @@ export default function LoginPage() {
       type: "pending",
       message: "Your doctor account is pending approval. Please wait for confirmation."
     });
-    
-    // Redirect after showing notification
+
     setTimeout(() => router.push("/Auth/MainPage"), 3000);
   };
 
@@ -114,27 +113,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white relative">
       {notification && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
           <div className="bg-green-100 border-l-4 border-green-500 text-black-700 p-4 rounded shadow-lg">
-            <div className="flex items-center">
-              <div className="py-1">
-                <svg className="fill-current h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
-                </svg>
-              </div>
-              <div>
-                <p className="font-bold">Account Pending</p>
-                <p className="text-sm">{notification.message}</p>
-                <p className="text-sm mt-1">Redirecting to main page...</p>
-              </div>
-            </div>
+            <p className="font-bold">Account Pending</p>
+            <p className="text-sm">{notification.message}</p>
+            <p className="text-sm mt-1">Redirecting to main page...</p>
           </div>
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden max-w-3xl w-full">
+      <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden max-w-3xl w-full z-10">
         <div className="flex flex-col justify-center p-8 w-full md:w-1/2">
           <h2 className="text-2xl font-bold text-teal-700 text-center mb-2">
             WELCOME BACK!
