@@ -3,6 +3,7 @@ import axios from "axios";
 import PaymentConfirmation from "./paymentConfirmation"; // Import the confirmation component
 
 const PaymentAtLocation = ({
+  paymentId,
   totalCharge,
   hospital,
   specialization,
@@ -155,27 +156,41 @@ const PaymentAtLocation = ({
   };
 
   const handleCreateAppointment = async () => {
-    const appointmentData = {
-      patientId: patientId || "P021",
-      doctorId: doctorId || "D008",
-      hospitalId: hospitalId || "H027",  //hospital id and doctodid is not passing correctly
-      date: appointmentDate,
-      time: appointmentTime,
-      charge: totalCharge,
-      status: "Pending",
-      typeOfAppointment: "Consultation",
+    const paymentPayload = {
+      paymentId, // use prop directly
+      paymentAmount: totalCharge,
+      paymentMethod: selectedMethod === "online" ? "Card" : "Location",
+      paymentStatus: selectedMethod === "online" ? "Done" : "Pending",
     };
-
+  
     try {
+      // 1. Save payment info
+      await axios.post("https://localhost:7021/api/Controller/payment/add", paymentPayload);
+      console.log("Sent to the payment service successfully.");
+      // 2. Save appointment info
+      const appointmentData = {
+        patientId: patientId || "P021",
+        doctorId: doctorId || "D008",
+        hospitalId: hospitalId || "H027",
+        date: appointmentDate,
+        time: appointmentTime,
+        paymentId: paymentId,
+        charge: totalCharge,
+        status: "Pending",
+        typeOfAppointment: selectedMethod === "online" ? "Online" : "PayAtLocation",
+      };
+  
       await axios.post("https://localhost:7021/api/Appointments", appointmentData);
+  
       setCheckbox1Checked(false);
       setCheckbox2Checked(false);
       setConfirmationOpen(true);
     } catch (error) {
-      console.error("Appointment creation failed:", error);
+      console.error("Error saving payment or appointment:", error);
       alert("Failed to confirm booking. Please try again.");
     }
   };
+  
 
   const handleCloseConfirmation = () => {
     setConfirmationOpen(false);
@@ -186,7 +201,7 @@ const PaymentAtLocation = ({
     <div className="w-full max-w-[600px] p-10 border-2 border-[#B9E9EC] rounded-md">
       <h3 className="underline font-semibold text-lg mb-4">Appointment Summary</h3>
       <div className="space-y-2 text-sm">
-        <div className="flex justify-between"><span>PaymentID</span><span>PA21-345</span></div>
+        <div className="flex justify-between"><span>PaymentID</span><span>{paymentId}</span></div>
         <div className="flex justify-between"><span>Total bill payment</span><span>Rs. {totalCharge}.00</span></div>
         <div className="flex justify-between"><span>Doctor</span><span>Dr. {doctorName}</span></div>
         <div className="flex justify-between"><span>Specialization</span><span>{specialization}</span></div>

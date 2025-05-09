@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PaymentAtLocation from "./paymentAtLocation";
 
 const PaymentView = ({
+  paymentId,
   hospitalCharge,
   doctorCharge,
   hospital,
@@ -71,6 +72,7 @@ const PaymentView = ({
       {/* Right Section */}
       <div className="flex-1 min-w-[300px] max-w-[450px]">
         <PaymentAtLocation
+          paymentId={paymentId}
           totalCharge={totalCharge}
           hospital={hospital}
           specialization={specialization}
