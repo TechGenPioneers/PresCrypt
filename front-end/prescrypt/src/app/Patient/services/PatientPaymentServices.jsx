@@ -1,6 +1,6 @@
 import axios from "axios";
-
 const BASE_URL = "https://localhost:7021/api";
+
 
 export const addPayment = async (paymentPayload) => {
   return await axios.post(`${BASE_URL}/Controller/payment/add`, paymentPayload);
