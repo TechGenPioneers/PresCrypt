@@ -156,7 +156,9 @@ const Patients = () => {
                             ? "text-green-500"
                             : patient.status === "Cancelled"
                             ? "text-red-500"
-                            : "text-yellow-500"
+                            :  patient.status === "Pending"
+                            ? "text-yellow-500"
+                            : ""
                         }`}
                       >
                         <span
@@ -165,7 +167,9 @@ const Patients = () => {
                               ? "bg-green-500"
                               : patient.status === "Cancelled"
                               ? "bg-red-500"
-                              : "bg-yellow-500"
+                              :  patient.status === "Pending"
+                              ? "text-yellow-500"
+                              : ""
                           }`}
                         ></span>
                         {patient.status}

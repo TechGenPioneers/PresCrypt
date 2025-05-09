@@ -2,11 +2,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bell, Check } from "lucide-react";
 import * as signalR from "@microsoft/signalr";
-import { GetAllNotifications, MarkAsRead } from "../service/AdminDashboardService";
+import {
+  GetAllNotifications,
+  MarkAllAsRead,
+  MarkAsRead,
+} from "../service/AdminDashboardService";
 import { useMemo } from "react";
 
-
 const AdminNotification = () => {
+  const [connection, setConnection] = useState(null);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const sidebarRef = useRef(null);
@@ -29,24 +33,40 @@ const AdminNotification = () => {
   useEffect(() => {
     GetNotifications(); // fetch all notifications
 
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7021/AdminNotificationHub") // <-- Update this
+    const newConnection = new signalR.HubConnectionBuilder()
+      .withUrl("https://localhost:7021/AdminNotificationHub", { transport: signalR.HttpTransportType.WebSockets })
       .withAutomaticReconnect()
       .build();
 
-    connection
+    newConnection
       .start()
       .then(() => {
-        console.log("SignalR connected");
-      })
-      .catch((err) => console.error("SignalR error: ", err));
+        console.log("Connected to SignalR hub");
 
-    connection.on("ReceiveNotification", (notification) => {
-      setNotifications((prev) => [notification, ...prev]);
-    });
+        newConnection.on("ReceiveNotification", (msg) => {
+          console.log("New Notification", msg);
+          setNotifications((prev) => [
+            {
+              id: msg.id,
+              title: msg.title,
+              message: msg.message,
+              date: msg.createdAt,
+              isRead: false,
+              type: msg.type,
+              doctorId: msg.doctorId || null,
+              patientId: msg.patientId || null,
+              requestId: msg.requestId || null,
+            },
+            ...prev,
+          ]);
+        });
+      })
+      .catch((err) => console.error("SignalR connection failed:", err));
+
+    setConnection(newConnection);
 
     return () => {
-      connection.stop();
+      newConnection.stop();
     };
   }, []);
 
@@ -69,24 +89,35 @@ const AdminNotification = () => {
     };
   }, [isSidebarVisible]);
 
-  //set the time ago format
   const timeAgo = (dateString) => {
     const now = new Date();
     const createdAt = new Date(dateString);
-    const diff = (now - createdAt) / 1000; // seconds
-
-    if (diff < 60) return `${Math.floor(diff)} seconds ago`;
-    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-    if (diff < 2592000) return `${Math.floor(diff / 86400)} days ago`;
-    if (diff < 31536000) return `${Math.floor(diff / 2592000)} months ago`;
-    return `${Math.floor(diff / 31536000)} years ago`;
+    const diffSeconds = Math.floor((now - createdAt) / 1000);
+  
+    const units = [
+      { label: "year", seconds: 31536000 },
+      { label: "month", seconds: 2592000 },
+      { label: "day", seconds: 86400 },
+      { label: "hour", seconds: 3600 },
+      { label: "minute", seconds: 60 },
+      { label: "second", seconds: 1 },
+    ];
+  
+    for (const unit of units) {
+      const count = Math.floor(diffSeconds / unit.seconds);
+      if (count >= 1) {
+        return `${count} ${unit.label}${count > 1 ? "s" : ""} ago`;
+      }
+    }
+  
+    return "just now";
   };
+  
 
   const markAsRead = async (notificationId) => {
     try {
       const response = await MarkAsRead(notificationId);
-  
+
       if (response.status === 200) {
         setNotifications((prev) =>
           prev.map((n) =>
@@ -103,21 +134,19 @@ const AdminNotification = () => {
 
   const MarkAllRead = async () => {
     try {
-      // Call backend endpoint to mark all as read (make sure you create this API endpoint)
-      await fetch("https://localhost:7021/api/AdminDashboard/MarkAllAsRead", {
-        method: "PUT",
-      });
-  
+      
+      const response = await MarkAllAsRead();
+      if (response.status === 200) {
       // Update local state
       setNotifications((prev) =>
         prev.map((notif) => ({ ...notif, isRead: true }))
       );
+    }
     } catch (error) {
       console.error("Failed to mark all notifications as read", error);
     }
   };
-  
-  
+
   const unreadCount = useMemo(() => {
     return notifications.filter((n) => !n.isRead).length;
   }, [notifications]);
@@ -132,10 +161,10 @@ const AdminNotification = () => {
         >
           <Bell className="w-6 h-6 text-gray-700" />
           {unreadCount > 0 && (
-      <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
-        {unreadCount}
-      </span>
-    )}
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+              {unreadCount}
+            </span>
+          )}
         </button>
       </div>
 
@@ -155,8 +184,9 @@ const AdminNotification = () => {
           </h3>
           <div className="flex items-center space-x-3">
             <button
-            onClick={MarkAllRead}
-            className="text-sm text-[#094A4D] hover:underline cursor-pointer">
+              onClick={MarkAllRead}
+              className="text-sm text-[#094A4D] hover:underline cursor-pointer"
+            >
               Mark All Read
             </button>
             <button

@@ -34,4 +34,15 @@ const MarkAsRead = async (notificationId) => {
     throw error
   }
 }
- export {GetAllDashboardData,GetAllNotifications,MarkAsRead}
+
+//mark all read
+const MarkAllAsRead = async () => {
+  try{
+    const response = await  axios.put(`${AdminDashboardURL}/MarkAllAsRead`)
+    return response
+  }catch(error){
+    console.error("Failed to get the data",error);
+    throw error
+  }
+}
+ export {GetAllDashboardData,GetAllNotifications,MarkAsRead,MarkAllAsRead}
