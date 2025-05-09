@@ -12,30 +12,25 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import axios from "axios";
+import { fetchHospitalLocations } from "../services/AppointmentsFindingService"; 
 
 const LocationDialog = ({ open, handleClose, onSelect }) => {
   const [search, setSearch] = useState("");
   const [locations, setLocations] = useState([]);
 
   useEffect(() => {
-    if (open) {
-      const fetchHospitals = async () => {
-        try {
-          const response = await axios.get("https://localhost:7021/api/Hospital/locations"); // Replace with actual URL if different
-          const data = response.data;
-          const formatted = Object.entries(data).map(([city, hospitals]) => ({
-            district: city,
-            hospitals,
-          }));
-          setLocations(formatted);
-        } catch (error) {
-          console.error("Error fetching hospital data", error);
-        }
-      };
+    if (!open) return;
 
-      fetchHospitals();
-    }
+    const loadData = async () => {
+      try {
+        const result = await fetchHospitalLocations();
+        setLocations(result);
+      } catch (error) {
+        console.error("Failed to load locations.");
+      }
+    };
+
+    loadData();
   }, [open]);
 
   const filteredLocations = locations
@@ -58,14 +53,8 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
       onClose={handleClose}
       fullWidth
       maxWidth="sm"
-      sx={{
-        "& .MuiDialog-paper": {
-          border: "2px solid #4CAF50",
-          borderRadius: "30px",
-        },
-      }}
+      sx={{ "& .MuiDialog-paper": { border: "2px solid #4CAF50", borderRadius: "30px" } }}
     >
-      {/* Header */}
       <div className="flex justify-between items-center px-5 py-3 border-b border-gray-300">
         <IconButton onClick={handleClose} className="text-gray-500">
           <CloseIcon />
@@ -73,7 +62,6 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
       </div>
 
       <DialogContent className="min-h-[300px] flex flex-col">
-        {/* Search */}
         <TextField
           fullWidth
           variant="outlined"
@@ -83,25 +71,17 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        {/* Title */}
-        <Typography
-          variant="subtitle2"
-          className="text-green-800 font-semibold mb-6"
-        >
+        <Typography variant="subtitle2" className="text-green-800 font-semibold mb-6">
           Available Locations
         </Typography>
 
-        {/* Hospital List */}
         <div className="flex-grow overflow-y-auto">
           <List>
             {filteredLocations.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">
-                No results found
-              </p>
+              <p className="text-gray-500 text-center py-4">No results found</p>
             ) : (
               filteredLocations.map(({ district, hospitals }, index) => (
                 <div key={index} className="mb-5">
-                  {/* City/District Heading */}
                   <Typography
                     variant="h6"
                     className="font-semibold text-gray-700 mb-2 pl-3"
@@ -109,7 +89,6 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
                     {district.toUpperCase()}
                   </Typography>
 
-                  {/* Hospitals under city */}
                   {hospitals.map((hospital, i) => (
                     <ListItemButton
                       key={i}
@@ -117,10 +96,7 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
                       className="flex items-center space-x-3 border rounded-[20px] border-green-700 px-6 py-4 mb-2 shadow-sm hover:bg-gray-100"
                     >
                       <LocationOnIcon className="text-green-500 text-xl" />
-                      <ListItemText
-                        primary={hospital}
-                        className="font-medium"
-                      />
+                      <ListItemText primary={hospital} className="font-medium" />
                     </ListItemButton>
                   ))}
                 </div>

@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import PaymentConfirmation from "./paymentConfirmation"; // Import the confirmation component
+import PaymentConfirmation from "./paymentConfirmation";
+import {
+  addPayment,
+  createAppointment,
+  sendFailureEmail,
+  sendFailureNotification,
+} from "../services/PatientPaymentServices"; // Adjust path based on folder structure
 
 const PaymentAtLocation = ({
+  paymentId,
   totalCharge,
   hospital,
   specialization,
   appointmentDate,
   appointmentTime,
   doctorId,
-  patientId ="P021",
+  patientId = "P021",
   hospitalId,
   doctorName,
   selectedMethod,
-  email = "dewminkasmitha30@gmail.com", // email passed as a prop or default
+  email = "dewminkasmitha30@gmail.com",
 }) => {
   const [checkbox1Checked, setCheckbox1Checked] = useState(false);
   const [checkbox2Checked, setCheckbox2Checked] = useState(false);
@@ -30,7 +36,6 @@ const PaymentAtLocation = ({
       console.log("PayHere script loaded.");
     };
     document.body.appendChild(script);
-
     return () => {
       document.body.removeChild(script);
     };
@@ -76,10 +81,8 @@ const PaymentAtLocation = ({
             country: "Sri Lanka",
           }),
         });
-        
+
         const obj = await res.json();
-        
-      
 
         window.payhere.onCompleted = function (orderId) {
           console.log("Payment completed. OrderID:", orderId);
@@ -91,33 +94,29 @@ const PaymentAtLocation = ({
         };
 
         window.payhere.onError = async function (error) {
-          console.error("Payment error:", error);//this should be implemented using a service
-        
+          console.error("Payment error:", error);
+
           try {
-            // 1. Send Email Notification
             const emailPayload = {
-              receptor: email, // use passed prop
+              receptor: email,
               title: "Payment Failed",
               message: `Your online payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospital} has failed. Please try again or choose to pay at the location.`,
             };
-        
-            await axios.post("https://localhost:7021/api/PatientEmail", emailPayload);
-        
-            // 2. Send In-App Notification
+            await sendFailureEmail(emailPayload);
+
             const notificationPayload = {
               patientId,
               title: "Payment Failed",
               type: "Payment",
               message: `Online payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospital} has failed.`,
             };
-        
-            await axios.post("https://localhost:7021/api/PatientNotification/send", notificationPayload);
-        
+            await sendFailureNotification(notificationPayload);
+
             console.log("Payment failure email and notification sent.");
           } catch (notifyError) {
             console.error("Failed to send failure email or notification", notifyError);
           }
-        
+
           alert("Payment failed. Please try again or select pay at location.");
         };
 
@@ -155,24 +154,35 @@ const PaymentAtLocation = ({
   };
 
   const handleCreateAppointment = async () => {
-    const appointmentData = {
-      patientId: patientId || "P021",
-      doctorId: doctorId || "D008",
-      hospitalId: hospitalId || "H027",  //hospital id and doctodid is not passing correctly
-      date: appointmentDate,
-      time: appointmentTime,
-      charge: totalCharge,
-      status: "Pending",
-      typeOfAppointment: "Consultation",
+    const paymentPayload = {
+      paymentId,
+      paymentAmount: totalCharge,
+      paymentMethod: selectedMethod === "online" ? "Card" : "Location",
+      paymentStatus: selectedMethod === "online" ? "Done" : "Pending",
     };
 
     try {
-      await axios.post("https://localhost:7021/api/Appointments", appointmentData);
+      await addPayment(paymentPayload);
+      console.log("Sent to the payment service successfully.");
+
+      const appointmentData = {
+        patientId: patientId || "P021",
+        doctorId: doctorId || "D008",
+        hospitalId: hospitalId || "H027",
+        date: appointmentDate,
+        time: appointmentTime,
+        paymentId,
+        charge: totalCharge,
+        status: "Pending",
+        typeOfAppointment: selectedMethod === "online" ? "Online" : "PayAtLocation",
+      };
+
+      await createAppointment(appointmentData);
       setCheckbox1Checked(false);
       setCheckbox2Checked(false);
       setConfirmationOpen(true);
     } catch (error) {
-      console.error("Appointment creation failed:", error);
+      console.error("Error saving payment or appointment:", error);
       alert("Failed to confirm booking. Please try again.");
     }
   };
@@ -186,7 +196,7 @@ const PaymentAtLocation = ({
     <div className="w-full max-w-[600px] p-10 border-2 border-[#B9E9EC] rounded-md">
       <h3 className="underline font-semibold text-lg mb-4">Appointment Summary</h3>
       <div className="space-y-2 text-sm">
-        <div className="flex justify-between"><span>PaymentID</span><span>PA21-345</span></div>
+        <div className="flex justify-between"><span>PaymentID</span><span>{paymentId}</span></div>
         <div className="flex justify-between"><span>Total bill payment</span><span>Rs. {totalCharge}.00</span></div>
         <div className="flex justify-between"><span>Doctor</span><span>Dr. {doctorName}</span></div>
         <div className="flex justify-between"><span>Specialization</span><span>{specialization}</span></div>
@@ -220,19 +230,17 @@ const PaymentAtLocation = ({
         {loading ? "Processing..." : "Confirm the Booking"}
       </button>
 
-      {/* Success Dialog */}
       <PaymentConfirmation
-  open={confirmationOpen}
-  handleClose={handleCloseConfirmation}
-  email={email}
-  totalCharge={totalCharge}
-  patientId={patientId}
-  doctorName={doctorName}
-  appointmentDate={appointmentDate}
-  appointmentTime={appointmentTime}
-  hospitalName={hospital}
-/>
-
+        open={confirmationOpen}
+        handleClose={handleCloseConfirmation}
+        email={email}
+        totalCharge={totalCharge}
+        patientId={patientId}
+        doctorName={doctorName}
+        appointmentDate={appointmentDate}
+        appointmentTime={appointmentTime}
+        hospitalName={hospital}
+      />
     </div>
   );
 };

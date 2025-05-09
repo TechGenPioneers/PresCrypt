@@ -2,7 +2,7 @@
 import { LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import axios from "axios";
+import {getProfileImage , getPatientDetails} from "../services/PatientDataService";
 
 const AdminNavBar = ({ patientId = "P021" }) => {
   const [profileImage, setProfileImage] = useState("/profile.png");
@@ -18,42 +18,24 @@ const AdminNavBar = ({ patientId = "P021" }) => {
   ];
 
   useEffect(() => {
-    const fetchProfileImage = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `https://localhost:7021/api/Patient/profileImage/${patientId}`,
-          { responseType: "arraybuffer" }
-        );
-        const base64Image = Buffer.from(response.data, "binary").toString("base64");
-        setProfileImage(`data:image/jpeg;base64,${base64Image}`);
-      } catch (error) {
-        console.error("Error fetching profile image:", error);
-      }
-    };
+        setProfileImage(await getProfileImage(patientId));
+        const { name, createdAt } = await getPatientDetails(patientId);
+        setPatientName(name);
 
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await axios.get(
-          `https://localhost:5213/api/Patient/profileNavbarDetails/${patientId}`,
-        );
-        const { name, createdAt } = response.data;
-
-        setPatientName(`${name}`);
-
-        const date = new Date(createdAt);
-        const formattedDate = date.toLocaleDateString("en-US", {
+        const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
           day: "2-digit",
           month: "long",
           year: "numeric",
         });
         setJoinDate(formattedDate);
       } catch (error) {
-        console.error("Error fetching patient details:", error);
+        console.error("Error loading patient info:", error);
       }
     };
 
-    fetchProfileImage();
-    fetchPatientDetails();
+    fetchData();
   }, [patientId]);
 
   return (
