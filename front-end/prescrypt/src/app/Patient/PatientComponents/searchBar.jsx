@@ -3,6 +3,7 @@ import axios from "axios";
 import SpecializationDialog from "./specializationBox";
 import LocationDialog from "./locationSelectBox";
 import { CircularProgress } from "@mui/material";
+import { findDoctors } from "../services/AppointmentsFindingService";  
 
 const SearchBar = ({ setDoctors }) => {
   const [specializationOpen, setSpecializationOpen] = useState(false);
@@ -24,19 +25,18 @@ const SearchBar = ({ setDoctors }) => {
 
     setLoading(true);
     try {
-      const response = await axios.get("https://localhost:7021/api/Doctor/search", {
-        params: {
-          specialization: selectedName ? "" : selectedSpecialization,
-          hospitalName: selectedName ? "" : selectedLocation,
-          name: selectedName || "",
-        },
+      // Use the service function here for fetching data
+      const doctorsData = await findDoctors({
+        specialization: selectedSpecialization,
+        hospitalName: selectedLocation,
+        name: selectedName,
       });
 
-      setDoctors(response.data);
+      setDoctors(doctorsData);
 
-      if (response.data && response.data.length > 0) {
-        setHospitalCharge(response.data[0].charge);
-        localStorage.setItem("hospitalCharge", response.data[0].charge);
+      if (doctorsData && doctorsData.length > 0) {
+        setHospitalCharge(doctorsData[0].charge);
+        localStorage.setItem("hospitalCharge", doctorsData[0].charge);
       }
     } catch (error) {
       console.error("Error fetching doctors:", error);
@@ -47,6 +47,7 @@ const SearchBar = ({ setDoctors }) => {
   };
 
   useEffect(() => {
+    // Clear the selections in localStorage when the component mounts
     localStorage.removeItem("selectedSpecialization");
     localStorage.removeItem("selectedLocation");
     localStorage.removeItem("selectedName");

@@ -1,4 +1,3 @@
-// components/PaymentConfirmation.jsx
 "use client";
 import React, { useEffect } from "react";
 import {
@@ -10,7 +9,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import axios from "axios"; // install axios if not already installed
+import { sendEmail, sendNotification /* , generatePdf */ } from "../services/PatientPaymentServices";
 
 const PaymentConfirmation = ({
   open,
@@ -22,71 +21,65 @@ const PaymentConfirmation = ({
   appointmentDate,
   appointmentTime,
   hospitalName,
-  patientEmail= 'dewminkasmitha30@gmail.com' //for testing
+  patientEmail = "dewminkasmitha30@gmail.com",
 }) => {
 
   useEffect(() => {
     if (open) {
-      const sendNotification = async () => {
+      const sendNotificationFlow = async () => {
         try {
-          const pdfPayload = {
-            patientId,
-            doctorName,
-            hospitalName,
-            appointmentDate,
-            appointmentTime,
-            totalCharge,
-          };
-      
-          const pdfResponse = await axios.post("https://localhost:7021/api/PatientPDF/generate", pdfPayload, {
-            responseType: "blob",
-          });
-      
-          const pdfBlob = new Blob([pdfResponse.data], { type: "application/pdf" });
-          const pdfBase64 = await blobToBase64(pdfBlob);
-          
-      
-          // 1. Send Email Notification with PDF attachment
+          // const pdfPayload = {
+          //   patientId,
+          //   doctorName,
+          //   hospitalName,
+          //   appointmentDate,
+          //   appointmentTime,
+          //   totalCharge,
+          // };
+
+          // // 1. Generate the PDF
+          // const pdfBlob = await generatePdf(pdfPayload);
+          // const pdfBase64 = await blobToBase64(pdfBlob);
+
+          // 2. Send email WITHOUT PDF attachment
           const emailPayload = {
             receptor: patientEmail,
             title: "Appointment Booked",
-            message: `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospitalName} is confirmed now. Please find the attached details.`,
+            message: `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospitalName} is confirmed now.`,
             attachment: {
-              fileName: "AppointmentConfirmation.pdf",
-              contentType: "application/pdf",
-              base64Content: pdfBase64,
+              fileName: "",
+              contentType: "",
+              base64Content: "",
             },
           };
-      
-          await axios.post("https://localhost:7021/api/PatientEmail", emailPayload);
-      
-          // 2. Send In-App Notification
+          await sendEmail(emailPayload);
+
+          // 3. Send in-app notification
           const notificationPayload = {
             patientId,
             title: "Appointment Booking",
             type: "Appointment",
             message: `Your appointment with Dr. ${doctorName} has been successfully scheduled on ${appointmentDate} at ${appointmentTime} at ${hospitalName}.`,
           };
-      
-          await axios.post("https://localhost:7021/api/PatientNotification/send", notificationPayload);
-      
-          console.log("PDF generated, email sent, notification posted");
+          await sendNotification(notificationPayload);
+
+          console.log("Email sent (no PDF), notification posted");
         } catch (error) {
           console.error("Error during notification flow:", error);
         }
       };
-      
-      const blobToBase64 = async (blob) => {
-        const buffer = await blob.arrayBuffer();
-        const binary = new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '');
-        return btoa(binary);
-      };
-      
-  
-      sendNotification();
+
+      // Helper function (not used now)
+      // const blobToBase64 = async (blob) => {
+      //   const buffer = await blob.arrayBuffer();
+      //   const binary = new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), "");
+      //   return btoa(binary);
+      // };
+
+      sendNotificationFlow();
     }
   }, [open, patientId, patientEmail, doctorName, appointmentDate, appointmentTime, hospitalName]);
-  
+
   return (
     <Dialog
       open={open}

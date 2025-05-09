@@ -1,5 +1,3 @@
-
-
 const AppointmentListStat = ({ patientName, age, location, imageUrl, total, accepted, cancelled }) => {
   return (
     <div className="mb-6">

@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { FaChevronRight, FaUserMd } from "react-icons/fa";
+import { fetchSpecializations } from "../services/AppointmentsFindingService"; 
 
 const SpecializationDialog = ({ open, handleClose, onSelect }) => {
   const [search, setSearch] = useState("");
@@ -20,19 +21,17 @@ const SpecializationDialog = ({ open, handleClose, onSelect }) => {
   useEffect(() => {
     if (!open) return;
 
-    const fetchSpecializations = async () => {
+    const getData = async () => {
       try {
-        const res = await fetch("https://localhost:7021/api/Doctor/specializations");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        setSpecializations(data.map((name) => ({ name, icon: <FaUserMd /> })));
+        const data = await fetchSpecializations();
+        // Add icon here since we kept it null in the service layer
+        setSpecializations(data.map((item) => ({ ...item, icon: <FaUserMd /> })));
       } catch (err) {
-        console.error(err);
         setError("Unable to load specializations.");
       }
     };
 
-    fetchSpecializations();
+    getData();
   }, [open]);
 
   const filteredSpecializations = specializations.filter((spec) =>
@@ -40,7 +39,13 @@ const SpecializationDialog = ({ open, handleClose, onSelect }) => {
   );
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" sx={{ "& .MuiDialog-paper": { border: "2px solid #4CAF50", borderRadius: "30px" } }}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="sm"
+      sx={{ "& .MuiDialog-paper": { border: "2px solid #4CAF50", borderRadius: "30px" } }}
+    >
       <div className="flex justify-between items-center px-5 py-3 border-b border-gray-300">
         <IconButton onClick={handleClose} className="text-gray-500">
           <CloseIcon />
@@ -64,29 +69,28 @@ const SpecializationDialog = ({ open, handleClose, onSelect }) => {
         </div>
 
         <List className="flex flex-col gap-3">
-  {filteredSpecializations.length === 0 ? (
-    <p className="text-gray-500 text-center py-4">No results found</p>
-  ) : (
-    filteredSpecializations.map((spec, index) => (
-      <ListItemButton
-      key={index}
-      onClick={() => onSelect(spec.name)}
-      className="flex items-center p-4 shadow-sm hover:bg-gray-100"
-      sx={{
-        border: "1px solid #4CAF50",
-        borderRadius: "10px",
-      }}
-    >
-      <div className="flex items-center space-x-3 flex-1">
-        <div className="text-blue-500 text-xl">{spec.icon}</div>
-        <ListItemText primary={spec.name} className="font-medium" />
-      </div>
-      <FaChevronRight className="text-gray-500 text-lg ml-auto" />
-    </ListItemButton>
-    ))
-  )}
-</List>
-
+          {filteredSpecializations.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">No results found</p>
+          ) : (
+            filteredSpecializations.map((spec, index) => (
+              <ListItemButton
+                key={index}
+                onClick={() => onSelect(spec.name)}
+                className="flex items-center p-4 shadow-sm hover:bg-gray-100"
+                sx={{
+                  border: "1px solid #4CAF50",
+                  borderRadius: "10px",
+                }}
+              >
+                <div className="flex items-center space-x-3 flex-1">
+                  <div className="text-blue-500 text-xl">{spec.icon}</div>
+                  <ListItemText primary={spec.name} className="font-medium" />
+                </div>
+                <FaChevronRight className="text-gray-500 text-lg ml-auto" />
+              </ListItemButton>
+            ))
+          )}
+        </List>
       </DialogContent>
     </Dialog>
   );
