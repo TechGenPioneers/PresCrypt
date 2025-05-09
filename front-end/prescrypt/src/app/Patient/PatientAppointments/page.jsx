@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import Header from "../../Components/Header/Header";
 import Footer from "../../Components/Footer/Footer";
@@ -6,11 +7,12 @@ import Nav from "../PatientComponents/navBar";
 import CustomCalendar from "../PatientComponents/calender";
 import SearchBar from "../PatientComponents/searchBar";
 import BookingCard from "../PatientComponents/bookingCard";
+import dayjs from "dayjs";
 import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function Appointments() {
   useAuthGuard(["Patient"]);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(dayjs());
   const [isExpanded, setIsExpanded] = useState(false);
   const [doctors, setDoctors] = useState([]); // Store doctors received from API
 

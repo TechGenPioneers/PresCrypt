@@ -3,6 +3,7 @@ import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import {getProfileImage , getPatientDetails} from "../services/PatientDataService";
 import axios from "axios";
 
 
@@ -39,63 +40,30 @@ const AdminNavBar = ({ patientId = "P021" }) => {
       link: "/Patient/PatientDashboard",
     },
     { text: "Profile", icon: "/image12.png", link: "/Patient/PatientProfile" },
-    {
-      text: "Appointments",
-      icon: "/image27.png",
-      link: "/Patient/PatientAppointments",
-    },
-    {
-      text: "Health Records",
-      icon: "/image19.png",
-      link: "/Patient/PatientRecords",
-    },
-    {
-      text: "Chat with doctor",
-      icon: "/image20.png",
-      link: "/Patient/PatientChat",
-    },
+    { text: "Appointments", icon: "/image27.png", link: "/Patient/PatientAppointments" },
+    { text: "Health Records", icon: "/image19.png", link: "/Patient/PatientHealthRecords" },
+    { text: "Chat with doctor", icon: "/image20.png", link: "/Patient/PatientChat" },
   ];
 
   useEffect(() => {
-    const fetchProfileImage = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `https://localhost:7021/api/Patient/profileImage/${patientId}`,
-          { responseType: "arraybuffer" }
-        );
-        const base64Image = Buffer.from(response.data, "binary").toString(
-          "base64"
-        );
-        setProfileImage(`data:image/jpeg;base64,${base64Image}`);
-      } catch (error) {
-        console.error("Error fetching profile image:", error);
-      }
-    };
+        setProfileImage(await getProfileImage(patientId));
+        const { name, createdAt } = await getPatientDetails(patientId);
+        setPatientName(name);
 
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await axios.get(
-          `https://localhost:7021/api/Patient/profileNavbarDetails/${patientId}`
-        );
-        const { firstName, lastName, createdAt } = response.data;
-
-        setPatientName(`${firstName} ${lastName}`);
-
-        const date = new Date(createdAt);
-        const formattedDate = date.toLocaleDateString("en-US", {
+        const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
           day: "2-digit",
           month: "long",
           year: "numeric",
         });
         setJoinDate(formattedDate);
       } catch (error) {
-        console.error("Error fetching patient details:", error);
+        console.error("Error loading patient info:", error);
       }
     };
 
-    fetchProfileImage();
-    fetchPatientDetails();
-    
+    fetchData();
   }, [patientId]);
 
   return (

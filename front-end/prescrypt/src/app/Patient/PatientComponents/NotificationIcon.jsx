@@ -11,7 +11,12 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CheckIcon from "@mui/icons-material/Check";
-import axios from "axios";
+
+import {
+  getNotifications,
+  markAsRead,
+  respondToRequest,
+} from "../services/PatientHeaderService";
 
 export default function NotificationIcon({ userId = "P021" }) {
   const [connection, setConnection] = useState(null);
@@ -19,40 +24,43 @@ export default function NotificationIcon({ userId = "P021" }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  const fetchNotifications = async () => {
-    try {
-      const res = await axios.get(`https://localhost:7021/api/PatientNotification/${userId}`);
-      setNotifications(res.data);
-    } catch (err) {
-      console.error("Failed to fetch notifications", err);
-    }
-  };
-
   useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const data = await getNotifications(userId);
+        setNotifications(data);
+      } catch (err) {
+        console.error("Failed to fetch notifications", err);
+      }
+    };
+
     fetchNotifications();
 
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`https://localhost:7021/patientNotificationHub?userId=${userId}`)
+      .withUrl(`https://localhost:7021/patientNotificationHub?patientId=${userId}`)
       .withAutomaticReconnect()
       .build();
 
-    newConnection.start()
+    newConnection
+      .start()
       .then(() => {
         console.log("Connected to SignalR hub");
-
         newConnection.on("ReceiveNotification", (msg) => {
-          setNotifications(prev => [
+          setNotifications((prev) => [
             {
+              id: msg.id,
               title: msg.title,
               message: msg.message,
+              date: msg.createdAt,
               isRead: false,
-              id: Date.now()
+              type: msg.type,
+              doctorId: msg.doctorId || null,
             },
-            ...prev
+            ...prev,
           ]);
         });
       })
-      .catch(err => console.error("SignalR connection failed:", err));
+      .catch((err) => console.error("SignalR connection failed:", err));
 
     setConnection(newConnection);
 
@@ -67,12 +75,23 @@ export default function NotificationIcon({ userId = "P021" }) {
 
   const handleMarkAsRead = async (id) => {
     try {
-      await axios.post(`https://localhost:7021/api/PatientNotification/mark-as-read`, { id });
-      setNotifications(prev =>
-        prev.map(n => n.id === id ? { ...n, isRead: true } : n)
+      await markAsRead(id);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
       );
     } catch (err) {
       console.error("Failed to mark notification as read", err);
+    }
+  };
+
+  const handleResponse = async (id, doctorId, accepted) => {
+    try {
+      await respondToRequest(id, doctorId, accepted);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      );
+    } catch (err) {
+      console.error("Failed to respond to request", err);
     }
   };
 
@@ -96,6 +115,7 @@ export default function NotificationIcon({ userId = "P021" }) {
             width: 450,
             padding: 10,
             borderRadius: 16,
+            overflowY: "auto",
           },
         }}
       >
@@ -107,7 +127,11 @@ export default function NotificationIcon({ userId = "P021" }) {
 
         {notifications.length === 0 ? (
           <Box p={2}>
-            <Typography variant="body2" color="text.secondary" textAlign="center">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              textAlign="center"
+            >
               No notifications
             </Typography>
           </Box>
@@ -132,19 +156,27 @@ export default function NotificationIcon({ userId = "P021" }) {
                 {n.message}
               </Typography>
 
-              {/* Show Accept/Deny buttons if needed */}
-              {n.title.includes('wants to access your profile') && (
+              {n.type === "Request" && (
                 <Box display="flex" gap={1} mt={1}>
-                  <Button variant="contained" color="primary" size="small">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={() => handleResponse(n.id, n.doctorId, true)}
+                  >
                     Accept
                   </Button>
-                  <Button variant="outlined" color="error" size="small">
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    onClick={() => handleResponse(n.id, n.doctorId, false)}
+                  >
                     Deny
                   </Button>
                 </Box>
               )}
 
-              {/* Mark as read button */}
               {!n.isRead && (
                 <IconButton
                   size="small"

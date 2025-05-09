@@ -1,36 +1,43 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
+  IconButton,
   List,
   ListItemButton,
   ListItemText,
   TextField,
-  IconButton,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-
-const locations = [
-  { district: "Ratnapura", hospitals: ["Aloka Hospital", "Kingsbury Hospital", "The Ceylon Hospital"] },
-  { district: "Negombo", hospitals: ["Asia Hospital", "Co-Operative Hospital"] },
-  { district: "Colombo", hospitals: ["Durdans Hospital", "Asiri Surgical Hospital", "Asiri Central Hospital", "Lanka Hospitals PLC", "Nawaloka Hospitals PLC","Durdans Hospital","Ninewells Hospital (Pvt) Ltd"] },
-  { district: "Kegalle", hospitals: ["Arogya Hospital", "Osro Hospital"] },
-  { district: "Gampaha", hospitals: ["Hemas Hospital", "Arogya Hospitals (Pvt) Ltd", "Browns Hospitals"] },
-  { district: "Kandy", hospitals: ["Suwasewana Hospitals Pvt Ltd","Asiri Hospital Kandy (Pvt) Ltd","Surgical Care Hospital"] },
-];
+import { fetchHospitalLocations } from "../services/AppointmentsFindingService"; 
 
 const LocationDialog = ({ open, handleClose, onSelect }) => {
   const [search, setSearch] = useState("");
+  const [locations, setLocations] = useState([]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const loadData = async () => {
+      try {
+        const result = await fetchHospitalLocations();
+        setLocations(result);
+      } catch (error) {
+        console.error("Failed to load locations.");
+      }
+    };
+
+    loadData();
+  }, [open]);
 
   const filteredLocations = locations
     .map(({ district, hospitals }) => {
       const districtMatch = district.toLowerCase().includes(search.toLowerCase());
-      const filteredHospitals = hospitals.filter((hospital) =>
-        hospital.toLowerCase().includes(search.toLowerCase())
+      const filteredHospitals = hospitals.filter(h =>
+        h.toLowerCase().includes(search.toLowerCase())
       );
 
       return {
@@ -41,15 +48,19 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
     .filter(({ hospitals }) => hospitals.length > 0);
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" sx={{ "& .MuiDialog-paper": { border: "2px solid #4CAF50", borderRadius: "30px" } }} >
-      {/* Header */}
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="sm"
+      sx={{ "& .MuiDialog-paper": { border: "2px solid #4CAF50", borderRadius: "30px" } }}
+    >
       <div className="flex justify-between items-center px-5 py-3 border-b border-gray-300">
         <IconButton onClick={handleClose} className="text-gray-500">
           <CloseIcon />
         </IconButton>
       </div>
 
-      {/* Search Bar */}
       <DialogContent className="min-h-[300px] flex flex-col">
         <TextField
           fullWidth
@@ -60,14 +71,10 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        {/* Title */}
-        <div>
-          <h6 className="text-xs font-semibold relative top-4 mb-6 text-green-800">
-            Available Locations
-          </h6>
-        </div>
+        <Typography variant="subtitle2" className="text-green-800 font-semibold mb-6">
+          Available Locations
+        </Typography>
 
-        {/* Locations List */}
         <div className="flex-grow overflow-y-auto">
           <List>
             {filteredLocations.length === 0 ? (
@@ -75,12 +82,13 @@ const LocationDialog = ({ open, handleClose, onSelect }) => {
             ) : (
               filteredLocations.map(({ district, hospitals }, index) => (
                 <div key={index} className="mb-5">
-                  {/* District Name */}
-                  <Typography variant="h6" className="font-semibold text-gray-700 mb-2 pl-3">
+                  <Typography
+                    variant="h6"
+                    className="font-semibold text-gray-700 mb-2 pl-3"
+                  >
                     {district.toUpperCase()}
                   </Typography>
 
-                  {/* Hospitals List */}
                   {hospitals.map((hospital, i) => (
                     <ListItemButton
                       key={i}
