@@ -8,7 +8,6 @@ import NavBar from "../PatientComponents/navBar";
 
 
 const HealthRecords = () => {
-  // Simulated logged-in patient ID
   const patientId = "P021";
 
   return (
