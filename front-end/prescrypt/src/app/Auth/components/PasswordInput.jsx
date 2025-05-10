@@ -17,7 +17,7 @@ const PasswordInput = ({ value, onChange, error, ...props }) => {
       />
       <button
         type="button"
-        className="absolute inset-y-0 right-3 flex items-center text-gray-600"
+        className="absolute inset-y-1 right-3 flex items-center text-gray-600"
         onClick={() => setShowPassword(!showPassword)}
       >
         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
