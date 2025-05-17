@@ -21,7 +21,6 @@ const AdminNavBar = ({ patientId = "P021" }) => {
     const fetchData = async () => {
       try {
         setProfileImage(await getProfileImage(patientId));
-
         const { name, createdAt } = await getPatientDetails(patientId);
         setPatientName(name);
 
