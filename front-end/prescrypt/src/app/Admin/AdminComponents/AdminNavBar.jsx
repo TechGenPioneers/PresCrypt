@@ -9,10 +9,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const AdminNavBar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
+  const router = useRouter();
 
   const navItems = [
     { text: "Dashboard", image: "/image11.png",link: "/Admin/AdminDashboard"}, 
@@ -21,7 +24,25 @@ const AdminNavBar = () => {
     { text: "Doctors", image: "/image19.png",link: "/Admin/AdminDoctor" },
     { text: "Reports", image: "/image20.png",link: "/Admin/AdminReportGeneratorPage" },
   ];
+  const handleLogout = async () => {
+    const ok = window.confirm("Are you sure you want to log out?");
+    if (!ok) return;
 
+    try {
+      await axios.post(
+        "https://localhost:7021/api/User/logout",
+        null,
+        { withCredentials: true }
+      );
+    } catch (err) {
+      console.warn("Backend logout failed (may not be using cookies):", err);
+    }
+ 
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+  
+    router.push("/Auth/login");
+  };
   return (
     <aside
       className={`bg-white p-4 shadow-md flex flex-col items-center justify-between min-h-screen transition-all duration-100 ease-in-out fixed left-0 top-0 h-full ${
@@ -87,6 +108,7 @@ const AdminNavBar = () => {
 
       {/* Logout Button */}
       <button
+        onClick={handleLogout}
         className={`flex items-center p-2 rounded-full border-2 border-red-600 hover:bg-red-100 mb-10 ${
           isExpanded
             ? "justify-start space-x-3 cursor-pointer"

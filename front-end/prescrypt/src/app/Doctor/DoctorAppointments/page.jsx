@@ -11,7 +11,9 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { FaCalendarAlt } from "react-icons/fa";
 
+import useAuthGuard from "@/utils/useAuthGuard";
 export default function AppointmentsPage() {
+  useAuthGuard(["Doctor"]);
   const Title = "Appointments";
   const [appointments, setAppointments] = useState([]);
   const [availability, setAvailability] = useState([]);

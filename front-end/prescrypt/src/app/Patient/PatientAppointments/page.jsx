@@ -8,8 +8,11 @@ import CustomCalendar from "../PatientComponents/calender";
 import SearchBar from "../PatientComponents/searchBar";
 import BookingCard from "../PatientComponents/bookingCard";
 import dayjs from "dayjs";
+import useAuthGuard from "@/utils/useAuthGuard";
+import Chatbot from "../ChatbotComponents/chatbot";
 
 export default function Appointments() {
+  useAuthGuard(["Patient"]);
   const [date, setDate] = useState(dayjs());
   const [isExpanded, setIsExpanded] = useState(false);
   const [doctors, setDoctors] = useState([]); // Store doctors received from API
@@ -47,6 +50,7 @@ export default function Appointments() {
         </div>
       </div>
       <Nav setIsExpanded={setIsExpanded} isExpanded={isExpanded} />
+      <Chatbot />
       <Footer />
     </div>
   );
