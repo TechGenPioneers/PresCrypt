@@ -22,7 +22,7 @@ export const sendEmail = async (emailPayload) => {
   return await axios.post(`${BASE_URL}/PatientEmail`, emailPayload);
 };
 
-// Existing notification service
+
 export const sendNotification = async (notificationPayload) => {
   return await axios.post(`${BASE_URL}/PatientNotification/send`, notificationPayload);
 };
