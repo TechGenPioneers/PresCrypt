@@ -162,12 +162,24 @@ const SearchBar = ({ setDoctors }) => {
 
         {/* Find My Doctor */}
         <button
-          className="px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center"
+          className="px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center relative min-w-[160px]"
           onClick={handleFindDoctor}
           disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} color="inherit" /> : "Find my Doctor"}
+       >
+          {loading ? (
+            <>
+              <span className="invisible">Find my Doctor</span>
+              <CircularProgress
+                size={24}
+                color="inherit"
+                className="absolute"
+              />
+            </>
+          ) : (
+            "Find my Doctor"
+          )}
         </button>
+
       </div>
 
       {/* Dialogs */}
