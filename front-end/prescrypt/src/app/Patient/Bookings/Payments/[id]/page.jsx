@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState , createContext} from "react";
 import Header from "../../../../components/header/header";
 import Footer from "../../../../components/footer/footer";
 import NavBar from "../../../PatientComponents/navBar";
 import PaymentView from "../../../PatientComponents/paymentView";
+import { User } from "lucide-react";
+
+
+export const AppointmentContext = createContext();
 
 function PaymentClient({ id }) {
   const [appointmentData, setAppointmentData] = useState(null);
@@ -39,16 +43,22 @@ function PaymentClient({ id }) {
       <Header />
       <div className="flex justify-between w-full max-w-6xl mx-auto gap-8">
         {appointmentData && (
-          <PaymentView
-            paymentId={paymentId}
-            hospitalCharge={hospitalCharge}
-            doctorCharge={appointmentData.charge}
-            hospital={selectedLocation}
-            specialization={selectedSpecialization}
-            appointmentDate={appointmentData.selectedDate}
-            appointmentTime={appointmentData.appointmentTime}
-            doctorName={appointmentData.firstName  + " " + appointmentData.lastName} 
-          />
+          <AppointmentContext.Provider value= 
+            {{
+              paymentId,
+              hospitalCharge,
+              doctorCharge:appointmentData.charge,
+              hospitalName:selectedLocation, 
+              specialization:selectedSpecialization,
+              appointmentDate:appointmentData.selectedDate, 
+              appointmentTime:appointmentData.appointmentTime, 
+              doctorId:appointmentData.doctorId,
+              doctorFirstName:appointmentData.firstName,
+              doctorLastName:appointmentData.lastName
+            }}
+          >
+          <PaymentView/>
+          </AppointmentContext.Provider>
         )}
       </div>
       <Footer />
