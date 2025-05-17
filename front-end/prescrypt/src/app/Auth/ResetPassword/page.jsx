@@ -1,92 +1,195 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // Get URL parameters
-import { resetPassword } from "../../../utils/api"; // API call
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
+import SubmitButton from "../components/SubmitButton";
+import CardLayout from "../components/CardLayout";
+import Alert from "../components/Alert";
+import axios from "axios";
 
 export default function ResetPasswordPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams(); // Get query params
-  const token = searchParams.get("token");
-  const email = searchParams.get("email");
+  const searchParams = useSearchParams();
+  const token = decodeURIComponent(searchParams.get("token") || ""); // Decode URL-encoded token
+  const email = decodeURIComponent(searchParams.get("email") || ""); // Decode URL-encoded email
 
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  useEffect(() => {
-    if (!token || !email) {
-      setError("Invalid or expired reset link.");
-    }
-  }, [token, email]);
+  const validateForm = () => {
+    const newErrors = {};
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/; // Changed to 8+ chars
 
-  const handleResetPassword = async () => {
-    setError(null);
+    if (!formData.newPassword) {
+      newErrors.newPassword = "Password is required.";
+    } else if (!passwordPattern.test(formData.newPassword)) {
+      newErrors.newPassword =
+        "Must be 8+ chars with uppercase, lowercase, number, and special character.";
+    }
 
-    if (!newPassword || !confirmPassword) {
-      setError("Both fields are required.");
-      return;
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password.";
+    } else if (formData.newPassword !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
     }
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error for the current field when typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+    if (!validateForm()) return;
 
     setLoading(true);
-    try {
-      const response = await resetPassword({ email, token, newPassword });
+    setMessage("");
+    setErrors((prev) => ({ ...prev, submit: "" }));
 
-      if (response.success) {
-        setSuccess(true);
-        setTimeout(() => router.push("/Auth/Login"), 3000); // Redirect after success
-      } else {
-        setError(response.message || "Failed to reset password.");
+    try {
+      const response = await axios.post(
+        "https://localhost:7021/api/User/ResetPassword",
+        {
+          Email: email,
+          Token: token,
+          NewPassword: formData.newPassword,
+          ConfirmPassword: formData.confirmPassword,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+          timeout: 10000, // 10-second timeout
+        }
+      );
+
+      if (response.status === 200) {
+        setMessage(response.data.message || "Password reset successfully!");
+        // Clear form on success
+        setFormData({ newPassword: "", confirmPassword: "" });
       }
     } catch (err) {
-      setError("Error occurred. Please try again.");
+      let errorMessage = "Failed to reset password. Please try again.";
+
+      if (err.response) {
+        // Server responded with error status
+        errorMessage =
+          err.response.data?.message || `Server error: ${err.response.status}`;
+      } else if (err.request) {
+        // Request was made but no response
+        errorMessage = "No response from server. Check your connection.";
+      }
+
+      setErrors((prev) => ({ ...prev, submit: errorMessage }));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold text-center text-teal-700 mb-4">Reset Password</h2>
+    <CardLayout>
+      <h2 className="text-2xl font-semibold text-center text-gray-800">
+        Change Your Password
+      </h2>
+      <p className="text-sm text-gray-600 text-center mb-4">
+        Enter a new password below to change your password.
+      </p>
 
-        {error && <p className="text-red-500 text-sm text-center mb-3">{error}</p>}
-        {success ? (
-          <p className="text-green-500 text-sm text-center">Password reset successful! Redirecting...</p>
-        ) : (
-          <>
-            <input
-              type="password"
-              placeholder="New Password"
-              className="w-full px-4 py-2 mb-3 border border-gray-300 rounded-md"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              className="w-full px-4 py-2 mb-3 border border-gray-300 rounded-md"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            <button
-              className="w-full py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition"
-              onClick={handleResetPassword}
-              disabled={loading}
-            >
-              {loading ? "Resetting Password..." : "Reset Password"}
-            </button>
-          </>
+      <form onSubmit={handleSubmit}>
+        {" "}
+        {/* Added form tag for proper submission */}
+        {/* New Password Field */}
+        <div className="relative mb-4">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="newPassword"
+            placeholder="New password"
+            value={formData.newPassword}
+            onChange={handleChange}
+            className={`w-full p-3 pr-10 border rounded-lg focus:outline-none focus:ring-2 ${
+              errors.newPassword
+                ? "border-red-500 focus:ring-red-400"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
+            autoComplete="new-password" // Important for password managers
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+          {errors.newPassword && (
+            <p className="text-sm text-red-500 mt-1">{errors.newPassword}</p>
+          )}
+        </div>
+        {/* Confirm Password Field */}
+        <div className="relative mb-6">
+          {" "}
+          {/* Increased margin-bottom */}
+          <input
+            type={showConfirm ? "text" : "password"}
+            name="confirmPassword"
+            placeholder="Re-enter new password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className={`w-full p-3 pr-10 border rounded-lg focus:outline-none focus:ring-2 ${
+              errors.confirmPassword
+                ? "border-red-500 focus:ring-red-400"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
+            autoComplete="new-password"
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirm(!showConfirm)}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            aria-label={showConfirm ? "Hide password" : "Show password"}
+          >
+            {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+          {errors.confirmPassword && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.confirmPassword}
+            </p>
+          )}
+        </div>
+        {errors.submit && (
+          <Alert type="error" message={errors.submit} className="mb-4" />
         )}
+        {message && <Alert type="success" message={message} className="mb-4" />}
+        <SubmitButton
+          type="submit" // Changed to type="submit"
+          onClick={handleSubmit}
+          text="Reset password"
+          loading={loading}
+          disabled={loading} // Disable during submission
+          className="w-full"
+        />
+      </form>
+      <div className="mt-4 text-center">
+        <a
+          href="/Auth/login"
+          className="text-green-800 hover:text-teal-500 text-sm font-medium"
+        >
+          ← Back to Login
+        </a>
       </div>
-    </div>
+    </CardLayout>
   );
 }
