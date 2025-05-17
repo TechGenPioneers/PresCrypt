@@ -6,9 +6,11 @@ import axiosInstance from "../utils/axiosInstance";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import MedicalHistoryModal from "./Modals/MedicalHistoryModal";
 import RequestAccessModal from "./Modals/RequestAccessModal";
+import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as a Doctor
 
 export default function Page() {
   const Title = "Prescriptions";
+  useAuthGuard("Doctor"); 
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [doctorId, setDoctorId] = useState("D002");

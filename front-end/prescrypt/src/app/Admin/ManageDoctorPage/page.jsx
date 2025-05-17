@@ -4,8 +4,9 @@ import AdminNavBar from "../AdminComponents/AdminNavBar";
 import Footer from "@/app/Components/footer/Footer";
 import ManageDoctor from "../AdminComponents/ManageDoctor";
 import { Spinner } from "@material-tailwind/react";
-
+import useAuthGuard from "@/utils/useAuthGuard"; 
 const ManageDoctorPage = () => {
+  useAuthGuard("Admin"); 
   const [doctorData, setDoctorData] = useState(null); // Initialize as null
 
   // UseEffect to fetch doctor data from localStorage

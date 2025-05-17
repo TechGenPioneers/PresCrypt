@@ -1,18 +1,24 @@
+"use client"
+
 import Footer from "../../Components/footer/Footer";
 import Header from "../../Components/header/Header";
 import NavBar from "../PatientComponents/navBar";
 import PatientDashboard from "../PatientComponents/patientDashboard";
 import Link from "next/link"; // Import the Link component
 import Image from "next/image";
-
 import React from "react";
+import { useEffect } from "react";
+import useAuthGuard from "@/utils/useAuthGuard";
+import Chatbot from "../ChatbotComponents/chatbot";
 
 export default function Home() {
+ useAuthGuard(["Patient"]);
   return (
     <div>
       <Header/>
       <NavBar/>
       <PatientDashboard />
+      <Chatbot />
       <Footer/>
     </div>
   );

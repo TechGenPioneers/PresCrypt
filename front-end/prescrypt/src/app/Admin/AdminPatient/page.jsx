@@ -1,9 +1,11 @@
+"use client";
 import React from 'react';
 import AdminNavBar from '../AdminComponents/AdminNavBar';
 import Patients from '../AdminComponents/Patients';
 import Footer from '@/app/Components/footer/Footer';
-
+import useAuthGuard from "@/utils/useAuthGuard"; 
 const AdminPatientsPage = () => {
+    useAuthGuard("Admin"); 
     return (
         <div>
       <div className="flex">

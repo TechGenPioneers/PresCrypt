@@ -6,8 +6,10 @@ import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import axiosInstance from "../utils/axiosInstance";
 import Link from "next/link";
 import * as signalR from "@microsoft/signalr";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function Dashboard() {
+  useAuthGuard("Doctor");
   const Title = "Dashboard";
   const [profile, setProfile] = useState({ name: "", doctorImage: "" });
   const [loading, setLoading] = useState(false);
