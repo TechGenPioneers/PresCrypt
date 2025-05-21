@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://localhost:7021/api";
 
@@ -22,19 +23,23 @@ export const registerPatient = async (patientData) => {
   }
 };
 
+// Login User
 export const loginUser = async (loginData) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/User/Login`, loginData, {
       headers: {
         'Content-Type': 'application/json'
       },
-      validateStatus: (status) => status < 500 // Don't throw for 400 errors
+      validateStatus: (status) => status < 500 // Allow custom error handling
     });
 
-    console.log('Full response:', response); // Debug response
+    console.log('Full response:', response);
 
-    // Successful login (2xx status)
     if (response.data.token) {
+      // ✅ Store token and role in cookies
+      Cookies.set("token", response.data.token, { expires: 1 }); // 1 day expiry
+      Cookies.set("role", response.data.user.role, { expires: 1 });
+
       return {
         success: true,
         token: response.data.token,
@@ -42,7 +47,6 @@ export const loginUser = async (loginData) => {
       };
     }
 
-    // Handle special cases (like pending approval)
     if (response.data.message?.includes("pending approval")) {
       return {
         success: false,
@@ -51,7 +55,6 @@ export const loginUser = async (loginData) => {
       };
     }
 
-    // Default error case
     return {
       success: false,
       message: response.data.message || "Login failed"
@@ -65,7 +68,8 @@ export const loginUser = async (loginData) => {
     };
   }
 };
-// Forgot Password (Send Reset Email)
+
+// Forgot Password
 export const forgotPassword = async (data) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/Patient/ForgotPassword`, data);
@@ -75,7 +79,7 @@ export const forgotPassword = async (data) => {
   }
 };
 
-// Reset Password (After clicking reset link)
+// Reset Password
 export const resetPassword = async (data) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/Patient/ResetPassword`, data);
@@ -83,4 +87,10 @@ export const resetPassword = async (data) => {
   } catch (error) {
     return error.response?.data || { success: false, message: "Error resetting password." };
   }
+};
+
+// Logout Function (Optional)
+export const logout = () => {
+  Cookies.remove("token");
+  Cookies.remove("role");
 };
