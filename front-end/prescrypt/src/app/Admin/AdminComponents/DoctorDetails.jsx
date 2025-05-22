@@ -9,7 +9,7 @@ export default function DoctorDetails({ doctorID }) {
   const [dateTime, setDateTime] = useState(null);
   const router = useRouter();
   useEffect(() => {
-
+    //fetch doctor by id
     const fetchDoctor = async () => {
       const getDoctor = await GetDoctorById(doctorID);
       setDoctor(getDoctor);
@@ -41,6 +41,7 @@ export default function DoctorDetails({ doctorID }) {
     hour12: true,
   });
 
+  //check the doctor
   if (!doctor) {
     return (
       <div className="h-[650px] p-8 border-15 border-[#E9FAF2]">
@@ -72,6 +73,7 @@ export default function DoctorDetails({ doctorID }) {
 
   return (
     <div className="p-8 border-15 border-[#E9FAF2]">
+      {/*title*/}
       <h1 className="text-3xl font-bold mb-2">
         {doctor.doctor.doctorId} - {doctor.doctor.firstName}{" "}
         {doctor.doctor.lastName} - {doctor.doctor.specialization}.

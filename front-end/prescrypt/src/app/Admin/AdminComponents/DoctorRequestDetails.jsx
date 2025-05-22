@@ -24,6 +24,7 @@ const DoctorRequestDetails = ({ requestId }) => {
     reason: "",
   });
 
+  //get request by id
   const fetchRequest = async () => {
     const getRequest = await GetRequestById(requestId);
     setRequest(getRequest);
@@ -105,6 +106,7 @@ const DoctorRequestDetails = ({ requestId }) => {
   if (!request) {
     return (
       <div className="h-[650px] p-8 border-15 border-[#E9FAF2]">
+        {/*Title*/}
         <h1 className="text-3xl font-bold mb-2"> Doctor Request</h1>
         <div className="h-[400px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
           <div className="flex-grow flex items-center justify-center">
@@ -126,6 +128,7 @@ const DoctorRequestDetails = ({ requestId }) => {
   }
   return (
     <div className="p-8 border-15 border-[#E9FAF2]">
+      {/*Title*/}
       <h1 className="text-3xl font-bold mb-2">
         Doctor Request - {request.request.requestId} -{" "}
         {request.request.firstName} {request.request.lastName}
@@ -300,6 +303,7 @@ const DoctorRequestDetails = ({ requestId }) => {
           </div>
         </div>
       )}
+      {/*waiting component */}
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">

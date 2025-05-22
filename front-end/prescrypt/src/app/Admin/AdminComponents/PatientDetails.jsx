@@ -12,12 +12,14 @@ const PatientDetails = ({ patientId }) => {
   const [showModal, setShowModal] = useState(false);
   const [status, setStatus] = useState("");
 
+  //get patient by id
   const getPatientData = async () => {
     const getPatient = await GetPatientById(patientId);
     setPatientsData(getPatient);
     console.log("patientID:", patientId);
   };
 
+  //calculate the patient age
   function calculateAge(dobString) {
     const dob = new Date(dobString);
     const today = new Date();
@@ -66,7 +68,7 @@ const PatientDetails = ({ patientId }) => {
       }
       setIsLoading(false);
       getPatientData();
-      setShowModal(false); // Close modal after submit
+      setShowModal(false); 
     };
 
 
@@ -108,6 +110,7 @@ const PatientDetails = ({ patientId }) => {
 
   return (
     <div className="p-8 border-15 border-[#E9FAF2]">
+      {/* Title */}
       <h1 className="text-3xl font-bold mb-2">
         Patient - {patientData.patient.patientId} -{" "}
         {patientData.patient.firstName} {patientData.patient.lastName}
@@ -138,7 +141,7 @@ const PatientDetails = ({ patientId }) => {
           Manage Patient
         </button>
       </div>
-
+                {/* patient details */}
       <div className="flex mt-6 space-x-15 justify-center items-center">
         <div>
           <div className="w-24 h-24 bg-red-500 rounded-full mx-auto mb-3">
@@ -198,6 +201,7 @@ const PatientDetails = ({ patientId }) => {
           </div>
         </div>
       </div>
+      {/* patient appointments */}
       <h1 className="text-3xl font-bold mb-2 mt-10">Appointments</h1>
       <div className="overflow-x-auto mt-10">
         <div className="rounded-lg overflow-hidden">
@@ -390,6 +394,7 @@ const PatientDetails = ({ patientId }) => {
           </div>
         </div>
       )}
+      {/* loading component */}
       {isLoading && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center">
                       <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">

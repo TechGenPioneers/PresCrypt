@@ -8,6 +8,7 @@ const Patients = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [patients, setPatients] = useState([]);
 
+  //get all patients
   const getPatients = async () => {
     try {
       const patients = await GetPatients();

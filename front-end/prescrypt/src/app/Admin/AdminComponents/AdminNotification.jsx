@@ -19,6 +19,7 @@ const AdminNotification = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
+  //get all notifications
   const GetNotifications = async () => {
     try {
       const response = await GetAllNotifications();
@@ -89,6 +90,7 @@ const AdminNotification = () => {
     };
   }, [isSidebarVisible]);
 
+  //notification time based on triggered
   const timeAgo = (dateString) => {
     const now = new Date();
     const createdAt = new Date(dateString);
@@ -113,7 +115,7 @@ const AdminNotification = () => {
     return "just now";
   };
   
-
+// mark as read one notification
   const markAsRead = async (notificationId) => {
     try {
       const response = await MarkAsRead(notificationId);
@@ -132,6 +134,7 @@ const AdminNotification = () => {
     }
   };
 
+  //mark all as read
   const MarkAllRead = async () => {
     try {
       
@@ -177,7 +180,7 @@ const AdminNotification = () => {
             : "translate-x-full opacity-0"
         } overflow-hidden z-40`}
       >
-        {/* Sidebar Header */}
+        {/* notification Header */}
         <div className="flex justify-between items-center border-b pb-2 mb-4">
           <h3 className="text-xl font-semibold flex items-center">
             <Bell className="w-5 h-5 mr-2" /> Notifications

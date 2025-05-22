@@ -210,6 +210,7 @@ export default function DoctorRegistrationForm() {
 
   useEffect(() => {
     const loadData = async () => {
+      //get all hospitals
       const HospitalDetails = await GetHospitals();
       console.log(HospitalDetails);
       setHospitalsData(HospitalDetails); // Set doctor data as an array
@@ -487,7 +488,7 @@ export default function DoctorRegistrationForm() {
             </div>
           </div>
           <h3 className="font-semibold mb-2 mt-4">Selected Time Slots:</h3>
-
+              {/*availability table */}
           <div className="rounded-xl">
             <table className="w-full mt-5 border border-gray-200 rounded-xl">
               <thead className="bg-gray-100">
@@ -566,6 +567,7 @@ export default function DoctorRegistrationForm() {
           </div>
         </div>
       )}
+      {/*loading component */}
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
