@@ -36,7 +36,7 @@ export const loginUser = async (loginData) => {
     console.log('Full response:', response);
 
     if (response.data.token) {
-      // ✅ Store token and role in cookies
+      //  Store token and role in cookies
       Cookies.set("token", response.data.token, { expires: 1 }); // 1 day expiry
       Cookies.set("role", response.data.user.role, { expires: 1 });
 
