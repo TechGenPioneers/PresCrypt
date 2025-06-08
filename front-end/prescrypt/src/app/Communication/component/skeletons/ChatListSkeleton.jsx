@@ -1,34 +1,32 @@
-import { Users } from "lucide-react";
+"use client";
 
 const ChatListSkeleton = () => {
-  // Create 8 skeleton items
-  const skeletonContacts = Array(8).fill(null);
+  const skeletonItems = Array(6).fill(null);
 
   return (
-    <aside
-      className="flex flex-col w-20 h-full transition-all duration-200 border-r lg:w-72 border-base-300"
-    >
-      {/* Header */}
+    <aside className="flex flex-col w-full min-h-screen transition-all duration-200 border-base-300 bg-base-100">
       <div className="w-full p-5 border-b border-base-300">
         <div className="flex items-center gap-2">
-          <Users className="w-6 h-6" />
-          <span className="hidden font-medium lg:block">Contacts</span>
+          <span className="font-bold text-2xl">TeleHealth</span>
+        </div>
+
+        <div className="w-full mt-3">
+          <input
+            type="text"
+            placeholder="Search contacts..."
+            className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-1.5"
+          />
         </div>
       </div>
 
-      {/* Skeleton Contacts */}
-      <div className="w-full py-3 overflow-y-auto">
-        {skeletonContacts.map((_, idx) => (
-          <div key={idx} className="flex items-center w-full gap-3 p-3">
-            {/* Avatar skeleton */}
-            <div className="relative mx-auto lg:mx-0">
-              <div className="rounded-full skeleton size-12" />
-            </div>
-
-            {/* User info */}
-            <div className="flex-1 hidden min-w-0 text-left lg:block">
-              <div className="w-32 h-4 mb-2 skeleton" />
-              <div className="w-16 h-3 skeleton" />
+      <div className="w-full py-3 overflow-y-auto space-y-4 px-5">
+        {skeletonItems.map((_, idx) => (
+          <div key={idx} className="flex items-center gap-3 animate-pulse">
+            <div className="w-12 h-12 bg-gray-300 rounded-full" />
+            <div className="flex-1 space-y-2 hidden md:block">
+              <div className="h-4 w-32 bg-gray-300 rounded" />
+              <div className="h-3 w-20 bg-gray-200 rounded" />
             </div>
           </div>
         ))}
