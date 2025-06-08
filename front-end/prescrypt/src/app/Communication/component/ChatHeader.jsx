@@ -48,12 +48,12 @@ const ChatHeader = ({ selectedUser, setSelectedUser }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 relative" ref={dropdownRef}>
           <div
-            className="flex items-center gap-3 cursor-pointer hover:scale-105 transition-transform duration-200"
+            className="flex items-center gap-3 cursor-pointer hover:bg-emerald-100  py-1 pr-20 pl-2 rounded-md transition-colors duration-200"
             onClick={() => setMenuOpen(!menuOpen)}
           >
             <div className="relative">
               <div className="avatar">
-                <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-blue-500">
+                <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-emerald-200">
                   <img
                     src={selectedUser.profilePic || "profile.png"}
                     alt={selectedUser.fullName}
@@ -99,16 +99,16 @@ const ChatHeader = ({ selectedUser, setSelectedUser }) => {
           <button
             onClick={startCall}
             title="Start video call"
-            className="p-2 rounded-full hover:bg-blue-100 transition"
+            className="p-2 rounded-full hover:bg-emerald-100 transition"
           >
-            <Video className="w-6 h-6 text-blue-600" />
+            <Video className="w-6 h-6 text-emerald-700 cursor-pointer" />
           </button>
           <button
             onClick={() => setSelectedUser(null)}
             title="Close chat"
             className="p-2 rounded-full hover:bg-gray-100 transition"
           >
-            <X className="w-5 h-5 text-gray-600" />
+            <X className="w-5 h-5 text-gray-600 hover:text-red-500 cursor-pointer" />
           </button>
         </div>
       </div>

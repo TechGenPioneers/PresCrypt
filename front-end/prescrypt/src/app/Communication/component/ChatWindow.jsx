@@ -104,7 +104,7 @@ const ChatWindow = ({ selectedUser, setSelectedUser }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col flex-1 overflow-auto">
+    <div className="flex flex-col flex-1 min-h-0">
       <ChatHeader
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
@@ -124,7 +124,7 @@ const ChatWindow = ({ selectedUser, setSelectedUser }) => {
             {/* If message is from other user, show avatar on left */}
             {message.senderId !== authUser._id && (
               <div className="chat-image avatar mr-2">
-                <div className="border rounded-full w-10 h-10 overflow-hidden">
+                <div className="border border-emerald-600 rounded-full w-10 h-10 overflow-hidden">
                   <img
                     src={selectedUser.profilePic || "/avatar.png"}
                     alt="profile pic"
@@ -162,7 +162,7 @@ const ChatWindow = ({ selectedUser, setSelectedUser }) => {
             {/* If message is from authUser, show avatar on right */}
             {message.senderId === authUser._id && (
               <div className="chat-image avatar ml-2">
-                <div className="border rounded-full w-10 h-10 overflow-hidden">
+                <div className="border border-emerald-800 rounded-full w-10 h-10 overflow-hidden">
                   <img
                     src={authUser.profilePic || "/avatar.png"}
                     alt="profile pic"
