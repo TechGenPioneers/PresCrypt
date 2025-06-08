@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
+import ChatHeaderSkeleton from "./skeletons/ChatHeaderSkeleton";
 
 // Dummy auth user
 const authUser = {
@@ -95,7 +96,7 @@ const ChatWindow = ({ selectedUser, setSelectedUser }) => {
   if (isMessagesLoading) {
     return (
       <div className="flex flex-col flex-1 overflow-auto">
-        <ChatHeader />
+        <ChatHeaderSkeleton />
         <MessageSkeleton />
         <MessageInput />
       </div>
@@ -103,75 +104,76 @@ const ChatWindow = ({ selectedUser, setSelectedUser }) => {
   }
 
   return (
-    <div className="flex flex-col flex-1 overflow-auto">
+    <div className="min-h-screen flex flex-col flex-1 overflow-auto">
       <ChatHeader
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
       />
 
       <div className="flex-1 p-4 space-y-4 overflow-y-auto flex flex-col">
-  {messages.map((message, index) => (
-    <div
-      key={message._id}
-      ref={index === messages.length - 1 ? messageEndRef : null}
-      className={`flex items-end ${
-        message.senderId === authUser._id ? "justify-end" : "justify-start"
-      }`}
-    >
-      {/* If message is from other user, show avatar on left */}
-      {message.senderId !== authUser._id && (
-        <div className="chat-image avatar mr-2">
-          <div className="border rounded-full w-10 h-10 overflow-hidden">
-            <img
-              src={selectedUser.profilePic || "/avatar.png"}
-              alt="profile pic"
-              className="object-cover w-full h-full"
-            />
+        {messages.map((message, index) => (
+          <div
+            key={message._id}
+            ref={index === messages.length - 1 ? messageEndRef : null}
+            className={`flex items-end ${
+              message.senderId === authUser._id
+                ? "justify-end"
+                : "justify-start"
+            }`}
+          >
+            {/* If message is from other user, show avatar on left */}
+            {message.senderId !== authUser._id && (
+              <div className="chat-image avatar mr-2">
+                <div className="border rounded-full w-10 h-10 overflow-hidden">
+                  <img
+                    src={selectedUser.profilePic || "/avatar.png"}
+                    alt="profile pic"
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="max-w-[70%]">
+              <div className="mb-1 chat-header text-right">
+                <time className="ml-1 text-xs opacity-50">
+                  {formatMessageTime(message.createdAt)}
+                </time>
+              </div>
+
+              <div
+                className={`flex flex-col chat-bubble p-3 rounded-lg break-words ${
+                  message.senderId === authUser._id
+                    ? "bg-[#E9FAF2] text-gray-800 rounded-br-none"
+                    : "bg-gray-200 text-gray-900 rounded-bl-none"
+                }`}
+              >
+                {message.image && (
+                  <img
+                    src={message.image}
+                    alt="Attachment"
+                    className="sm:max-w-[200px] rounded-md mb-2"
+                  />
+                )}
+                {message.text && <p>{message.text}</p>}
+              </div>
+            </div>
+
+            {/* If message is from authUser, show avatar on right */}
+            {message.senderId === authUser._id && (
+              <div className="chat-image avatar ml-2">
+                <div className="border rounded-full w-10 h-10 overflow-hidden">
+                  <img
+                    src={authUser.profilePic || "/avatar.png"}
+                    alt="profile pic"
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
-
-      <div className="max-w-[70%]">
-        <div className="mb-1 chat-header text-right">
-          <time className="ml-1 text-xs opacity-50">
-            {formatMessageTime(message.createdAt)}
-          </time>
-        </div>
-
-        <div
-          className={`flex flex-col chat-bubble p-3 rounded-lg break-words ${
-            message.senderId === authUser._id
-              ? "bg-[#E9FAF2] text-gray-800 rounded-br-none"
-              : "bg-gray-200 text-gray-900 rounded-bl-none"
-          }`}
-        >
-          {message.image && (
-            <img
-              src={message.image}
-              alt="Attachment"
-              className="sm:max-w-[200px] rounded-md mb-2"
-            />
-          )}
-          {message.text && <p>{message.text}</p>}
-        </div>
+        ))}
       </div>
-
-      {/* If message is from authUser, show avatar on right */}
-      {message.senderId === authUser._id && (
-        <div className="chat-image avatar ml-2">
-          <div className="border rounded-full w-10 h-10 overflow-hidden">
-            <img
-              src={authUser.profilePic || "/avatar.png"}
-              alt="profile pic"
-              className="object-cover w-full h-full"
-            />
-          </div>
-        </div>
-      )}
-    </div>
-  ))}
-</div>
-
 
       <MessageInput />
     </div>
