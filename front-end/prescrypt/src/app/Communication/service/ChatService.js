@@ -40,4 +40,14 @@ const MarkMessagesAsRead = async (senderId,receiverId) => {
         throw error;
     }
 }
-export {GetUsers,GetAllMessages,SendMessage,MarkMessagesAsRead}
+
+const DeleteMessage = async (messageId) => {
+    try {
+        const response = await axios.delete(`${baseUrl}?messageId=${messageId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Failed to send message", error);
+        throw error;
+    }
+}
+export {GetUsers,GetAllMessages,SendMessage,MarkMessagesAsRead,DeleteMessage}

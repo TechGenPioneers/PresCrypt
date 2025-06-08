@@ -5,8 +5,8 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import ChatHeaderSkeleton from "./skeletons/ChatHeaderSkeleton";
-import { GetAllMessages, MarkMessagesAsRead } from "../service/ChatService";
-
+import { DeleteMessage, GetAllMessages, MarkMessagesAsRead } from "../service/ChatService";
+import { EllipsisVertical, Trash2  } from "lucide-react"; 
 // Utility: Format HH:mm
 const formatMessageTime = (date) =>
   new Date(date).toLocaleTimeString([], {
@@ -39,7 +39,9 @@ const getDateLabel = (date) => {
 const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [menuOpenId, setMenuOpenId] = useState(null);
   const messageEndRef = useRef(null);
+  const menuRef = useRef(null);
 
   // Re-render every minute to update timestamps
   const [, setTimeTick] = useState(0);
@@ -82,6 +84,32 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Close menu if click outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpenId(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Delete message 
+  const handleDeleteMessage = async (messageId) => {
+    try {
+     
+      const response = await DeleteMessage(messageId);
+      setMenuOpenId(null);
+      fetchUsers();
+      fetchMessages();
+    } catch (err) {
+      console.error("Failed to delete message", err);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col flex-1 overflow-auto">
@@ -94,10 +122,7 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <ChatHeader
-        selectedUser={selectedUser}
-        setSelectedUser={setSelectedUser}
-      />
+      <ChatHeader selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
 
       <div className="flex-1 p-4 space-y-4 overflow-y-auto flex flex-col">
         {messages.length === 0 && (
@@ -117,7 +142,7 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
             const isSelf = msg.senderId === userId;
 
             return (
-              <div key={msg.id}>
+              <div key={msg.id} className="relative group">
                 {showDate && (
                   <div className="flex justify-center my-2">
                     <span className="text-sm text-gray-500 bg-gray-200 px-3 py-1 rounded-full">
@@ -128,9 +153,7 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
 
                 <div
                   ref={i === messages.length - 1 ? messageEndRef : null}
-                  className={`flex items-end ${
-                    isSelf ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex items-end ${isSelf ? "justify-end" : "justify-start"}`}
                 >
                   {!isSelf && (
                     <div className="avatar mr-2">
@@ -144,7 +167,20 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
                     </div>
                   )}
 
-                  <div className="max-w-[70%]">
+                  <div className="max-w-[70%] relative">
+                    {/* 3-dot menu button (only for self messages) */}
+                    {isSelf && (
+                      <button
+                        onClick={() =>
+                          setMenuOpenId(menuOpenId === msg.id ? null : msg.id)
+                        }
+                        className="absolute top-2 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out cursor-pointer z-10"
+                        aria-label="Open message menu"
+                      >
+                        <EllipsisVertical className="w-5 h-5 text-gray-500 hover:text-gray-700" />
+                      </button>
+                    )}
+
                     <div
                       className={`flex flex-col chat-bubble p-2 rounded-lg break-words ${
                         isSelf
@@ -164,6 +200,22 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
                         {formatMessageTime(msg.sendAt)}
                       </time>
                     </div>
+
+                    {/* Menu dropdown */}
+                    {menuOpenId === msg.id && (
+                      <ul
+                        ref={menuRef}
+                        className="absolute top-0 right-0 z-0 w-48 rounded-md border bg-white p-2 shadow-xl space-y-1"
+                      >
+                        <li>
+                          <button 
+                           onClick={() => handleDeleteMessage(msg.id)}
+                          className="w-full flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 p-2 rounded-md transition">
+                            <Trash2  /> delete
+                          </button>
+                        </li>
+                      </ul>
+                    )}
                   </div>
 
                   {isSelf && (

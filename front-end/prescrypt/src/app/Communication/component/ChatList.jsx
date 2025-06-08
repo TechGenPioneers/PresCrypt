@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ChatListSkeleton from "./skeletons/ChatListSkeleton";
-import { GetUsers } from "../service/ChatService";
+import { GetAllMessages } from "../service/ChatService";
 
 const formatMessageTime = (date) => {
   const msgDate = new Date(date);
@@ -43,10 +43,38 @@ const ChatList = ({
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [hasFetched, setHasFetched] = useState(false);
+  const [unreadCounts, setUnreadCounts] = useState({});
+
+  // Fetch messages for each user once
+  useEffect(() => {
+    const fetchUnreadCounts = async () => {
+      const counts = {};
+      await Promise.all(
+        users.map(async (user) => {
+          try {
+            const messages = await GetAllMessages(userId, user.receiverId);
+            const count = messages.filter(
+              (msg) =>
+                !msg.isRead &&
+                msg.senderId === user.receiverId &&
+                msg.receiverId === userId
+            ).length;
+            counts[user.receiverId] = count;
+          } catch (err) {
+            console.error("Failed to fetch messages for", user.receiverId);
+          }
+        })
+      );
+      setUnreadCounts(counts);
+    };
+
+    if (users && users.length > 0) {
+      fetchUnreadCounts();
+    }
+  }, [users, userId]);
 
   useEffect(() => {
     fetchUsers();
-    
   }, []);
 
   useEffect(() => {
@@ -63,8 +91,11 @@ const ChatList = ({
       );
     }
 
+    // Sort by latest message time descending
+    filtered.sort((a, b) => new Date(b.sendAt) - new Date(a.sendAt));
+
     setFilteredUsers(filtered);
-  }, [users, onlineUsers, searchTerm]);
+  }, [users, searchTerm]);
 
   if (!hasFetched && isUsersLoading) return <ChatListSkeleton />;
 
@@ -90,65 +121,74 @@ const ChatList = ({
 
       {/* Scrollable User List */}
       <div className="w-full py-3 h-screen overflow-auto scroll-smooth">
-        {filteredUsers.map((user) => (
-          <button
-            key={user.receiverId}
-            onClick={() => setSelectedUser(user)}
-            className={`w-full p-3 flex items-center gap-3 rounded-lg transition-colors duration-200 cursor-pointer select-none
+        {filteredUsers.map((user) => {
+          const unread = unreadCounts[user.receiverId] || 0;
+
+          return (
+            <button
+              key={user.receiverId}
+              onClick={() => setSelectedUser(user)}
+              className={`w-full p-3 flex items-center gap-3 rounded-lg transition-colors duration-200 cursor-pointer select-none
               ${
                 selectedUser && selectedUser.receiverId === user.receiverId
                   ? "bg-[#E9FAF2] text-gray-600 shadow-md"
                   : "bg-transparent text-gray-900 hover:bg-[#E9FAF2]/50"
               }`}
-          >
-            {/* Avatar */}
-            <div className="relative">
-              <div className="avatar">
-                <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-emerald-200">
-                  <img
-                    src={user.image || "profile.png"}
-                    alt={user.fullName}
-                    className="object-cover w-full h-full"
-                  />
+            >
+              {/* Avatar */}
+              <div className="relative">
+                <div className="avatar">
+                  <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-emerald-200">
+                    <img
+                      src={user.image || "profile.png"}
+                      alt={user.fullName}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
                 </div>
-              </div>
-              <span
-                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${
-                  onlineUsers.includes(user.id)
-                    ? "bg-green-500 animate-pingOnce"
-                    : "bg-gray-400"
-                }`}
-              />
-            </div>
-
-            {/* User Info */}
-            <div className="flex flex-col justify-between w-full text-left relative">
-              <div className="flex justify-between items-center">
-                <div className="font-medium truncate" title={user.fullName}>
-                  {user.fullName}
-                </div>
-                <div className="flex items-center gap-2 ml-2">
-                  <time className="text-xs opacity-50 whitespace-nowrap">
-                    {formatMessageTime(user.sendAt)}
-                  </time>
-                </div>
+                <span
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${
+                    onlineUsers.includes(user.id)
+                      ? "bg-green-500 animate-pingOnce"
+                      : "bg-gray-400"
+                  }`}
+                />
               </div>
 
-              <div
-                className={`text-sm truncate ${
-                  !user.isRead && user.lastMessageSenderId !== userId
-                    ? "text-emerald-600 font-semibold"
-                    : "text-zinc-400"
-                }`}
-                title={user.lastMessage}
-              >
-                {user.lastMessageSenderId === userId
-                  ? `You: ${user.lastMessage}`
-                  : `${user.fullName}: ${user.lastMessage}`}
+              {/* User Info */}
+              <div className="flex flex-col justify-between w-full text-left relative">
+                <div className="flex justify-between items-center">
+                  <div className="font-medium truncate" title={user.fullName}>
+                    {user.fullName}
+                  </div>
+                  <div className="flex flex-col items-end gap-0 ml-2">
+                    <time className="text-xs opacity-50 whitespace-nowrap">
+                      {formatMessageTime(user.sendAt)}
+                    </time>
+                    {unread > 0 && (
+                      <span className="bg-emerald-500 text-white text-xs font-semibold px-2 py-0.5  rounded-full mt-0.5">
+                        {unread}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div
+                  className={`text-sm truncate ${
+                    !user.isRead && user.lastMessageSenderId !== userId
+                      ? "text-emerald-600 font-semibold"
+                      : "text-zinc-400"
+                  }`}
+                  title={user.lastMessage}
+                >
+                  {user.lastMessageSenderId === userId
+                    ? `You: ${user.lastMessage}`
+                    : `${user.fullName}: ${user.lastMessage}`}
+                </div>
               </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
 
         {filteredUsers.length === 0 && (
           <div className="py-4 text-center text-zinc-500">No users found</div>
