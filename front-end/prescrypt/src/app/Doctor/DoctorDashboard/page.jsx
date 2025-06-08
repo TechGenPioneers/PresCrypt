@@ -316,7 +316,7 @@ export default function Dashboard() {
                           ? "--"
                           : dashboardData.upcomingAppointments}
                       </p>
-                      <p className="text-sm text-gray-500">Today</p>
+                      
                     </div>
 
                     <div className="bg-[#E9FAF2] p-6 rounded-[20px] shadow-lg flex items-center justify-center transition hover:bg-[#D4E9EA] cursor-pointer">
