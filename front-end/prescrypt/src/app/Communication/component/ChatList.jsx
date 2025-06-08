@@ -74,30 +74,32 @@ const ChatList = ({ selectedUser, setSelectedUser }) => {
         </div>
       </div>
 
-      <div className="w-full py-3 overflow-y-auto">
+            <div className="w-full py-3 overflow-y-auto">
         {filteredUsers.map((user) => (
           <button
             key={user._id}
             onClick={() => setSelectedUser(user)}
             className={`w-full p-3 flex items-center gap-3 rounded-lg transition-colors duration-200 cursor-pointer select-none
-    ${
-      selectedUser && selectedUser._id === user._id
-        ? "bg-[#E9FAF2] text-gray-600 shadow-md"
-        : "bg-transparent text-gray-900 hover:bg-[#E9FAF2]/50"
-    }`}
+              ${
+                selectedUser && selectedUser._id === user._id
+                  ? "bg-[#E9FAF2] text-gray-600 shadow-md"
+                  : "bg-transparent text-gray-900 hover:bg-[#E9FAF2]/50"
+              }`}
           >
-            <div className="relative inline-flex">
+            {/* Avatar - Hidden on small screens, visible from md+ */}
+            <div className="relative hidden md:inline-flex">
               <img
                 src={user.profilePic || "profile.png"}
                 alt="avatar"
-                className="inline-block relative object-cover object-center rounded-full w-12 h-12"
+                className="relative object-cover object-center rounded-full w-12 h-12"
               />
               {onlineUsers.includes(user._id) && (
-                <span className="absolute min-w-[12px] min-h-[12px] rounded-full py-1 px-1 text-xs font-medium content-[''] leading-none grid place-items-center top-[14%] right-[14%] translate-x-2/4 -translate-y-2/4 bg-green-500 text-white border border-white"></span>
+                <span className="absolute min-w-[12px] min-h-[12px] rounded-full py-1 px-1 text-xs font-medium leading-none grid place-items-center top-[14%] right-[14%] translate-x-2/4 -translate-y-2/4 bg-green-500 text-white border border-white"></span>
               )}
             </div>
 
-            <div className="hidden min-w-0 text-left md:block">
+            {/* Text Info */}
+            <div className="min-w-0 text-left">
               <div className="font-medium truncate">{user.fullName}</div>
               <div className="text-sm text-zinc-400">
                 {onlineUsers.includes(user._id) ? "Online" : "Offline"}
@@ -110,7 +112,7 @@ const ChatList = ({ selectedUser, setSelectedUser }) => {
           <div className="py-4 text-center text-zinc-500">No users found</div>
         )}
       </div>
-    </aside>
+      </aside>
   );
 };
 
