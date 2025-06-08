@@ -4,29 +4,49 @@ import { useEffect, useState } from "react";
 import ChatListSkeleton from "./skeletons/ChatListSkeleton";
 import { GetUsers } from "../service/ChatService";
 
-const ChatList = ({ selectedUser, setSelectedUser }) => {
+const formatMessageTime = (date) => {
+  const msgDate = new Date(date);
+  const now = new Date();
+
+  const isSameDay = (d1, d2) =>
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate() - 1);
+
+  if (isSameDay(msgDate, now)) {
+    return msgDate.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  } else if (isSameDay(msgDate, yesterday)) {
+    return "Yesterday";
+  } else {
+    return msgDate.toLocaleDateString([], {
+      weekday: "short",
+    });
+  }
+};
+
+const ChatList = ({
+  selectedUser,
+  setSelectedUser,
+  userId,
+  fetchUsers,
+  users,
+  isUsersLoading,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [isUsersLoading, setIsUsersLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
-
-  const fetchUsers = async () => {
-    setIsUsersLoading(true);
-    try {
-      const response = await GetUsers();
-      setUsers(response || []);
-      setHasFetched(true);
-    } catch (error) {
-      console.error("Failed to fetch users", error);
-    } finally {
-      setIsUsersLoading(false);
-    }
-  };
 
   useEffect(() => {
     fetchUsers();
+    
   }, []);
 
   useEffect(() => {
@@ -82,23 +102,49 @@ const ChatList = ({ selectedUser, setSelectedUser }) => {
               }`}
           >
             {/* Avatar */}
-            <div className="relative hidden md:inline-flex">
-              <img
-                src={user.profilePic || "profile.png"}
-                alt={user.fullName}
-                onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
-                className="object-cover object-center rounded-full w-12 h-12"
+            <div className="relative">
+              <div className="avatar">
+                <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-emerald-200">
+                  <img
+                    src={user.image || "profile.png"}
+                    alt={user.fullName}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              </div>
+              <span
+                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${
+                  onlineUsers.includes(user.id)
+                    ? "bg-green-500 animate-pingOnce"
+                    : "bg-gray-400"
+                }`}
               />
-              {onlineUsers.includes(user.id) && (
-                <span className="absolute min-w-[12px] min-h-[12px] rounded-full py-1 px-1 text-xs font-medium leading-none grid place-items-center top-[14%] right-[14%] translate-x-2/4 -translate-y-2/4 bg-green-500 text-white border border-white"></span>
-              )}
             </div>
 
             {/* User Info */}
-            <div className="min-w-0 text-left">
-              <div className="font-medium truncate">{user.fullName}</div>
-              <div className="text-sm text-zinc-400">
-                {onlineUsers.includes(user.id) ? "Online" : "Offline"}
+            <div className="flex flex-col justify-between w-full text-left relative">
+              <div className="flex justify-between items-center">
+                <div className="font-medium truncate" title={user.fullName}>
+                  {user.fullName}
+                </div>
+                <div className="flex items-center gap-2 ml-2">
+                  <time className="text-xs opacity-50 whitespace-nowrap">
+                    {formatMessageTime(user.sendAt)}
+                  </time>
+                </div>
+              </div>
+
+              <div
+                className={`text-sm truncate ${
+                  !user.isRead && user.lastMessageSenderId !== userId
+                    ? "text-emerald-600 font-semibold"
+                    : "text-zinc-400"
+                }`}
+                title={user.lastMessage}
+              >
+                {user.lastMessageSenderId === userId
+                  ? `You: ${user.lastMessage}`
+                  : `${user.fullName}: ${user.lastMessage}`}
               </div>
             </div>
           </button>
