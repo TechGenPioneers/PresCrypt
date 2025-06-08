@@ -135,14 +135,8 @@ const ChatWindow = ({ selectedUser, setSelectedUser }) => {
             )}
 
             <div className="max-w-[70%]">
-              <div className="mb-1 chat-header text-right">
-                <time className="ml-1 text-xs opacity-50">
-                  {formatMessageTime(message.createdAt)}
-                </time>
-              </div>
-
               <div
-                className={`flex flex-col chat-bubble p-3 rounded-lg break-words ${
+                className={`flex flex-col chat-bubble p-2 rounded-lg break-words ${
                   message.senderId === authUser._id
                     ? "bg-[#E9FAF2] text-gray-800 rounded-br-none"
                     : "bg-gray-200 text-gray-900 rounded-bl-none"
@@ -152,10 +146,15 @@ const ChatWindow = ({ selectedUser, setSelectedUser }) => {
                   <img
                     src={message.image}
                     alt="Attachment"
-                    className="sm:max-w-[200px] rounded-md mb-2"
+                    className="sm:max-w-[200px] rounded-md"
                   />
                 )}
                 {message.text && <p>{message.text}</p>}
+                <div className="text-right">
+                  <time className="ml-1 text-xs opacity-50">
+                    {formatMessageTime(message.createdAt)}
+                  </time>
+                </div>
               </div>
             </div>
 
