@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
+import ChatListSkeleton from "./skeletons/ChatListSkeleton";
 
 const dummyUsers = [
   {
@@ -34,7 +35,7 @@ const ChatList = ({ selectedUser, setSelectedUser }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [users, setUsers] = useState(dummyUsers);
   const [filteredUsers, setFilteredUsers] = useState([]);
-
+  const [isUsersLoading, setIsUsersLoading] = useState(false);
   useEffect(() => {
     setOnlineUsers(dummyOnlineUsers);
   }, []);
@@ -51,8 +52,11 @@ const ChatList = ({ selectedUser, setSelectedUser }) => {
     setFilteredUsers(filtered);
   }, [users, onlineUsers, searchTerm]);
 
+  //want to update
+  if (isUsersLoading) return <ChatListSkeleton />;
+
   return (
-    <aside className="flex flex-col w-full h-full transition-all duration-200 border-base-300 bg-base-100">
+    <aside className="flex flex-col w-full min-h-screen transition-all duration-200 border-base-300 bg-base-100">
       <div className="w-full p-5 border-b border-base-300">
         <div className="flex items-center gap-2">
           <span className="font-bold text-2xl">TeleHealth</span>
@@ -72,16 +76,16 @@ const ChatList = ({ selectedUser, setSelectedUser }) => {
 
       <div className="w-full py-3 overflow-y-auto">
         {filteredUsers.map((user) => (
-         <button
-  key={user._id}
-  onClick={() => setSelectedUser(user)}
-  className={`w-full p-3 flex items-center gap-3 rounded-lg transition-colors duration-200 cursor-pointer select-none
+          <button
+            key={user._id}
+            onClick={() => setSelectedUser(user)}
+            className={`w-full p-3 flex items-center gap-3 rounded-lg transition-colors duration-200 cursor-pointer select-none
     ${
       selectedUser && selectedUser._id === user._id
         ? "bg-[#E9FAF2] text-gray-600 shadow-md"
         : "bg-transparent text-gray-900 hover:bg-[#E9FAF2]/50"
     }`}
->
+          >
             <div className="relative inline-flex">
               <img
                 src={user.profilePic || "profile.png"}
