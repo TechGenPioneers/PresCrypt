@@ -1,52 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import ChatList from "./ChatList";
-import ChatWindow from "./ChatWindow";
+import ChatList from "./component/ChatList";
+import ChatWindow from "./component/ChatWindow";
+import NoChatSelected from "./component/NoChatSelected";
 import VideoCall from "./VideoCall";
+import { Video } from "lucide-react";
 import "./styles/telehealth.css"; // Import the CSS file
 
 const Layout = () => {
-  const contacts = [
-    { name: "Dr. John Doe", recentMessage: "Hello, how can I assist you?", id: 1 },
-    { name: "Dr. Jane Smith", recentMessage: "Let's discuss your symptoms.", id: 2 },
-  ];
-
-  // Set the first contact as the default selected contact
-  const [selectedContact, setSelectedContact] = useState(contacts[0]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
-
-  const selectChat = (contact) => {
-    setSelectedContact(contact);
-    setMessages([]); // Fetch chat history for the contact
-  };
 
   const sendMessage = (message) => {
     setMessages([...messages, { sender: "patient", text: message }]);
   };
 
-  const startCall = () => {
-    console.log("Starting video call with", selectedContact.name);
-  };
-
   return (
-    <div className="telehealth-app">
+    <div className="flex min-h-screen">
       {/* Left side - Chat Contacts */}
-      <div className="left-side">
-        <ChatList contacts={contacts} selectChat={selectChat} selectedContact={selectedContact} />
+      <div className="w-1/4 bg-white text-black p-4 overflow-y-auto border-[3px] border-[#006369] m-5">
+        <ChatList
+          selectedUser={selectedUser}
+          setSelectedUser={setSelectedUser}
+        />
       </div>
 
       {/* Right side - Chat Window & Video Call */}
       <div className="right-side">
-        {selectedContact && (
-          <>
-            <VideoCall startCall={startCall} />
-            <ChatWindow
-              selectedContact={selectedContact}
-              messages={messages}
-              sendMessage={sendMessage}
-            />
-          </>
+        {selectedUser !== null ? (
+          <ChatWindow
+            selectedUser={selectedUser}
+            setSelectedUser={setSelectedUser}
+            messages={messages}
+            sendMessage={sendMessage}
+          />
+        ) : (
+          <NoChatSelected />
         )}
       </div>
     </div>
