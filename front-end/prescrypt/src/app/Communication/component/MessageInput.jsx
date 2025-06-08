@@ -3,8 +3,10 @@ import { useRef, useState, useEffect } from "react";
 import { Image, Send, Smile, X } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import toast from "react-hot-toast";
+import { SendMessage } from "../service/ChatService";
 
-const MessageInput = () => {
+const MessageInput = ({selectedUser,fetchMessages}) => {
+  const userId="P002"
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -31,17 +33,30 @@ const MessageInput = () => {
   };
 
   const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!text.trim() && !imagePreview) return;
+  e.preventDefault();
+  if (!text.trim() && !imagePreview) return;
 
-    try {
-      setText("");
-      setImagePreview(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    } catch (error) {
-      console.error("Failed to send message:", error);
-    }
-  };
+  try {
+    const messagePayload = {
+      SenderId: userId,      
+      ReceiverId: selectedUser.receiverId, 
+      Text: text.trim(),
+      Image: imagePreview || null,  // base64 image string or null
+    };
+
+    // Send messagePayload to your API or SignalR sendMessage method
+    const response = await SendMessage(messagePayload);
+    await fetchMessages()
+
+    // Reset inputs
+    setText("");
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  } catch (error) {
+    console.error("Failed to send message:", error);
+  }
+};
+
 
   const handleEmojiClick = (emojiData) => {
     setText((prev) => prev + emojiData.emoji);

@@ -14,7 +14,7 @@ const Layout = () => {
 
   return (
     <div className="flex h-screen p-2 gap-2">
-  <div className="w-1/4 bg-white text-black p-4 border-[3px] border-[#006369] overflow-y-auto rounded-xl">
+  <div className="w-1/4 bg-white text-black border-[3px] border-[#006369] overflow-y-auto rounded-xl">
     <ChatList
       selectedUser={selectedUser}
       setSelectedUser={setSelectedUser}
