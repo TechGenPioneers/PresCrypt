@@ -69,7 +69,8 @@ const RequestReportDialog = ({ open, handleClose }) => {
           Request Appointment Report
           <IconButton
             onClick={handleClose}
-            className="absolute right-4 top-4 text-gray-700 hover:text-gray-900 z-10"
+            className="
+             left-65 text-gray-500 hover:text-gray-800"
           >
             <CloseIcon />
           </IconButton>

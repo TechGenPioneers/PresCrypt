@@ -117,7 +117,7 @@ const PaymentAtLocation = ({selectedMethod, totalCharge, onlineFee}) => {
           merchant_id: obj.merchant_id,
           return_url: "http://localhost:3000",
           cancel_url: "http://localhost:3000",
-          notify_url: "http://sample.com/notify",
+          notify_url: "",
           order_id: obj.order_id,
           items: obj.items,
           amount: obj.amount,
@@ -130,9 +130,9 @@ const PaymentAtLocation = ({selectedMethod, totalCharge, onlineFee}) => {
           address: obj.address,
           city: obj.city,
           country: obj.country,
-          delivery_address: "No. 46, Galle road, Kalutara South",
-          delivery_city: "Kalutara",
-          delivery_country: "Sri Lanka",
+          delivery_address: "",
+          delivery_city: "",
+          delivery_country: "",
         };
 
         window.payhere.startPayment(payment);
@@ -155,11 +155,10 @@ const PaymentAtLocation = ({selectedMethod, totalCharge, onlineFee}) => {
 
     try {
       await addPayment(paymentPayload);
-
       const appointmentData = {
-        patientId: patientId || "P021",
-        doctorId: doctorId || "D008",
-        hospitalId: hospitalId || "H027",
+        patientId: patientId ,
+        doctorId: doctorId ,
+        hospitalId: hospitalId,
         date: appointmentDate,
         time: appointmentTime,
         paymentId,
