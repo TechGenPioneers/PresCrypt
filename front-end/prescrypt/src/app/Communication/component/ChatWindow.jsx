@@ -53,7 +53,6 @@ const ChatWindow = ({
   const messageEndRef = useRef(null);
   const menuRef = useRef(null);
 
-
   const [, setTimeTick] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -63,22 +62,21 @@ const ChatWindow = ({
   }, []);
 
   const fetchMessages = useCallback(async () => {
-  setIsLoading(true);
-  try {
-    const data = await GetAllMessages(userId, selectedUser.receiverId);
-    setMessages(data);
-  } catch (err) {
-    if (err.response && err.response.status === 404) {
-      console.warn("No messages found for this conversation.");
-      setMessages([]); // Clear messages or handle as needed
-    } else {
-      console.error("Error loading messages:", err);
+    setIsLoading(true);
+    try {
+      const data = await GetAllMessages(userId, selectedUser.receiverId);
+      setMessages(data);
+    } catch (err) {
+      if (err.response && err.response.status === 404) {
+        console.warn("No messages found for this conversation.");
+        setMessages([]); // Clear messages or handle as needed
+      } else {
+        console.error("Error loading messages:", err);
+      }
+    } finally {
+      setIsLoading(false);
     }
-  } finally {
-    setIsLoading(false);
-  }
-}, [userId, selectedUser.receiverId]);
-
+  }, [userId, selectedUser.receiverId]);
 
   const markAsRead = useCallback(async () => {
     try {
@@ -87,7 +85,7 @@ const ChatWindow = ({
     } catch (error) {
       console.error("Error marking messages as read:", error);
     }
-  }, [userId, selectedUser.receiverId,messages]);
+  }, [userId, selectedUser.receiverId, messages]);
 
   useEffect(() => {
     fetchMessages();
@@ -142,21 +140,35 @@ const ChatWindow = ({
     };
   }, [connection, userId, handleReceiveMessage]);
 
-useEffect(() => {
-  const container = messageEndRef.current;
-  if (!container) return;
+  useEffect(() => {
+    if (!connection) return;
 
-  // Check if user is near bottom before update
-  const isNearBottom = 
-    container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+    const handleDeleted = (deletedId) => {
+      setMessages((prev) => prev.filter((msg) => msg.id !== deletedId));
+    };
 
-  if (isNearBottom) {
-    // Scroll to bottom smoothly
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }
-  // else do nothing, so user scroll position stays where it is
-}, [messages]);
+    connection.on("MessageDeleted", handleDeleted);
 
+    return () => {
+      connection.off("MessageDeleted", handleDeleted);
+    };
+  }, [connection]);
+
+  useEffect(() => {
+    const container = messageEndRef.current;
+    if (!container) return;
+
+    // Check if user is near bottom before update
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight <
+      50;
+
+    if (isNearBottom) {
+      // Scroll to bottom smoothly
+      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    // else do nothing, so user scroll position stays where it is
+  }, [messages]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -172,10 +184,11 @@ useEffect(() => {
 
   const handleDeleteMessage = async (messageId) => {
     try {
-      await DeleteMessage(messageId);
+      await DeleteMessage(messageId); // Your API method that triggers SignalR
+
+      // UI updates automatically via `MessageDeleted` event
       setMenuOpenId(null);
-      fetchUsers();
-      fetchMessages();
+      fetchUsers(); // Update last message if needed
     } catch (err) {
       console.error("Failed to delete message", err);
     }
