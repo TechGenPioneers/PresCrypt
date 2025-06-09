@@ -87,7 +87,7 @@ const ChatWindow = ({
     } catch (error) {
       console.error("Error marking messages as read:", error);
     }
-  }, [userId, selectedUser.receiverId]);
+  }, [userId, selectedUser.receiverId,messages]);
 
   useEffect(() => {
     fetchMessages();
@@ -110,6 +110,7 @@ const ChatWindow = ({
         if (alreadyExists) return prev;
         return [...prev, msg];
       });
+      markAsRead();
     },
     [selectedUser.receiverId]
   );
@@ -133,7 +134,7 @@ const ChatWindow = ({
     };
 
     setupConnection();
-
+ markAsRead();
     return () => {
       if (connection && connection.state === "Connected") {
         connection.invoke("LeaveGroup", userId);
@@ -313,10 +314,10 @@ useEffect(() => {
 
       <MessageInput
         selectedUser={selectedUser}
-        fetchMessages={fetchMessages}
         userId={userId}
         fetchUsers={fetchUsers}
         connection={connection}
+        setMessages={setMessages}
       />
     </div>
   );

@@ -7,10 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import * as signalR from "@microsoft/signalr";
 const MessageInput = ({
   selectedUser,
-  fetchMessages,
   userId,
   fetchUsers,
   connection,
+  setMessages
 }) => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
@@ -43,49 +43,58 @@ const MessageInput = ({
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!text.trim() && !imagePreview) return;
+const handleSendMessage = async (e) => {
+  e.preventDefault();
+  if (!text.trim() && !imagePreview) return;
 
-    setIsSending(true);
+  setIsSending(true);
 
-    const messagePayload = {
-      senderId: userId,
-      receiverId: selectedUser.receiverId,
-      text: text.trim(),
-      image: imagePreview || null,
-    };
-
-    try {
-      console.log("📤 Sending message:", messagePayload);
-
-      if (
-        !connection ||
-        connection.state !== signalR.HubConnectionState.Connected
-      ) {
-        toast.error("Not connected to chat server");
-        console.error("Connection state:", connection?.state);
-        return;
-      }
-
-      await connection.invoke("SendMessage", messagePayload);
-      toast.success("Message sent!");
-
-      console.log("✅ Message sent via SignalR");
-
-      await fetchMessages();
-      await fetchUsers();
-
-      setText("");
-      setImagePreview(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    } catch (error) {
-      console.error("❌ Failed to send message:", error);
-      toast.error("Failed to send message");
-    }finally{
-      setIsSending(false);
-    }
+  const messagePayload = {
+    senderId: userId,
+    receiverId: selectedUser.receiverId,
+    text: text.trim(),
+    image: imagePreview || null,
   };
+
+  try {
+    console.log("📤 Sending message:", messagePayload);
+
+    if (
+      !connection ||
+      connection.state !== signalR.HubConnectionState.Connected
+    ) {
+      toast.error("Not connected to chat server");
+      console.error("Connection state:", connection?.state);
+      return;
+    }
+
+    await connection.invoke("SendMessage", messagePayload);
+    toast.success("Message sent!");
+
+    console.log("✅ Message sent via SignalR");
+
+    await fetchUsers();
+
+    // Optional: add your own sent message optimistically to the UI
+    setMessages((prev) => [...prev, {
+      ...messagePayload,
+      id: Date.now(),
+      sendAt: new Date().toISOString(),
+      isRead: false,
+      isReceived: false,
+    }]);
+
+    setText("");
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  } catch (error) {
+    console.error("❌ Failed to send message:", error);
+    toast.error("Failed to send message");
+  } finally {
+    setIsSending(false);
+  }
+};
+
 
   const handleEmojiClick = (emojiData) => {
     setText((prev) => prev + emojiData.emoji);
