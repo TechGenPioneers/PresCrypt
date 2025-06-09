@@ -56,7 +56,7 @@ Key Benefits
   💾 MSSQL – Database management
 
 - Additional Tools
-  🔄 OpenEMR – Electronic medical records integration
+  🔄 OpenMRS – Electronic medical records integration
   🔐 OAuth2 / JWT – Secure user authentication
   ☁️ GitHub – Version control
 
