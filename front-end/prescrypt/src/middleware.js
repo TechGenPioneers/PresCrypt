@@ -22,7 +22,7 @@ export function middleware(req) {
   // Prevent logged-in users from accessing login/register
   if (["Auth/login", "Auth/PatientRegister"].includes(pathname) && token && role) {
     let redirectTo = "/";
-    if (role === "admin") redirectTo = "/AdminDashboard";
+    if (role === "Admin") redirectTo = "/AdminDashboard";
     else if (role === "doctor") redirectTo = "/DoctorDashboard";
     else if (role === "patient") redirectTo = "/PatientDashboard";
 
