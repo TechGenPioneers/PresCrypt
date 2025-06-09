@@ -43,6 +43,14 @@ const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformC
     if (open) {
       const sendNotificationFlow = async () => {
         try {
+          const notificationPayload = {
+            patientId:'P021',
+            title: "Appointment Booking",
+            type: "Appointment",
+            message: `Your appointment with Dr. ${doctorName} has been successfully scheduled on ${appointmentDate} at ${appointmentTime} at ${hospitalName}.`,
+          };
+          await sendNotification(notificationPayload);
+
           const pdfPayload = {
             paymentId,
             patientId:'P021',
@@ -69,16 +77,6 @@ const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformC
             },
           };
           await sendEmail(emailPayload);
-
-          
-          const notificationPayload = {
-            patientId,
-            title: "Appointment Booking",
-            type: "Appointment",
-            message: `Your appointment with Dr. ${doctorName} has been successfully scheduled on ${appointmentDate} at ${appointmentTime} at ${hospitalName}.`,
-          };
-          await sendNotification(notificationPayload);
-
           console.log("Email sent (no PDF), notification posted");
         } catch (error) {
           console.error("Error during notification flow:", error);

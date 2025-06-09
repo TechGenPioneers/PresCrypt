@@ -13,6 +13,7 @@ export const AppointmentContext = createContext();
 function PaymentClient({ id }) {
   const [appointmentData, setAppointmentData] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [hospitalId,setHospitalId] = useState("");
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
   const [charge, setCharge] = useState(0);
   const [hospitalCharge, setHospitalCharge] = useState(0);
@@ -27,6 +28,7 @@ function PaymentClient({ id }) {
     const specialization = localStorage.getItem("selectedSpecialization");
     const doctorCharge = localStorage.getItem("selectedCharge");
     const hospCharge = localStorage.getItem("hospitalCharge");
+    const hospitalId =localStorage.getItem("hospitalId");
     const newPaymentId = generatePaymentId();
     setPaymentId(newPaymentId);
 
@@ -35,6 +37,8 @@ function PaymentClient({ id }) {
     if (specialization) setSelectedSpecialization(specialization);
     if (doctorCharge) setCharge(Number(doctorCharge));
     if (hospCharge) setHospitalCharge(Number(hospCharge));
+    if (hospitalId) setHospitalId(hospitalId);
+
   }, [id]);
 
   return (
@@ -48,7 +52,8 @@ function PaymentClient({ id }) {
               paymentId,
               hospitalCharge,
               doctorCharge:appointmentData.charge,
-              hospitalName:selectedLocation, 
+              hospitalName:selectedLocation,
+              hospitalId:hospitalId, 
               specialization:selectedSpecialization,
               appointmentDate:appointmentData.selectedDate, 
               appointmentTime:appointmentData.appointmentTime, 
