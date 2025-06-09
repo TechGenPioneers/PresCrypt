@@ -3,14 +3,20 @@ import { useRef, useState, useEffect } from "react";
 import { Image, Send, Smile, X, Loader2 } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import toast from "react-hot-toast";
-import { SendMessage } from "../service/ChatService";
 import { motion, AnimatePresence } from "framer-motion";
-
-const MessageInput = ({ selectedUser, fetchMessages,userId,fetchUsers }) => {
+import * as signalR from "@microsoft/signalr";
+const MessageInput = ({
+  selectedUser,
+  fetchMessages,
+  userId,
+  fetchUsers,
+  connection,
+}) => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isSending, setIsSending] = useState(false);
+
   const fileInputRef = useRef(null);
   const emojiPickerRef = useRef(null);
 
@@ -42,25 +48,41 @@ const MessageInput = ({ selectedUser, fetchMessages,userId,fetchUsers }) => {
     if (!text.trim() && !imagePreview) return;
 
     setIsSending(true);
-    try {
-      const messagePayload = {
-        SenderId: userId,
-        ReceiverId: selectedUser.receiverId,
-        Text: text.trim(),
-        Image: imagePreview || null,
-      };
 
-      await SendMessage(messagePayload);
+    const messagePayload = {
+      senderId: userId,
+      receiverId: selectedUser.receiverId,
+      text: text.trim(),
+      image: imagePreview || null,
+    };
+
+    try {
+      console.log("📤 Sending message:", messagePayload);
+
+      if (
+        !connection ||
+        connection.state !== signalR.HubConnectionState.Connected
+      ) {
+        toast.error("Not connected to chat server");
+        console.error("Connection state:", connection?.state);
+        return;
+      }
+
+      await connection.invoke("SendMessage", messagePayload);
       toast.success("Message sent!");
+
+      console.log("✅ Message sent via SignalR");
+
       await fetchMessages();
       await fetchUsers();
+
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error("❌ Failed to send message:", error);
       toast.error("Failed to send message");
-    } finally {
+    }finally{
       setIsSending(false);
     }
   };
@@ -78,7 +100,10 @@ const MessageInput = ({ selectedUser, fetchMessages,userId,fetchUsers }) => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(e.target)
+      ) {
         setShowEmojiPicker(false);
       }
     };
@@ -186,7 +211,11 @@ const MessageInput = ({ selectedUser, fetchMessages,userId,fetchUsers }) => {
               : "disabled:opacity-50 disabled:cursor-not-allowed text-zinc-400 hover:bg-zinc-200"
           }`}
         >
-          {isSending ? <Loader2 className="animate-spin w-5 h-5" /> : <Send className="w-5 h-5" />}
+          {isSending ? (
+            <Loader2 className="animate-spin w-5 h-5" />
+          ) : (
+            <Send className="w-5 h-5" />
+          )}
         </button>
       </form>
     </div>

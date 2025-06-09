@@ -5,9 +5,14 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import ChatHeaderSkeleton from "./skeletons/ChatHeaderSkeleton";
-import { DeleteMessage, GetAllMessages, MarkMessagesAsRead } from "../service/ChatService";
-import { EllipsisVertical, Trash2  } from "lucide-react"; 
-// Utility: Format HH:mm
+import {
+  DeleteMessage,
+  GetAllMessages,
+  MarkMessagesAsRead,
+} from "../service/ChatService";
+import { EllipsisVertical, Trash2 } from "lucide-react";
+
+// Utility functions
 const formatMessageTime = (date) =>
   new Date(date).toLocaleTimeString([], {
     hour: "2-digit",
@@ -15,7 +20,6 @@ const formatMessageTime = (date) =>
     hour12: false,
   });
 
-// Utility: Today, Yesterday, or formatted date
 const getDateLabel = (date) => {
   const today = new Date();
   const msgDate = new Date(date);
@@ -36,14 +40,20 @@ const getDateLabel = (date) => {
       });
 };
 
-const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
+const ChatWindow = ({
+  selectedUser,
+  setSelectedUser,
+  userId,
+  fetchUsers,
+  connection,
+}) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const messageEndRef = useRef(null);
   const menuRef = useRef(null);
 
-  // Re-render every minute to update timestamps
+
   const [, setTimeTick] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -53,38 +63,101 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
   }, []);
 
   const fetchMessages = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await GetAllMessages(userId, selectedUser.receiverId);
-      setMessages(data);
-    } catch (err) {
+  setIsLoading(true);
+  try {
+    const data = await GetAllMessages(userId, selectedUser.receiverId);
+    setMessages(data);
+  } catch (err) {
+    if (err.response && err.response.status === 404) {
+      console.warn("No messages found for this conversation.");
+      setMessages([]); // Clear messages or handle as needed
+    } else {
       console.error("Error loading messages:", err);
-    } finally {
-      setIsLoading(false);
     }
-  }, [userId, selectedUser.receiverId]);
+  } finally {
+    setIsLoading(false);
+  }
+}, [userId, selectedUser.receiverId]);
+
 
   const markAsRead = useCallback(async () => {
     try {
       await MarkMessagesAsRead(userId, selectedUser.receiverId);
+      fetchUsers();
     } catch (error) {
       console.error("Error marking messages as read:", error);
     }
   }, [userId, selectedUser.receiverId]);
 
   useEffect(() => {
-    if (!selectedUser?.receiverId) return;
-
     fetchMessages();
     markAsRead();
-    fetchUsers(); // Assuming fetchUsers is defined outside or in parent
-  }, [fetchMessages, markAsRead, selectedUser?.receiverId]);
+  }, [selectedUser]);
+
+  const handleReceiveMessage = useCallback(
+    (msg) => {
+      if (
+        msg.senderId !== selectedUser.receiverId &&
+        msg.receiverId !== selectedUser.receiverId
+      ) {
+        return; // Not for this chat
+      }
+
+      console.log("New msg", msg);
+      fetchUsers();
+      setMessages((prev) => {
+        const alreadyExists = prev.some((m) => m.id === msg.id);
+        if (alreadyExists) return prev;
+        return [...prev, msg];
+      });
+    },
+    [selectedUser.receiverId]
+  );
 
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (!connection || !userId) return;
 
-  // Close menu if click outside
+    const setupConnection = async () => {
+      try {
+        if (connection.state === "Disconnected") {
+          await connection.start();
+          console.log("Connected to SignalR hub");
+        }
+
+        await connection.invoke("JoinGroup", userId);
+        connection.off("ReceiveMessage", handleReceiveMessage);
+        connection.on("ReceiveMessage", handleReceiveMessage);
+      } catch (err) {
+        console.error("SignalR connection error:", err);
+      }
+    };
+
+    setupConnection();
+
+    return () => {
+      if (connection && connection.state === "Connected") {
+        connection.invoke("LeaveGroup", userId);
+        connection.off("ReceiveMessage", handleReceiveMessage);
+      }
+    };
+  }, [connection, userId, handleReceiveMessage]);
+
+useEffect(() => {
+  const container = messageEndRef.current;
+  if (!container) return;
+
+  // Check if user is near bottom before update
+  const isNearBottom = 
+    container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+
+  if (isNearBottom) {
+    // Scroll to bottom smoothly
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+  // else do nothing, so user scroll position stays where it is
+}, [messages]);
+
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -97,11 +170,9 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
     };
   }, []);
 
-  // Delete message 
   const handleDeleteMessage = async (messageId) => {
     try {
-     
-      const response = await DeleteMessage(messageId);
+      await DeleteMessage(messageId);
       setMenuOpenId(null);
       fetchUsers();
       fetchMessages();
@@ -122,7 +193,10 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <ChatHeader selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
+      <ChatHeader
+        selectedUser={selectedUser}
+        setSelectedUser={setSelectedUser}
+      />
 
       <div className="flex-1 p-4 space-y-4 overflow-y-auto flex flex-col">
         {messages.length === 0 && (
@@ -153,7 +227,9 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
 
                 <div
                   ref={i === messages.length - 1 ? messageEndRef : null}
-                  className={`flex items-end ${isSelf ? "justify-end" : "justify-start"}`}
+                  className={`flex items-end ${
+                    isSelf ? "justify-end" : "justify-start"
+                  }`}
                 >
                   {!isSelf && (
                     <div className="avatar mr-2">
@@ -168,7 +244,6 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
                   )}
 
                   <div className="max-w-[70%] relative">
-                    {/* 3-dot menu button (only for self messages) */}
                     {isSelf && (
                       <button
                         onClick={() =>
@@ -201,17 +276,17 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
                       </time>
                     </div>
 
-                    {/* Menu dropdown */}
                     {menuOpenId === msg.id && (
                       <ul
                         ref={menuRef}
                         className="absolute top-0 right-0 z-0 w-48 rounded-md border bg-white p-2 shadow-xl space-y-1"
                       >
                         <li>
-                          <button 
-                           onClick={() => handleDeleteMessage(msg.id)}
-                          className="w-full flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 p-2 rounded-md transition">
-                            <Trash2  /> delete
+                          <button
+                            onClick={() => handleDeleteMessage(msg.id)}
+                            className="w-full flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 p-2 rounded-md transition"
+                          >
+                            <Trash2 /> delete
                           </button>
                         </li>
                       </ul>
@@ -241,6 +316,7 @@ const ChatWindow = ({ selectedUser, setSelectedUser, userId, fetchUsers }) => {
         fetchMessages={fetchMessages}
         userId={userId}
         fetchUsers={fetchUsers}
+        connection={connection}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ChatListSkeleton from "./skeletons/ChatListSkeleton";
 import { GetAllMessages } from "../service/ChatService";
 
@@ -36,8 +36,10 @@ const ChatList = ({
   setSelectedUser,
   userId,
   fetchUsers,
+  setUsers,
   users,
   isUsersLoading,
+  connection,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -45,37 +47,9 @@ const ChatList = ({
   const [hasFetched, setHasFetched] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState({});
 
-  // Fetch messages for each user once
-  useEffect(() => {
-    const fetchUnreadCounts = async () => {
-      const counts = {};
-      await Promise.all(
-        users.map(async (user) => {
-          try {
-            const messages = await GetAllMessages(userId, user.receiverId);
-            const count = messages.filter(
-              (msg) =>
-                !msg.isRead &&
-                msg.senderId === user.receiverId &&
-                msg.receiverId === userId
-            ).length;
-            counts[user.receiverId] = count;
-          } catch (err) {
-            console.error("Failed to fetch messages for", user.receiverId);
-          }
-        })
-      );
-      setUnreadCounts(counts);
-    };
-
-    if (users && users.length > 0) {
-      fetchUnreadCounts();
-    }
-  }, [users, userId]);
-
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (!users || users.length === 0) {
@@ -96,6 +70,47 @@ const ChatList = ({
 
     setFilteredUsers(filtered);
   }, [users, searchTerm]);
+
+  // Fetch messages for each user once
+  useEffect(() => {
+    const fetchUnreadCounts = async () => {
+      const counts = {};
+
+      await Promise.all(
+        users.map(async (user) => {
+          try {
+            const messages = await GetAllMessages(userId, user.receiverId);
+
+            const unreadCount = messages.filter(
+              (msg) =>
+                !msg.isRead &&
+                msg.senderId === user.receiverId &&
+                msg.receiverId === userId
+            ).length;
+
+            counts[user.receiverId] = unreadCount;
+          } catch (err) {
+            // Handle 404 (no messages yet) gracefully
+            if (err.response?.status === 404) {
+              counts[user.receiverId] = 0; // No messages means no unread messages
+              console.warn(`No messages found for ${user.receiverId}`);
+            } else {
+              console.error(
+                `Failed to fetch messages for ${user.receiverId}:`,
+                err
+              );
+            }
+          }
+        })
+      );
+
+      setUnreadCounts(counts);
+    };
+
+    if (users?.length > 0 && userId) {
+      fetchUnreadCounts();
+    }
+  }, [users, userId]);
 
   if (!hasFetched && isUsersLoading) return <ChatListSkeleton />;
 
@@ -173,18 +188,20 @@ const ChatList = ({
                   </div>
                 </div>
 
-                <div
-                  className={`text-sm truncate ${
-                    !user.isRead && user.lastMessageSenderId !== userId
-                      ? "text-emerald-600 font-semibold"
-                      : "text-zinc-400"
-                  }`}
-                  title={user.lastMessage}
-                >
-                  {user.lastMessageSenderId === userId
-                    ? `You: ${user.lastMessage}`
-                    : `${user.fullName}: ${user.lastMessage}`}
-                </div>
+                {user.lastMessage && (
+                  <div
+                    className={`text-sm truncate ${
+                      !user.isRead && user.lastMessageSenderId !== userId
+                        ? "text-emerald-600 font-semibold"
+                        : "text-zinc-400"
+                    }`}
+                    title={user.lastMessage}
+                  >
+                    {user.lastMessageSenderId === userId
+                      ? `You: ${user.lastMessage}`
+                      : `${user.fullName}: ${user.lastMessage}`}
+                  </div>
+                )}
               </div>
             </button>
           );

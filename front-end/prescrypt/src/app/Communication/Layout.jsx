@@ -1,17 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChatList from "./component/ChatList";
 import ChatWindow from "./component/ChatWindow";
 import NoChatSelected from "./component/NoChatSelected";
-import { GetUsers } from "./service/ChatService";
+import { EstablishSignalRConnection, GetUsers } from "./service/ChatService";
+import * as signalR from "@microsoft/signalr";
 
-const Layout = () => {
-  const userId = "P003"
+const Layout = ({ userId }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [isUsersLoading, setIsUsersLoading] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
+  const [connection, setConnection] = useState();
 
   const fetchUsers = async () => {
     try {
@@ -24,9 +25,11 @@ const Layout = () => {
       setIsUsersLoading(false);
     }
   };
-  const sendMessage = (message) => {
-    setMessages([...messages, { sender: "patient", text: message }]);
-  };
+  // SignalR setup
+  useEffect(() => {
+    const newConnection = EstablishSignalRConnection();
+    setConnection(newConnection);
+  }, []);
 
   return (
     <div className="flex h-screen p-2 gap-2">
@@ -36,8 +39,10 @@ const Layout = () => {
           setSelectedUser={setSelectedUser}
           userId={userId}
           fetchUsers={fetchUsers}
+          setUsers={setUsers}
           users={users}
           isUsersLoading={isUsersLoading}
+            connection={connection}
         />
       </div>
 
@@ -47,9 +52,9 @@ const Layout = () => {
             selectedUser={selectedUser}
             setSelectedUser={setSelectedUser}
             messages={messages}
-            sendMessage={sendMessage}
             userId={userId}
             fetchUsers={fetchUsers}
+            connection={connection}
           />
         ) : (
           <NoChatSelected />

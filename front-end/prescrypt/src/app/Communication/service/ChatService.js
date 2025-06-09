@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as signalR from '@microsoft/signalr';
 const baseUrl = "https://localhost:7021/api/Chat"
 
 const GetUsers = async(userId)=>{
@@ -50,4 +51,27 @@ const DeleteMessage = async (messageId) => {
         throw error;
     }
 }
-export {GetUsers,GetAllMessages,SendMessage,MarkMessagesAsRead,DeleteMessage}
+
+const EstablishSignalRConnection = () => {
+const newConnection = new signalR.HubConnectionBuilder()
+      .withUrl(`https://localhost:7021/chatHub`, {
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
+      })
+      .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+
+    newConnection
+      .start()
+      .then(() => {
+        console.log("✅ .js file - Connected to SignalR hub");
+      })
+      .catch((err) => {
+        console.error("❌ .js file - SignalR connection failed: ", err);
+      });
+  
+
+  return newConnection;
+}
+export {GetUsers,GetAllMessages,SendMessage,MarkMessagesAsRead,DeleteMessage,EstablishSignalRConnection}
