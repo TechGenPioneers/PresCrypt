@@ -134,7 +134,6 @@ const ChatWindow = ({
     };
 
     setupConnection();
- markAsRead();
     return () => {
       if (connection && connection.state === "Connected") {
         connection.invoke("LeaveGroup", userId);

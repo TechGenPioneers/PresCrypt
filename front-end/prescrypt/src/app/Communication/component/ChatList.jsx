@@ -36,7 +36,6 @@ const ChatList = ({
   setSelectedUser,
   userId,
   fetchUsers,
-  setUsers,
   users,
   isUsersLoading,
   connection,
@@ -111,6 +110,62 @@ const ChatList = ({
       fetchUnreadCounts();
     }
   }, [users, userId]);
+
+const handleReceiveMessage = useCallback((msg) => {
+  console.log("New in chat list msg", msg);
+  fetchUsers();
+}, [fetchUsers]);
+
+
+useEffect(() => {
+  if (!connection || !userId) return;
+
+  const setupConnection = async () => {
+    try {
+      if (connection.state !== "Connected") {
+        await connection.start();
+        console.log("Connected to SignalR hub");
+      }
+
+      // Delay if still not connected
+      if (connection.state !== "Connected") {
+        const waitForConnection = () =>
+          new Promise((resolve, reject) => {
+            const interval = setInterval(() => {
+              if (connection.state === "Connected") {
+                clearInterval(interval);
+                resolve();
+              }
+            }, 100);
+            // Timeout after 5 seconds
+            setTimeout(() => {
+              clearInterval(interval);
+              reject(new Error("SignalR connection timed out"));
+            }, 5000);
+          });
+
+        await waitForConnection();
+      }
+
+      await connection.invoke("JoinGroup", userId);
+
+      connection.off("ReceiveMessage", handleReceiveMessage);
+      connection.on("ReceiveMessage", handleReceiveMessage);
+
+    } catch (err) {
+      console.error("SignalR connection error:", err);
+    }
+  };
+
+  setupConnection();
+
+  return () => {
+    if (connection?.state === "Connected") {
+      connection.invoke("LeaveGroup", userId);
+      connection.off("ReceiveMessage", handleReceiveMessage);
+    }
+  };
+}, [connection, userId, handleReceiveMessage]);
 
   if (!hasFetched && isUsersLoading) return <ChatListSkeleton />;
 
