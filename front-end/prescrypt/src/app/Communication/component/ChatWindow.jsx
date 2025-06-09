@@ -10,7 +10,7 @@ import {
   GetAllMessages,
   MarkMessagesAsRead,
 } from "../service/ChatService";
-import { EllipsisVertical, Trash2, Check } from "lucide-react";
+import { EllipsisVertical, Trash2, Check, Clock } from "lucide-react";
 
 // Utility functions
 const formatMessageTime = (date) =>
@@ -313,16 +313,20 @@ const ChatWindow = ({
                         </time>
                         {isSelf && (
                           <>
-                            {msg.isRead ? (
+                            {!msg.isReceived ? (
+                              <span className="text-gray-500 text-xs">
+                                <Clock className="w-3 h-3" />
+                              </span>
+                            ) : msg.isRead ? (
                               <span className="flex items-center gap-[1px] text-blue-500 text-xs">
                                 <Check className="w-3 h-3" />
                                 <Check className="w-3 h-3 -ml-1.5" />
                               </span>
-                            ) : msg.isReceived ? (
-                              <span className="text-gray-500 text-xs">
+                            ) : (
+                              <span className="flex items-center gap-[1px] text-gray-500 text-xs">
                                 <Check className="w-3 h-3" />
                               </span>
-                            ) : null}
+                            )}
                           </>
                         )}
                       </div>

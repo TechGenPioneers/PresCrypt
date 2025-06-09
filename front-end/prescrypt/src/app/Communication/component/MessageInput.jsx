@@ -5,12 +5,13 @@ import EmojiPicker from "emoji-picker-react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import * as signalR from "@microsoft/signalr";
+import { SendMessage } from "../service/ChatService";
 const MessageInput = ({
   selectedUser,
   userId,
   fetchUsers,
   connection,
-  setMessages
+  setMessages,
 }) => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
@@ -43,58 +44,85 @@ const MessageInput = ({
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-const handleSendMessage = async (e) => {
-  e.preventDefault();
-  if (!text.trim() && !imagePreview) return;
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!text.trim() && !imagePreview) return;
 
-  setIsSending(true);
+    setIsSending(true);
 
-  const messagePayload = {
-    senderId: userId,
-    receiverId: selectedUser.receiverId,
-    text: text.trim(),
-    image: imagePreview || null,
-  };
+    // Generate a temporary ID for optimistic UI
+    const tempId = `temp-${Date.now()}`;
+    const messagePayload = {
+      senderId: userId,
+      receiverId: selectedUser.receiverId,
+      text: text.trim(),
+      image: imagePreview || null,
+    };
 
-  try {
-    console.log("📤 Sending message:", messagePayload);
-
-    if (
-      !connection ||
-      connection.state !== signalR.HubConnectionState.Connected
-    ) {
-      toast.error("Not connected to chat server");
-      console.error("Connection state:", connection?.state);
-      return;
-    }
-
-    await connection.invoke("SendMessage", messagePayload);
-    toast.success("Message sent!");
-
-    console.log("✅ Message sent via SignalR");
-
-    await fetchUsers();
-
-    // Optional: add your own sent message optimistically to the UI
-    setMessages((prev) => [...prev, {
+    const optimisticMessage = {
       ...messagePayload,
-      id: Date.now(),
+      id: tempId,
       sendAt: new Date().toISOString(),
       isRead: false,
       isReceived: false,
-    }]);
+    };
 
-    setText("");
-    setImagePreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  } catch (error) {
-    console.error("❌ Failed to send message:", error);
-    toast.error("Failed to send message");
-  } finally {
-    setIsSending(false);
-  }
-};
+    // Show optimistic message
+    setMessages((prev) => [...prev, optimisticMessage]);
 
+    try {
+      console.log("📤 Sending message:", messagePayload);
+      await SendMessage(messagePayload); // Assumes it just triggers SignalR to return the actual message
+      await fetchUsers();
+    } catch (error) {
+      console.error("❌ Failed to send message:", error);
+      toast.error("Failed to send message");
+
+      // Optional: remove the optimistic message on error
+      setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
+    } finally {
+      setIsSending(false);
+      setText("");
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  useEffect(() => {
+    if (!connection) return;
+
+    const handleIncomingMessage = (message) => {
+      setMessages((prev) => {
+        const isSender = message.senderId === userId;
+
+        if (isSender) {
+          // Replace the optimistic message with real message from server
+          const updated = [...prev];
+          const tempIndex = updated.findIndex(
+            (msg) =>
+              msg.id.startsWith("temp-") &&
+              msg.text === message.text &&
+              msg.image === message.image
+              
+          );
+
+          if (tempIndex !== -1) {
+            updated[tempIndex] = message;
+            return updated;
+          }
+        }
+
+        // If you're the receiver or no match found, just add the message
+        return [...prev, message];
+      });
+    };
+
+    connection.on("SendMessage", handleIncomingMessage);
+
+    return () => {
+      connection.off("SendMessage", handleIncomingMessage);
+    };
+  }, [connection, userId]);
 
   const handleEmojiClick = (emojiData) => {
     setText((prev) => prev + emojiData.emoji);
