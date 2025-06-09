@@ -10,7 +10,7 @@ import {
   GetAllMessages,
   MarkMessagesAsRead,
 } from "../service/ChatService";
-import { EllipsisVertical, Trash2 } from "lucide-react";
+import { EllipsisVertical, Trash2, Check } from "lucide-react";
 
 // Utility functions
 const formatMessageTime = (date) =>
@@ -80,12 +80,35 @@ const ChatWindow = ({
 
   const markAsRead = useCallback(async () => {
     try {
+      console.log("Marking messages as read for user:", userId);
       await MarkMessagesAsRead(userId, selectedUser.receiverId);
       fetchUsers();
     } catch (error) {
       console.error("Error marking messages as read:", error);
     }
-  }, [userId, selectedUser.receiverId, messages]);
+  }, [userId, selectedUser.receiverId]); // add userId and fetchUsers to deps
+
+  useEffect(() => {
+    if (!connection) return;
+
+    const handleMessageRead = (payload) => {
+      console.log("MessageRead event received:", payload);
+      // Defensive: Check payload shape and data type
+      if (!payload || !Array.isArray(payload.messageIds)) return;
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          payload.messageIds.includes(msg.id) ? { ...msg, isRead: true } : msg
+        )
+      );
+    };
+
+    connection.on("MessageRead", handleMessageRead);
+
+    return () => {
+      connection.off("MessageRead", handleMessageRead);
+    };
+  }, [connection]);
 
   useEffect(() => {
     fetchMessages();
@@ -284,9 +307,25 @@ const ChatWindow = ({
                         />
                       )}
                       {msg.text && <p>{msg.text}</p>}
-                      <time className="text-xs text-right opacity-50">
-                        {formatMessageTime(msg.sendAt)}
-                      </time>
+                      <div className="flex items-center justify-end gap-1 mt-1">
+                        <time className="text-xs text-right opacity-50">
+                          {formatMessageTime(msg.sendAt)}
+                        </time>
+                        {isSelf && (
+                          <>
+                            {msg.isRead ? (
+                              <span className="flex items-center gap-[1px] text-blue-500 text-xs">
+                                <Check className="w-3 h-3" />
+                                <Check className="w-3 h-3 -ml-1.5" />
+                              </span>
+                            ) : msg.isReceived ? (
+                              <span className="text-gray-500 text-xs">
+                                <Check className="w-3 h-3" />
+                              </span>
+                            ) : null}
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     {menuOpenId === msg.id && (
@@ -305,18 +344,6 @@ const ChatWindow = ({
                       </ul>
                     )}
                   </div>
-
-                  {isSelf && (
-                    <div className="avatar ml-2">
-                      <div className="w-10 h-10 rounded-full border border-emerald-800 overflow-hidden">
-                        <img
-                          src="/avatar.png"
-                          alt="me"
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             );
