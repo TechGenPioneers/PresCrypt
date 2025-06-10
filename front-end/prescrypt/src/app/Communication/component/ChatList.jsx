@@ -122,35 +122,34 @@ useEffect(() => {
 
   const setupConnection = async () => {
     try {
-      if (connection.state !== "Connected") {
+      if (connection.state === "Disconnected") {
         await connection.start();
         console.log("Connected to SignalR hub");
       }
 
-      // Delay if still not connected
       if (connection.state !== "Connected") {
-        const waitForConnection = () =>
-          new Promise((resolve, reject) => {
-            const interval = setInterval(() => {
-              if (connection.state === "Connected") {
-                clearInterval(interval);
-                resolve();
-              }
-            }, 100);
-            // Timeout after 5 seconds
-            setTimeout(() => {
+        await new Promise((resolve, reject) => {
+          const interval = setInterval(() => {
+            if (connection.state === "Connected") {
               clearInterval(interval);
-              reject(new Error("SignalR connection timed out"));
-            }, 5000);
-          });
-
-        await waitForConnection();
+              resolve();
+            }
+          }, 100);
+          setTimeout(() => {
+            clearInterval(interval);
+            reject(new Error("SignalR connection timed out"));
+          }, 5000);
+        });
       }
 
       await connection.invoke("JoinGroup", userId);
 
-      connection.off("ReceiveMessage", handleReceiveMessage);
-      connection.on("ReceiveMessage", handleReceiveMessage);
+      // Remove any existing handler and register the correct one
+      connection.off("SendMessage");
+      connection.on("SendMessage", (msg) => {
+        console.log("SendMessage received:", msg);
+        fetchUsers();
+      });
 
     } catch (err) {
       console.error("SignalR connection error:", err);
@@ -162,10 +161,11 @@ useEffect(() => {
   return () => {
     if (connection?.state === "Connected") {
       connection.invoke("LeaveGroup", userId);
-      connection.off("ReceiveMessage", handleReceiveMessage);
+      connection.off("SendMessage");
     }
   };
-}, [connection, userId, handleReceiveMessage]);
+}, [connection, userId, fetchUsers]);
+
 
   if (!hasFetched && isUsersLoading) return <ChatListSkeleton />;
 
