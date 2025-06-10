@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import ChatListSkeleton from "./skeletons/ChatListSkeleton";
 import { GetAllMessages } from "../service/ChatService";
+import { Clock, Check } from "lucide-react";
 
 const formatMessageTime = (date) => {
   const msgDate = new Date(date);
@@ -111,61 +112,67 @@ const ChatList = ({
     }
   }, [users, userId]);
 
-const handleReceiveMessage = useCallback((msg) => {
-  console.log("New in chat list msg", msg);
-  fetchUsers();
-}, [fetchUsers]);
+  useEffect(() => {
+    if (!connection || !userId) return;
 
+    const setupConnection = async () => {
+      try {
+        if (connection.state === "Disconnected") {
+          await connection.start();
+          console.log("Connected to SignalR hub");
+        }
 
-useEffect(() => {
-  if (!connection || !userId) return;
-
-  const setupConnection = async () => {
-    try {
-      if (connection.state === "Disconnected") {
-        await connection.start();
-        console.log("Connected to SignalR hub");
-      }
-
-      if (connection.state !== "Connected") {
-        await new Promise((resolve, reject) => {
-          const interval = setInterval(() => {
-            if (connection.state === "Connected") {
+        if (connection.state !== "Connected") {
+          await new Promise((resolve, reject) => {
+            const interval = setInterval(() => {
+              if (connection.state === "Connected") {
+                clearInterval(interval);
+                resolve();
+              }
+            }, 100);
+            setTimeout(() => {
               clearInterval(interval);
-              resolve();
-            }
-          }, 100);
-          setTimeout(() => {
-            clearInterval(interval);
-            reject(new Error("SignalR connection timed out"));
-          }, 5000);
+              reject(new Error("SignalR connection timed out"));
+            }, 5000);
+          });
+        }
+
+        await connection.invoke("JoinGroup", userId);
+
+        // Remove any existing handler and register the correct one
+        connection.off("ReceiveMessage");
+        connection.on("ReceiveMessage", (msg) => {
+          fetchUsers();
         });
+      } catch (err) {
+        console.error("SignalR connection error:", err);
       }
+    };
 
-      await connection.invoke("JoinGroup", userId);
+    setupConnection();
 
-      // Remove any existing handler and register the correct one
-      connection.off("SendMessage");
-      connection.on("SendMessage", (msg) => {
-        console.log("SendMessage received:", msg);
-        fetchUsers();
-      });
+    return () => {
+      if (connection?.state === "Connected") {
+        connection.invoke("LeaveGroup", userId);
+        connection.off("ReceiveMessage");
+      }
+    };
+  }, [connection, userId, fetchUsers]);
 
-    } catch (err) {
-      console.error("SignalR connection error:", err);
-    }
-  };
+   useEffect(() => {
+    if (!connection) return;
 
-  setupConnection();
+    const handleMessageRead = (payload) => {
+      console.log("MessageRead event received:", payload);
+      fetchUsers();
+    };
 
-  return () => {
-    if (connection?.state === "Connected") {
-      connection.invoke("LeaveGroup", userId);
-      connection.off("SendMessage");
-    }
-  };
-}, [connection, userId, fetchUsers]);
+    connection.on("MessageRead", handleMessageRead);
 
+    return () => {
+      connection.off("MessageRead", handleMessageRead);
+    };
+  }, [connection]);
 
   if (!hasFetched && isUsersLoading) return <ChatListSkeleton />;
 
@@ -232,9 +239,26 @@ useEffect(() => {
                     {user.fullName}
                   </div>
                   <div className="flex flex-col items-end gap-0 ml-2">
-                    <time className="text-xs opacity-50 whitespace-nowrap">
-                      {formatMessageTime(user.sendAt)}
-                    </time>
+                    <div className="flex items-center justify-end gap-1 mt-1">
+                      <time className="text-xs text-right opacity-50">
+                        {formatMessageTime(user.sendAt)}
+                      </time>
+                      {user.lastMessageSenderId === userId &&
+                        (user.isReceived ? (
+                          <span className="text-gray-500 text-xs">
+                            <Clock className="w-3 h-3" />
+                          </span>
+                        ) : user.isRead ? (
+                          <span className="flex items-center gap-[1px] text-blue-500 text-xs">
+                            <Check className="w-3 h-3" />
+                            <Check className="w-3 h-3 -ml-1.5" />
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-[1px] text-gray-500 text-xs">
+                            <Check className="w-3 h-3" />
+                          </span>
+                        ))}
+                    </div>
                     {unread > 0 && (
                       <span className="bg-emerald-500 text-white text-xs font-semibold px-2 py-0.5  rounded-full mt-0.5">
                         {unread}

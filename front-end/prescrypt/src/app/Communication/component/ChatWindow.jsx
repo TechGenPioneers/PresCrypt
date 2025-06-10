@@ -117,14 +117,15 @@ const ChatWindow = ({
 
   const handleReceiveMessage = useCallback(
     (msg) => {
+      
+      console.log("New msg", msg);
       if (
-        msg.senderId !== selectedUser.receiverId &&
-        msg.receiverId !== selectedUser.receiverId
+        msg.senderId !== selectedUser.userId && // or selectedUser.id
+        msg.receiverId !== selectedUser.userId
       ) {
-        return; // Not for this chat
+        return;
       }
 
-      console.log("New msg", msg);
       fetchUsers();
       setMessages((prev) => {
         const alreadyExists = prev.some((m) => m.id === msg.id);
