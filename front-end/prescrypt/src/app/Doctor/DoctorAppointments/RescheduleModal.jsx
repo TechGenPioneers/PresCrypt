@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -9,312 +10,212 @@ export default function RescheduleModal({
   onClose,
   doctorId = "D002",
 }) {
-  // Initialize date with local time (without time component)
-  const [date, setDate] = useState(() => {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  });
-  const [hospital, setHospital] = useState("");
-  const [selectedHospitalName, setSelectedHospitalName] = useState("");
-  const [time, setTime] = useState("");
+  const [date, setDate] = useState(new Date());
+  const [hospitalFilter, setHospitalFilter] = useState("");
   const [availableHospitals, setAvailableHospitals] = useState([]);
-  const [availabilityData, setAvailabilityData] = useState([]);
-  const [availableTimes, setAvailableTimes] = useState({ start: "", end: "" });
-  const [timeSlots, setTimeSlots] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [rescheduleStates, setRescheduleStates] = useState({}); // Stores which appointments are marked for reschedule
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState({
-    date: "",
-    time: "",
-    hospital: "",
-    api: "",
-  });
+  const [errors, setErrors] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const convertTo24Hour = (time) => {
-    const date = new Date(`1970-01-01T${time}`);
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
+  const formatDateWithoutTimezone = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
-  // Fetch hospitals and availability when date changes
-  useEffect(() => {
-    if (!isOpen) return;
+  const getAppointmentUniqueKey = (appointment, index) => {
+    return `${appointment.appointmentId || appointment.id}-${
+      appointment.time
+    }-${appointment.patientId}-${index}`;
+  };
 
-    if (date && doctorId) {
-      // Prevent selecting past dates (using local date comparison)
+  const filteredAppointments = hospitalFilter
+    ? appointments.filter((a) => a.hospitalId === hospitalFilter)
+    : appointments;
+
+  useEffect(() => {
+    if (isOpen) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      if (date < today) {
-        setErrors((prev) => ({ ...prev, date: "Please select a future date" }));
-        setDate(new Date(today));
+      setDate(today); // Set calendar to today's date
+      setHospitalFilter("");
+      setRescheduleStates({}); // Reset selections on modal open
+      setSuccessMessage("");
+      setErrors("");
+    }
+  }, [isOpen]);
+
+  // Effect to fetch available hospitals when modal opens, doctorId or date changes
+  useEffect(() => {
+    if (!isOpen || !doctorId || !date) return; // Only fetch if modal is open and required data exists
+    const formattedDate = formatDateWithoutTimezone(date);
+    setErrors("");
+    setSuccessMessage("");
+
+    axiosInstance
+      .get(
+        `/Appointments/available-hospitals?doctorId=${doctorId}&date=${formattedDate}`
+      )
+      .then((res) => {
+        const hospitals = res.data || [];
+        const normalized = hospitals.map((h) => ({
+          hospitalId: h.hospitalId || h.id,
+          hospitalName:
+            h.hospitalName || h.name || `Hospital ${h.hospitalId || h.id}`,
+        }));
+        setAvailableHospitals(normalized);
+      })
+      .catch((err) => {
+        console.error("Failed to load hospitals:", err);
+        setErrors("Failed to load hospitals. Please try again.");
+      });
+  }, [isOpen, doctorId, date]);
+
+  // Effect to fetch appointments when modal opens, doctorId or date changes
+  useEffect(() => {
+    if (!isOpen || !doctorId || !date) return; // Only fetch if modal is open and required data exists
+    const formattedDate = formatDateWithoutTimezone(date);
+    setErrors("");
+    setSuccessMessage("");
+
+    axiosInstance
+      .get(`/Appointments/by-doctor/${doctorId}?date=${formattedDate}`)
+      .then((res) => {
+        const fetchedAppointments = res.data || [];
+        // Log fetched data to inspect its structure, especially the ID field
+        console.log("Fetched Appointments:", fetchedAppointments);
+        setAppointments(fetchedAppointments);
+        setRescheduleStates({});
+      })
+      .catch((err) => {
+        console.error("Failed to load appointments:", err);
+        setErrors("Failed to load appointments. Please try again.");
+      });
+  }, [isOpen, doctorId, date]); // Dependency array: re-run when these change
+
+  // Toggles the selection state for an individual appointment using its unique key
+  const toggleSelection = (uniqueKey) => {
+    setRescheduleStates((prev) => ({
+      ...prev,
+      [uniqueKey]: !prev[uniqueKey],
+    }));
+  };
+
+  const handleConfirm = () => {
+    const selectedCount =
+      Object.values(rescheduleStates).filter(Boolean).length;
+    if (selectedCount === 0) {
+      setErrors("Please select at least one appointment to reschedule.");
+      return;
+    }
+    setErrors("");
+    setShowConfirmation(true);
+  };
+
+  const confirmReschedule = async () => {
+    setIsSubmitting(true);
+    setErrors("");
+    setSuccessMessage("");
+
+    try {
+      // Get the unique keys of selected appointments
+      const selectedUniqueKeys = Object.keys(rescheduleStates).filter(
+        (uniqueKey) => rescheduleStates[uniqueKey]
+      );
+
+      const appointmentIdsToReschedule = selectedUniqueKeys.map((uniqueKey) => {
+        const originalAppointmentId = uniqueKey.split("-")[0];
+        return originalAppointmentId;
+      });
+
+      if (appointmentIdsToReschedule.length === 0) {
+        setErrors("No appointments selected for rescheduling.");
+        setIsSubmitting(false);
         return;
       }
 
-      // Format date correctly for API (YYYY-MM-DD) without timezone issues
-      const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
-        .toString()
-        .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-
-      // Reset errors and selections
-      setErrors({ date: "", time: "", hospital: "", api: "" });
-      setHospital("");
-      setSelectedHospitalName("");
-      setTime("");
-      setAvailableTimes({ start: "", end: "" });
-      setTimeSlots([]);
-
-      // Fetch hospitals
-      axiosInstance
-        .get(
-          `/Appointments/available-hospitals?doctorId=${doctorId}&date=${formattedDate}`
-        )
-        .then((response) => {
-          // More robust handling of different response structures
-          let hospitalsData = [];
-
-          if (Array.isArray(response.data)) {
-            hospitalsData = response.data;
-          } else if (
-            response.data?.hospitals &&
-            Array.isArray(response.data.hospitals)
-          ) {
-            hospitalsData = response.data.hospitals;
-          } else if (
-            typeof response.data === "object" &&
-            response.data !== null
-          ) {
-            // Handle case where hospitals are properties of the object
-            hospitalsData = Object.values(response.data);
-          }
-
-          // More flexible mapping to handle different structures
-          const normalizedHospitals = hospitalsData
-            .map((hospital) => {
-              // Try different possible property names for hospital ID and name
-              const hospitalId =
-                hospital.hospitalId ||
-                hospital.id ||
-                hospital.hospital?.hospitalId ||
-                hospital.hospital?.id;
-
-              const hospitalName =
-                hospital.hospitalName ||
-                hospital.name ||
-                hospital.hospital?.hospitalName ||
-                hospital.hospital?.name ||
-                `Hospital ${hospitalId}`;
-
-              return {
-                hospitalId,
-                hospitalName,
-              };
-            })
-            .filter((h) => h.hospitalId && h.hospitalName); // Only filter if both are missing
-
-          console.log("Available hospitals:", normalizedHospitals); // Debug log
-          setAvailableHospitals(normalizedHospitals);
-
-          if (normalizedHospitals.length === 0) {
-            setErrors((prev) => ({
-              ...prev,
-              api: "No hospitals available for the selected date.",
-            }));
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching hospitals:", error);
-          setErrors((prev) => ({
-            ...prev,
-            api: "Failed to load hospitals. Please try again.",
-          }));
-        });
-
-      // Fetch availability
-      axiosInstance
-        .get(`/Appointments/availability/${formattedDate}?doctorId=${doctorId}`)
-        .then((response) => {
-          setAvailabilityData(
-            Array.isArray(response.data) ? response.data : []
-          );
-        })
-        .catch((error) => {
-          if (error.response?.status === 404) {
-            setAvailabilityData([]);
-          } else {
-            console.error("Error fetching availability:", error);
-            setErrors((prev) => ({
-              ...prev,
-              api: "Failed to load availability. Please try again.",
-            }));
-          }
-        });
-    }
-  }, [date, doctorId, isOpen]);
-
-  // Update available times when hospital is selected
-  useEffect(() => {
-    if (hospital && availabilityData.length > 0) {
-      const selectedAvailability = availabilityData.find(
-        (a) => a.hospitalId === hospital
-      );
-
-      if (selectedAvailability) {
-        const { availableStartTime, availableEndTime } = selectedAvailability;
-        setAvailableTimes({
-          start: availableStartTime,
-          end: availableEndTime,
-        });
-        setTimeSlots(generateTimeSlots(availableStartTime, availableEndTime));
-      } else {
-        setAvailableTimes({ start: "", end: "" });
-        setTimeSlots([]);
-      }
-    }
-  }, [hospital, availabilityData]);
-
-  // Handle date selection
-  const handleDateSelect = (selectedDate) => {
-    if (!selectedDate) return;
-    
-    // Create a new date without time component to avoid timezone issues
-    const localDate = new Date(
-      selectedDate.getFullYear(),
-      selectedDate.getMonth(),
-      selectedDate.getDate()
-    );
-    
-    setDate(localDate);
-    setErrors((prev) => ({ ...prev, date: "" }));
-  };
-
-
-  // Handle hospital selection change
-  const handleHospitalChange = (e) => {
-    const selectedId = e.target.value;
-    setHospital(selectedId);
-
-    // Find and set the hospital name
-    const selectedHospital = availableHospitals.find(
-      (h) => h.hospitalId === selectedId
-    );
-    setSelectedHospitalName(selectedHospital?.hospitalName || "");
-    setErrors((prev) => ({ ...prev, hospital: "" }));
-  };
-
-  const generateTimeSlots = (startTime12h, endTime12h) => {
-    if (!startTime12h || !endTime12h) return [];
-
-    const startTime = convertTo24Hour(startTime12h);
-    const endTime = convertTo24Hour(endTime12h);
-
-    const slots = [];
-    const [startHour, startMinute] = startTime.split(":").map(Number);
-    const [endHour, endMinute] = endTime.split(":").map(Number);
-
-    let currentHour = startHour;
-    let currentMinute = startMinute;
-
-    while (
-      currentHour < endHour ||
-      (currentHour === endHour && currentMinute < endMinute)
-    ) {
-      const timeString = `${currentHour
-        .toString()
-        .padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`;
-      slots.push(timeString);
-
-      currentMinute += 30;
-      if (currentMinute >= 60) {
-        currentHour += 1;
-        currentMinute -= 60;
-      }
-    }
-
-    return slots;
-  };
-
-  const handleSubmit = async () => {
-    setErrors({ date: "", time: "", hospital: "", api: "" });
-    setSuccessMessage("");
-
-    let newErrors = {};
-
-    // Individual field validations
-    if (!date) newErrors.date = "Please select a date.";
-    if (!time) newErrors.time = "Please select a time.";
-    if (!hospital) newErrors.hospital = "Please select a hospital.";
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors((prev) => ({ ...prev, ...newErrors }));
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const formattedDate = date.toISOString().split("T")[0];
-      const formattedTime = time.includes(":")
-        ? time
-        : `${time.slice(0, 2)}:${time.slice(2)}`;
-      const fullTime = `${formattedTime}:00`;
-
-      const rescheduleData = {
-        doctorId,
-        hospitalId: hospital,
-        hospitalName: selectedHospitalName,
-        date: formattedDate,
-        time: fullTime,
+      const payload = {
+        appointmentIds: appointmentIdsToReschedule,
       };
+      console.log("Sending payload for reschedule:", payload);
 
+      // Call the backend endpoint for rescheduling multiple appointments
       const response = await axiosInstance.post(
-        "/Appointments/reschedule",
-        rescheduleData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
+        "/Appointments/reschedule-multiple",
+        payload
       );
 
-      if (response.data.success) {
-        if (response.data.rescheduledCount === 0) {
-          setErrors((prev) => ({
-            ...prev,
-            api:
-              response.data.message ||
-              "No appointments found to reschedule. Please ensure you have an existing appointment with this doctor.",
-          }));
-        } else {
+      console.log("Backend response for reschedule:", response.data); // Log backend response
+
+      if (response.data && response.data.length > 0) {
+        const successfulReschedules = response.data.filter(
+          (r) => r.success
+        ).length;
+        if (successfulReschedules > 0) {
           setSuccessMessage(
-            response.data.message ||
-              `Successfully rescheduled ${response.data.rescheduledCount} appointment(s).`
+            `Successfully initiated auto-reschedule for ${successfulReschedules} appointment(s). ` +
+              `Patients will receive an email for confirmation.`
           );
-          setTimeout(() => onClose(true), 1500); // Close after showing success
+        } else {
+          // Check for individual appointment errors from the backend response
+          const failedMessages = response.data
+            .filter((r) => !r.success)
+            .map((r) => r.message)
+            .join("; ");
+          setErrors(
+            `Some appointments could not be auto-rescheduled: ${
+              failedMessages || "No specific error messages provided."
+            }`
+          );
         }
+
+        setShowConfirmation(false);
+        setRescheduleStates({}); // Clear selection after processing
+
+        // Re-fetch appointments for the currently selected date to update the list
+        const res = await axiosInstance.get(
+          `/Appointments/by-doctor/${doctorId}?date=${formatDateWithoutTimezone(
+            date
+          )}`
+        );
+        setAppointments(res.data || []);
       } else {
-        setErrors((prev) => ({
-          ...prev,
-          api: response.data.message || "Failed to reschedule appointment.",
-        }));
+        setErrors(
+          "Failed to auto-reschedule appointments: No response data or empty result from backend."
+        );
       }
-    } catch (error) {
-      const errorData = error.response?.data;
-      let errorMsg = "Something went wrong while rescheduling.";
-
-      if (
-        error.response?.status === 400 &&
-        errorData?.errorType === "ValidationError"
-      ) {
-        errorMsg = `Validation error: ${errorData.message}`;
-      } else if (error.response?.status === 500) {
-        errorMsg =
-          errorData?.message || "Server error. Please try again later.";
-      } else if (error.message === "Network Error") {
-        errorMsg = "Network issue. Please check your internet connection.";
+    } catch (err) {
+      console.error("Auto-rescheduling error:", err);
+      if (err.response) {
+        console.error("Error response data:", err.response.data);
+        console.error("Error response status:", err.response.status);
+        console.error("Error response headers:", err.response.headers);
+        if (err.response.data && typeof err.response.data === "string") {
+          setErrors(`Server Error: ${err.response.data}`);
+        } else if (err.response.data && err.response.data.message) {
+          setErrors(`Error: ${err.response.data.message}`);
+        } else {
+          setErrors(
+            `Server responded with status ${err.response.status}. Please try again.`
+          );
+        }
+      } else if (err.request) {
+        // The request was made but no response was received
+        setErrors(
+          "No response from server. Please check your network connection."
+        );
+        console.error("Error request:", err.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setErrors(
+          "An unknown error occurred while preparing the request. Please try again."
+        );
+        console.error("Error message:", err.message);
       }
-
-      setErrors((prev) => ({ ...prev, api: errorMsg }));
     } finally {
       setIsSubmitting(false);
     }
@@ -323,129 +224,214 @@ export default function RescheduleModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#ffffffc0] z-50 flex justify-center items-center">
-      <div className="p-1 bg-[#E9FAF2] rounded-[20px] shadow-2xl w-[90%] max-w-3xl">
-        <div className="p-8 relative border-2 border-dashed border-black rounded-[20px]">
-          <h2 className="text-lg font-bold mb-4 text-[#094A4D]">
-            Reschedule Appointment
-          </h2>
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-1 rounded-full cursor-pointer"
-            disabled={isSubmitting}
-          >
-            <X className="w-6 h-6 text-gray-500" />
-          </button>
+    <div className="fixed inset-0 bg-[#ffffffc0] z-50 flex justify-center items-center p-4 overflow-auto">
+      <div className="p-1 bg-[#E9FAF2] rounded-[20px] shadow-2xl max-w-6xl w-full mx-4 overflow-y-auto">
+        <div className="p-3 relative border-2 border-dashed border-black rounded-[20px]">
+          <div className="max-w-6xl w-full max-h-[90vh] overflow-hidden flex relative">
+            <button
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 transition z-10"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6 text-gray-600 cursor-pointer" />
+            </button>
 
-          {/* Error/Success Messages */}
-          {errors.api && (
-            <div className="mb-4 p-3 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
-              <p>{errors.api}</p>
-            </div>
-          )}
-
-          {successMessage && (
-            <div className="mb-4 p-3 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
-              <p>{successMessage}</p>
-            </div>
-          )}
-
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex-1">
-              <label className="block mb-2 text-[#094A4D]">Select Date:</label>
+            {/* Left Side: Calendar */}
+            <div className="w-1/2 border-r border-gray-300 p-6 overflow-auto">
+              <h2 className="text-2xl font-bold mb-6 text-[#094A4D]">
+                Select Date to View Appointments
+              </h2>
               <DayPicker
-                selected={date}
-                onSelect={handleDateSelect} // Use the new handler
-                className="mb-4"
                 mode="single"
-                disabled={isSubmitting}
-                required
-                fromDate={new Date()} // This will use local time
-                modifiers={{
-                  disabled: [{ before: new Date() }],
+                selected={date}
+                onSelect={(d) => {
+                  // Ensure a date is selected and it's a new day before updating state
+                  if (d) {
+                    const newDate = new Date(
+                      d.getFullYear(),
+                      d.getMonth(),
+                      d.getDate()
+                    );
+                    // Only update if the date actually changed to prevent unnecessary re-fetches
+                    if (newDate.toDateString() !== date.toDateString()) {
+                      setDate(newDate);
+                    }
+                  }
                 }}
+                fromDate={new Date()} // Prevents selecting past dates
+                disabled={isSubmitting}
+                modifiers={{ disabled: [{ before: new Date() }] }} // Visually disables past dates
               />
-              {errors.date && (
-                <p className="text-red-500 text-sm">{errors.date}</p>
-              )}
-            </div>
-
-            <div className="flex-1">
-              <div className="mb-4">
-                <label className="block mb-2 text-[#094A4D]">
-                  Select Hospital:
+              <div className="mt-8 mb-6">
+                <label className="block mb-2 font-semibold text-[#094A4D]">
+                  Filter by Hospital:
                 </label>
                 <select
-                  className={`w-full border p-2 rounded-[12px] cursor-pointer ${
-                    errors.hospital ? "border-red-500" : ""
-                  }`}
-                  value={hospital}
-                  onChange={handleHospitalChange}
-                  disabled={!availableHospitals.length || isSubmitting}
+                  value={hospitalFilter}
+                  onChange={(e) => setHospitalFilter(e.target.value)}
+                  disabled={isSubmitting || !availableHospitals.length}
+                  className="w-full p-2 border rounded-[10px] cursor-pointer"
                 >
-                  <option value="">Select Hospital</option>
-                  {availableHospitals.length > 0 ? (
-                    availableHospitals.map((hospital) => (
-                      <option
-                        key={hospital.hospitalId}
-                        value={hospital.hospitalId}
-                      >
-                        {hospital.hospitalName}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="" disabled>
-                      No hospitals available for selected date
-                    </option>
-                  )}
-                </select>
-                {errors.hospital && (
-                  <p className="text-red-500 text-sm mt-1">{errors.hospital}</p>
-                )}
-              </div>
-              {availableTimes.start && (
-                <p className="text-sm text-gray-600 mb-5">
-                  Available between: {convertTo24Hour(availableTimes.start)} and{" "}
-                  {convertTo24Hour(availableTimes.end)}
-                </p>
-              )}
-              <div className="mb-4">
-                <label className="block mb-2 text-[#094A4D]">
-                  Select Time:
-                </label>
-                <select
-                  className={`w-full border p-2 rounded-[12px] cursor-pointer ${
-                    errors.time ? "border-red-500" : ""
-                  }`}
-                  value={time}
-                  onChange={(e) => {
-                    setTime(e.target.value);
-                    setErrors((prev) => ({ ...prev, time: "" }));
-                  }}
-                  disabled={!hospital || !timeSlots.length || isSubmitting}
-                >
-                  <option value="">Select Time</option>
-                  {timeSlots.map((slot) => (
-                    <option key={slot} value={slot}>
-                      {slot}
+                  <option value="">All Hospitals</option>
+                  {availableHospitals.map((h) => (
+                    <option key={h.hospitalId} value={h.hospitalId}>
+                      {h.hospitalName}
                     </option>
                   ))}
                 </select>
-                {errors.time && (
-                  <p className="text-red-500 text-sm mt-1">{errors.time}</p>
-                )}
+              </div>
+              <div className="mt-4 p-3 bg-blue-50 rounded-[10px] border rounded-12px border-blue-200">
+                <p className="font-semibold">Viewing Appointments for:</p>
+                <p>{date.toDateString()}</p>
               </div>
             </div>
-          </div>
 
-          <div className="flex justify-end mt-4">
-            <button
-              onClick={handleSubmit}
-              className="px-4 py-2 rounded-[12px] bg-[#094A4D] text-white hover:bg-[#072f30] disabled:opacity-50 flex items-center cursor-pointer"
-              disabled={isSubmitting}
-            >
-              Confirm Reschedule
-            </button>
+            {/* Right Side: Appointment List */}
+            <div className="w-1/2 p-6 flex flex-col">
+              <h2 className="text-2xl font-bold mb-4 text-[#094A4D]">
+                Appointments for {date.toDateString()}
+              </h2>
+
+              {errors && (
+                <div className="mb-4 p-3 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
+                  {errors}
+                </div>
+              )}
+
+              {successMessage && (
+                <div className="mb-4 p-3 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
+                  {successMessage}
+                </div>
+              )}
+
+              <div className="flex-grow overflow-y-auto mb-4 border rounded-[12px] p-4 bg-white">
+                {filteredAppointments.length === 0 ? (
+                  <p className="text-center text-gray-600">
+                    No upcoming appointments for selected date and hospital.
+                  </p>
+                ) : (
+                  filteredAppointments.map((appointment, index) => {
+                    const uniqueKey = getAppointmentUniqueKey(
+                      appointment,
+                      index
+                    );
+                    const isSelected = rescheduleStates[uniqueKey] || false;
+
+                    const canSelect =
+                      appointment.status !== "Rescheduled" &&
+                      appointment.status !== "Completed" &&
+                      appointment.status !== "Pending Confirmation"; // Added this status
+
+                    return (
+                      <div
+                        key={uniqueKey} // Use the unique key here
+                        className={`flex justify-between items-center p-3 mb-2 rounded-[12px] border ${
+                          isSelected
+                            ? "border-green-500 bg-green-50"
+                            : "border-gray-300"
+                        } ${
+                          !canSelect
+                            ? "bg-gray-100 opacity-70 cursor-not-allowed"
+                            : ""
+                        }`}
+                      >
+                        <div className="flex-grow">
+                          <p>
+                            <strong>Patient ID:</strong> {appointment.patientId}
+                          </p>
+                          <p>
+                            <strong>Hospital:</strong>{" "}
+                            {appointment.hospitalName}
+                          </p>
+                          <p>
+                            <strong>Time:</strong> {appointment.time}
+                          </p>
+                          <p>
+                            <strong>Status:</strong>{" "}
+                            <span className="font-semibold">
+                              {appointment.status}
+                            </span>
+                          </p>
+                          {isSelected && (
+                            <p className="mt-1 text-[#094a4dbd]">
+                              <span className="font-semibold">Action:</span>{" "}
+                              Initiate auto-reschedule
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => toggleSelection(uniqueKey)} // Pass the unique key to toggleSelection
+                          className={`px-3 py-1 rounded-[10px] text-white cursor-pointer ${
+                            isSelected
+                              ? "bg-red-500 hover:bg-red-600"
+                              : "bg-[#094A4D] hover:bg-[#0b6669]"
+                          }`}
+                          disabled={isSubmitting || !canSelect} // Disable if submitting or not eligible for reschedule
+                        >
+                          {isSelected ? "Unselect" : "Reschedule"}
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {!showConfirmation ? (
+                <div className="flex justify-end gap-4">
+                  <button
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                    className="px-6 py-2 bg-gray-400 rounded-[10px] text-white hover:bg-gray-500 transition cursor-pointer"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={handleConfirm}
+                    // Disable if submitting or no appointments are selected for reschedule
+                    disabled={
+                      isSubmitting ||
+                      !Object.values(rescheduleStates).some((s) => s)
+                    }
+                    className={`px-6 py-2 rounded-[10px] text-white transition cursor-pointer ${
+                      !Object.values(rescheduleStates).some((s) => s)
+                        ? "bg-gray-300 cursor-not-allowed"
+                        : "bg-[#094A4D] hover:bg-[#0b6669]"
+                    }`}
+                  >
+                    {Object.values(rescheduleStates).filter((s) => s).length > 0
+                      ? `Initiate Reschedule for ${
+                          Object.values(rescheduleStates).filter((s) => s)
+                            .length
+                        } Appointment(s)`
+                      : "Initiate Reschedule"}
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                  <p className="mb-4">
+                    Rescheduling for{" "}
+                    {Object.values(rescheduleStates).filter((s) => s).length}{" "}
+                    appointment(s). Please confirm your action.
+                  </p>
+                  <div className="flex justify-end gap-4">
+                    <button
+                      onClick={() => setShowConfirmation(false)}
+                      className="px-6 py-2 bg-gray-400 rounded-[12px] text-white hover:bg-gray-600 transition cursor-pointer"
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={confirmReschedule}
+                      disabled={isSubmitting}
+                      className="px-6 py-2 rounded-[12px] bg-[#094A4D] text-white hover:bg-[#0b6669] transition cursor-pointer"
+                    >
+                      {isSubmitting ? "Processing..." : "Confirm"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

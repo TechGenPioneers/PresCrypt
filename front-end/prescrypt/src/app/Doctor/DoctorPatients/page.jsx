@@ -62,7 +62,7 @@ export default function page() {
     let patientsToFilter = patientType === "past" ? allPatients.past : allPatients.future;
     
     if (searchTerm) {
-      // earch through all patients regardless of type
+      // each through all patients regardless of type
       patientsToFilter = [...allPatients.past, ...allPatients.future].filter(
         (p) =>
           p.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -89,17 +89,6 @@ export default function page() {
   const handleViewClick = (patient) => {
     setSelectedPatient(patient);
     setIsPatientModalOpen(true);
-  };
-
-  const getGenderFullName = (genderChar) => {
-    switch (genderChar) {
-      case "M":
-        return "Male";
-      case "F":
-        return "Female";
-      default:
-        return "Other";
-    }
   };
 
   return (
@@ -191,7 +180,7 @@ export default function page() {
                                       {patient.patientName}
                                     </span>
                                     <span className="text-sm text-gray-600">
-                                      {getGenderFullName(patient.gender)},{" "}
+                                      {patient.gender},{" "}
                                       {calculateAge(patient.dob)} yrs
                                     </span>
                                   </div>

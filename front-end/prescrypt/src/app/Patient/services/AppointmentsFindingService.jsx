@@ -57,6 +57,21 @@ export const getAppointmentsByPatientId = async (patientId) => {
   }
 };
 
+export const getAppointmentsByDate = async (startDate, endDate) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Appointments/Appointments/GetByDateRange`, {
+      params: {
+        startDate,
+        endDate,
+      },
+    });
+    return response.data; // This will be a list of appointments
+  } catch (error) {
+    console.error("Error fetching appointments by date range", error);
+    throw error;
+  }
+};
+
 // Fetch doctor details for appointment card
 export const fetchDoctorDetails = async (doctorId) => {
   const response = await fetch(`${BASE_URL}/Doctor/book/${doctorId}`);

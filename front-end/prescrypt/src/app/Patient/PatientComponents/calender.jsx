@@ -14,7 +14,7 @@ const CustomCalendar = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const data = await getAppointmentsByPatientId(patientId); // ✅ Call service
+        const data = await getAppointmentsByPatientId(patientId); // Call service
         console.log("Fetched appointments:", data);
         setAppointments(data);
       } catch (error) {

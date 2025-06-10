@@ -139,17 +139,6 @@ export default function AppointmentsPage() {
     setIsPatientModalOpen(true);
   };
 
-  const getGenderFullName = (genderChar) => {
-    switch (genderChar) {
-      case "M":
-        return "Male";
-      case "F":
-        return "Female";
-      default:
-        return "Other";
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen ml-32">
       <div className="flex flex-1">
@@ -272,7 +261,7 @@ export default function AppointmentsPage() {
                                       {appointment.patientName}
                                     </span>
                                     <span className="text-sm text-gray-600">
-                                      {getGenderFullName(appointment.gender)},{" "}
+                                      {appointment.gender},{" "}
                                       {calculateAge(appointment.dob)} yrs
                                     </span>
                                   </div>
@@ -292,7 +281,7 @@ export default function AppointmentsPage() {
                               <td className="px-8 py-2">
                                 {appointment.status}
                               </td>
-                              <td>
+                              <td className="px-3">
                                 <button
                                   onClick={() => handleViewClick(appointment)}
                                   className="block p-3 text-left w-full cursor-pointer font-semibold text-[#094A4D] hover:underline"
