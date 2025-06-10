@@ -145,7 +145,7 @@ export default function RescheduleModal({
 
       // Call the backend endpoint for rescheduling multiple appointments
       const response = await axiosInstance.post(
-        "/Appointments/reschedule-multiple",
+        "/Appointments/reschedule-appointments",
         payload
       );
 
@@ -305,7 +305,7 @@ export default function RescheduleModal({
                 </div>
               )}
 
-              <div className="flex-grow overflow-y-auto mb-4 border rounded-[12px] p-4 bg-white">
+              <div className="flex-grow overflow-y-auto mb-4 border border-gray-300 rounded-[12px] p-4">
                 {filteredAppointments.length === 0 ? (
                   <p className="text-center text-gray-600">
                     No upcoming appointments for selected date and hospital.

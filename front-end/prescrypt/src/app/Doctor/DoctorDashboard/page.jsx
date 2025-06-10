@@ -25,6 +25,7 @@ export default function Dashboard() {
     error: null,
   });
 
+  //const doctorId = localStorage.getItem("userId");
   const doctorId = "D002";
   const connectionRef = useRef(null);
   const notificationsContainerRef = useRef(null);

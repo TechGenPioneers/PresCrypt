@@ -9,7 +9,8 @@ export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const pathname = usePathname(); // Get the current URL path
   const [userName, setUserName] = useState("Dr. Nimal Fernando"); // Replace with dynamic data from API
-
+  //const doctorId = localStorage.getItem("userId");
+  
  const handleLogout = async () => {
      const ok = window.confirm("Are you sure you want to log out?");
      if (!ok) return;

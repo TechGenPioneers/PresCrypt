@@ -20,7 +20,8 @@ export default function page() {
   const [patientType, setPatientType] = useState("past");
 
   const doctorId = "D002"; // to be replaced with login user
-
+  //const doctorId = localStorage.getItem("userId");
+  
   const fetchPatients = async () => {
     setLoading(true);
     try {

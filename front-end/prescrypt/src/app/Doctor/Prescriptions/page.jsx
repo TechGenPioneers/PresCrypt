@@ -21,6 +21,8 @@ export default function Page() {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [accessGranted, setAccessGranted] = useState(true); // Assume access is granted for now
 
+  //const doctorId = localStorage.getItem("userId");
+  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -61,17 +63,6 @@ export default function Page() {
     setShowMedicalHistory(false);
     setShowRequestModal(false);
     setSelectedPatient(null);
-  };
-
-  const getGenderFullName = (genderChar) => {
-    switch (genderChar) {
-      case "M":
-        return "Male";
-      case "F":
-        return "Female";
-      default:
-        return "Other";
-    }
   };
 
   const calculateAge = (dob) => {
@@ -167,7 +158,7 @@ export default function Page() {
                                     {appointment.patientName}
                                   </span>
                                   <span className="text-sm text-gray-600">
-                                    {getGenderFullName(appointment.gender)},{" "}
+                                    {appointment.gender},{" "}
                                     {calculateAge(appointment.dob)} yrs
                                   </span>
                                 </div>
