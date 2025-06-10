@@ -44,10 +44,14 @@ export default function Chatbot() {
       ? JSON.parse(savedMessages)
       : [
           {
-            sender: "bot",
-            text: "Hello Kayle!",
-            time: getCurrentTime(),
-          },
+          sender: "bot",
+          text: (() => {
+            const hour = new Date().getHours();
+            if (hour < 12) return "Hello! Good morning!";
+            if (hour < 18) return "Hello! Good afternoon!";
+            return "Hello! Good evening!";
+          })(), time: getCurrentTime(),
+        },
           {
             sender: "bot",
             text: "Welcome to Prescrypt! Let me know how can I help you to continue your journey healthily?",
@@ -76,8 +80,12 @@ export default function Chatbot() {
       setMessages([
         {
           sender: "bot",
-          text: "Hello Kayle!",
-          time: getCurrentTime(),
+          text: (() => {
+            const hour = new Date().getHours();
+            if (hour < 12) return "Hello! Good morning!";
+            if (hour < 18) return "Hello! Good afternoon!";
+            return "Hello! Good evening!";
+          })(), time: getCurrentTime(),
         },
         {
           sender: "bot",
@@ -113,7 +121,7 @@ export default function Chatbot() {
         {
           question: newMessage,
           patient_id: patientId,
-          page: usePathname(), // Pass current page context
+          //page: usePathname(), // Pass current page context
         },
         {
           headers: {
@@ -152,7 +160,9 @@ export default function Chatbot() {
         ...prev,
         {
           sender: "bot",
-          text: "Sorry, there was a problem connecting to the chatbot backend.",
+           error: error.message,
+          text: "Sorry, there was a problem connecting to the chatbot backend: " + error.message,
+          
           time: formattedTime,
         },
       ]);
@@ -205,3 +215,4 @@ export default function Chatbot() {
     </>
   );
 }
+
