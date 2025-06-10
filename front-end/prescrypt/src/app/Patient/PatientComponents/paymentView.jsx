@@ -1,16 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AppointmentContext } from "../Bookings/Payments/[id]/page";
 import PaymentAtLocation from "./paymentAtLocation";
 
-const PaymentView = ({
-  paymentId,
-  hospitalCharge,
-  doctorCharge,
-  hospital,
-  specialization,
-  appointmentDate,
-  appointmentTime,
-  doctorName,
-}) => {
+const PaymentView = () => {
+  const {
+    hospitalCharge,
+    doctorCharge,
+  } = useContext(AppointmentContext);
+
   const onlineFee = 200.0;
   const hospitalFee = parseFloat(hospitalCharge) || 0;
   const doctorFee = parseFloat(doctorCharge) || 0;
@@ -72,14 +69,9 @@ const PaymentView = ({
       {/* Right Section */}
       <div className="flex-1 min-w-[300px] max-w-[450px]">
         <PaymentAtLocation
-          paymentId={paymentId}
-          totalCharge={totalCharge}
-          hospital={hospital}
-          specialization={specialization}
-          appointmentDate={appointmentDate}
-          doctorName={doctorName}
-          appointmentTime={appointmentTime}
           selectedMethod={selectedMethod}
+          totalCharge={totalCharge}
+          onlineFee={onlineFee}
         />
       </div>
     </div>

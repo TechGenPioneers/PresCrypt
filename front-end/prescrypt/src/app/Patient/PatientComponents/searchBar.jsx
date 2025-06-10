@@ -11,12 +11,12 @@ const SearchBar = ({ setDoctors }) => {
 
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [hospitalId, setHospitalId] = useState("");
   const [selectedName, setSelectedName] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [hospitalCharge, setHospitalCharge] = useState("");
   const [showNameInput, setShowNameInput] = useState(false);
-
   const handleFindDoctor = async () => {
     if (!selectedName && (!selectedSpecialization || !selectedLocation)) {
       alert("Please select either a doctor name or both specialization and location.");
@@ -29,14 +29,18 @@ const SearchBar = ({ setDoctors }) => {
       const doctorsData = await findDoctors({
         specialization: selectedSpecialization,
         hospitalName: selectedLocation,
-        name: selectedName,
+        name: selectedName,//not accpeting from the backend
       });
 
       setDoctors(doctorsData);
 
       if (doctorsData && doctorsData.length > 0) {
-        setHospitalCharge(doctorsData[0].charge);
-        localStorage.setItem("hospitalCharge", doctorsData[0].charge);
+        const { charge, hospitalId } = doctorsData[0];
+        setHospitalCharge(charge);
+        setHospitalId(hospitalId); 
+        localStorage.setItem("hospitalCharge", charge);
+        localStorage.setItem("hospitalId", hospitalId); 
+        localStorage.setItem("selectedLocation", selectedLocation);
       }
     } catch (error) {
       console.error("Error fetching doctors:", error);
@@ -154,7 +158,7 @@ const SearchBar = ({ setDoctors }) => {
       <div className="flex gap-4 mt-6 justify-end">
         {/* More Options Button */}
         <button
-          className="px-6 py-3 border border-gray-300 rounded-md text-white bg-gray-600 hover:bg-gray-500 shadow-sm"
+          className="px-6 py-3 border border-gray-300 rounded-md text-white bg-red-600 hover:bg-gray-500 shadow-sm"
           onClick={() => setShowNameInput(!showNameInput)}
         >
           More Options
@@ -162,11 +166,22 @@ const SearchBar = ({ setDoctors }) => {
 
         {/* Find My Doctor */}
         <button
-          className="px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center"
+          className="px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center relative min-w-[160px]"
           onClick={handleFindDoctor}
           disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} color="inherit" /> : "Find my Doctor"}
+       >
+          {loading ? (
+            <>
+              <span className="invisible">Find my Doctor</span>
+              <CircularProgress
+                size={24}
+                color="inherit"
+                className="absolute"
+              />
+            </>
+          ) : (
+            "Find my Doctor"
+          )}
         </button>
       </div>
 

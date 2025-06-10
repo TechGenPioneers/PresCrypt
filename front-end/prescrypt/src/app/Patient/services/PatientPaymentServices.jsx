@@ -3,7 +3,7 @@ const BASE_URL = "https://localhost:7021/api";
 
 
 export const addPayment = async (paymentPayload) => {
-  return await axios.post(`${BASE_URL}/Controller/payment/add`, paymentPayload);
+  return await axios.post(`${BASE_URL}/Payment/add`, paymentPayload);
 };
 
 export const createAppointment = async (appointmentData) => {
@@ -22,7 +22,7 @@ export const sendEmail = async (emailPayload) => {
   return await axios.post(`${BASE_URL}/PatientEmail`, emailPayload);
 };
 
-// Existing notification service
+
 export const sendNotification = async (notificationPayload) => {
   return await axios.post(`${BASE_URL}/PatientNotification/send`, notificationPayload);
 };

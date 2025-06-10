@@ -7,7 +7,7 @@ import {getProfileImage , getPatientDetails} from "../services/PatientDataServic
 import axios from "axios";
 
 
-const AdminNavBar = ({ patientId = "P021" }) => {
+const PatientNavBar = ({ patientId = "P021" }) => {
   const [profileImage, setProfileImage] = useState("/profile.png");
   const [patientName, setPatientName] = useState("Patient Profile");
   const [joinDate, setJoinDate] = useState("31 December 1999");
@@ -119,4 +119,4 @@ const AdminNavBar = ({ patientId = "P021" }) => {
   );
 };
 
-export default AdminNavBar;
+export default PatientNavBar;

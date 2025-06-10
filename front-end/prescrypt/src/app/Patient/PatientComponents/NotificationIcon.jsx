@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 import IconButton from "@mui/material/IconButton";

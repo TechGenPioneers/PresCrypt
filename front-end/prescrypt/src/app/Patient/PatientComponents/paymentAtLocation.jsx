@@ -1,26 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import PaymentConfirmation from "./paymentConfirmation";
 import {
   addPayment,
   createAppointment,
   sendFailureEmail,
   sendFailureNotification,
-} from "../services/PatientPaymentServices"; // Adjust path based on folder structure
+} from "../services/PatientPaymentServices";
+import { AppointmentContext } from "../Bookings/Payments/[id]/page";
 
-const PaymentAtLocation = ({
-  paymentId,
-  totalCharge,
-  hospital,
-  specialization,
-  appointmentDate,
-  appointmentTime,
-  doctorId,
-  patientId = "P021",
-  hospitalId,
-  doctorName,
-  selectedMethod,
-  email = "dewminkasmitha30@gmail.com",
-}) => {
+const PaymentAtLocation = ({selectedMethod, totalCharge, onlineFee}) => {
+  const {
+    paymentId,
+    hospitalName,
+    specialization,
+    appointmentDate,
+    appointmentTime,
+    doctorFirstName,
+    doctorLastName,
+    hospitalId,
+    doctorId,
+    patientId = "P021",
+    email = "dewminkasmitha30@gmail.com",
+  } = useContext(AppointmentContext);
+
+  const doctorName = `${doctorFirstName} ${doctorLastName}`;
+
   const [checkbox1Checked, setCheckbox1Checked] = useState(false);
   const [checkbox2Checked, setCheckbox2Checked] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,7 +37,6 @@ const PaymentAtLocation = ({
     script.async = true;
     script.onload = () => {
       setPayhereReady(true);
-      console.log("PayHere script loaded.");
     };
     document.body.appendChild(script);
     return () => {
@@ -46,19 +49,16 @@ const PaymentAtLocation = ({
     setCheckbox2Checked(false);
   }, [selectedMethod]);
 
-  const handleCheckbox1Change = (e) => setCheckbox1Checked(e.target.checked);
-  const handleCheckbox2Change = (e) => setCheckbox2Checked(e.target.checked);
-
   const handleConfirmBooking = async () => {
     if (selectedMethod === "location") {
       if (!checkbox1Checked || !checkbox2Checked) {
-        alert("Please mark both confirmations before proceeding.");
+        alert("Please confirm both checkboxes to proceed.");
         return;
       }
       handleCreateAppointment();
     } else if (selectedMethod === "online") {
       if (!payhereReady) {
-        alert("Payment gateway not ready yet. Please try again in a few seconds.");
+        alert("Payment gateway is not ready yet. Please wait.");
         return;
       }
 
@@ -74,7 +74,7 @@ const PaymentAtLocation = ({
             item: `Booking for Dr. ${doctorName} on ${appointmentDate}`,
             first_name: "Dewmin",
             last_name: "Deniyegedara",
-            email: email,
+            email,
             phone: "0771234567",
             address: "Colombo 07",
             city: "Colombo",
@@ -85,7 +85,6 @@ const PaymentAtLocation = ({
         const obj = await res.json();
 
         window.payhere.onCompleted = function (orderId) {
-          console.log("Payment completed. OrderID:", orderId);
           handleCreateAppointment();
         };
 
@@ -95,29 +94,22 @@ const PaymentAtLocation = ({
 
         window.payhere.onError = async function (error) {
           console.error("Payment error:", error);
-
           try {
-            const emailPayload = {
+            await sendFailureEmail({
               receptor: email,
               title: "Payment Failed",
-              message: `Your online payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospital} has failed. Please try again or choose to pay at the location.`,
-            };
-            await sendFailureEmail(emailPayload);
-
-            const notificationPayload = {
+              message: `Your payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} in ${hospitalName} has failed.`,
+            });
+            await sendFailureNotification({
               patientId,
               title: "Payment Failed",
               type: "Payment",
-              message: `Online payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospital} has failed.`,
-            };
-            await sendFailureNotification(notificationPayload);
-
-            console.log("Payment failure email and notification sent.");
+              message: `Online payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} failed.`,
+            });
           } catch (notifyError) {
-            console.error("Failed to send failure email or notification", notifyError);
+            console.error("Failed to send failure notifications", notifyError);
           }
-
-          alert("Payment failed. Please try again or select pay at location.");
+          alert("Payment failed. Please try again or choose pay at location.");
         };
 
         const payment = {
@@ -125,7 +117,7 @@ const PaymentAtLocation = ({
           merchant_id: obj.merchant_id,
           return_url: "http://localhost:3000",
           cancel_url: "http://localhost:3000",
-          notify_url: "http://sample.com/notify",
+          notify_url: "",
           order_id: obj.order_id,
           items: obj.items,
           amount: obj.amount,
@@ -138,15 +130,15 @@ const PaymentAtLocation = ({
           address: obj.address,
           city: obj.city,
           country: obj.country,
-          delivery_address: "No. 46, Galle road, Kalutara South",
-          delivery_city: "Kalutara",
-          delivery_country: "Sri Lanka",
+          delivery_address: "",
+          delivery_city: "",
+          delivery_country: "",
         };
 
         window.payhere.startPayment(payment);
       } catch (err) {
         console.error("Payment init error:", err);
-        alert("Failed to load payment gateway.");
+        alert("Failed to initiate payment.");
       } finally {
         setLoading(false);
       }
@@ -163,12 +155,10 @@ const PaymentAtLocation = ({
 
     try {
       await addPayment(paymentPayload);
-      console.log("Sent to the payment service successfully.");
-
       const appointmentData = {
-        patientId: patientId || "P021",
-        doctorId: doctorId || "D008",
-        hospitalId: hospitalId || "H027",
+        patientId: patientId ,
+        doctorId: doctorId ,
+        hospitalId: hospitalId,
         date: appointmentDate,
         time: appointmentTime,
         paymentId,
@@ -182,14 +172,14 @@ const PaymentAtLocation = ({
       setCheckbox2Checked(false);
       setConfirmationOpen(true);
     } catch (error) {
-      console.error("Error saving payment or appointment:", error);
-      alert("Failed to confirm booking. Please try again.");
+      console.error("Failed to save appointment:", error);
+      alert("Error occurred. Try again.");
     }
   };
 
   const handleCloseConfirmation = () => {
     setConfirmationOpen(false);
-    window.location.href = "http://localhost:3000/Patient/PatientAppointments";
+    window.location.href = "/Patient/PatientAppointments";
   };
 
   return (
@@ -197,26 +187,25 @@ const PaymentAtLocation = ({
       <h3 className="underline font-semibold text-lg mb-4">Appointment Summary</h3>
       <div className="space-y-2 text-sm">
         <div className="flex justify-between"><span>PaymentID</span><span>{paymentId}</span></div>
-        <div className="flex justify-between"><span>Total bill payment</span><span>Rs. {totalCharge}.00</span></div>
+        <div className="flex justify-between"><span>Total Charge</span><span>Rs. {totalCharge}.00</span></div>
         <div className="flex justify-between"><span>Doctor</span><span>Dr. {doctorName}</span></div>
         <div className="flex justify-between"><span>Specialization</span><span>{specialization}</span></div>
-        <div className="flex justify-between"><span>Venue</span><span>{hospital}</span></div>
-        <div className="flex justify-between"><span>Building/Room</span><span>TBD</span></div>
+        <div className="flex justify-between"><span>Hospital</span><span>{hospitalName}</span></div>
         <div className="flex justify-between"><span>Date</span><span>{appointmentDate}</span></div>
         <div className="flex justify-between"><span>Time</span><span>{appointmentTime}</span></div>
-        <p className="text-xs text-justify text-gray-600 mt-2">
-          Be on time confirming your booking. You can pay online or at the location and get treatments.
+        <p className="text-xs mt-2 text-gray-600">
+          Be on time. You can pay online or at the location and receive treatment.
         </p>
       </div>
 
       {selectedMethod === "location" && (
         <div className="mt-6 space-y-3 text-sm text-gray-700">
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="accent-green-600" checked={checkbox1Checked} onChange={handleCheckbox1Change} />
+            <input type="checkbox" className="accent-green-600" checked={checkbox1Checked} onChange={() => setCheckbox1Checked(!checkbox1Checked)} />
             I confirm that I read the appointment summary and will attend on time.
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="accent-green-600" checked={checkbox2Checked} onChange={handleCheckbox2Change} />
+            <input type="checkbox" className="accent-green-600" checked={checkbox2Checked} onChange={() => setCheckbox2Checked(!checkbox2Checked)} />
             I’m aware that not attending without notice may affect future bookings.
           </label>
         </div>
@@ -235,11 +224,7 @@ const PaymentAtLocation = ({
         handleClose={handleCloseConfirmation}
         email={email}
         totalCharge={totalCharge}
-        patientId={patientId}
-        doctorName={doctorName}
-        appointmentDate={appointmentDate}
-        appointmentTime={appointmentTime}
-        hospitalName={hospital}
+        platformCharge={onlineFee}
       />
     </div>
   );
