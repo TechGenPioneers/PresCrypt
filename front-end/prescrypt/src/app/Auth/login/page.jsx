@@ -1,4 +1,3 @@
-// app/auth/login/page.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,20 +18,28 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("patient");
   const [notification, setNotification] = useState(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  
   useEffect(() => {
+    // Check for role parameter
     const roleParam = searchParams.get("role");
     if (roleParam && ["patient", "doctor", "admin"].includes(roleParam)) {
       setRole(roleParam);
+    }
+    
+    // Check for session parameter
+    const sessionParam = searchParams.get("session");
+    if (sessionParam === "expired") {
+      setSessionExpired(true);
     }
   }, [searchParams]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleLogin = async (e) => {
@@ -55,10 +62,11 @@ export default function LoginPage() {
       }
 
       if (
-        (response.user?.role === "DoctorPending") ||
-        (response.user?.role === "Doctor" && response.user?.emailVerified === false) ||
-        (response.message?.toLowerCase().includes("pending approval")) ||
-        (response.message?.toLowerCase().includes("not verified"))
+        response.user?.role === "DoctorPending" ||
+        (response.user?.role === "Doctor" &&
+          response.user?.emailVerified === false) ||
+        response.message?.toLowerCase().includes("pending approval") ||
+        response.message?.toLowerCase().includes("not verified")
       ) {
         showPendingNotification();
         return;
@@ -86,7 +94,10 @@ export default function LoginPage() {
     await fetch("/api/set-cookie", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: response.token, role: response.user?.role }),
+      body: JSON.stringify({
+        token: response.token,
+        role: response.user?.role,
+      }),
     });
 
     switch (response.user?.role) {
@@ -107,18 +118,27 @@ export default function LoginPage() {
   const showPendingNotification = () => {
     setNotification({
       type: "pending",
-      message: "Your doctor account is pending approval. Please wait for confirmation."
+      message:
+        "Your doctor account is pending approval. Please wait for confirmation.",
     });
 
     setTimeout(() => router.push("/Auth/MainPage"), 3000);
   };
 
   const getRegistrationUrl = () => {
-    return role === "doctor" ? "/Auth/DoctorRegistration" : "/Auth/PatientRegistration";
+    return role === "doctor"
+      ? "/Auth/DoctorRegistration"
+      : "/Auth/PatientRegistration";
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white relative">
+      {sessionExpired && (
+        <div className="w-full max-w-md mb-4 px-4 py-3 bg-red-400 border border-red-700 rounded-md text-white text-center">
+          Your session has timed out. Please log in again.
+        </div>
+      )}
+
       {notification && (
         <Notification
           type={notification.type}
@@ -132,7 +152,9 @@ export default function LoginPage() {
           WELCOME BACK!
         </h2>
         <p className="text-gray-600 text-center mb-6">
-          {role === "doctor" ? "READY TO HELP PATIENTS?" : "YOUR HEALTH JOURNEY AWAITS!"}
+          {role === "doctor"
+            ? "READY TO HELP PATIENTS?"
+            : "YOUR HEALTH JOURNEY AWAITS!"}
         </p>
 
         <AuthForm onSubmit={handleLogin}>
@@ -140,7 +162,7 @@ export default function LoginPage() {
             type="email"
             name="email"
             placeholder="Email"
-            className="w-full px-4 py-2 mb-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-400 focus:outline-none"
+            className="w-full px-4 py-2 mb-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-400 focus:outline-none text-teal"
             value={formData.email}
             onChange={handleChange}
             required
@@ -153,12 +175,13 @@ export default function LoginPage() {
             onChange={handleChange}
             error={error}
             required
+            inputClassName="text-white"
           />
 
           <p className="text-sm text-center text-teal-600 hover:underline mt-2">
             <Link href="/Auth/ForgotPassword">Forgot Password?</Link>
           </p>
-
+          
           <button
             type="submit"
             className="w-full py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition disabled:opacity-50 mt-4"
@@ -168,7 +191,9 @@ export default function LoginPage() {
           </button>
         </AuthForm>
 
-        <p className="text-gray-600 text-sm text-center mt-4">Not registered yet?</p>
+        <p className="text-gray-600 text-sm text-center mt-4">
+          Not registered yet?
+        </p>
         <Link href={getRegistrationUrl()}>
           <button className="w-full py-2 mt-2 border border-teal-500 text-teal-500 font-bold rounded-md hover:bg-teal-500 hover:text-white transition">
             Create an Account
