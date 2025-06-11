@@ -44,9 +44,7 @@ const ChatList = ({
   newMessage
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [onlineUsers, setOnlineUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [hasFetched, setHasFetched] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState({});
 
   useEffect(() => {
@@ -185,7 +183,7 @@ const ChatList = ({
     };
   }, [connection]);
 
-  if (!hasFetched && isUsersLoading) return <ChatListSkeleton />;
+  if (isUsersLoading) return <ChatListSkeleton />;
 
   return (
     <aside className="flex flex-col w-full transition-all duration-200">

@@ -4,7 +4,6 @@ import { X, Video, Ban, Info } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const ChatHeader = ({ selectedUser, setSelectedUser }) => {
-  const onlineUsers = ["1"]; // Simulate that the user is online
   const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
