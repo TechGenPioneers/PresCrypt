@@ -15,29 +15,36 @@ const MessageInput = ({
 }) => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
+  const [image,setImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
   const fileInputRef = useRef(null);
   const emojiPickerRef = useRef(null);
 
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file || !file.type.startsWith("image/")) {
-      toast.error("Please select a valid image file");
-      return;
-    }
+ const handleImageChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file || !file.type.startsWith("image/")) {
+    toast.error("Please select a valid image file");
+    return;
+  }
 
-    try {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    } catch {
-      toast.error("Failed to read image");
-    }
-  };
+  try {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result; // data:image/png;base64,...
+      setImagePreview(result);
+
+      // Extract only the base64 string
+      const base64 = result.split(',')[1];
+      setImage(base64); // base64 only, no prefix
+    };
+    reader.readAsDataURL(file);
+  } catch {
+    toast.error("Failed to read image");
+  }
+};
+
 
   const removeImage = () => {
     setImagePreview(null);
@@ -56,7 +63,7 @@ const MessageInput = ({
       senderId: userId,
       receiverId: selectedUser.receiverId,
       text: text.trim(),
-      image: imagePreview || null,
+      image: image || null,
     };
 
     const optimisticMessage = {

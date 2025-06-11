@@ -1,9 +1,9 @@
 "use client";
 
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ChatListSkeleton from "./skeletons/ChatListSkeleton";
 import { GetAllMessages } from "../service/ChatService";
-import { Clock, Check } from "lucide-react";
+import { Clock, Check, Image } from "lucide-react";
 
 const formatMessageTime = (date) => {
   const msgDate = new Date(date);
@@ -41,7 +41,7 @@ const ChatList = ({
   isUsersLoading,
   connection,
   setNewMessage,
-  newMessage
+  newMessage,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -142,11 +142,11 @@ const ChatList = ({
         // Remove any existing handler and register the correct one
         connection.off("ReceiveMessage");
         connection.on("ReceiveMessage", (msg) => {
-          if(selectedUser){
+          if (selectedUser) {
             if (msg.senderId === selectedUser.receiverId) {
-              if(newMessage===null || newMessage.length === 0){
+              if (newMessage === null || newMessage.length === 0) {
                 setNewMessage([msg]);
-              }else{
+              } else {
                 setNewMessage((prev) => [...prev, msg]);
               }
             }
@@ -168,7 +168,7 @@ const ChatList = ({
     };
   }, [connection, userId, fetchUsers]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (!connection) return;
 
     const handleMessageRead = (payload) => {
@@ -269,20 +269,37 @@ const ChatList = ({
                   </div>
                 </div>
 
-                {user.lastMessage && (
-                  <div
-                    className={`text-sm truncate ${
-                      !user.isRead && user.lastMessageSenderId !== userId
-                        ? "text-emerald-600 font-semibold"
-                        : "text-zinc-400"
-                    }`}
-                    title={user.lastMessage}
-                  >
-                    {user.lastMessageSenderId === userId
-                      ? `You: ${user.lastMessage}`
-                      : `${user.fullName}: ${user.lastMessage}`}
-                  </div>
-                )}
+                <div className="space-y-0.5">
+                  {user.image && (
+                    <div
+                      className={`flex items-center gap-1 text-sm truncate ${
+                        !user.isRead && user.lastMessageSenderId !== userId
+                          ? "text-emerald-600 font-semibold"
+                          : "text-zinc-400"
+                      }`}
+                    >
+                      <Image className="w-4 h-4" />
+                      {user.lastMessageSenderId === userId
+                        ? "You: Attachment"
+                        : `${user.fullName}: Attachment`}
+                    </div>
+                  )}
+
+                  {user.lastMessage && (
+                    <div
+                      className={`text-sm truncate ${
+                        !user.isRead && user.lastMessageSenderId !== userId
+                          ? "text-emerald-600 font-semibold"
+                          : "text-zinc-400"
+                      }`}
+                      title={user.lastMessage}
+                    >
+                      {user.lastMessageSenderId === userId
+                        ? `You: ${user.lastMessage}`
+                        : `${user.fullName}: ${user.lastMessage}`}
+                    </div>
+                  )}
+                </div>
               </div>
             </button>
           );

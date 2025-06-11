@@ -274,9 +274,9 @@ const ChatWindow = ({
                     >
                       {msg.image && (
                         <img
-                          src={msg.image}
+                          src={`data:${msg.imageMimeType || 'image/png'};base64,${msg.image}`}
                           alt="attachment"
-                          className="sm:max-w-[200px] rounded-md mb-1"
+                          className="sm:max-w-auto rounded-md mb-1"
                         />
                       )}
                       {msg.text && <p>{msg.text}</p>}
