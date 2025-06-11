@@ -61,21 +61,11 @@ const ChatHeader = ({ selectedUser, setSelectedUser }) => {
                   />
                 </div>
               </div>
-              <span
-                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${
-                  onlineUsers.includes(selectedUser._id)
-                    ? "bg-green-500 animate-pingOnce"
-                    : "bg-gray-400"
-                }`}
-              />
             </div>
             <div>
               <h3 className="text-base font-semibold text-gray-800">
                 {selectedUser.fullName}
               </h3>
-              <p className="text-sm text-gray-500">
-                {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
-              </p>
             </div>
           </div>
 

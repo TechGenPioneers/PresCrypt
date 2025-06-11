@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import ChatListSkeleton from "./skeletons/ChatListSkeleton";
 import { GetAllMessages } from "../service/ChatService";
 import { Clock, Check } from "lucide-react";
@@ -40,6 +40,8 @@ const ChatList = ({
   users,
   isUsersLoading,
   connection,
+  setNewMessage,
+  newMessage
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -142,6 +144,15 @@ const ChatList = ({
         // Remove any existing handler and register the correct one
         connection.off("ReceiveMessage");
         connection.on("ReceiveMessage", (msg) => {
+          if(selectedUser){
+            if (msg.senderId === selectedUser.receiverId) {
+              if(newMessage===null || newMessage.length === 0){
+                setNewMessage([msg]);
+              }else{
+                setNewMessage((prev) => [...prev, msg]);
+              }
+            }
+          }
           fetchUsers();
         });
       } catch (err) {
@@ -223,13 +234,6 @@ const ChatList = ({
                     />
                   </div>
                 </div>
-                <span
-                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${
-                    onlineUsers.includes(user.id)
-                      ? "bg-green-500 animate-pingOnce"
-                      : "bg-gray-400"
-                  }`}
-                />
               </div>
 
               {/* User Info */}

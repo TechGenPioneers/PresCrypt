@@ -46,6 +46,8 @@ const ChatWindow = ({
   userId,
   fetchUsers,
   connection,
+  setNewMessage,
+  newMessage,
 }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -115,55 +117,6 @@ const ChatWindow = ({
     markAsRead();
   }, [selectedUser]);
 
-  const handleReceiveMessage = useCallback(
-    (msg) => {
-      
-      console.log("New msg", msg);
-      if (
-        msg.senderId !== selectedUser.userId && // or selectedUser.id
-        msg.receiverId !== selectedUser.userId
-      ) {
-        return;
-      }
-
-      fetchUsers();
-      setMessages((prev) => {
-        const alreadyExists = prev.some((m) => m.id === msg.id);
-        if (alreadyExists) return prev;
-        return [...prev, msg];
-      });
-      markAsRead();
-    },
-    [selectedUser.receiverId]
-  );
-
-  useEffect(() => {
-    if (!connection || !userId) return;
-
-    const setupConnection = async () => {
-      try {
-        if (connection.state === "Disconnected") {
-          await connection.start();
-          console.log("Connected to SignalR hub");
-        }
-
-        await connection.invoke("JoinGroup", userId);
-        connection.off("ReceiveMessage", handleReceiveMessage);
-        connection.on("ReceiveMessage", handleReceiveMessage);
-      } catch (err) {
-        console.error("SignalR connection error:", err);
-      }
-    };
-
-    setupConnection();
-    return () => {
-      if (connection && connection.state === "Connected") {
-        connection.invoke("LeaveGroup", userId);
-        connection.off("ReceiveMessage", handleReceiveMessage);
-      }
-    };
-  }, [connection, userId, handleReceiveMessage]);
-
   useEffect(() => {
     if (!connection) return;
 
@@ -193,6 +146,25 @@ const ChatWindow = ({
     }
     // else do nothing, so user scroll position stays where it is
   }, [messages]);
+
+  useEffect(() => {
+    if (!newMessage) return;
+
+    console.log("New message received:", newMessage);
+
+    if (
+      newMessage.senderId === selectedUser.receiverId ||
+      newMessage.receiverId === selectedUser.sender
+    ) {
+      setMessages((prev) => [
+        ...prev,
+        ...(Array.isArray(newMessage) ? newMessage : [newMessage]),
+      ]);
+      markAsRead();
+      fetchUsers();
+      setNewMessage(null);
+    }
+  }, [newMessage]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -253,7 +225,7 @@ const ChatWindow = ({
             const isSelf = msg.senderId === userId;
 
             return (
-              <div key={msg.id} className="relative group">
+              <div key={msg.id || i} className="relative group">
                 {showDate && (
                   <div className="flex justify-center my-2">
                     <span className="text-sm text-gray-500 bg-gray-200 px-3 py-1 rounded-full">
