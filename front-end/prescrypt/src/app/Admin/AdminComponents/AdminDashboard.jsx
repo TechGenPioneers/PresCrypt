@@ -19,6 +19,7 @@ const AdminDashboard = () => {
   const [dateTime, setDateTime] = useState(null);
   const [dashboardData, setDashboardData] = useState([]);
 
+  //get dashboard data
   const getDashboardData = async () => {
     try {
       const response = await GetAllDashboardData();
@@ -28,6 +29,7 @@ const AdminDashboard = () => {
     }
   };
 
+  //get last 7 days in order according to today
   const getLast7DaysInOrder = () => {
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -53,12 +55,12 @@ const AdminDashboard = () => {
     updateDateTime(); // Set initial value
     const interval = setInterval(updateDateTime, 1000); // Update every second
 
-    return () => clearInterval(interval); // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   // Sort appointments over time based on the last 7 days
   const sortAppointmentsOverTime = (data) => {
-    const daysOrder = getLast7DaysInOrder(); // Get dynamic order
+    const daysOrder = getLast7DaysInOrder(); 
     if (!Array.isArray(data)) return []; // Handle undefined or invalid data
 
     return [...data].sort(
@@ -72,7 +74,7 @@ const AdminDashboard = () => {
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
-  // Formatting date as "Wednesday 5 March 2025"
+  // Formatting date
   const formattedDate = dateTime.toLocaleDateString("en-GB", {
     weekday: "long",
     day: "numeric",
@@ -86,7 +88,7 @@ const AdminDashboard = () => {
     year: "numeric",
   });
 
-  // Formatting time as "11:15 AM"
+  // Formatting time 
   const formattedTime = dateTime.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
@@ -201,6 +203,7 @@ const AdminDashboard = () => {
 
         <aside className="w-100 bg-[#CEE4E6] p-5 shadow-md relative">
           {/* Notifications */}
+          
           {/* Button to toggle the Notification Bar */}
           <AdminNotification />
 

@@ -632,6 +632,7 @@ export default function ManageDoctor({ doctorData }) {
             <h3 className="font-semibold mb-2 mt-4">Selected Time Slots:</h3>
 
             <div className="rounded-xl">
+              {/*availability table */}
               <table className="w-full mt-5 border border-gray-200 rounded-xl">
                 <thead className="bg-gray-100">
                   <tr>

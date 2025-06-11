@@ -23,7 +23,7 @@ const Doctors = () => {
     loadData();
   }, []);
 
-  if (!dateTime) return null; // Prevent SSR mismatch
+  if (!dateTime) return null; 
 
   // Date and Time Formatting
   const formattedDate = dateTime.toLocaleDateString("en-GB", {
