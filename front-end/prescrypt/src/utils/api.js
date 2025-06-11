@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://localhost:7021/api";
 
@@ -10,60 +11,65 @@ export const registerPatient = async (patientData) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patientData),
     });
-    
+
     if (!response.ok) {
       const errorMessage = await response.text();
       throw new Error(errorMessage || "Registration failed");
     }
-    
+
     return await response.json();
   } catch (error) {
     throw new Error(error.message || "An error occurred");
   }
 };
 
-// Common Login for all roles
+// Login User
 export const loginUser = async (loginData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/User/Login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(loginData),
+    const response = await axios.post(`${API_BASE_URL}/User/Login`, loginData, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      validateStatus: (status) => status < 500 // Allow custom error handling
     });
-    
-    // Parse the JSON response regardless of success or failure
-    const data = await response.json();
-    
-    // If response is not ok, we still want to return the data for proper handling
-    if (!response.ok) {
-      // If the error contains user info (like for pending doctors), return it
-      if (data.user) {
-        return {
-          success: false,
-          message: data.message || "Login failed",
-          user: data.user
-        };
-      }
-      // Otherwise return the error message
+
+    console.log('Full response:', response);
+
+    if (response.data.token) {
+      //  Store token and role in cookies
+      Cookies.set("token", response.data.token, { expires: 1 }); // 1 day expiry
+      Cookies.set("role", response.data.user.role, { expires: 1 });
+
       return {
-        success: false,
-        message: data.message || "Login failed"
+        success: true,
+        token: response.data.token,
+        user: response.data.user
       };
     }
-    
-    // Success case
-    return data;
+
+    if (response.data.message?.includes("pending approval")) {
+      return {
+        success: false,
+        message: response.data.message,
+        user: response.data.user
+      };
+    }
+
+    return {
+      success: false,
+      message: response.data.message || "Login failed"
+    };
+
   } catch (error) {
-    console.error("Login error:", error);
-    // Handle network errors or JSON parsing errors
-    return { 
-      success: false, 
-      message: "Login service unavailable. Please try again later." 
+    console.error('Login error details:', error.response?.data || error.message);
+    return {
+      success: false,
+      message: error.response?.data?.message || "Login service unavailable"
     };
   }
 };
 
-// Forgot Password (Send Reset Email)
+// Forgot Password
 export const forgotPassword = async (data) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/Patient/ForgotPassword`, data);
@@ -73,7 +79,7 @@ export const forgotPassword = async (data) => {
   }
 };
 
-// Reset Password (After clicking reset link)
+// Reset Password
 export const resetPassword = async (data) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/Patient/ResetPassword`, data);
@@ -81,4 +87,10 @@ export const resetPassword = async (data) => {
   } catch (error) {
     return error.response?.data || { success: false, message: "Error resetting password." };
   }
+};
+
+// Logout Function (Optional)
+export const logout = () => {
+  Cookies.remove("token");
+  Cookies.remove("role");
 };

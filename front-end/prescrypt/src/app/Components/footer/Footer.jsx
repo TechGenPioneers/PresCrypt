@@ -28,7 +28,7 @@ const Footer = () => {
           <ul className=" space-x-4">
             <li>
               <Link
-                href="/contact-us"
+                href="/Patient/PatientContactUs"
                 className="text-gray-600 hover:text-gray-800 font-bold "
               >
                 Contact Us

@@ -3,7 +3,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
-import "./calender.css"; // ⬅️ Import your custom styles
+import { getAppointmentsByPatientId } from "../services/AppointmentsFindingService"; 
+import "./calender.css";
 
 const CustomCalendar = () => {
   const [date, setDate] = useState(dayjs());
@@ -13,12 +14,7 @@ const CustomCalendar = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(
-          `https://localhost:7021/api/patient/appointments/${patientId}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch data");
-
-        const data = await response.json();
+        const data = await getAppointmentsByPatientId(patientId); // Call service
         console.log("Fetched appointments:", data);
         setAppointments(data);
       } catch (error) {
@@ -61,7 +57,6 @@ const CustomCalendar = () => {
     <div className="flex flex-col p-6 border border-gray-300 rounded-xl bg-white shadow-md">
       <h3 className="text-center mb-2 font-semibold">Your Appointments</h3>
 
-      {/* Calendar */}
       <div className="flex justify-center items-center">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateCalendar
@@ -73,7 +68,6 @@ const CustomCalendar = () => {
         </LocalizationProvider>
       </div>
 
-      {/* Legend */}
       <div className="flex justify-center space-x-4 mt-4">
         <div className="flex items-center space-x-2">
           <span className="w-3 h-3 bg-red-500 rounded-full"></span>

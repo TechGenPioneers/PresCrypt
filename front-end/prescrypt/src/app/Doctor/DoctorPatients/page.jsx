@@ -5,8 +5,10 @@ import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import PatientViewModal from "./PatientViewModal";
 import axiosInstance from "../utils/axiosInstance";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function page() {
+  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const Title = "Patients";
   const [allPatients, setAllPatients] = useState({ past: [], future: [] });
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -18,7 +20,8 @@ export default function page() {
   const [patientType, setPatientType] = useState("past");
 
   const doctorId = "D002"; // to be replaced with login user
-
+  //const doctorId = localStorage.getItem("userId");
+  
   const fetchPatients = async () => {
     setLoading(true);
     try {
@@ -60,7 +63,7 @@ export default function page() {
     let patientsToFilter = patientType === "past" ? allPatients.past : allPatients.future;
     
     if (searchTerm) {
-      // earch through all patients regardless of type
+      // each through all patients regardless of type
       patientsToFilter = [...allPatients.past, ...allPatients.future].filter(
         (p) =>
           p.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,17 +90,6 @@ export default function page() {
   const handleViewClick = (patient) => {
     setSelectedPatient(patient);
     setIsPatientModalOpen(true);
-  };
-
-  const getGenderFullName = (genderChar) => {
-    switch (genderChar) {
-      case "M":
-        return "Male";
-      case "F":
-        return "Female";
-      default:
-        return "Other";
-    }
   };
 
   return (
@@ -189,7 +181,7 @@ export default function page() {
                                       {patient.patientName}
                                     </span>
                                     <span className="text-sm text-gray-600">
-                                      {getGenderFullName(patient.gender)},{" "}
+                                      {patient.gender},{" "}
                                       {calculateAge(patient.dob)} yrs
                                     </span>
                                   </div>

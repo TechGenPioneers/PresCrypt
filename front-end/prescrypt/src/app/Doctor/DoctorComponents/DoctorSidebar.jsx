@@ -3,15 +3,34 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // Import usePathname
+import axios from "axios";
+import { DayPicker } from "react-day-picker";
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const pathname = usePathname(); // Get the current URL path
   const [userName, setUserName] = useState("Dr. Nimal Fernando"); // Replace with dynamic data from API
-
-  const handleLogout = () => {
-    console.log("User logged out");
-  };
+  //const doctorId = localStorage.getItem("userId");
+  
+ const handleLogout = async () => {
+     const ok = window.confirm("Are you sure you want to log out?");
+     if (!ok) return;
+ 
+     try {
+       await axios.post(
+         "https://localhost:7021/api/User/logout",
+         null,
+         { withCredentials: true }
+       );
+     } catch (err) {
+       console.warn("Backend logout failed (may not be using cookies):", err);
+     }
+  
+     localStorage.removeItem("token");
+     sessionStorage.removeItem("token");
+   
+     router.push("/Auth/login");
+   };
 
   useEffect(() => {
     // Fetch user name from API when authentication is implemented
@@ -120,7 +139,7 @@ export default function Sidebar() {
       >
         <li className="mb-4 w-full flex justify-center">
           <a
-            href="#"
+            href="/Auth/login"
             className="flex items-center p-2 hover:border-1 rounded-full transition-all duration-300 hover:border-[#033A3D] hover:bg-[#033a3d32]"
             onClick={handleLogout}
             style={{

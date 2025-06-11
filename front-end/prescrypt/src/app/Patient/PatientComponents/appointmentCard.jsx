@@ -9,6 +9,10 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useRouter } from "next/navigation";
+import {
+  fetchDoctorDetails,
+  fetchAppointmentCounts,
+} from "../services/AppointmentsFindingService";
 
 const AppointmentCard = ({
   doctorId,
@@ -28,26 +32,24 @@ const AppointmentCard = ({
   const [appointmentCounts, setAppointmentCounts] = useState({});
   const router = useRouter();
 
-  // 🔁 Get next 4 slots for each available day
-  useEffect(() => {
-    const daysOfWeek = {
-      Sunday: 0,
-      Monday: 1,
-      Tuesday: 2,
-      Wednesday: 3,
-      Thursday: 4,
-      Friday: 5,
-      Saturday: 6,
-    };
+  const daysOfWeek = {
+    Sunday: 0,
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+  };
 
+  useEffect(() => {
     const getNextAvailableDates = async (dayName) => {
       const today = new Date();
       const targetDay = daysOfWeek[dayName];
       if (targetDay === undefined) return;
 
       const currentDay = today.getDay();
-      const daysUntilTarget =
-        (targetDay - currentDay + 7) % 7 || 7;
+      const daysUntilTarget = (targetDay - currentDay + 7) % 7 || 7;
 
       const firstAvailableDate = new Date(today);
       firstAvailableDate.setDate(today.getDate() + daysUntilTarget);
@@ -70,66 +72,30 @@ const AppointmentCard = ({
         return unique.sort((a, b) => a.date.localeCompare(b.date));
       });
 
-      const counts = await fetchAppointmentCounts(
-        nextDates.map((d) => d.date)
-      );
-      setAppointmentCounts((prev) => ({ ...prev, ...counts }));
+      try {
+        const counts = await fetchAppointmentCounts(
+          doctorId,
+          nextDates.map((d) => d.date)
+        );
+        setAppointmentCounts((prev) => ({ ...prev, ...counts }));
+      } catch (err) {
+        console.error(err);
+      }
     };
 
     if (appointmentDay) {
       const daysArray = appointmentDay.split(",").map((d) => d.trim());
       daysArray.forEach(getNextAvailableDates);
     }
-  }, [appointmentDay]);
+  }, [appointmentDay, doctorId]);
 
-  // 🔁 Fetch appointment counts
-  const fetchAppointmentCounts = async (dates) => {
-    try {
-      const response = await fetch(
-        "https://localhost:7021/api/Appointments/count-by-dates",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ doctorId, dates }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch appointment counts");
-      }
-
-      const rawData = await response.json();
-
-      const normalizedData = {};
-      for (const dateTime in rawData) {
-        const dateOnly = new Date(dateTime).toISOString().split("T")[0];
-        normalizedData[dateOnly] = rawData[dateTime];
-      }
-
-      return normalizedData;
-    } catch (error) {
-      console.error(error);
-      return {};
-    }
-  };
-
-  // 🔁 Fetch doctor details
   useEffect(() => {
     if (open && doctorId) {
-      const fetchDoctorDetails = async () => {
+      const fetchData = async () => {
         setLoading(true);
         setError("");
-
         try {
-          const response = await fetch(
-            `https://localhost:7021/api/Doctor/book/${doctorId}`
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch doctor details");
-          }
-          const data = await response.json();
+          const data = await fetchDoctorDetails(doctorId);
           setDoctorDetails(data);
         } catch (err) {
           setError(err.message);
@@ -138,11 +104,10 @@ const AppointmentCard = ({
         }
       };
 
-      fetchDoctorDetails();
+      fetchData();
     }
   }, [open, doctorId]);
 
-  // 🔁 Booking handler
   const handleBooking = (selectedDate) => {
     if (doctorDetails) {
       localStorage.setItem(
@@ -177,7 +142,6 @@ const AppointmentCard = ({
       }}
     >
       <div className="bg-white rounded-3xl shadow-lg p-5 relative w-full border-2 border-green-600">
-        {/* Close Button */}
         <button
           onClick={handleClose}
           className="absolute top-0 right-0 text-gray-700 hover:text-gray-900 rounded-full p-2"
@@ -185,14 +149,12 @@ const AppointmentCard = ({
           <CloseIcon />
         </button>
 
-        {/* Header */}
         <div className="bg-teal-700 text-white py-3 rounded-t-3xl text-center">
           <DialogTitle className="text-lg font-semibold">
             Dr. {firstName} {lastName}
           </DialogTitle>
         </div>
 
-        {/* Content */}
         <DialogContent
           className="p-6 flex flex-col items-center bg-white overflow-y-auto"
           sx={{ maxHeight: "70vh" }}
@@ -218,7 +180,6 @@ const AppointmentCard = ({
                 {doctorDetails.description}
               </Typography>
 
-              {/* Appointment Dates */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full text-center mt-6">
                 {appointmentDates.map(({ date, day }, index) => (
                   <div

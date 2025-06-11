@@ -1,6 +1,5 @@
-// components/PaymentConfirmation.jsx
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,83 +9,84 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import axios from "axios"; // install axios if not already installed
+import { sendEmail, sendNotification } from "../services/PatientPaymentServices";
+import {generatePdf} from "../services/PatientDataService"; 
+import { AppointmentContext } from "../Bookings/Payments/[id]/page"; // Assuming this path is correct
 
-const PaymentConfirmation = ({
-  open,
-  handleClose,
-  email,
-  totalCharge,
-  patientId,
-  doctorName,
-  appointmentDate,
-  appointmentTime,
-  hospitalName,
-  patientEmail= 'dewminkasmitha30@gmail.com' //for testing
-}) => {
+const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformCharge}) => {
+  const {
+    paymentId,
+    patientId,
+    doctorFirstName,
+    doctorLastName,
+    appointmentDate,
+    appointmentTime,
+    hospitalName,
+    doctorCharge,
+    hospitalCharge
+  } = useContext(AppointmentContext);
+
+  const doctorName = `${doctorFirstName} ${doctorLastName}`;
+  const blobToBase64 = (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result.split(",")[1];
+      resolve(base64String);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+    });
+  };
 
   useEffect(() => {
     if (open) {
-      const sendNotification = async () => {
+      const sendNotificationFlow = async () => {
         try {
-          const pdfPayload = {
-            patientId,
-            doctorName,
-            hospitalName,
-            appointmentDate,
-            appointmentTime,
-            totalCharge,
-          };
-      
-          const pdfResponse = await axios.post("https://localhost:7021/api/PatientPDF/generate", pdfPayload, {
-            responseType: "blob",
-          });
-      
-          const pdfBlob = new Blob([pdfResponse.data], { type: "application/pdf" });
-          const pdfBase64 = await blobToBase64(pdfBlob);
-          
-      
-          // 1. Send Email Notification with PDF attachment
-          const emailPayload = {
-            receptor: patientEmail,
-            title: "Appointment Booked",
-            message: `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospitalName} is confirmed now. Please find the attached details.`,
-            attachment: {
-              fileName: "AppointmentConfirmation.pdf",
-              contentType: "application/pdf",
-              base64Content: pdfBase64,
-            },
-          };
-      
-          await axios.post("https://localhost:7021/api/PatientEmail", emailPayload);
-      
-          // 2. Send In-App Notification
           const notificationPayload = {
-            patientId,
+            patientId:'P021',
             title: "Appointment Booking",
             type: "Appointment",
             message: `Your appointment with Dr. ${doctorName} has been successfully scheduled on ${appointmentDate} at ${appointmentTime} at ${hospitalName}.`,
           };
-      
-          await axios.post("https://localhost:7021/api/PatientNotification/send", notificationPayload);
-      
-          console.log("PDF generated, email sent, notification posted");
+          await sendNotification(notificationPayload);
+
+          const pdfPayload = {
+            paymentId,
+            patientId:'P021',
+            doctorName,
+            hospitalName,
+            appointmentDate,
+            appointmentTime,
+            doctorCharge,
+            hospitalCharge,
+            platformCharge,
+            totalCharge,
+          };
+          const pdfBlob = await generatePdf(pdfPayload);
+          const pdfBase64 = await blobToBase64(pdfBlob);
+         
+          const emailPayload = {
+            receptor: email,
+            title: "Appointment Booked",
+            message: `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospitalName} is confirmed now.`,
+            attachment: {
+              fileName: "Appointment.pdf",
+              contentType: "application/pdf",
+              base64Content: pdfBase64,
+            },
+          };
+          await sendEmail(emailPayload);
+          console.log("Email sent (no PDF), notification posted");
         } catch (error) {
           console.error("Error during notification flow:", error);
         }
       };
-      
-      const blobToBase64 = async (blob) => {
-        const buffer = await blob.arrayBuffer();
-        const binary = new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '');
-        return btoa(binary);
-      };
-      
-  
-      sendNotification();
+
+      sendNotificationFlow();
     }
-  }, [open, patientId, patientEmail, doctorName, appointmentDate, appointmentTime, hospitalName]);
-  
+  }, [open, patientId, email, doctorName, appointmentDate, appointmentTime, hospitalName, totalCharge]);
+
   return (
     <Dialog
       open={open}

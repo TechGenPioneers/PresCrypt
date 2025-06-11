@@ -3,26 +3,19 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import NotificationIcon from "../../Patient/PatientComponents/NotificationIcon";
-import axios from "axios";
+import { getProfileImage } from "../../Patient/services/PatientDataService";
 
 export default function Header({ patientId = "P021" }) {
   const [profileImage, setProfileImage] = useState("/profile.png"); // fallback/default
-  const [patientName, setPatientName] = useState("User");
 
   useEffect(() => {
     const fetchProfileImage = async () => {
-      try {
-        const response = await axios.get(
-          `https://localhost:7021/api/Patient/profileImage/${patientId}`,
-          { responseType: "arraybuffer" }
-        );
-        const base64Image = Buffer.from(response.data, "binary").toString("base64");
-        setProfileImage(`data:image/jpeg;base64,${base64Image}`);
-      } catch (error) {
-        console.error("Error fetching profile image:", error);
-      }
+        try {
+            setProfileImage(await getProfileImage(patientId)); 
+        } catch (error) {
+            console.error("Error loading patient image:", error);
+        }
     };
-
     fetchProfileImage();
   }, [patientId]);
 

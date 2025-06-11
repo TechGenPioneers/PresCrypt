@@ -10,8 +10,10 @@ import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { FaCalendarAlt } from "react-icons/fa";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function AppointmentsPage() {
+  useAuthGuard(["Doctor"]);
   const Title = "Appointments";
   const [appointments, setAppointments] = useState([]);
   const [availability, setAvailability] = useState([]);
@@ -63,6 +65,7 @@ export default function AppointmentsPage() {
           setNoAppointments(true);
         }
 
+        //const doctorId = localStorage.getItem("userId");
         // Fetch availability
         if (formattedDate) {
           try {
@@ -135,17 +138,6 @@ export default function AppointmentsPage() {
   const handleViewClick = (patient) => {
     setSelectedPatient(patient);
     setIsPatientModalOpen(true);
-  };
-
-  const getGenderFullName = (genderChar) => {
-    switch (genderChar) {
-      case "M":
-        return "Male";
-      case "F":
-        return "Female";
-      default:
-        return "Other";
-    }
   };
 
   return (
@@ -270,7 +262,7 @@ export default function AppointmentsPage() {
                                       {appointment.patientName}
                                     </span>
                                     <span className="text-sm text-gray-600">
-                                      {getGenderFullName(appointment.gender)},{" "}
+                                      {appointment.gender},{" "}
                                       {calculateAge(appointment.dob)} yrs
                                     </span>
                                   </div>
@@ -290,7 +282,7 @@ export default function AppointmentsPage() {
                               <td className="px-8 py-2">
                                 {appointment.status}
                               </td>
-                              <td>
+                              <td className="px-3">
                                 <button
                                   onClick={() => handleViewClick(appointment)}
                                   className="block p-3 text-left w-full cursor-pointer font-semibold text-[#094A4D] hover:underline"

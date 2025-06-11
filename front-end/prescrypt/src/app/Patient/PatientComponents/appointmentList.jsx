@@ -2,31 +2,46 @@
 
 import React, { useEffect, useState } from "react";
 import AppointmentListStat from "./appointmentListStat";
-import CancelAppointmentDialog from "./cancelAppointmentConfirmation"; // import the dialog
-import axios from "axios";
+import CancelAppointmentDialog from "./cancelAppointmentConfirmation";
+import {
+  getAppointmentsByPatient,
+  deleteAppointment,
+  sendEmail,
+  sendNotification
+} from "../services/AppointmentsFindingService";
+import {
+  getPatientDetails,
+  getProfileImage
+} from "../services/PatientDataService"; // updated import
 
 const AppointmentList = ({ patientId }) => {
   const [appointments, setAppointments] = useState([]);
   const [patientDetails, setPatientDetails] = useState({});
+  const [profileImage, setProfileImage] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`https://localhost:7021/api/Appointments/patient/${patientId}`);
-        const pres = await axios.get(`https://localhost:7021/api/Patient/profileNavbarDetails/${patientId}`);
-        const sorted = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-        const calculatedAge = calculateAge(pres.data.dob);
+        const [appointmentsRes, patientRes, imageRes] = await Promise.all([
+          getAppointmentsByPatient(patientId),
+          getPatientDetails(patientId),
+          getProfileImage(patientId)
+        ]);
 
-        setAppointments(sorted);
-        setPatientDetails({ ...pres.data, age: calculatedAge });
+        const sortedAppointments = appointmentsRes.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const calculatedAge = calculateAge(patientRes.dob);
+
+        setAppointments(sortedAppointments);
+        setPatientDetails({ ...patientRes, age: calculatedAge });
+        setProfileImage(imageRes);
       } catch (error) {
-        console.error("Error fetching data", error);
+        console.error("Error fetching patient data:", error);
       }
     };
 
-    fetchAppointments();
+    fetchData();
   }, [patientId]);
 
   const calculateAge = (dob) => {
@@ -52,7 +67,7 @@ const AppointmentList = ({ patientId }) => {
     setAppointments((prev) => prev.filter((appt) => appt.appointmentId !== appointmentId));
 
     try {
-      await axios.delete(`https://localhost:7021/api/Appointments/${appointmentId}`);
+      await deleteAppointment(appointmentId);
       alert(`Cancelled appointment ${appointmentId}`);
 
       if (cancelledAppt) {
@@ -77,15 +92,15 @@ const AppointmentList = ({ patientId }) => {
           message: `Your appointment with Dr. ${cancelledAppt.doctorName} on ${cancelledAppt.date} at ${cancelledAppt.time} at ${cancelledAppt.hospitalName} has been cancelled as per your request.`
         };
 
-        await axios.post("https://localhost:7021/api/PatientEmail", patientEmailPayload);
-        await axios.post("https://localhost:7021/api/PatientEmail", doctorEmailPayload);
-        await axios.post("https://localhost:7021/api/PatientNotification/send", notificationPayload);
+        await sendEmail(patientEmailPayload);
+        await sendEmail(doctorEmailPayload);
+        await sendNotification(notificationPayload);
       }
     } catch (err) {
       console.error("Failed to cancel appointment", err);
       alert("Failed to cancel appointment.");
-      const res = await axios.get(`https://localhost:7021/api/Appointments/patient/${patientId}`);
-      setAppointments(res.data);
+      const res = await getAppointmentsByPatient(patientId);
+      setAppointments(res);
     }
   };
 
@@ -99,7 +114,7 @@ const AppointmentList = ({ patientId }) => {
         patientName={patientDetails.name}
         age={patientDetails.age}
         location={patientDetails.location}
-        imageUrl={`https://localhost:7021/api/Patient/profileImage/${patientId}`}
+        imageUrl={profileImage}
         total={total}
         accepted={accepted}
         cancelled={cancelled}
@@ -168,7 +183,6 @@ const AppointmentList = ({ patientId }) => {
         )}
       </div>
 
-      {/* Cancel Appointment Dialog */}
       {selectedAppointment && (
         <CancelAppointmentDialog
           open={openDialog}

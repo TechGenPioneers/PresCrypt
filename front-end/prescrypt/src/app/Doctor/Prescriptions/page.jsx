@@ -6,9 +6,11 @@ import axiosInstance from "../utils/axiosInstance";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import MedicalHistoryModal from "./Modals/MedicalHistoryModal";
 import RequestAccessModal from "./Modals/RequestAccessModal";
+import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as a Doctor
 
 export default function Page() {
   const Title = "Prescriptions";
+  useAuthGuard("Doctor"); 
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [doctorId, setDoctorId] = useState("D002");
@@ -19,6 +21,8 @@ export default function Page() {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [accessGranted, setAccessGranted] = useState(true); // Assume access is granted for now
 
+  //const doctorId = localStorage.getItem("userId");
+  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -59,17 +63,6 @@ export default function Page() {
     setShowMedicalHistory(false);
     setShowRequestModal(false);
     setSelectedPatient(null);
-  };
-
-  const getGenderFullName = (genderChar) => {
-    switch (genderChar) {
-      case "M":
-        return "Male";
-      case "F":
-        return "Female";
-      default:
-        return "Other";
-    }
   };
 
   const calculateAge = (dob) => {
@@ -165,7 +158,7 @@ export default function Page() {
                                     {appointment.patientName}
                                   </span>
                                   <span className="text-sm text-gray-600">
-                                    {getGenderFullName(appointment.gender)},{" "}
+                                    {appointment.gender},{" "}
                                     {calculateAge(appointment.dob)} yrs
                                   </span>
                                 </div>

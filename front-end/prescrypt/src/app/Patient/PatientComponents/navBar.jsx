@@ -1,16 +1,44 @@
 "use client";
 import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import {getProfileImage , getPatientDetails} from "../services/PatientDataService";
 import axios from "axios";
 
-const AdminNavBar = ({ patientId = "P021" }) => {
+
+const PatientNavBar = ({ patientId = "P021" }) => {
   const [profileImage, setProfileImage] = useState("/profile.png");
   const [patientName, setPatientName] = useState("Patient Profile");
   const [joinDate, setJoinDate] = useState("31 December 1999");
+  const router = useRouter();
+  const handleLogout = async () => {
+    const ok = window.confirm("Are you sure you want to log out?");
+    if (!ok) return;
 
+    try {
+      await axios.post(
+        "https://localhost:7021/api/User/logout",
+        null,
+        { withCredentials: true }
+      );
+    } catch (err) {
+      console.warn("Backend logout failed (may not be using cookies):", err);
+    }
+  
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+   
+    router.push("/Auth/login");
+  };
+  
+  
   const navItems = [
-    { text: "Dashboard", icon: "/image11.png", link: "/Patient/PatientDashboard" },
+    {
+      text: "Dashboard",
+      icon: "/image11.png",
+      link: "/Patient/PatientDashboard",
+    },
     { text: "Profile", icon: "/image12.png", link: "/Patient/PatientProfile" },
     { text: "Appointments", icon: "/image27.png", link: "/Patient/PatientAppointments" },
     { text: "Health Records", icon: "/image19.png", link: "/Patient/PatientHealthRecords" },
@@ -18,42 +46,24 @@ const AdminNavBar = ({ patientId = "P021" }) => {
   ];
 
   useEffect(() => {
-    const fetchProfileImage = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `https://localhost:7021/api/Patient/profileImage/${patientId}`,
-          { responseType: "arraybuffer" }
-        );
-        const base64Image = Buffer.from(response.data, "binary").toString("base64");
-        setProfileImage(`data:image/jpeg;base64,${base64Image}`);
-      } catch (error) {
-        console.error("Error fetching profile image:", error);
-      }
-    };
+        setProfileImage(await getProfileImage(patientId));
+        const { name, createdAt } = await getPatientDetails(patientId);
+        setPatientName(name);
 
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await axios.get(
-          `https://localhost:5213/api/Patient/profileNavbarDetails/${patientId}`,
-        );
-        const { name, createdAt } = response.data;
-
-        setPatientName(`${name}`);
-
-        const date = new Date(createdAt);
-        const formattedDate = date.toLocaleDateString("en-US", {
+        const formattedDate = new Date(createdAt).toLocaleDateString("en-US", {
           day: "2-digit",
           month: "long",
           year: "numeric",
         });
         setJoinDate(formattedDate);
       } catch (error) {
-        console.error("Error fetching patient details:", error);
+        console.error("Error loading patient info:", error);
       }
     };
 
-    fetchProfileImage();
-    fetchPatientDetails();
+    fetchData();
   }, [patientId]);
 
   return (
@@ -80,7 +90,11 @@ const AdminNavBar = ({ patientId = "P021" }) => {
         {navItems.map((item, index) => (
           <Link key={index} href={item.link} passHref>
             <div className="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-[#E9FAF2] hover:border-[#047857] transition-all cursor-pointer w-full">
-              <img src={item.icon} alt={item.text} className="w-5 h-5 shrink-0" />
+              <img
+                src={item.icon}
+                alt={item.text}
+                className="w-5 h-5 shrink-0"
+              />
               <span className="ml-4 text-sm text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                 {item.text}
               </span>
@@ -91,7 +105,10 @@ const AdminNavBar = ({ patientId = "P021" }) => {
 
       {/* Logout Button */}
       <div className="px-3 pb-6">
-        <button className="flex items-center w-full p-3 rounded-lg border border-red-600 text-red-600 hover:bg-red-50 transition-all">
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full p-3 rounded-lg border border-red-600 text-red-600 hover:bg-red-50 transition-all cursor-pointer"
+        >
           <LogOut className="w-5 h-5 shrink-0" />
           <span className="ml-4 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
             Logout
@@ -102,4 +119,4 @@ const AdminNavBar = ({ patientId = "P021" }) => {
   );
 };
 
-export default AdminNavBar;
+export default PatientNavBar;

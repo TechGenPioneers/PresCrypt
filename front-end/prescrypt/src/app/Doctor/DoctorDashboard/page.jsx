@@ -6,8 +6,10 @@ import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import axiosInstance from "../utils/axiosInstance";
 import Link from "next/link";
 import * as signalR from "@microsoft/signalr";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function Dashboard() {
+  useAuthGuard("Doctor");
   const Title = "Dashboard";
   const [profile, setProfile] = useState({ name: "", doctorImage: "" });
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,7 @@ export default function Dashboard() {
     error: null,
   });
 
+  //const doctorId = localStorage.getItem("userId");
   const doctorId = "D002";
   const connectionRef = useRef(null);
   const notificationsContainerRef = useRef(null);
@@ -316,7 +319,7 @@ export default function Dashboard() {
                           ? "--"
                           : dashboardData.upcomingAppointments}
                       </p>
-                      <p className="text-sm text-gray-500">Today</p>
+                      
                     </div>
 
                     <div className="bg-[#E9FAF2] p-6 rounded-[20px] shadow-lg flex items-center justify-center transition hover:bg-[#D4E9EA] cursor-pointer">
