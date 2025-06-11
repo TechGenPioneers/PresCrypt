@@ -115,6 +115,7 @@ const MessageInput = ({
         // If you're the receiver or no match found, just add the message
         return [...prev, message];
       });
+      fetchUsers();
     };
 
     connection.on("SendMessage", handleIncomingMessage);
