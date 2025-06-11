@@ -8,7 +8,7 @@ import * as signalR from "@microsoft/signalr";
 
 const Layout = ({ userId }) => {
   const [selectedUser, setSelectedUser] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState([]);
   const [users, setUsers] = useState([]);
   const [isUsersLoading, setIsUsersLoading] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
@@ -42,7 +42,9 @@ const Layout = ({ userId }) => {
           setUsers={setUsers}
           users={users}
           isUsersLoading={isUsersLoading}
-            connection={connection}
+          connection={connection}
+          setNewMessage={setNewMessage}
+          newMessage={newMessage}
         />
       </div>
 
@@ -51,10 +53,11 @@ const Layout = ({ userId }) => {
           <ChatWindow
             selectedUser={selectedUser}
             setSelectedUser={setSelectedUser}
-            messages={messages}
             userId={userId}
             fetchUsers={fetchUsers}
             connection={connection}
+            setNewMessage={setNewMessage}
+            newMessage={newMessage}
           />
         ) : (
           <NoChatSelected />
