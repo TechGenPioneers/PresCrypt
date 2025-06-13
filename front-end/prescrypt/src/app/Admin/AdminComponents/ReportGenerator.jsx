@@ -4,6 +4,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { GetAllDetails, GetReportDetails } from "../service/AdminReportService";
 
+//searchable dropdown
 const SearchableDropdown = ({
   options,
   value,
@@ -145,7 +146,7 @@ export default function ReportGenerator() {
     };
 
     try {
-      const reportDatas = await GetReportDetails(reportDetails);
+      const reportDatas = await GetReportDetails(reportDetails); // get filtered data for report
       console.log("Fetched reportDatas:", reportDatas);
       setReportData(reportDatas); // This triggers useEffect
     } catch (err) {
@@ -161,6 +162,7 @@ export default function ReportGenerator() {
     }
   }, [reportData]);
 
+  //generate pdf
   const handleDownload = async () => {
     const element = reportRef.current;
     const canvas = await html2canvas(element, { scale: 5 });
@@ -183,6 +185,7 @@ export default function ReportGenerator() {
   const [patientOptions, setPatientOptions] = useState([]);
   const [specialtyOptions, setSpecialtyOptions] = useState([]);
 
+  // get all patients , doctors names and specialties
   const GetAllData = async () => {
     try {
       const response = await GetAllDetails();
@@ -271,6 +274,7 @@ export default function ReportGenerator() {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md border-15 border-[#E9FAF2]">
+      {/* Title */}
       <h1 className="text-2xl font-bold mb-2">Reports</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
 
@@ -818,7 +822,7 @@ export default function ReportGenerator() {
                   </div>
                 </>
               )}
-
+              {/* detailed Info for doctor*/}
               {reportType === "detailed" &&
                 patient === "" &&
                 doctor !== "all" && (
@@ -990,7 +994,7 @@ export default function ReportGenerator() {
                     </div>
                   </>
                 )}
-
+              {/* detailed Info for patient*/}
               {reportType === "detailed" &&
                 patient !== "all" &&
                 doctor === "" && (
@@ -1104,7 +1108,7 @@ export default function ReportGenerator() {
                     </div>
                   </>
                 )}
-
+              {/*  appointment info*/}
               {reportType === "appointment" && (
                 <div className="mt-4">
                   <h2 className="text-lg font-bold mb-4 text-left">
@@ -1280,7 +1284,7 @@ export default function ReportGenerator() {
                   </div>
                 </div>
               )}
-
+              {/* activity info*/}
               {reportType === "activity" && (
                 <div className="mt-4">
                   <h2 className="text-lg font-bold mb-4 text-left">
@@ -1368,8 +1372,6 @@ export default function ReportGenerator() {
                   </div>
                 </div>
               )}
-
-              {/* More report variations here... */}
             </div>
 
             {/* Download Button */}

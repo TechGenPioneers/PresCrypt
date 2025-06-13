@@ -13,7 +13,7 @@ const GetDoctorRequest = async () => {
          throw error
        }
  }
- //get doctor requestby id
+ //get doctor request by id
 const GetRequestById = async (requestId) => {
     try{
       const response = await axios.get(`${DoctorRequestURL}/${requestId}`);
@@ -45,6 +45,7 @@ const GetRequestById = async (requestId) => {
       throw error; // Rethrow error for handling upstream (in handleSubmit)
     }
   };
+  
   //update doctor
 const RejectRequest = async (requestId,reason) => {
   const rejectData = {

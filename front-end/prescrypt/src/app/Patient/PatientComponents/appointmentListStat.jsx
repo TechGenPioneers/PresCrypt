@@ -6,6 +6,7 @@ const AppointmentListStat = ({ patientName, age, location, imageUrl, total, acce
 
   const handleOpenReport = () => setReportDialogOpen(true);
   const handleCloseReport = () => setReportDialogOpen(false);
+  
 
   return (
     <div className="mb-6">
@@ -39,6 +40,7 @@ const AppointmentListStat = ({ patientName, age, location, imageUrl, total, acce
           <div className="bg-red-50 text-red-800 px-4 py-2 rounded-md shadow-sm text-sm font-medium">
             Cancelled Appointments: <span className="font-bold">{cancelled}</span>
           </div>
+          
         </div>
       </div>
 

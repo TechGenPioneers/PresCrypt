@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // Import usePathname
 import axios from "axios";
+import { DayPicker } from "react-day-picker";
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -138,7 +139,7 @@ export default function Sidebar() {
       >
         <li className="mb-4 w-full flex justify-center">
           <a
-            href="Auth/login"
+            href="/Auth/login"
             className="flex items-center p-2 hover:border-1 rounded-full transition-all duration-300 hover:border-[#033A3D] hover:bg-[#033a3d32]"
             onClick={handleLogout}
             style={{

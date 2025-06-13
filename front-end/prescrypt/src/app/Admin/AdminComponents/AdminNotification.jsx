@@ -19,6 +19,7 @@ const AdminNotification = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
+  //get all notifications
   const GetNotifications = async () => {
     try {
       const response = await GetAllNotifications();
@@ -34,8 +35,13 @@ const AdminNotification = () => {
     GetNotifications(); // fetch all notifications
 
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7021/AdminNotificationHub", { transport: signalR.HttpTransportType.WebSockets })
+      .withUrl(`${process.env.NEXT_PUBLIC_API_BASE_URL}/AdminNotificationHub`, {
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
+        logger: signalR.LogLevel.Debug,
+      })
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Information)
       .build();
 
     newConnection
@@ -89,11 +95,12 @@ const AdminNotification = () => {
     };
   }, [isSidebarVisible]);
 
+  //notification time based on triggered
   const timeAgo = (dateString) => {
     const now = new Date();
     const createdAt = new Date(dateString);
     const diffSeconds = Math.floor((now - createdAt) / 1000);
-  
+
     const units = [
       { label: "year", seconds: 31536000 },
       { label: "month", seconds: 2592000 },
@@ -102,18 +109,18 @@ const AdminNotification = () => {
       { label: "minute", seconds: 60 },
       { label: "second", seconds: 1 },
     ];
-  
+
     for (const unit of units) {
       const count = Math.floor(diffSeconds / unit.seconds);
       if (count >= 1) {
         return `${count} ${unit.label}${count > 1 ? "s" : ""} ago`;
       }
     }
-  
+
     return "just now";
   };
-  
 
+  // mark as read one notification
   const markAsRead = async (notificationId) => {
     try {
       const response = await MarkAsRead(notificationId);
@@ -132,16 +139,16 @@ const AdminNotification = () => {
     }
   };
 
+  //mark all as read
   const MarkAllRead = async () => {
     try {
-      
       const response = await MarkAllAsRead();
       if (response.status === 200) {
-      // Update local state
-      setNotifications((prev) =>
-        prev.map((notif) => ({ ...notif, isRead: true }))
-      );
-    }
+        // Update local state
+        setNotifications((prev) =>
+          prev.map((notif) => ({ ...notif, isRead: true }))
+        );
+      }
     } catch (error) {
       console.error("Failed to mark all notifications as read", error);
     }
@@ -177,7 +184,7 @@ const AdminNotification = () => {
             : "translate-x-full opacity-0"
         } overflow-hidden z-40`}
       >
-        {/* Sidebar Header */}
+        {/* notification Header */}
         <div className="flex justify-between items-center border-b pb-2 mb-4">
           <h3 className="text-xl font-semibold flex items-center">
             <Bell className="w-5 h-5 mr-2" /> Notifications

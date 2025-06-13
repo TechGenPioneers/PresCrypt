@@ -13,6 +13,7 @@ const GetAllDetails = async () => {
        }
  }
 
+ //get filter data
  const GetReportDetails = async (reportDetails) => {
   try {
     const response = await axios.post(ReportUrl, reportDetails);

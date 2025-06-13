@@ -6,7 +6,6 @@ import Layout from "./Layout";
 export default function Chat() {
   return (
     <div>
-      <Header />
       <Layout />
       <Footer />
     </div>

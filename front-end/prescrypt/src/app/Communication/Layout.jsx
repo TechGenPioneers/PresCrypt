@@ -1,52 +1,66 @@
 "use client";
+import { useEffect, useState } from "react";
+import ChatList from "./component/ChatList";
+import ChatWindow from "./component/ChatWindow";
+import NoChatSelected from "./component/NoChatSelected";
+import { EstablishSignalRConnection, GetUsers } from "./service/ChatService";
+import * as signalR from "@microsoft/signalr";
 
-import { useState } from "react";
-import ChatList from "./ChatList";
-import ChatWindow from "./ChatWindow";
-import VideoCall from "./VideoCall";
-import "./styles/telehealth.css"; // Import the CSS file
+const Layout = ({ userId }) => {
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [newMessage, setNewMessage] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [isUsersLoading, setIsUsersLoading] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
+  const [connection, setConnection] = useState();
 
-const Layout = () => {
-  const contacts = [
-    { name: "Dr. John Doe", recentMessage: "Hello, how can I assist you?", id: 1 },
-    { name: "Dr. Jane Smith", recentMessage: "Let's discuss your symptoms.", id: 2 },
-  ];
-
-  // Set the first contact as the default selected contact
-  const [selectedContact, setSelectedContact] = useState(contacts[0]);
-  const [messages, setMessages] = useState([]);
-
-  const selectChat = (contact) => {
-    setSelectedContact(contact);
-    setMessages([]); // Fetch chat history for the contact
+  const fetchUsers = async () => {
+    try {
+      const response = await GetUsers(userId);
+      setUsers(response || []);
+      setHasFetched(true);
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setIsUsersLoading(false);
+    }
   };
-
-  const sendMessage = (message) => {
-    setMessages([...messages, { sender: "patient", text: message }]);
-  };
-
-  const startCall = () => {
-    console.log("Starting video call with", selectedContact.name);
-  };
+  // SignalR setup
+  useEffect(() => {
+    const newConnection = EstablishSignalRConnection();
+    setConnection(newConnection);
+  }, []);
 
   return (
-    <div className="telehealth-app">
-      {/* Left side - Chat Contacts */}
-      <div className="left-side">
-        <ChatList contacts={contacts} selectChat={selectChat} selectedContact={selectedContact} />
+    <div className="flex h-screen p-2 gap-2">
+      <div className="w-1/4 bg-white text-black border-[3px] border-[#006369] overflow-y-auto rounded-xl">
+        <ChatList
+          selectedUser={selectedUser}
+          setSelectedUser={setSelectedUser}
+          userId={userId}
+          fetchUsers={fetchUsers}
+          setUsers={setUsers}
+          users={users}
+          isUsersLoading={isUsersLoading}
+          connection={connection}
+          setNewMessage={setNewMessage}
+          newMessage={newMessage}
+        />
       </div>
 
-      {/* Right side - Chat Window & Video Call */}
-      <div className="right-side">
-        {selectedContact && (
-          <>
-            <VideoCall startCall={startCall} />
-            <ChatWindow
-              selectedContact={selectedContact}
-              messages={messages}
-              sendMessage={sendMessage}
-            />
-          </>
+      <div className="w-3/4 flex flex-col bg-[#ecf0f1] rounded-xl overflow-hidden">
+        {selectedUser !== null ? (
+          <ChatWindow
+            selectedUser={selectedUser}
+            setSelectedUser={setSelectedUser}
+            userId={userId}
+            fetchUsers={fetchUsers}
+            connection={connection}
+            setNewMessage={setNewMessage}
+            newMessage={newMessage}
+          />
+        ) : (
+          <NoChatSelected />
         )}
       </div>
     </div>
