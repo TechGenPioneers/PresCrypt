@@ -3,9 +3,7 @@
 import Footer from "../../Components/footer/Footer";
 import Header from "../../Components/header/Header";
 import NavBar from "../PatientComponents/navBar";
-import PatientDashboard from "../PatientComponents/patientDashboard";
-import Link from "next/link"; // Import the Link component
-import Image from "next/image";
+import PatientDashboardSection from "../PatientComponents/patientDashboard";
 import React from "react";
 import { useEffect } from "react";
 import useAuthGuard from "@/utils/useAuthGuard";
@@ -17,7 +15,7 @@ export default function Home() {
     <div>
       <Header/>
       <NavBar/>
-      <PatientDashboard />
+      <PatientDashboardSection />
       <Chatbot />
       <Footer/>
     </div>
