@@ -37,7 +37,8 @@ export const config = {
     "/Admin/:path*",
     "/Doctor/:path*",
     "/Patient/:path*",
-    "/Auth/login"
+    "/Auth/login",
+    "/Auth/Verify2FA"
     
   ],
 };
