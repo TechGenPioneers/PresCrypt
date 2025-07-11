@@ -1,22 +1,29 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { CircularProgress } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+
 import SpecializationDialog from "./specializationBox";
 import LocationDialog from "./locationSelectBox";
-import { CircularProgress } from "@mui/material";
-import { findDoctors } from "../services/AppointmentsFindingService";  
+import DoctorNameDialog from "./doctorNameDialog";
+
+import { findDoctors } from "../services/AppointmentsFindingService";
 
 const SearchBar = ({ setDoctors }) => {
   const [specializationOpen, setSpecializationOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
+  const [doctorNameOpen, setDoctorNameOpen] = useState(false);
 
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [hospitalId, setHospitalId] = useState("");
   const [selectedName, setSelectedName] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [hospitalCharge, setHospitalCharge] = useState("");
   const [showNameInput, setShowNameInput] = useState(false);
+
+  const isNameSearchActive = selectedName.trim().length > 0;
+  const isCategorySearchActive =
+    selectedSpecialization.trim().length > 0 || selectedLocation.trim().length > 0;
+
   const handleFindDoctor = async () => {
     if (!selectedName && (!selectedSpecialization || !selectedLocation)) {
       alert("Please select either a doctor name or both specialization and location.");
@@ -25,23 +32,13 @@ const SearchBar = ({ setDoctors }) => {
 
     setLoading(true);
     try {
-      // Use the service function here for fetching data
       const doctorsData = await findDoctors({
         specialization: selectedSpecialization,
         hospitalName: selectedLocation,
-        name: selectedName,//not accpeting from the backend
+        name: selectedName,
       });
 
       setDoctors(doctorsData);
-
-      if (doctorsData && doctorsData.length > 0) {
-        const { charge, hospitalId } = doctorsData[0];
-        setHospitalCharge(charge);
-        setHospitalId(hospitalId); 
-        localStorage.setItem("hospitalCharge", charge);
-        localStorage.setItem("hospitalId", hospitalId); 
-        localStorage.setItem("selectedLocation", selectedLocation);
-      }
     } catch (error) {
       console.error("Error fetching doctors:", error);
       alert("Failed to fetch doctor details. Please try again.");
@@ -50,41 +47,28 @@ const SearchBar = ({ setDoctors }) => {
     }
   };
 
+  // Clear local storage on mount
   useEffect(() => {
-    // Clear the selections in localStorage when the component mounts
     localStorage.removeItem("selectedSpecialization");
     localStorage.removeItem("selectedLocation");
     localStorage.removeItem("selectedName");
+
     setSelectedSpecialization("");
     setSelectedLocation("");
     setSelectedName("");
   }, []);
 
   useEffect(() => {
-    if (selectedSpecialization) {
-      localStorage.setItem("selectedSpecialization", selectedSpecialization);
-    }
+    if (selectedSpecialization) localStorage.setItem("selectedSpecialization", selectedSpecialization);
   }, [selectedSpecialization]);
 
   useEffect(() => {
-    if (selectedLocation) {
-      localStorage.setItem("selectedLocation", selectedLocation);
-    }
+    if (selectedLocation) localStorage.setItem("selectedLocation", selectedLocation);
   }, [selectedLocation]);
 
   useEffect(() => {
-    if (selectedName) {
-      localStorage.setItem("selectedName", selectedName);
-    }
+    if (selectedName) localStorage.setItem("selectedName", selectedName);
   }, [selectedName]);
-
-  useEffect(() => {
-    if (hospitalCharge) {
-      localStorage.setItem("hospitalCharge", hospitalCharge);
-    }
-  }, [hospitalCharge]);
-
-  const isNameSearchActive = selectedName.trim().length > 0;
 
   return (
     <div className="bg-[#E8F4F2] p-6 rounded-md">
@@ -92,63 +76,92 @@ const SearchBar = ({ setDoctors }) => {
         Search for available appointments
       </h2>
 
-      {/* Layout section */}
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Left column - Specialization + Doctor Name */}
+        {/* Left column */}
         <div className="flex flex-col gap-4 w-full md:w-1/2">
           {/* Specialization */}
           <button
             className={`w-full p-4 text-md border rounded-md text-gray-700 shadow-sm text-left ${
-              isNameSearchActive ? "bg-gray-200 border-gray-300" : "bg-white border-green-700"
+              isNameSearchActive
+                ? "bg-gray-200 border-gray-300 cursor-not-allowed"
+                : "bg-white border-green-700"
             }`}
             onClick={() => !isNameSearchActive && setSpecializationOpen(true)}
             disabled={isNameSearchActive}
           >
             <span className="text-gray-400 text-sm">Specialization / Category</span>
             <br />
-            <span className="font-medium text-green-700">
+            <span className="font-medium text-green-700 flex items-center justify-between">
               {selectedSpecialization || "Find Your Category"}
+              {selectedSpecialization && !isNameSearchActive && (
+                <CloseIcon
+                  fontSize="small"
+                  className="cursor-pointer ml-2 text-gray-400 hover:text-gray-700"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedSpecialization("");
+                  }}
+                />
+              )}
             </span>
           </button>
 
-          {/* Doctor Name input (below Specialization if shown) */}
+          {/* Doctor Name selection via dialog */}
           {showNameInput && (
-            <label
-              className={`w-full block p-4 text-md border rounded-md shadow-sm text-left ${
-                isNameSearchActive ? "bg-white border-green-700" : "bg-white border-gray-300"
+            <button
+              className={`w-full p-4 text-md border rounded-md text-gray-700 shadow-sm text-left ${
+                isCategorySearchActive
+                  ? "bg-gray-200 border-gray-300 cursor-not-allowed"
+                  : "bg-white border-green-700"
               }`}
+              onClick={() => !isCategorySearchActive && setDoctorNameOpen(true)}
+              disabled={isCategorySearchActive}
             >
               <span className="text-gray-400 text-sm">Doctor Name</span>
-              <input
-                type="text"
-                placeholder="Enter doctor's name"
-                className="mt-1 w-full bg-transparent outline-none font-medium text-green-700"
-                value={selectedName}
-                onChange={(e) => {
-                  setSelectedName(e.target.value);
-                  if (e.target.value) {
-                    setSelectedSpecialization("");
-                    setSelectedLocation("");
-                  }
-                }}
-              />
-            </label>
+              <br />
+              <span className="font-medium text-green-700 flex items-center justify-between">
+                {selectedName || "Select Doctor Name"}
+                {selectedName && !isCategorySearchActive && (
+                  <CloseIcon
+                    fontSize="small"
+                    className="cursor-pointer ml-2 text-gray-400 hover:text-gray-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedName("");
+                    }}
+                  />
+                )}
+              </span>
+            </button>
           )}
         </div>
 
-        {/* Right column - Location */}
+        {/* Right column */}
         <div className="flex flex-col gap-4 w-full md:w-1/2">
+          {/* Location */}
           <button
             className={`w-full p-4 text-md border rounded-md text-gray-700 shadow-sm text-left ${
-              isNameSearchActive ? "bg-gray-200 border-gray-300" : "bg-white border-green-700"
+              isNameSearchActive
+                ? "bg-gray-200 border-gray-300 cursor-not-allowed"
+                : "bg-white border-green-700"
             }`}
             onClick={() => !isNameSearchActive && setLocationOpen(true)}
             disabled={isNameSearchActive}
           >
             <span className="text-gray-400 text-sm">Location or remote appointment</span>
             <br />
-            <span className="font-medium text-green-700">
+            <span className="font-medium text-green-700 flex items-center justify-between">
               {selectedLocation || "Find Your Location"}
+              {selectedLocation && !isNameSearchActive && (
+                <CloseIcon
+                  fontSize="small"
+                  className="cursor-pointer ml-2 text-gray-400 hover:text-gray-700"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedLocation("");
+                  }}
+                />
+              )}
             </span>
           </button>
         </div>
@@ -156,7 +169,6 @@ const SearchBar = ({ setDoctors }) => {
 
       {/* Buttons */}
       <div className="flex gap-4 mt-6 justify-end">
-        {/* More Options Button */}
         <button
           className="px-6 py-3 border border-gray-300 rounded-md text-white bg-red-600 hover:bg-gray-500 shadow-sm"
           onClick={() => setShowNameInput(!showNameInput)}
@@ -164,31 +176,27 @@ const SearchBar = ({ setDoctors }) => {
           More Options
         </button>
 
-        {/* Find My Doctor */}
         <button
           className="px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center relative min-w-[160px]"
           onClick={handleFindDoctor}
           disabled={loading}
-       >
-          {loading ? (
-            <>
-              <span className="invisible">Find my Doctor</span>
-              <CircularProgress
-                size={24}
-                color="inherit"
-                className="absolute"
-              />
-            </>
-          ) : (
-            "Find my Doctor"
+        >
+          {loading && (
+            <CircularProgress
+              size={24}
+              thickness={4}
+              color="inherit"
+              className="absolute left-4"
+            />
           )}
+          Find Doctor
         </button>
       </div>
 
       {/* Dialogs */}
       <SpecializationDialog
         open={specializationOpen}
-        handleClose={() => setSpecializationOpen(false)}
+        onClose={() => setSpecializationOpen(false)}
         onSelect={(spec) => {
           setSelectedSpecialization(spec);
           setSpecializationOpen(false);
@@ -197,10 +205,19 @@ const SearchBar = ({ setDoctors }) => {
 
       <LocationDialog
         open={locationOpen}
-        handleClose={() => setLocationOpen(false)}
+        onClose={() => setLocationOpen(false)}
         onSelect={(loc) => {
           setSelectedLocation(loc);
           setLocationOpen(false);
+        }}
+      />
+
+      <DoctorNameDialog
+        open={doctorNameOpen}
+        onClose={() => setDoctorNameOpen(false)}
+        onSelect={(name) => {
+          setSelectedName(name);
+          setDoctorNameOpen(false);
         }}
       />
     </div>

@@ -24,6 +24,7 @@ const AppointmentCard = ({
   open,
   handleClose,
   specialization,
+  hospitalName,
 }) => {
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -119,6 +120,8 @@ const AppointmentCard = ({
           charge: doctorDetails.charge,
           selectedDate,
           appointmentTime,
+          specialization,
+          hospitalName,
         })
       );
       router.push(`/Patient/Bookings/Payments/${doctorId}`);
