@@ -10,6 +10,7 @@ const DoctorRequest = () => {
   const [statusFilter, setStatusFilter] = useState("Pending");
 
   useEffect(() => {
+    //get all requests
     const fetchDoctorRequests = async () => {
       const getDoctorRequest = await GetDoctorRequest();
       setRequests(getDoctorRequest);

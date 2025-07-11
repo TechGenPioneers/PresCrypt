@@ -222,11 +222,13 @@ export default function DoctorConfirmForm({ requestId }) {
     }
   };
 
+  //get request
   const fetchRequest = async () => {
     const getRequest = await GetRequestById(requestId);
     setRequest(getRequest);
     console.log("Request:", getRequest);
   };
+  //get and set hospitals
   const loadData = async () => {
     const HospitalDetails = await GetHospitals();
     console.log(HospitalDetails);
@@ -245,7 +247,7 @@ export default function DoctorConfirmForm({ requestId }) {
     };
 
     load();
-  }, [requestId]); // ✅ Only re-run when requestId changes
+  }, [requestId]); //  Only re-run when requestId changes
 
   useEffect(() => {
     if (request && request.request) {
@@ -279,7 +281,7 @@ export default function DoctorConfirmForm({ requestId }) {
         );
       }
     }
-  }, [request]); // ✅ This effect only runs when request changes
+  }, [request]); //  This effect only runs when request changes
 
   // set date and time
   if (!dateTime) return null;
@@ -653,6 +655,7 @@ export default function DoctorConfirmForm({ requestId }) {
           </div>
         </div>
       )}
+      {/*loading component*/}
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
