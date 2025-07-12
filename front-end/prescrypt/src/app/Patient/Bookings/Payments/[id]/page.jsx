@@ -50,11 +50,11 @@ function PaymentClient({ id }) {
           <AppointmentContext.Provider value= 
             {{
               paymentId,
-              hospitalCharge,
+              hospitalCharge:appointmentData.hospitalCharge,
               doctorCharge:appointmentData.charge,
-              hospitalName:selectedLocation,
-              hospitalId:hospitalId, 
-              specialization:selectedSpecialization,
+              hospitalName:appointmentData.hospitalName,
+              hospitalId:appointmentData.hospitalId, 
+              specialization:appointmentData.specialization,
               appointmentDate:appointmentData.selectedDate, 
               appointmentTime:appointmentData.appointmentTime, 
               doctorId:appointmentData.doctorId,

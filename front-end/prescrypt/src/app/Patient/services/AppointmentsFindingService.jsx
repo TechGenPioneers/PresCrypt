@@ -46,6 +46,19 @@ export const fetchHospitalLocations = async () => {
   }
 };
 
+
+// Fetch list of doctor names
+export const fetchDoctorNames = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Doctor/doctors`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching doctor names:", error.message);
+    throw error;
+  }
+};
+
+
 // Fetch appointments of a patient for calendar
 export const getAppointmentsByPatientId = async (patientId) => {
   try {
