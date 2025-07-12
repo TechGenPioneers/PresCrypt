@@ -121,7 +121,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
       const appointmentData = {
         patientId,
         doctorId,
-        hospitalId: hospitalId || "H021",
+        hospitalId: hospitalId,
         date: appointmentDate,
         time: appointmentTime,
         charge: totalCharge,
@@ -141,37 +141,90 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
 
   const handleOnlinePayment = async () => {
     if (!payhereReady) {
-      alert("Payment gateway is not ready yet. Please wait.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch("/api/payhere-process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: totalCharge,
-          item: `Booking for Dr. ${doctorName} on ${appointmentDate}`,
-          first_name: "Dewmin",
-          last_name: "Deniyegedara",
-          email,
-          phone: "0771234567",
-          address: "Colombo 07",
-          city: "Colombo",
-          country: "Sri Lanka",
-        }),
-      });
-      const obj = await res.json();
-      window.payhere.onCompleted = function () {
-        handleCreateAppointment();
-      };
-      window.payhere.startPayment(obj);
-    } catch (err) {
-      console.error("Payment init error:", err);
-      alert("Failed to initiate payment.");
-    } finally {
-      setLoading(false);
-    }
+        alert("Payment gateway is not ready yet. Please wait.");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await fetch("/api/payhere-process", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: totalCharge,
+            item: `Booking for Dr. ${doctorName} on ${appointmentDate}`,
+            first_name: "Dewmin",
+            last_name: "Deniyegedara",
+            email,
+            phone: "0771234567",
+            address: "Colombo 07",
+            city: "Colombo",
+            country: "Sri Lanka",
+          }),
+        });
+
+        const obj = await res.json();
+
+        window.payhere.onCompleted = function (orderId) {
+          handleCreateAppointment();
+        };
+
+        window.payhere.onDismissed = function () {
+          console.log("Payment dismissed");
+        };
+
+        window.payhere.onError = async function (error) {
+          console.error("Payment error:", error);
+          try {
+            await sendFailureEmail({
+              receptor: email,
+              title: "Payment Failed",
+              message: `Your payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} in ${hospitalName} has failed.`,
+            });
+            await sendFailureNotification({
+              patientId,
+              title: "Payment Failed",
+              type: "Payment",
+              message: `Online payment for Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} failed.`,
+            });
+          } catch (notifyError) {
+            console.error("Failed to send failure notifications", notifyError);
+          }
+          alert("Payment failed. Please try again or choose pay at location.");
+        };
+
+        const payment = {
+          sandbox: true,
+          merchant_id: obj.merchant_id,
+          return_url: "http://localhost:3000",
+          cancel_url: "http://localhost:3000",
+          notify_url: "",
+          order_id: obj.order_id,
+          items: obj.items,
+          amount: obj.amount,
+          currency: obj.currency,
+          hash: obj.hash,
+          first_name: obj.first_name,
+          last_name: obj.last_name,
+          email: obj.email,
+          phone: obj.phone,
+          address: obj.address,
+          city: obj.city,
+          country: obj.country,
+          delivery_address: "",
+          delivery_city: "",
+          delivery_country: "",
+        };
+
+        window.payhere.startPayment(payment);
+      } catch (err) {
+        console.error("Payment init error:", err);
+        alert("Failed to initiate payment.");
+      } finally {
+        setLoading(false);
+      }
   };
 
   const handleCloseConfirmation = () => {

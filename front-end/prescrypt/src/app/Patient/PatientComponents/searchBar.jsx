@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Fade } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 import SpecializationDialog from "./specializationBox";
@@ -39,6 +39,7 @@ const SearchBar = ({ setDoctors }) => {
       });
 
       setDoctors(doctorsData);
+      console.log("Doctors found:", doctorsData);
     } catch (error) {
       console.error("Error fetching doctors:", error);
       alert("Failed to fetch doctor details. Please try again.");
@@ -196,29 +197,31 @@ const SearchBar = ({ setDoctors }) => {
       {/* Dialogs */}
       <SpecializationDialog
         open={specializationOpen}
-        onClose={() => setSpecializationOpen(false)}
-        onSelect={(spec) => {
-          setSelectedSpecialization(spec);
+        handleClose={() => setSpecializationOpen(false)}
+        onSelect={(val) => {
+          setSelectedSpecialization(val);
           setSpecializationOpen(false);
         }}
       />
 
       <LocationDialog
         open={locationOpen}
-        onClose={() => setLocationOpen(false)}
-        onSelect={(loc) => {
-          setSelectedLocation(loc);
+        handleClose={() => setLocationOpen(false)}
+        onSelect={(val) => {
+          setSelectedLocation(val);
           setLocationOpen(false);
         }}
       />
 
       <DoctorNameDialog
         open={doctorNameOpen}
-        onClose={() => setDoctorNameOpen(false)}
-        onSelect={(name) => {
-          setSelectedName(name);
+        handleClose={() => setDoctorNameOpen(false)}
+        onSelect={(val) => {
+          setSelectedName(val);
           setDoctorNameOpen(false);
         }}
+        TransitionComponent={Fade}
+        transitionDuration={300}
       />
     </div>
   );

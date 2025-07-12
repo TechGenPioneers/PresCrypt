@@ -46,6 +46,8 @@ export default function Appointments() {
                       imageUrl="https://png.pngtree.com/png-clipart/20240323/original/pngtree-professional-doctor-with-stethoscope-png-image_14666123.png"
                       hospitalName={doctor.hospitalName}
                       specialization={doctor.specialization}
+                      hospitalId={doctor.hospitalId}
+                      hospitalCharge={doctor.charge}
                     />
                   ))
                 )

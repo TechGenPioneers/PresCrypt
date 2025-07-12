@@ -10,6 +10,8 @@ const BookingCard = ({
   imageUrl,
   hospitalName,
   specialization,
+  hospitalId,
+  hospitalCharge,
 }) => {
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -23,6 +25,8 @@ const BookingCard = ({
       imageUrl,
       hospitalName,
       specialization,
+      hospitalId,
+      hospitalCharge,
     };
     localStorage.setItem("selectedAppointment", JSON.stringify(appointmentData));
     console.log("Appointment saved to localStorage:", appointmentData);
@@ -75,6 +79,8 @@ const BookingCard = ({
         imageUrl={imageUrl}
         hospitalName={hospitalName}
         specialization={specialization}
+        hospitalId={hospitalId}
+        hospitalCharge={hospitalCharge}
         open={openDialog}
         handleClose={() => setOpenDialog(false)}
       />
