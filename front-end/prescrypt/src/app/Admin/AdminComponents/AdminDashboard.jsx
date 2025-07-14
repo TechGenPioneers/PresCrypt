@@ -14,8 +14,9 @@ import {
 } from "recharts";
 import AdminNotification from "./AdminNotification";
 import { GetAllDashboardData } from "../service/AdminDashboardService";
+import Dashboard from "@/app/Doctor/DoctorDashboard/page";
 
-const AdminDashboard = () => {
+const AdminDashboard = ({setAdminName}) => {
   const [dateTime, setDateTime] = useState(null);
   const [dashboardData, setDashboardData] = useState([]);
 
@@ -24,6 +25,7 @@ const AdminDashboard = () => {
     try {
       const response = await GetAllDashboardData();
       setDashboardData(response);
+      setAdminName(response.adminName);
     } catch (error) {
       console.error("Failed to get the data", error);
     }
@@ -107,7 +109,7 @@ const AdminDashboard = () => {
           {/* Welcome Section */}
           <div className="bg-[#E9FAF2] p-6 rounded-4xl mb-6">
             <h3 className="text-2xl text-[#094A4D] font-semibold ">
-              Welcome, Nimal
+              Welcome, {dashboardData.adminName}
             </h3>
             <p className="text-[#094A4D]">Have a nice day at work!</p>
           </div>
