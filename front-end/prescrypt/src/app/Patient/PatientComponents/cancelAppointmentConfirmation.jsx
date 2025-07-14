@@ -50,7 +50,7 @@ const CancelAppointmentDialog = ({
           Are you sure you want to cancel this appointment?
         </Typography>
         <Typography variant="body1" sx={{ mt: 1, color: "#555", maxWidth: "480px" }}>
-        You are about to cancel your appointment with Dr. <strong>{doctorName}</strong> on <strong>{date}</strong> at <strong>{time}</strong> at <strong>{hospitalName}</strong>. By cancelling this appointment, you may lose your booking fee and the opportunity to reschedule. Please confirm your decision. Frequent cancellations may lead to your account being suspended. Patients who cancel appointments at least 48 hours in advance are eligible for a full refund and automatically credited to your account.
+        You are about to cancel your appointment with Dr. <strong>{doctorName}</strong> on <strong>{date}</strong> at <strong>{time}</strong> at <strong>{hospitalName}</strong>. By cancelling this appointment, you may lose your booking fee and the opportunity to reschedule. Please confirm your decision. Frequent cancellations may lead to your account being suspended. Patients who cancel appointments at least 48 hours in advance aare eligible for a full refund and automatically credited to your account.
         </Typography>
       </DialogContent>
 

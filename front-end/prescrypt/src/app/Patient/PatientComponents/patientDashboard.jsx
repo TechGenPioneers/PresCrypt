@@ -23,7 +23,8 @@ const PatientDashboard = ({ id = "P021" }) => {
   }, [id]);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-12 min-h-[85vh] py-10 bg-white">
+    <div className="flex flex-col items-center justify-center gap-12 min-h-[85vh] py-10">
+
       <h2 className="text-3xl font-bold text-green-700 text-center">
         {patient?.name && (
           <>
@@ -84,7 +85,7 @@ const PatientDashboard = ({ id = "P021" }) => {
           <Card className="w-96 h-64 rounded-2xl shadow-md border border-green-200 hover:shadow-xl transition duration-300">
             <CardActionArea className="h-full rounded-2xl overflow-hidden">
               <Image
-                src="/ContactUs.jpg" // 👉 make sure this image exists in /public
+                src="/ContactUs.jpg" 
                 alt="Contact Us"
                 width={384}
                 height={192}
