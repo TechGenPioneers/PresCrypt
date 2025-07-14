@@ -88,7 +88,7 @@ export default function LoginPage() {
 
   const completeLogin = async (response) => {
     localStorage.setItem("token", response.token);
-    localStorage.setItem("userId", response.user?.id);
+    localStorage.setItem("username", response.user?.username);
     localStorage.setItem("userRole", response.user?.role);
 
     await fetch("/api/set-cookie", {
@@ -97,6 +97,7 @@ export default function LoginPage() {
       body: JSON.stringify({
         token: response.token,
         role: response.user?.role,
+        username: response.user?.username
       }),
     });
 
