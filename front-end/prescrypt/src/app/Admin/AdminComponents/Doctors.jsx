@@ -64,13 +64,6 @@ const Doctors = () => {
             className="w-full max-w-5xl p-2 bg-[#E9FAF2] border border-gray-300 rounded-full shadow-sm 
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6]"
           />
-
-          <button
-            className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
-          hover:bg-[#91B4B8] transition duration-300"
-          >
-            <Link href="/Admin/DoctorRegistrationForm">Add New Doctor</Link>
-          </button>
         </div>
       </div>
 
