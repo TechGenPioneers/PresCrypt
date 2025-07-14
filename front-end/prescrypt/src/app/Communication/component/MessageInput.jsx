@@ -90,6 +90,7 @@ const MessageInput = ({
     } finally {
       setIsSending(false);
       setText("");
+      setImage(null);
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
