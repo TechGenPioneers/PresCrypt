@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as signalR from '@microsoft/signalr';
-const baseUrl = "https://localhost:7021/api/Chat"
+const baseUrl = "https://localhost:7021/api/ChatMsg"
 
 const GetUsers = async(userId)=>{
     try {
