@@ -10,10 +10,10 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import Select from "react-select";
-//import useAuthGuard from "@/utils/useAuthGuard";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function Page() {
-  //useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
+  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const Title = "Reports";
   const [formData, setFormData] = useState({
     fromDate: null,

@@ -9,7 +9,7 @@ import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authentic
 
 export default function Page() {
   const Title = "Prescriptions";
-  //useAuthGuard("Doctor"); 
+  useAuthGuard("Doctor"); 
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [doctorId, setDoctorId] = useState("D002");

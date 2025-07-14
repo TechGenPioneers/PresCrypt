@@ -5,10 +5,10 @@ import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import PatientViewModal from "./PatientViewModal";
 import DoctorPatientsService from "../services/DoctorPatientsService";
-//import useAuthGuard from "@/utils/useAuthGuard";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function page() {
-  //useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
+  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const Title = "Patients";
   const [allPatients, setAllPatients] = useState({ past: [], future: [] });
   const [filteredPatients, setFilteredPatients] = useState([]);
