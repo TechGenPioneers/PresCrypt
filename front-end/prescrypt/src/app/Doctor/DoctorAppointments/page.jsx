@@ -5,15 +5,15 @@ import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import PatientViewModal from "./PatientViewModal";
 import RescheduleModal from "./RescheduleModal";
-import axiosInstance from "../utils/axiosInstance";
+import AppointmentService from "../services/DoctorAppointmentsService";
 import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { FaCalendarAlt } from "react-icons/fa";
-import useAuthGuard from "@/utils/useAuthGuard";
+//import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function AppointmentsPage() {
-  useAuthGuard(["Doctor"]);
+  //useAuthGuard(["Doctor"]);
   const Title = "Appointments";
   const [appointments, setAppointments] = useState([]);
   const [availability, setAvailability] = useState([]);
@@ -26,6 +26,9 @@ export default function AppointmentsPage() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
   const calendarRef = useRef(null);
+
+  //const doctorId = user?.id;
+  const doctorId = "D002";
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -44,59 +47,47 @@ export default function AppointmentsPage() {
   }, [showCalendar]);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      setLoading(true);
-      try {
-        const formattedDate = selectedDate
-          ? format(new Date(selectedDate), "yyyy-MM-dd")
-          : "";
+  const fetchAppointments = async () => {
+    setLoading(true);
+    try {
+      const formattedDate = selectedDate
+        ? format(new Date(selectedDate), "yyyy-MM-dd")
+        : "";
 
-        const appointmentsResponse = await axiosInstance.get(
-          `/Appointments/by-doctor/D002${
-            formattedDate ? `?date=${formattedDate}` : ""
-          }`
-        );
+      const appointmentsData = await AppointmentService.getAppointmentsByDoctor(doctorId, formattedDate);
 
-        if (appointmentsResponse.data && appointmentsResponse.data.length > 0) {
-          setAppointments(appointmentsResponse.data);
-          setNoAppointments(false);
-        } else {
-          setAppointments([]);
-          setNoAppointments(true);
-        }
-
-        //const doctorId = localStorage.getItem("userId");
-        // Fetch availability
-        if (formattedDate) {
-          try {
-            const availabilityResponse = await axiosInstance.get(
-              `/Appointments/availability/${formattedDate}`,
-              {
-                params: {
-                  doctorId: "D002",
-                },
-              }
-            );
-            setAvailability(availabilityResponse.data || []);
-          } catch (error) {
-            if (error.response?.status === 404) {
-              setAvailability([]);
-            } else {
-              console.error("Error fetching availability:", error);
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
+      if (appointmentsData && appointmentsData.length > 0) {
+        setAppointments(appointmentsData);
+        setNoAppointments(false);
+      } else {
         setAppointments([]);
         setNoAppointments(true);
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchAppointments();
-  }, [selectedDate]);
+      if (formattedDate) {
+        try {
+          const availabilityData = await AppointmentService.getAvailabilityByDoctor(doctorId, formattedDate);
+          setAvailability(availabilityData || []);
+        } catch (error) {
+          if (error.response?.status === 404) {
+            setAvailability([]);
+          } else {
+            console.error("Error fetching availability:", error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      setAppointments([]);
+      setNoAppointments(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAppointments();
+}, [selectedDate]);
+
 
   const toggleMenu = (id) => {
     setOpenMenuId(openMenuId === id ? null : id);

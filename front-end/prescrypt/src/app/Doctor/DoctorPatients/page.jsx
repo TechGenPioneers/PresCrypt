@@ -4,11 +4,11 @@ import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import PatientViewModal from "./PatientViewModal";
-import axiosInstance from "../utils/axiosInstance";
-import useAuthGuard from "@/utils/useAuthGuard";
+import DoctorPatientsService from "../services/DoctorPatientsService";
+//import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function page() {
-  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
+  //useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const Title = "Patients";
   const [allPatients, setAllPatients] = useState({ past: [], future: [] });
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -21,31 +21,21 @@ export default function page() {
 
   const doctorId = "D002"; // to be replaced with login user
   //const doctorId = localStorage.getItem("userId");
-  
+
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      const [pastResponse, futureResponse] = await Promise.all([
-        axiosInstance.get(`/DoctorPatient/patient-details/${doctorId}?type=past`)
-          .catch(err => {
-            if (err.response?.status === 404) {
-              return { data: [] }; //as empty data
-            }
-            throw err;
-          }),
-        axiosInstance.get(`/DoctorPatient/patient-details/${doctorId}?type=future`)
-          .catch(err => {
-            if (err.response?.status === 404) {
-              return { data: [] };
-            }
-            throw err;
-          })
+      const [pastPatients, futurePatients] = await Promise.all([
+        DoctorPatientsService.getPatientsByType(doctorId, "past"),
+        DoctorPatientsService.getPatientsByType(doctorId, "future"),
       ]);
-    
       setAllPatients({
-        past: pastResponse.data || [],
-        future: futureResponse.data || []
+        past: pastPatients || [],
+        future: futurePatients || [],
       });
+      setNoPatients(
+        (pastPatients?.length || 0) === 0 && (futurePatients?.length || 0) === 0
+      );
     } catch (error) {
       console.error("Error:", error);
       setNoPatients(true);
@@ -61,7 +51,7 @@ export default function page() {
   //filtered patients
   useEffect(() => {
     let patientsToFilter = patientType === "past" ? allPatients.past : allPatients.future;
-    
+
     if (searchTerm) {
       // each through all patients regardless of type
       patientsToFilter = [...allPatients.past, ...allPatients.future].filter(
@@ -70,7 +60,7 @@ export default function page() {
           p.patientId.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     setFilteredPatients(patientsToFilter);
     setNoPatients(patientsToFilter.length === 0);
   }, [patientType, searchTerm, allPatients]);
@@ -164,9 +154,7 @@ export default function page() {
                               key={patient.appointmentId}
                               className="border-b border-[#094A4D] relative odd:bg-[#E9FAF2]"
                             >
-                              <td className="px-4 py-2">
-                                {patient.patientId}
-                              </td>
+                              <td className="px-4 py-2">{patient.patientId}</td>
                               <td className="py-2">
                                 <div className="flex items-center space-x-3">
                                   <img
@@ -181,16 +169,13 @@ export default function page() {
                                       {patient.patientName}
                                     </span>
                                     <span className="text-sm text-gray-600">
-                                      {patient.gender},{" "}
-                                      {calculateAge(patient.dob)} yrs
+                                      {patient.gender}, {calculateAge(patient.dob)} yrs
                                     </span>
                                   </div>
                                 </div>
                               </td>
                               <td className="px-4 py-2">
-                                {new Date(patient.date).toLocaleDateString(
-                                  "en-US"
-                                )}
+                                {new Date(patient.date).toLocaleDateString("en-US")}
                               </td>
                               <td className="py-2">{patient.hospitalName}</td>
                               <td>

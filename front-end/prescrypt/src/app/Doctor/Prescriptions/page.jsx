@@ -2,15 +2,14 @@
 import React, { useState, useEffect } from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
-import axiosInstance from "../utils/axiosInstance";
+import PrescriptionsService from "../services/PrescriptionsService"; 
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import MedicalHistoryModal from "./Modals/MedicalHistoryModal";
-import RequestAccessModal from "./Modals/RequestAccessModal";
 import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as a Doctor
 
 export default function Page() {
   const Title = "Prescriptions";
-  useAuthGuard("Doctor"); 
+  //useAuthGuard("Doctor"); 
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [doctorId, setDoctorId] = useState("D002");
@@ -22,15 +21,13 @@ export default function Page() {
   const [accessGranted, setAccessGranted] = useState(true); // Assume access is granted for now
 
   //const doctorId = localStorage.getItem("userId");
-  
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axiosInstance.get(
-          `/Appointments/recent-by-doctor/${doctorId}`
-        );
-        setAppointments(res.data.length === 0 ? [] : res.data);
+        const data = await PrescriptionsService.getRecentByDoctor(doctorId);
+        setAppointments(data.length === 0 ? [] : data);
       } catch (err) {
         setError(err);
       } finally {
@@ -141,9 +138,7 @@ export default function Page() {
                             key={appointment.id || index}
                             className="border-b border-[#094A4D] relative odd:bg-[#E9FAF2]"
                           >
-                            <td className="px-4 py-2">
-                              {appointment.patientId}
-                            </td>
+                            <td className="px-4 py-2">{appointment.patientId}</td>
                             <td className="px-4 py-2">
                               <div className="flex items-center space-x-3">
                                 <img
@@ -165,25 +160,18 @@ export default function Page() {
                               </div>
                             </td>
                             <td className="px-4 py-2">
-                              {new Date(appointment.date).toLocaleDateString(
-                                "en-US"
-                              )}{" "}
+                              {new Date(appointment.date).toLocaleDateString("en-US")}{" "}
                               <span className="text-sm text-gray-600">
-                                {new Date(
-                                  `1970-01-01T${appointment.time}`
-                                ).toLocaleTimeString([], {
+                                {new Date(`1970-01-01T${appointment.time}`).toLocaleTimeString([], {
                                   hour: "2-digit",
                                   minute: "2-digit",
                                   hour12: true,
                                 })}
                               </span>
                             </td>
-
+                            <td className="px-4 py-2">{appointment.hospitalName}</td>
                             <td className="px-4 py-2">
-                              {appointment.hospitalName}
-                            </td>
-                            <td className="px-4 py-2">
-                              <button 
+                              <button
                                 className="font-medium cursor-pointer text-[#094A4D] hover:underline"
                                 onClick={() => handleViewClick(appointment)}
                               >
@@ -208,17 +196,9 @@ export default function Page() {
         isOpen={showMedicalHistory}
         onClose={closeModals}
         patient={selectedPatient}
-        getGenderFullName={getGenderFullName}
         calculateAge={calculateAge}
       />
-
-      {/* Request Access Modal */}
-      <RequestAccessModal
-        isOpen={showRequestModal}
-        onClose={closeModals}
-        patient={selectedPatient}
-        onRequestSubmit={handleRequestAccess}
-      />
+      
     </div>
   );
 }
