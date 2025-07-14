@@ -125,7 +125,7 @@ export default function PatientRegistration() {
             </button>
             {showRoleDropdown && (
               <div className={styles.dropdownMenu}>
-                {["Patient", "Doctor", "Admin"].map((role) => (
+                {["Patient", "Doctor"].map((role) => (
                   <div
                     key={role}
                     className={styles.dropdownItem}
