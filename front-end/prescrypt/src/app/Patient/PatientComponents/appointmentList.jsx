@@ -177,13 +177,6 @@ const AppointmentList = ({ patientId }) => {
           </div>
         ))}
 
-        {appointments.length > 5 && (
-          <div className="text-center">
-            <button className="bg-[#5da9a7] hover:bg-[#4c9995] text-white px-6 py-2 rounded-full shadow">
-              Load more..
-            </button>
-          </div>
-        )}
       </div>
 
       {selectedAppointment && (
