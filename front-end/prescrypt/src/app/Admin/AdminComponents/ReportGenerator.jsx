@@ -243,13 +243,6 @@ export default function ReportGenerator() {
     year: "numeric",
   });
 
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-
   const reportTypeOptions = [
     { value: "summary", label: "Summary" },
     { value: "detailed", label: "Detailed" },
@@ -273,7 +266,7 @@ export default function ReportGenerator() {
       : reportTypeOptions; // Show all other options when none of the above conditions are true
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md border-15 border-[#E9FAF2]">
+    <div className="p-6 bg-white  border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">Reports</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
@@ -400,11 +393,6 @@ export default function ReportGenerator() {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="mt-6 text-gray-500 text-right">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
       </div>
       {/* Modal to show the generated report */}
       {isModalOpen && (

@@ -40,7 +40,7 @@ const AdminNavBar = ({ adminName }) => {
       image: "/image20.png",
       link: "/Admin/AdminReportGeneratorPage",
     },
-    { text: "Message", image: "/message.png", link: "/Admin/Message" },
+    { text: "Message", image: "/message.png", link: "/Admin/AdminMessage" },
   ];
   const handleLogout = async () => {
     const ok = window.confirm("Are you sure you want to log out?");

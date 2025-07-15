@@ -89,17 +89,9 @@ const AdminDashboard = ({setAdminName}) => {
     month: "long",
     year: "numeric",
   });
-
-  // Formatting time 
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
   return (
     <>
-      <div className="flex min-h-screen bg-white border-15 border-[#E9FAF2]">
+      <div className="flex min-h-screen bg-white border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
         {/* Main Content */}
         <main className="overflow-auto flex-grow p-6">
           <div className="mb-10 pl-5 ">
@@ -234,11 +226,6 @@ const AdminDashboard = ({setAdminName}) => {
                 <h4 className="text-lg font-semibold">Total Patients</h4>
                 <p className="text-3xl font-bold">{dashboardData.patients}</p>
               </div>
-            </div>
-            {/* Date & Time */}
-            <div className="mt-15 text-center text-[#094A4D]">
-              <p>{formattedDate}</p>
-              <p>{formattedTime}</p>
             </div>
           </div>
         </aside>
