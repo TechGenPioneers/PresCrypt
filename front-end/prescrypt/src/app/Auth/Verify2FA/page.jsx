@@ -13,7 +13,7 @@ export default function Verify2FA() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
-
+  const username = localStorage.getItem("username");
   const handleVerify = async () => {
     setError("");
 
@@ -39,6 +39,8 @@ export default function Verify2FA() {
         // ✅ Optionally store in localStorage (only for UI purposes)
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("userRole", res.data.user.role);
+        localStorage.setItem("username", username);
+        localStorage.setItem("email", email);
 
         // ✅ Redirect based on role
         if (res.data.user.role == "Admin") {
