@@ -123,7 +123,7 @@ export default function LoginPage() {
         "Your doctor account is pending approval. Please wait for confirmation.",
     });
 
-    setTimeout(() => router.push("/Auth/MainPage"), 3000);
+    setTimeout(() => router.push("/"), 3000);
   };
 
   const getRegistrationUrl = () => {
