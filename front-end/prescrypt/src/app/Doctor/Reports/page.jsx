@@ -3,14 +3,14 @@ import React, { useState, useRef, useEffect } from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
-import axiosInstance from "../utils/axiosInstance";
+import ReportsService from "../services/ReportsService"; 
 import { Input, Button, Checkbox } from "@material-tailwind/react";
 import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import Select from "react-select";
-import useAuthGuard from "@/utils/useAuthGuard"; 
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function Page() {
   useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
@@ -98,37 +98,20 @@ export default function Page() {
 
     setIsGenerating(true);
     try {
-      // Format dates as YYYY-MM-DD strings to avoid timezone issues
-      const formatDate = (date) => {
-        if (!date) return null;
-        return format(date, "yyyy-MM-dd");
-      };
+      const patientId =
+        formData.patient?.id === "all" ? "all" : formData.patient?.id;
 
-      console.log("Sending dates:", {
-        from: formatDate(formData.fromDate),
-        to: formatDate(formData.toDate),
+      const response = await ReportsService.generateReport({
+        fromDate: formData.fromDate,
+        toDate: formData.toDate,
+        patientId,
+        reportType: formData.reportType,
+        doctorId: "D002", // Replace this with dynamic doctorId if needed
       });
-
-      const response = await axiosInstance.post(
-        "/DoctorReport/generate-reports",
-        {
-          from: formatDate(formData.fromDate),
-          to: formatDate(formData.toDate),
-          patient:
-            formData.patient?.id === "all" ? "all" : formData.patient?.id,
-          reportType: formData.reportType,
-          doctorId: "D002", // Should come from auth context
-        },
-        {
-          responseType: "blob",
-        }
-      );
 
       const reportDate = format(new Date(), "yyyyMMdd");
       const patientIdentifier =
-        formData.patient?.id === "all"
-          ? "AllPatients"
-          : `Patient-${formData.patient?.id}`;
+        patientId === "all" ? "AllPatients" : `Patient-${patientId}`;
       const filename = `${formData.reportType.replace(
         /\s+/g,
         "-"
@@ -232,7 +215,7 @@ export default function Page() {
                             : "To Date"}
                         </span>
                         <span>
-                          <FaCalendarAlt className="mt-1 text-[#094A4D]"/>
+                          <FaCalendarAlt className="mt-1 text-[#094A4D]" />
                         </span>
                       </button>
                       {showToDateCalendar && (

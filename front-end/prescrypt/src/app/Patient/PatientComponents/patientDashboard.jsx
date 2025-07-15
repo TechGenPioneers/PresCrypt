@@ -23,7 +23,8 @@ const PatientDashboard = ({ id = "P021" }) => {
   }, [id]);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-12 min-h-[85vh] py-10 bg-white">
+    <div className="flex flex-col items-center justify-center gap-12 min-h-[85vh] py-10">
+
       <h2 className="text-3xl font-bold text-green-700 text-center">
         {patient?.name && (
           <>
@@ -34,7 +35,7 @@ const PatientDashboard = ({ id = "P021" }) => {
         Welcome to your Personal Health Hub
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
         <Link href="/Patient/PatientAppointments">
           <Card className="w-96 h-64 rounded-2xl shadow-md border border-green-200 hover:shadow-xl transition duration-300">
             <CardActionArea className="h-full rounded-2xl overflow-hidden">
@@ -80,6 +81,29 @@ const PatientDashboard = ({ id = "P021" }) => {
             </CardActionArea>
           </Card>
         </Link>
+        <Link href="/Patient/PatientContactUs">
+          <Card className="w-96 h-64 rounded-2xl shadow-md border border-green-200 hover:shadow-xl transition duration-300">
+            <CardActionArea className="h-full rounded-2xl overflow-hidden">
+              <Image
+                src="/ContactUs.jpg" 
+                alt="Contact Us"
+                width={384}
+                height={192}
+                className="h-2/3 w-full object-cover"
+              />
+              <CardContent className="flex justify-center items-center h-1/3 bg-green-50">
+                <Typography
+                  variant="h6"
+                  align="center"
+                  className="text-green-700 font-semibold"
+                >
+                  Contact Us
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        </Link>
+
       </div>
     </div>
   );

@@ -46,3 +46,7 @@ export async function generateAppointmentReport(payload) {
 
   return response.data; // This is the blob
 }
+
+export const sendPatientContactUs = async (dataload) => {
+  return await axios.post(`${BASE_URL}/Patient/ContactUs`, dataload);
+};
