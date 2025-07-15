@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Card, CardActionArea, CardContent, Typography } from "@mui/material";
 import { getPatientDetails } from "../services/PatientDataService";
 
-const PatientDashboard = ({ id = "P021" }) => {
+const PatientDashboard = ({ id = "P025" }) => {
   const [patient, setPatient] = useState(null);
 
   useEffect(() => {

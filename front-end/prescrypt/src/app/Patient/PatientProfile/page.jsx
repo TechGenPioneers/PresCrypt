@@ -1,20 +1,70 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Import useRouter
-import { FaUser, FaEnvelope, FaBirthdayCake, FaPhone, FaMapMarkerAlt, FaEdit, FaPlus } from 'react-icons/fa';
+import { useRouter } from 'next/navigation'; 
+import { FaUser, FaEnvelope, FaBirthdayCake, FaPhone, FaMapMarkerAlt, FaEdit, FaPlus, FaInfoCircle, FaIdCard } from 'react-icons/fa';
 import Header from '@/app/Components/header/Header';
 import Sidebar from '@/app/Patient/PatientComponents/navBar';
 import axios from 'axios';
 
-
 const HealthRecord = () => {
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
   const [patientData, setPatientData] = useState(null);
   const [healthData, setHealthData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [healthError, setHealthError] = useState(null);
+
+  // Helper function to format date safely
+  const formatDate = (dateString) => {
+    if (!dateString || dateString.trim() === '') {
+      return 'Not provided';
+    }
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+      }
+      
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return 'Invalid Date';
+    }
+  };
+
+  // Helper function to format name from first and last name
+  const formatFullName = (firstName, lastName) => {
+    const first = firstName || '';
+    const last = lastName || '';
+    return `${first} ${last}`.trim() || 'Not provided';
+  };
+
+  // Helper function to convert blob to base64 URL
+  const convertBlobToImageUrl = (blobData) => {
+    if (!blobData) return null;
+    
+    try {
+      // If it's already a base64 string, return it with proper data URL prefix
+      if (typeof blobData === 'string') {
+        if (blobData.startsWith('data:image/')) {
+          return blobData;
+        }
+        return `data:image/jpeg;base64,${blobData}`;
+      }
+      
+      // If it's a blob object, convert to base64
+      return URL.createObjectURL(blobData);
+    } catch (error) {
+      console.error('Error converting blob to image URL:', error);
+      return null;
+    }
+  };
 
   // Helper function to extract value from observation display string
   const extractValueFromDisplay = (displayString) => {
@@ -41,12 +91,31 @@ const HealthRecord = () => {
     return matchingObs.length > 0 ? matchingObs[matchingObs.length - 1] : null;
   };
 
+  // OpenMRS Health Information Header Indicator Component
+  const HealthInfoIndicator = () => {
+    return (
+      <div className="group relative inline-block">
+        <div className="flex items-center space-x-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+          <FaInfoCircle className="w-4 h-4 text-blue-600" />
+          <span className="text-xs font-medium text-blue-700">
+            ⚕️ Synced via OpenMRS API
+          </span>
+        </div>
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 shadow-lg">
+          <div className="flex items-center space-x-2">
+            <span>All health information is automatically synced via OpenMRS API</span>
+          </div>
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-gray-800"></div>
+        </div>
+      </div>
+    );
+  };
+
   useEffect(() => {
-    // Function to fetch patient data from API
     const fetchPatientData = async () => {
       try {
         // Get patientId from localStorage or other state management
-        const patientId = "3B879C95-267A-42EA-B546-59FFFB748CFD";
+        const patientId = "P021";
         
         if (!patientId) {
           setError("Patient ID not found. Please log in again.");
@@ -55,33 +124,35 @@ const HealthRecord = () => {
         }
 
         // Fetch patient basic data from the API
-        const response = await axios.get(`https://localhost:7295/api/Patients/${patientId}`);
+        const response = await axios.get(`https://localhost:7021/api/PatientProfile/${patientId}/basic`);
+        
+        console.log('API Response:', response.data);
         
         // Transform API data to match component requirements
+        const apiData = response.data;
+        
         setPatientData({
-          name: response.data.name,
-          title: response.data.title,
-          joinedDate: new Date(response.data.joinedDate).toLocaleDateString('en-US', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-          }),
-          gender: response.data.gender,
-          birthDate: new Date(response.data.birthDate).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-          }),
-          phone: response.data.phone,
-          email: response.data.email,
-          address: response.data.address,
-          profileImage: response.data.profileImageBase64,
-          bloodGroup: response.data.bloodGroup || "Not recorded"
+          patientId: apiData.patientId || patientId,
+          name: formatFullName(apiData.firstName, apiData.lastName),
+          firstName: apiData.firstName || 'Not provided',
+          lastName: apiData.lastName || 'Not provided',
+          title: formatFullName(apiData.firstName, apiData.lastName),
+          gender: apiData.gender || 'Not provided',
+          birthDate: formatDate(apiData.dob || apiData.DOB),
+          phone: apiData.contactNo || 'Not provided',
+          email: apiData.email || 'Not provided',
+          address: apiData.address || 'Not provided',
+          bloodGroup: apiData.bloodGroup || "Not recorded",
+          nic: apiData.nic || apiData.NIC || 'Not provided',
+          profileImage: convertBlobToImageUrl(apiData.profileImage),
+          status: apiData.status || 'Active',
+          createdAt: formatDate(apiData.createdAt),
+          updatedAt: formatDate(apiData.updatedAt),
+          lastLogin: formatDate(apiData.lastLogin)
         });
 
-        // Now fetch health information data
+        // Fetch health data from the API
         try {
-          // Assume we're getting the data in the format of the second document
           const healthResponse = await axios.get(`https://localhost:7295/api/PatientObservations/${patientId}`);
           const results = healthResponse.data.results || [];
 
@@ -116,12 +187,12 @@ const HealthRecord = () => {
             heartRate: pulse ? `${pulse} bpm` : "Not recorded",
             bloodPressure: (systolicBP && diastolicBP) ? `${systolicBP}/${diastolicBP} mmHg` : "Not recorded",
             allergies: allergies,
-            bloodGroup: bloodType || (patientData?.bloodGroup || "Not recorded")
+            bloodGroup: bloodType || (apiData.bloodGroup || "Not recorded")
           });
         } catch (healthErr) {
           console.error("Error fetching health data:", healthErr);
-          setHealthError("Couldn't connect to the Health info server");
-          // Set default health data
+          setHealthError("Couldn't connect to the OpenMRS server");
+          // Set default health data with blood group from patient data
           setHealthData({
             height: "Not recorded",
             weight: "Not recorded",
@@ -130,7 +201,7 @@ const HealthRecord = () => {
             heartRate: "Not recorded",
             bloodPressure: "Not recorded",
             allergies: ["No allergies recorded"],
-            bloodGroup: patientData?.bloodGroup || "Not recorded"
+            bloodGroup: apiData.bloodGroup || "Not recorded"
           });
         }
         
@@ -228,10 +299,10 @@ const HealthRecord = () => {
   const bmiStatusColor = getBmiStatusColor(bmiStatus);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-blue-50">
       <Header/>
       <Sidebar/>
-      {/* Main Content - Adjusted with left margin/padding to move content right */}
+      
       <div className="ml-16 sm:ml-20 md:ml-24 lg:ml-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -243,7 +314,7 @@ const HealthRecord = () => {
                   <div className="relative mb-4">
                     {patientData.profileImage ? (
                       <Image 
-                        src={`data:image/jpeg;base64,${patientData.profileImage}`}
+                        src={patientData.profileImage}
                         alt={patientData.name}
                         width={80}
                         height={80}
@@ -256,12 +327,12 @@ const HealthRecord = () => {
                     )}
                   </div>
                   <h2 className="text-lg font-bold text-gray-900">{patientData.title}</h2>
-                  <p className="text-sm text-gray-500 mt-1">Joined since: {patientData.joinedDate}</p>
+                  <p className="text-sm text-gray-500">Patient ID: {patientData.patientId}</p>
                 </div>
 
                 {/* Basic Information */}
                 <div className="space-y-1">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Personal Information</h2>
+                  <h2 className="text-xl font-bold text-gray-900 mb-6">Personal Information</h2>
                   
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
@@ -269,7 +340,7 @@ const HealthRecord = () => {
                         <FaUser className="w-5 h-5 text-gray-400" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Name</p>
+                        <p className="text-xs text-gray-500">Full Name</p>
                         <p className="text-sm font-medium text-gray-900">{patientData.name}</p>
                       </div>
                     </div>
@@ -296,10 +367,20 @@ const HealthRecord = () => {
 
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
+                        <FaIdCard className="w-5 h-5 text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">NIC</p>
+                        <p className="text-sm font-medium text-gray-900">{patientData.nic}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
                         <FaPhone className="w-5 h-5 text-gray-400" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Phone Number</p>
+                        <p className="text-xs text-gray-500">Contact Number</p>
                         <p className="text-sm font-medium text-gray-900">{patientData.phone}</p>
                       </div>
                     </div>
@@ -323,11 +404,40 @@ const HealthRecord = () => {
                         <p className="text-sm font-medium text-gray-900">{patientData.address}</p>
                       </div>
                     </div>
+
+                    {/* Additional Information */}
+                    <div className="pt-4 border-t border-gray-200">
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-shrink-0">
+                            <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Status</p>
+                            <p className="text-sm font-medium text-gray-900">{patientData.status}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-shrink-0">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Last Login</p>
+                            <p className="text-sm font-medium text-gray-900">{patientData.lastLogin}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons - Updated with navigation functions */}
+              {/* Action Buttons */}
               <div className="space-y-3 mt-4">
                 <button 
                   onClick={navigateToPersonalInfo}
@@ -350,7 +460,10 @@ const HealthRecord = () => {
             {/* Right Content */}
             <div className="lg:col-span-8">
               <div className="bg-white rounded-2xl shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Health Information</h2>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Health Information</h2>
+                  <HealthInfoIndicator />
+                </div>
                 
                 {healthError ? (
                   <div className="bg-red-50 p-4 rounded-lg border border-red-200">
@@ -397,7 +510,9 @@ const HealthRecord = () => {
 
                         {/* BMI */}
                         <div className="bg-green-50 rounded-xl border border-green-100 p-4">
-                          <p className="text-sm text-gray-600 mb-1">Body Mass Index (BMI)</p>
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-sm text-gray-600">Body Mass Index (BMI)</p>
+                          </div>
                           <div className="flex items-center space-x-2 mb-2">
                             <p className="text-2xl font-bold text-gray-900">{healthData?.bmi}</p>
                             {healthData?.bmi && healthData.bmi !== "Not recorded" && (
@@ -416,7 +531,17 @@ const HealthRecord = () => {
 
                         {/* Blood Group */}
                         <div className="bg-white rounded-xl border border-gray-200 p-4">
-                          <p className="text-sm text-gray-600 mb-3">Blood Group</p>
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-sm text-gray-600">Blood Group</p>
+                          </div>
+                          <p className="text-2xl font-bold text-gray-900">{healthData?.bloodGroup}</p>
+                        </div>
+
+                        {/* Blood Group */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-sm text-gray-600">Blood Group</p>
+                          </div>
                           <p className="text-2xl font-bold text-gray-900">{healthData?.bloodGroup}</p>
                         </div>
 
@@ -469,7 +594,9 @@ const HealthRecord = () => {
 
                         {/* Allergies */}
                         <div className="bg-blue-50 rounded-xl border border-blue-100 p-4">
-                          <p className="text-sm text-gray-600 mb-3">Allergies</p>
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-sm text-gray-600">Allergies</p>
+                          </div>
                           {healthData?.allergies && healthData.allergies.length > 0 ? (
                             <ul className="text-sm space-y-1 text-gray-700">
                               {healthData.allergies.map((allergy, index) => (
