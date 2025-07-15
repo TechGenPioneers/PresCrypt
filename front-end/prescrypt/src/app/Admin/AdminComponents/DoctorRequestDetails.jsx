@@ -29,13 +29,9 @@ const DoctorRequestDetails = ({ requestId }) => {
   const fetchRequest = async () => {
     const getRequest = await GetRequestById(requestId);
 
-    console.log("Request image:", getRequest.request.slmcIdImage);
     const slmcIdImageBase64 = getRequest.request.slmcIdImage;
 
     setRequest(getRequest);
-    //const slmcIdImageBase64 = getRequest.request.slmcIdImage; // already base64
-
-    // Create the data URI
     setImageSrc(`data:image/jpeg;base64,${slmcIdImageBase64}`);
     console.log("Request:", getRequest);
   };
