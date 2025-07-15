@@ -20,7 +20,6 @@ const AppointmentCard = ({
   lastName,
   appointmentTime,
   appointmentDay,
-  imageUrl,
   open,
   handleClose,
   specialization,

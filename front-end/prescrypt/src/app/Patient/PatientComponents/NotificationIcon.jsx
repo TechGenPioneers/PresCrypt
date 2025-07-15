@@ -17,7 +17,7 @@ import {
   respondToRequest,
 } from "../services/PatientHeaderService";
 
-export default function NotificationIcon({ userId = "P021" }) {
+export default function NotificationIcon({ userId}) {
   const [connection, setConnection] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);

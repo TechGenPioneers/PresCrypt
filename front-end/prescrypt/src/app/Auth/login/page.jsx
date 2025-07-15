@@ -90,6 +90,7 @@ export default function LoginPage() {
     localStorage.setItem("token", response.token);
     localStorage.setItem("userId", response.user?.id);
     localStorage.setItem("userRole", response.user?.role);
+    localStorage.setItem("username", response.user?.username);
 
     await fetch("/api/set-cookie", {
       method: "POST",
@@ -97,6 +98,7 @@ export default function LoginPage() {
       body: JSON.stringify({
         token: response.token,
         role: response.user?.role,
+        userName: response.user?.userName,
       }),
     });
 

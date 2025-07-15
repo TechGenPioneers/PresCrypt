@@ -48,7 +48,7 @@ const SearchBar = ({ setDoctors }) => {
     }
   };
 
-  // Clear local storage on mount
+  
   useEffect(() => {
     localStorage.removeItem("selectedSpecialization");
     localStorage.removeItem("selectedLocation");

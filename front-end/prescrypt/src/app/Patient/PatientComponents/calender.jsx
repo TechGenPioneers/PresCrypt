@@ -9,12 +9,12 @@ import "./calender.css";
 const CustomCalendar = () => {
   const [date, setDate] = useState(dayjs());
   const [appointments, setAppointments] = useState([]);
-  const patientId = "P021"; // use for testing
+  const patientId = localStorage.getItem("patientId"); 
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const data = await getAppointmentsByPatientId(patientId); // Call service
+        const data = await getAppointmentsByPatientId(patientId); 
         console.log("Fetched appointments:", data);
         setAppointments(data);
       } catch (error) {

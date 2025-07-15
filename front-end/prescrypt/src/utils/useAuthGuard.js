@@ -16,7 +16,8 @@ export default function useAuthGuard(expectedRole) {
       
       const token = localStorage.getItem('token');
       const role = localStorage.getItem('userRole');
-      
+      const username = localStorage.getItem('username');
+
       if (!token || !role) {
         router.replace(`/Auth/login?session=expired`);
         return;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import RequestReportDialog from "./RequestReportDialog"; // New component
+import RequestReportDialog from "./RequestReportDialog"; 
 
 const AppointmentListStat = ({ patientName, age, location, imageUrl, total, accepted, cancelled, patientId, email }) => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
