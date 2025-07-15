@@ -294,16 +294,9 @@ export default function DoctorConfirmForm({ requestId }) {
     year: "numeric",
   });
 
-  // Time Formatting
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md border-15 border-[#E9FAF2]">
+    <div className="p-6 bg-white rounded-lg shadow-md border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">
         Doctor Registration Form - {newDoctor.FirstName} {newDoctor.LastName}
@@ -666,10 +659,6 @@ export default function DoctorConfirmForm({ requestId }) {
           </div>
         </div>
       )}
-      <div className="mt-6 text-gray-500 text-right">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
-      </div>
     </div>
   );
 }

@@ -55,13 +55,6 @@ const Patients = () => {
     year: "numeric",
   });
 
-  // Formatting time as "11:15 AM"
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
 
   // Filtered patients based on search query (searching by id or name)
   const filteredPatients = patients.filter(
@@ -72,7 +65,7 @@ const Patients = () => {
         .includes(searchQuery.toLowerCase())
   );
   return (
-    <div className="p-6 border-15 border-[#E9FAF2] bg-white ">
+    <div className="p-6 border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2] bg-white ">
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">Patients</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
@@ -200,11 +193,6 @@ const Patients = () => {
             </table>
           </div>
         </div>
-      </div>
-
-      <div className="mt-6 text-gray-500 flex flex-col items-end">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
       </div>
     </div>
   );

@@ -25,26 +25,11 @@ export default function DoctorDetails({ doctorID }) {
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
-  // Date Formatting
-  const formattedDate = dateTime.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-
-  // Time Formatting
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
 
   //check the doctor
   if (!doctor) {
     return (
-      <div className="h-[650px] p-8 border-15 border-[#E9FAF2]">
+      <div className="h-[650px] p-8 border-t-[15px] border-l-[15px] border-r-[15px] border-b-0 border-[#E9FAF2]">
         <h1 className="text-3xl font-bold mb-2"> Doctor Details</h1>
         <div className="h-[400px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
           <div className="flex-grow flex items-center justify-center">
@@ -200,10 +185,6 @@ export default function DoctorDetails({ doctorID }) {
           />
           <p className="mt-2 text-sm text-gray-500">SLMC ID Image</p>
         </div>
-      </div>
-      <div className="mt-6 text-gray-500 text-right">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
       </div>
     </div>
   );
