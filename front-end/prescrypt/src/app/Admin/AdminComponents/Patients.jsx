@@ -33,15 +33,15 @@ const Patients = () => {
   function calculateAge(dobString) {
     const dob = new Date(dobString);
     const today = new Date();
-  
+
     let age = today.getFullYear() - dob.getFullYear();
     const monthDiff = today.getMonth() - dob.getMonth();
     const dayDiff = today.getDate() - dob.getDate();
-  
+
     if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       age--; // Birthday hasn't occurred yet this year
     }
-  
+
     return age;
   }
 
@@ -67,7 +67,9 @@ const Patients = () => {
   const filteredPatients = patients.filter(
     (patient) =>
       patient.patientId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+      `${patient.firstName} ${patient.lastName}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
   );
   return (
     <div className="p-6 border-15 border-[#E9FAF2] bg-white ">
@@ -126,10 +128,16 @@ const Patients = () => {
                     <td className="p-3 text-[#094A4D]">{patient.patientId}</td>
                     <td className="p-3 flex items-center space-x-3">
                       <img
-                        src={patient.profileImage || "/profile2.png"} // Use profilePhoto if available
+                        src={
+                          patient.profileImage &&
+                          patient.profileImage.trim() !== ""
+                            ? `data:image/jpeg;base64,${patient.profileImage}`
+                            : "/profile2.png"
+                        }
                         alt="Avatar"
-                        className="w-10 h-10 rounded-full"
+                        className="w-10 h-10 rounded-full object-cover"
                       />
+
                       <div>
                         <p className="font-semibold text-[#094A4D]">
                           {patient.firstName} {patient.lastName}
@@ -157,7 +165,7 @@ const Patients = () => {
                             ? "text-green-500"
                             : patient.status === "Cancelled"
                             ? "text-red-500"
-                            :  patient.status === "Pending"
+                            : patient.status === "Pending"
                             ? "text-yellow-500"
                             : ""
                         }`}
@@ -168,7 +176,7 @@ const Patients = () => {
                               ? "bg-green-500"
                               : patient.status === "Cancelled"
                               ? "bg-red-500"
-                              :  patient.status === "Pending"
+                              : patient.status === "Pending"
                               ? "text-yellow-500"
                               : ""
                           }`}
@@ -179,8 +187,10 @@ const Patients = () => {
                     <td className="p-3 text-[#094A4D]">{patient.lastLogin}</td>
                     <td className="p-3 space-x-3">
                       <button className="px-4 py-2 text-[#094A4D] cursor-pointer rounded">
-                        <Link href={`/Admin/PatientDetailsPage/${patient.patientId}`}>
-                        View
+                        <Link
+                          href={`/Admin/PatientDetailsPage/${patient.patientId}`}
+                        >
+                          View
                         </Link>
                       </button>
                     </td>
