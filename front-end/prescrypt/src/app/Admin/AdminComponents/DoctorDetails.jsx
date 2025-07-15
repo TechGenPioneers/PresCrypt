@@ -104,16 +104,17 @@ export default function DoctorDetails({ doctorID }) {
         {/* Profile Card */}
         <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 text-left">
           {/* Profile Photo */}
-          <div className="w-24 h-24 bg-red-500 rounded-full mx-auto mb-3">
+          <div className="w-52 h-52 bg-red-500 rounded-full mx-auto mb-3">
             <img
-  src={
-    doctor.doctor.profilePhoto && doctor.doctor.profilePhoto.trim() !== ""
-      ? `data:image/jpeg;base64,${doctor.doctor.profilePhoto}`
-      : "/profile2.png"
-  }
-  alt="Avatar"
-  className="w-10 h-10 rounded-full object-cover"
-/> 
+              src={
+                doctor.doctor.profilePhoto &&
+                doctor.doctor.profilePhoto.trim() !== ""
+                  ? `data:image/jpeg;base64,${doctor.doctor.profilePhoto}`
+                  : "/profile2.png"
+              }
+              alt="Avatar"
+              className="w-52 h-52 rounded-full object-cover"
+            />
           </div>
 
           {/* Doctor Name */}
