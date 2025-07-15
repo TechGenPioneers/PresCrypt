@@ -5,7 +5,7 @@ const AdminDashboardURL = "https://localhost:7021/api/AdminDashboard"
 //get all Dashboard data
 const GetAllDashboardData = async () => {
        try{
-         const response = await  axios.get(`${AdminDashboardURL}/GetAllData?userName=${localStorage.getItem('username')}`)
+         const response = await  axios.get(`${AdminDashboardURL}/GetAllData?userName=${localStorage.getItem('email')}`)
          return response.data
        }catch(error){
          console.error("Failed to get the data",error);
