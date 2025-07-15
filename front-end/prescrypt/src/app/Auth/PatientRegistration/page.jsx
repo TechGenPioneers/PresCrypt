@@ -115,7 +115,7 @@ export default function PatientRegistration() {
       subtitle="Create your account"
     >
       <FormSelect
-        options={["Patient", "Doctor", "Admin"]}
+        options={["Patient", "Doctor"]}
         selected={formData.role}
         onChange={(role) => {
           setFormData({ ...formData, role });
