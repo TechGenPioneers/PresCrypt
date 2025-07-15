@@ -20,7 +20,7 @@ export default function RoleDropdown({ formData, setFormData }) {
       </button>
       {showRoleDropdown && (
         <div className="absolute w-full max-h-64 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-1 z-10 shadow-lg">
-          {["Patient", "Doctor", "Admin"].map((role) => (
+          {["Patient", "Doctor"].map((role) => (
             <div
               key={role}
               className="p-3 hover:bg-gray-100 cursor-pointer text-sm"
@@ -29,9 +29,7 @@ export default function RoleDropdown({ formData, setFormData }) {
                 setShowRoleDropdown(false);
                 if (role === "Patient") {
                   router.push("/Auth/PatientRegistration");
-                } else if (role === "Admin") {
-                  router.push("/Auth/AdminRegistration");
-                }
+                } 
               }}
             >
               {role}
