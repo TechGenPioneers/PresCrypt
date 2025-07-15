@@ -9,8 +9,11 @@ import {
   DeleteMessage,
   GetAllMessages,
   MarkMessagesAsRead,
+  StartVideoCall,
 } from "../service/ChatService";
 import { EllipsisVertical, Trash2, Check, Clock } from "lucide-react";
+import VideoCallRoom from "../VideoCall/VideoCallRoom";
+import { useVideoCall } from "../VideoCallProvider";
 
 // Utility functions
 const formatMessageTime = (date) =>
@@ -44,16 +47,34 @@ const ChatWindow = ({
   selectedUser,
   setSelectedUser,
   userId,
+  userRole,
   fetchUsers,
   connection,
   setNewMessage,
   newMessage,
+  doctorName,
+  patientName,
 }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const messageEndRef = useRef(null);
   const menuRef = useRef(null);
+  const [activeCall, setActiveCall] = useState(null);
+
+  const currentUserName =
+    userRole === "Doctor"
+      ? `Dr. ${doctorName || ""}`.trim()
+      : patientName || "Patient";
+
+  const otherUserName =
+    userRole === "Doctor"
+      ? patientName || "Patient"
+      : `Dr. ${doctorName || ""}`.trim();
+
+  // Video call hooks
+  const { incomingCall, callerInfo, roomUrl, receiveCall, resetCallState } =
+    useVideoCall();
 
   const [, setTimeTick] = useState(0);
   useEffect(() => {
@@ -90,6 +111,54 @@ const ChatWindow = ({
     }
   }, [userId, selectedUser.receiverId]); // add userId and fetchUsers to deps
 
+  // Handle video call events
+  const handleStartCall = async () => {
+    if (!selectedUser?.receiverId) return;
+
+    try {
+      const response = await StartVideoCall(userId, selectedUser.receiverId);
+      setActiveCall({
+        roomUrl: response.roomUrl,
+        otherUserName: selectedUser.fullName || selectedUser.userName,
+      });
+    } catch (error) {
+      console.error("Failed to start video call", error);
+    }
+  };
+
+  const handleEndCall = () => {
+    setActiveCall(null);
+  };
+  // Handle incoming call for current chat
+  useEffect(() => {
+    if (
+      incomingCall &&
+      callerInfo?.callerId === selectedUser?.receiverId &&
+      roomUrl
+    ) {
+      setActiveCall({
+        roomUrl: roomUrl,
+        otherUserName: callerInfo.callerName,
+      });
+      resetCallState();
+    }
+  }, [
+    incomingCall,
+    callerInfo,
+    roomUrl,
+    selectedUser?.receiverId,
+    resetCallState,
+  ]);
+  // for handling the video call event
+  useEffect(() => {
+    const handleCallEvent = (e) => {
+      const { roomUrl, otherUserName } = e.detail;
+      setActiveCall({ roomUrl, otherUserName });
+    };
+
+    window.addEventListener("startVideoCall", handleCallEvent);
+    return () => window.removeEventListener("startVideoCall", handleCallEvent);
+  }, []);
   useEffect(() => {
     if (!connection) return;
 
@@ -205,136 +274,156 @@ const ChatWindow = ({
       <ChatHeader
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
+        onStartCall={userRole === "Doctor" ? handleStartCall : null} // Only doctors can initiate calls
       />
+      {activeCall ? (
+        <VideoCallRoom
+          roomUrl={activeCall.roomUrl}
+          onLeave={handleEndCall}
+          userName={
+            currentUserName || (userRole === "Doctor" ? "Dr." : "Patient")
+          }
+          otherUserName={
+            otherUserName || (userRole === "Doctor" ? "Patient" : "Dr.")
+          }
+          userRole={userRole}
+        />
+      ) : (
+        <>
+          <div className="flex-1 p-4 space-y-4 overflow-y-auto flex flex-col">
+            {messages.length === 0 && (
+              <p className="text-center text-zinc-400 italic mt-10">
+                No messages yet. Start the conversation!
+              </p>
+            )}
 
-      <div className="flex-1 p-4 space-y-4 overflow-y-auto flex flex-col">
-        {messages.length === 0 && (
-          <p className="text-center text-zinc-400 italic mt-10">
-            No messages yet. Start the conversation!
-          </p>
-        )}
+            {(() => {
+              let lastDate = null;
 
-        {(() => {
-          let lastDate = null;
+              return messages.map((msg, i) => {
+                const currentDate = new Date(msg.sendAt).toDateString();
+                const showDate = currentDate !== lastDate;
+                lastDate = currentDate;
 
-          return messages.map((msg, i) => {
-            const currentDate = new Date(msg.sendAt).toDateString();
-            const showDate = currentDate !== lastDate;
-            lastDate = currentDate;
+                const isSelf = msg.senderId === userId;
 
-            const isSelf = msg.senderId === userId;
-
-            return (
-              <div key={msg.id || i} className="relative group">
-                {showDate && (
-                  <div className="flex justify-center my-2">
-                    <span className="text-sm text-gray-500 bg-gray-200 px-3 py-1 rounded-full">
-                      {getDateLabel(msg.sendAt)}
-                    </span>
-                  </div>
-                )}
-
-                <div
-                  ref={i === messages.length - 1 ? messageEndRef : null}
-                  className={`flex items-end ${
-                    isSelf ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {!isSelf && (
-                    <div className="avatar mr-2">
-                      <div className="w-10 h-10 rounded-full border border-emerald-600 overflow-hidden">
-                        <img
-                          src={selectedUser.image || "/profile.png"}
-                          alt="user"
-                          className="object-cover w-full h-full"
-                        />
+                return (
+                  <div key={msg.id || i} className="relative group">
+                    {showDate && (
+                      <div className="flex justify-center my-2">
+                        <span className="text-sm text-gray-500 bg-gray-200 px-3 py-1 rounded-full">
+                          {getDateLabel(msg.sendAt)}
+                        </span>
                       </div>
-                    </div>
-                  )}
-
-                  <div className="max-w-[70%] relative">
-                    {isSelf && (
-                      <button
-                        onClick={() =>
-                          setMenuOpenId(menuOpenId === msg.id ? null : msg.id)
-                        }
-                        className="absolute top-2 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out cursor-pointer z-10"
-                        aria-label="Open message menu"
-                      >
-                        <EllipsisVertical className="w-5 h-5 text-gray-500 hover:text-gray-700" />
-                      </button>
                     )}
 
                     <div
-                      className={`flex flex-col chat-bubble p-2 rounded-lg break-words ${
-                        isSelf
-                          ? "bg-[#E9FAF2] text-gray-800 rounded-br-none"
-                          : "bg-gray-200 text-gray-900 rounded-bl-none"
+                      ref={i === messages.length - 1 ? messageEndRef : null}
+                      className={`flex items-end ${
+                        isSelf ? "justify-end" : "justify-start"
                       }`}
                     >
-                      {msg.image && (
-                        <img
-                          src={`data:${msg.imageMimeType || 'image/png'};base64,${msg.image}`}
-                          alt="attachment"
-                          className="sm:max-w-auto rounded-md mb-1"
-                        />
+                      {!isSelf && (
+                        <div className="avatar mr-2">
+                          <div className="w-10 h-10 rounded-full border border-emerald-600 overflow-hidden">
+                            <img
+                              src={selectedUser.image || "/profile.png"}
+                              alt="user"
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        </div>
                       )}
-                      {msg.text && <p>{msg.text}</p>}
-                      <div className="flex items-center justify-end gap-1 mt-1">
-                        <time className="text-xs text-right opacity-50">
-                          {formatMessageTime(msg.sendAt)}
-                        </time>
+
+                      <div className="max-w-[70%] relative">
                         {isSelf && (
-                          <>
-                            {!msg.isReceived ? (
-                              <span className="text-gray-500 text-xs">
-                                <Clock className="w-3 h-3" />
-                              </span>
-                            ) : msg.isRead ? (
-                              <span className="flex items-center gap-[1px] text-blue-500 text-xs">
-                                <Check className="w-3 h-3" />
-                                <Check className="w-3 h-3 -ml-1.5" />
-                              </span>
-                            ) : (
-                              <span className="flex items-center gap-[1px] text-gray-500 text-xs">
-                                <Check className="w-3 h-3" />
-                              </span>
+                          <button
+                            onClick={() =>
+                              setMenuOpenId(
+                                menuOpenId === msg.id ? null : msg.id
+                              )
+                            }
+                            className="absolute top-2 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out cursor-pointer z-10"
+                            aria-label="Open message menu"
+                          >
+                            <EllipsisVertical className="w-5 h-5 text-gray-500 hover:text-gray-700" />
+                          </button>
+                        )}
+
+                        <div
+                          className={`flex flex-col chat-bubble p-2 rounded-lg break-words ${
+                            isSelf
+                              ? "bg-[#E9FAF2] text-gray-800 rounded-br-none"
+                              : "bg-gray-200 text-gray-900 rounded-bl-none"
+                          }`}
+                        >
+                          {msg.image && (
+                            <img
+                              src={`data:${
+                                msg.imageMimeType || "image/png"
+                              };base64,${msg.image}`}
+                              alt="attachment"
+                              className="sm:max-w-auto rounded-md mb-1"
+                            />
+                          )}
+                          {msg.text && <p>{msg.text}</p>}
+                          <div className="flex items-center justify-end gap-1 mt-1">
+                            <time className="text-xs text-right opacity-50">
+                              {formatMessageTime(msg.sendAt)}
+                            </time>
+                            {isSelf && (
+                              <>
+                                {!msg.isReceived ? (
+                                  <span className="text-gray-500 text-xs">
+                                    <Clock className="w-3 h-3" />
+                                  </span>
+                                ) : msg.isRead ? (
+                                  <span className="flex items-center gap-[1px] text-blue-500 text-xs">
+                                    <Check className="w-3 h-3" />
+                                    <Check className="w-3 h-3 -ml-1.5" />
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-[1px] text-gray-500 text-xs">
+                                    <Check className="w-3 h-3" />
+                                  </span>
+                                )}
+                              </>
                             )}
-                          </>
+                          </div>
+                        </div>
+
+                        {menuOpenId === msg.id && (
+                          <ul
+                            ref={menuRef}
+                            className="absolute top-0 right-0 z-0 w-48 rounded-md border bg-white p-2 shadow-xl space-y-1"
+                          >
+                            <li>
+                              <button
+                                onClick={() => handleDeleteMessage(msg.id)}
+                                className="w-full flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 p-2 rounded-md transition"
+                              >
+                                <Trash2 /> delete
+                              </button>
+                            </li>
+                          </ul>
                         )}
                       </div>
                     </div>
-
-                    {menuOpenId === msg.id && (
-                      <ul
-                        ref={menuRef}
-                        className="absolute top-0 right-0 z-0 w-48 rounded-md border bg-white p-2 shadow-xl space-y-1"
-                      >
-                        <li>
-                          <button
-                            onClick={() => handleDeleteMessage(msg.id)}
-                            className="w-full flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 p-2 rounded-md transition"
-                          >
-                            <Trash2 /> delete
-                          </button>
-                        </li>
-                      </ul>
-                    )}
                   </div>
-                </div>
-              </div>
-            );
-          });
-        })()}
-      </div>
+                );
+              });
+            })()}
+          </div>
 
-      <MessageInput
-        selectedUser={selectedUser}
-        userId={userId}
-        fetchUsers={fetchUsers}
-        connection={connection}
-        setMessages={setMessages}
-      />
+          <MessageInput
+            selectedUser={selectedUser}
+            userId={userId}
+            fetchUsers={fetchUsers}
+            connection={connection}
+            setMessages={setMessages}
+          />
+        </>
+      )}
     </div>
   );
 };

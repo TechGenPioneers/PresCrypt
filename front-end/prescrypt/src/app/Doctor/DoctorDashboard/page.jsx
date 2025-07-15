@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Footer from "../../Components/footer/Footer";
 import Sidebar from "../DoctorComponents/DoctorSidebar";
 import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
-import axiosInstance from "../utils/axiosInstance";
+import DoctorDashboardService from "../services/DoctorDashboardService";
 import Link from "next/link";
 import * as signalR from "@microsoft/signalr";
 import useAuthGuard from "@/utils/useAuthGuard";
@@ -33,10 +33,8 @@ export default function Dashboard() {
   const fetchProfileData = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get(
-        `/DoctorDashboard/profile?doctorId=${doctorId}`
-      );
-      setProfile(res.data || { name: "", doctorImage: "" });
+      const res = await DoctorDashboardService.getProfile(doctorId);
+      setProfile(res || { name: "", doctorImage: "" });
     } catch (err) {
       console.error("Profile fetch error:", err);
     } finally {
@@ -48,20 +46,18 @@ export default function Dashboard() {
     try {
       setDashboardData((prev) => ({ ...prev, isLoading: true, error: null }));
 
-      const [statsRes, notificationsRes] = await Promise.all([
-        axiosInstance.get(
-          `/DoctorDashboard/dashboard-stats?doctorId=${doctorId}`
-        ),
-        axiosInstance.get(`/DoctorNotifications/doctor/${doctorId}`),
+      const [stats, notifications] = await Promise.all([
+        DoctorDashboardService.getDashboardStats(doctorId),
+        DoctorDashboardService.getNotifications(doctorId),
       ]);
 
       setDashboardData({
-        upcomingAppointments: statsRes.data.upcomingAppointments || 0,
-        cancelledAppointments: statsRes.data.cancelledAppointments || 0,
-        telehealthPatients: statsRes.data.telehealthPatients || 0,
-        bookedPatients: statsRes.data.bookedPatients || 0,
+        upcomingAppointments: stats.upcomingAppointments || 0,
+        cancelledAppointments: stats.cancelledAppointments || 0,
+        telehealthPatients: stats.telehealthPatients || 0,
+        bookedPatients: stats.bookedPatients || 0,
         notifications:
-          notificationsRes.data.map((n) => ({
+          notifications.map((n) => ({
             ...n,
             createdAt: new Date(n.createdAt),
             formattedTime: formatNotificationTime(new Date(n.createdAt)),
@@ -125,10 +121,7 @@ export default function Dashboard() {
 
   const markAsRead = async (notificationId) => {
     try {
-      await axiosInstance.post(
-        `/DoctorNotifications/mark-as-read/${notificationId}`
-      );
-
+      await DoctorDashboardService.markNotificationAsRead(notificationId);
       setDashboardData((prev) => ({
         ...prev,
         notifications: prev.notifications.map((n) =>
@@ -148,8 +141,7 @@ export default function Dashboard() {
           (n) => n.id !== notificationId
         ),
       }));
-
-      await axiosInstance.delete(`/DoctorNotifications/${notificationId}`);
+      await DoctorDashboardService.deleteNotification(notificationId);
     } catch (error) {
       console.error("Error deleting notification:", error);
     }
@@ -319,7 +311,6 @@ export default function Dashboard() {
                           ? "--"
                           : dashboardData.upcomingAppointments}
                       </p>
-                      
                     </div>
 
                     <div className="bg-[#E9FAF2] p-6 rounded-[20px] shadow-lg flex items-center justify-center transition hover:bg-[#D4E9EA] cursor-pointer">

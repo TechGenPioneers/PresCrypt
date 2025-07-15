@@ -1,17 +1,17 @@
 "use client";
-
 import React, { useState } from "react";
-import dayjs from "dayjs";
-
 import Header from "../../Components/Header/Header";
 import Footer from "../../Components/Footer/Footer";
 import Nav from "../PatientComponents/navBar";
 import CustomCalendar from "../PatientComponents/calender";
 import SearchBar from "../PatientComponents/searchBar";
 import BookingCard from "../PatientComponents/bookingCard";
+import dayjs from "dayjs";
+import useAuthGuard from "@/utils/useAuthGuard";
 import Chatbot from "../ChatbotComponents/chatbot";
 
 export default function Appointments() {
+  useAuthGuard(["Patient"]);
   const [date, setDate] = useState(dayjs());
   const [isExpanded, setIsExpanded] = useState(false);
   const [doctors, setDoctors] = useState([]);
