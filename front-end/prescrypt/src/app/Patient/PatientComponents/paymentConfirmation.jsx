@@ -69,7 +69,7 @@ const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformC
           const emailPayload = {
             receptor: email,
             title: "Appointment Booked",
-            message: `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospitalName} is confirmed now.`,
+            message: `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime} at ${hospitalName} is confirmed now. Please be punctual to avoid any inconvenience. For online payments, no refunds will be issued if you fail to cancel the appointment at least 48 hours before the scheduled time. If you cancel the appointment 48 hours in advance, 80% of the payment will be refunded. For payments made at the hospital, please ensure you pay the amount mentioned in the appointment details document. Account inactivation will be applied to patients who choose “pay at the hospital” but fail to attend the appointment without prior notice to the hospital.`,
             attachment: {
               fileName: "Appointment.pdf",
               contentType: "application/pdf",
