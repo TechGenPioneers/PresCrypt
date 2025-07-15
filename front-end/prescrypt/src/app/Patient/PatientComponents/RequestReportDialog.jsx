@@ -8,7 +8,6 @@ import {
   Button,
   IconButton,
   Box,
-  Typography,
   CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -18,37 +17,44 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { getAppointmentsByDate } from "../services/AppointmentsFindingService";
 import { generateAppointmentReport } from "../services/PatientDataService";
 
-const RequestReportDialog = ({ open, handleClose }) => {
+const RequestReportDialog = ({ open, handleClose, patientId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleDownloadReport = async () => {
-    setLoading(true);
-    try {
-      const appointments = await getAppointmentsByDate(
-        startDate.toISOString().split("T")[0],
-        endDate.toISOString().split("T")[0]
-      );
+  setLoading(true);
+  try {
+    const formattedStartDate = startDate.toISOString().split("T")[0];
+    const formattedEndDate = endDate.toISOString().split("T")[0];
 
-      const pdfBlob = await generateAppointmentReport(appointments);
+    console.log("patientId being sent:", patientId);
 
-      const url = window.URL.createObjectURL(new Blob([pdfBlob]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "AppointmentReport.pdf");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+    const appointments = await getAppointmentsByDate(
+      formattedStartDate,
+      formattedEndDate,
+      patientId 
+    );
 
-      handleClose();
-    } catch (error) {
-      console.error("Failed to generate report:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const pdfBlob = await generateAppointmentReport(appointments);
+
+    const url = window.URL.createObjectURL(new Blob([pdfBlob]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "AppointmentReport.pdf");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    handleClose();
+  } catch (error) {
+    console.error("Failed to generate report:", error);
+    alert("Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <Dialog

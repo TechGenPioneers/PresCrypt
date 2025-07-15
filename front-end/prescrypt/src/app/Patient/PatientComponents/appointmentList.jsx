@@ -12,7 +12,7 @@ import {
 import {
   getPatientDetails,
   getProfileImage
-} from "../services/PatientDataService"; // updated import
+} from "../services/PatientDataService"; 
 
 const AppointmentList = ({ patientId }) => {
   const [appointments, setAppointments] = useState([]);
@@ -22,6 +22,7 @@ const AppointmentList = ({ patientId }) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
+    console.log("🔥 Received patientId in AppointmentList:", patientId);
     const fetchData = async () => {
       try {
         const [appointmentsRes, patientRes, imageRes] = await Promise.all([
@@ -29,6 +30,7 @@ const AppointmentList = ({ patientId }) => {
           getPatientDetails(patientId),
           getProfileImage(patientId)
         ]);
+        
 
         const sortedAppointments = appointmentsRes.sort((a, b) => new Date(b.date) - new Date(a.date));
         const calculatedAge = calculateAge(patientRes.dob);
@@ -118,6 +120,7 @@ const AppointmentList = ({ patientId }) => {
         total={total}
         accepted={accepted}
         cancelled={cancelled}
+        patientId={patientId}
       />
 
       <div className="rounded-lg space-y-4">
