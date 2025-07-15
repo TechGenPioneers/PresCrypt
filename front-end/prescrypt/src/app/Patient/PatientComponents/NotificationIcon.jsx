@@ -4,7 +4,6 @@ import * as signalR from "@microsoft/signalr";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -17,16 +16,23 @@ import {
   respondToRequest,
 } from "../services/PatientHeaderService";
 
-export default function NotificationIcon({ userId}) {
+export default function NotificationIcon({ patientId }) {
   const [connection, setConnection] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
   useEffect(() => {
+    if (!patientId) {
+      console.log("patientId is not ready yet. Skipping connection.");
+      return;
+    }
+
+    console.log("Using patientId:", patientId);
+
     const fetchNotifications = async () => {
       try {
-        const data = await getNotifications(userId);
+        const data = await getNotifications(patientId);
         setNotifications(data);
       } catch (err) {
         console.error("Failed to fetch notifications", err);
@@ -36,7 +42,7 @@ export default function NotificationIcon({ userId}) {
     fetchNotifications();
 
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`https://localhost:7021/patientNotificationHub?patientId=${userId}`)
+      .withUrl(`https://localhost:7021/patientNotificationHub?patientId=${patientId}`)
       .withAutomaticReconnect()
       .build();
 
@@ -66,7 +72,7 @@ export default function NotificationIcon({ userId}) {
     return () => {
       newConnection.stop();
     };
-  }, [userId]);
+  }, [patientId]);
 
   const handleClose = () => {
     setAnchorEl(null);

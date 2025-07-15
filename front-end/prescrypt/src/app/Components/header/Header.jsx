@@ -76,7 +76,7 @@ export default function Header() {
 
       {/* Right Icons (Notification + Profile) */}
       <div className="flex justify-end space-x-12 items-center">
-        <NotificationIcon userId={patientId} />
+        <NotificationIcon patientId={patientId} />
 
         <Link href="/Patient/PatientProfile">
           <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-gray-300 hover:ring-2 ring-green-400 transition ml-6">
