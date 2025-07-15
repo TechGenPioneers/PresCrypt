@@ -12,9 +12,7 @@ const Doctors = () => {
   useEffect(() => {
     const loadData = async () => {
       const doctorDetails = await GetDoctors();
-      console.log(doctorDetails); 
       setDoctorData(doctorDetails); // Set doctor data as an array
-
       const updateDateTime = () => setDateTime(new Date());
       updateDateTime(); // Set initial time
       const interval = setInterval(updateDateTime, 1000);
@@ -23,7 +21,7 @@ const Doctors = () => {
     loadData();
   }, []);
 
-  if (!dateTime) return null; 
+  if (!dateTime) return null;
 
   // Date and Time Formatting
   const formattedDate = dateTime.toLocaleDateString("en-GB", {
@@ -44,7 +42,9 @@ const Doctors = () => {
   const filteredDoctors = doctorData.filter(
     (doctor) =>
       doctor.doctorId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      `${doctor.firstName} ${doctor.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+      `${doctor.firstName} ${doctor.lastName}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -64,13 +64,6 @@ const Doctors = () => {
             className="w-full max-w-5xl p-2 bg-[#E9FAF2] border border-gray-300 rounded-full shadow-sm 
           focus:outline-none focus:ring-2 focus:ring-[#CEE4E6]"
           />
-
-          <button
-            className="ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
-          hover:bg-[#91B4B8] transition duration-300"
-          >
-            <Link href="/Admin/DoctorRegistrationForm">Add New Doctor</Link>
-          </button>
         </div>
       </div>
 
@@ -81,11 +74,21 @@ const Doctors = () => {
             <table className="w-full border-collapse">
               <thead className="sticky top-0 bg-[#B5D9DB]">
                 <tr className="text-[#094A4D]">
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Doctor ID</th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Doctor</th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Specialty</th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Status</th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">Action</th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
+                    Doctor ID
+                  </th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
+                    Doctor
+                  </th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
+                    Specialty
+                  </th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
+                    Status
+                  </th>
+                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
+                    Action
+                  </th>
                 </tr>
               </thead>
 
@@ -100,21 +103,31 @@ const Doctors = () => {
                     <td className="p-3 text-[#094A4D]">{doctor.doctorId}</td>
                     <td className="p-3 flex items-center space-x-3">
                       <img
-                        src={doctor.profilePhoto || "/profile2.png"} // Use profilePhoto if available
+                        src={
+                          doctor.profilePhoto &&
+                          doctor.profilePhoto.trim() !== ""
+                            ? `data:image/jpeg;base64,${doctor.profilePhoto}`
+                            : "/profile2.png"
+                        }
                         alt="Avatar"
-                        className="w-10 h-10 rounded-full"
+                        className="w-10 h-10 rounded-full object-cover"
                       />
+
                       <div>
-                      <span className="font-semibold text-[#094A4D]">
-                        {doctor.firstName} {doctor.lastName}
-                      </span>
+                        <span className="font-semibold text-[#094A4D]">
+                          {doctor.firstName} {doctor.lastName}
+                        </span>
                         <p className="text-[#094A4D] text-sm">
                           {doctor.gender}
                         </p>
                       </div>
                     </td>
-                    <td className="p-3 text-[#094A4D]">{doctor.specialization}</td>
-                    <td className="p-3 text-[#094A4D]">{doctor.status ? "Active" : "Inactive"}</td>
+                    <td className="p-3 text-[#094A4D]">
+                      {doctor.specialization}
+                    </td>
+                    <td className="p-3 text-[#094A4D]">
+                      {doctor.status ? "Active" : "Inactive"}
+                    </td>
                     <td className="p-3">
                       <Link href={`/Admin/DoctorDetailPage/${doctor.doctorId}`}>
                         <button className="px-4 py-2 text-[#094A4D] cursor-pointer rounded ">

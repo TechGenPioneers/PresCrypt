@@ -278,117 +278,130 @@ export default function ReportGenerator() {
       <h1 className="text-2xl font-bold mb-2">Reports</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
 
-      <div className="mt-10 flex justify-center ">
-        <div className="max-w-md md:max-w-md lg:max-w-lg xl:max-w-xl w-full">
-          <div className="bg-[#E9FAF2] p-6 shadow-md rounded-lg px-30">
-            <div className="flex flex-col gap-4 mb-4">
-              <label className="block font-semibold text-[#09424D]">
-                Select Date:
-              </label>
-              <label className="-m-2 text-[#09424D]">To Date:</label>
-              <input
-                type="date"
-                name="toDate"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-                disabled={
-                  reportType === "summary" ||
-                  reportType === "detailed" ||
-                  reportType === "activity"
-                }
-                className={`w-full p-2 text-[#09424D] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
-                  reportType === "summary" ||
-                  reportType === "detailed" ||
-                  reportType === "activity"
-                    ? "opacity-65 cursor-not-allowed"
-                    : ""
-                }`}
-                required
-              />
-              <label className="-m-2 text-[#09424D]">From Date:</label>
-              <input
-                type="date"
-                name="fromDate"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
-                disabled={
-                  reportType === "summary" ||
-                  reportType === "detailed" ||
-                  reportType === "activity"
-                }
-                className={`w-full p-2 text-[#09424D] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
-                  reportType === "summary" ||
-                  reportType === "detailed" ||
-                  reportType === "activity"
-                    ? "opacity-65 cursor-not-allowed"
-                    : ""
-                }`}
-                required
-              />
+      <div className="mt-10 flex justify-center px-4 sm:px-0">
+        <div className="w-full max-w-md md:max-w-lg lg:max-w-xl">
+          <div className="bg-[#E9FAF2] p-6 shadow-lg rounded-xl">
+            {/* Section Title (optional) */}
+            <h2 className="text-xl font-semibold text-[#09424D] mb-6 text-center">
+              Generate Report
+            </h2>
+
+            <div className="flex flex-col gap-5 mb-6">
+              {/* Date Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#09424D] mb-1">
+                    From Date
+                  </label>
+                  <input
+                    type="date"
+                    name="fromDate"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                    disabled={["summary", "detailed", "activity"].includes(
+                      reportType
+                    )}
+                    className={`w-full px-3 py-2 text-[#09424D] bg-white border border-gray-300 rounded-md transition focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
+                      ["summary", "detailed", "activity"].includes(reportType)
+                        ? "opacity-60 cursor-not-allowed"
+                        : ""
+                    }`}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#09424D] mb-1">
+                    To Date
+                  </label>
+                  <input
+                    type="date"
+                    name="toDate"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                    disabled={["summary", "detailed", "activity"].includes(
+                      reportType
+                    )}
+                    className={`w-full px-3 py-2 text-[#09424D] bg-white border border-gray-300 rounded-md transition focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
+                      ["summary", "detailed", "activity"].includes(reportType)
+                        ? "opacity-60 cursor-not-allowed"
+                        : ""
+                    }`}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Dropdowns */}
+              <div className="space-y-4">
+                <SearchableDropdown
+                  options={patientOptions}
+                  value={patient}
+                  onChange={setPatient}
+                  disabled={
+                    doctor === "all" ||
+                    (reportType === "detailed" && doctor !== "") ||
+                    (reportType === "summary" && doctor !== "") ||
+                    (reportType === "summary" && specialty !== "")
+                  }
+                  placeholder="-- Select Patient --"
+                />
+
+                <SearchableDropdown
+                  options={doctorOptions}
+                  value={doctor}
+                  onChange={setDoctor}
+                  disabled={
+                    patient === "all" ||
+                    specialty !== "" ||
+                    (reportType === "detailed" && patient !== "") ||
+                    (reportType === "summary" && patient !== "")
+                  }
+                  placeholder="-- Select Doctor --"
+                />
+
+                <SearchableDropdown
+                  options={specialtyOptions}
+                  value={specialty}
+                  onChange={setSpecialty}
+                  disabled={
+                    doctor !== "" ||
+                    (patient === "all" && reportType !== "appointment") ||
+                    patient === "all" ||
+                    reportType === "activity"
+                  }
+                  placeholder="-- Select Specialty --"
+                />
+
+                <SearchableDropdown
+                  options={filteredReportTypeOptions}
+                  value={reportType}
+                  onChange={setReportType}
+                  placeholder="-- Select Report Type --"
+                  required
+                />
+              </div>
             </div>
 
-            <div className="flex flex-col gap-4 mb-4">
-              <SearchableDropdown
-                options={patientOptions}
-                value={patient}
-                onChange={setPatient}
-                disabled={
-                  doctor === "all" ||
-                  (reportType === "detailed" && doctor !== "") ||
-                  (reportType === "summary" && doctor !== "") ||
-                  (reportType === "summary" && specialty !== "")
-                }
-                placeholder="-- Select Patient --"
-              />
+            {/* Error Message */}
+            {errorMessage && (
+              <p className="text-red-500 font-semibold text-center mb-4">
+                {errorMessage}
+              </p>
+            )}
 
-              <SearchableDropdown
-                options={doctorOptions}
-                value={doctor}
-                onChange={setDoctor}
-                disabled={
-                  patient === "all" ||
-                  specialty != "" ||
-                  (reportType === "detailed" && patient !== "") ||
-                  (reportType === "summary" && patient !== "")
-                }
-                placeholder="-- Select Doctor --"
-              />
-
-              <SearchableDropdown
-                options={specialtyOptions}
-                value={specialty}
-                onChange={setSpecialty}
-                disabled={
-                  doctor != "" ||
-                  (patient == "all" && reportType != "appointment") ||
-                  patient === "all" ||
-                  reportType === "activity"
-                }
-                placeholder="-- Select Specialty --"
-              />
-
-              <SearchableDropdown
-                options={filteredReportTypeOptions}
-                value={reportType}
-                onChange={setReportType}
-                placeholder="-- Select Report Type --"
-                required
-              />
+            {/* Button */}
+            <div className="flex justify-end">
+              <button
+                className="mt-2 px-8 py-2 bg-[#007e85] text-white rounded-md hover:bg-[#006369] transition duration-200"
+                onClick={handleGenerate}
+              >
+                Generate
+              </button>
             </div>
-            <p className="text-red-500 font-bold text-center mb-5">
-              {errorMessage}
-            </p>
-          </div>
-          <div className="flex justify-end">
-            <button
-              className="mt-4 px-10 py-1 bg-[#007e8556] text-[#006369] rounded-lg hover:bg-[#007e8589] cursor-pointer"
-              onClick={handleGenerate}
-            >
-              Generate
-            </button>
           </div>
         </div>
       </div>
+
       <div className="mt-6 text-gray-500 text-right">
         <p>{formattedDate}</p>
         <p>{formattedTime}</p>

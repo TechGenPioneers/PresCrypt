@@ -16,6 +16,7 @@ const DoctorRequestDetails = ({ requestId }) => {
   const [dateTime, setDateTime] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
 
   const [mail, setMail] = useState({
     Receptor: "",
@@ -27,7 +28,11 @@ const DoctorRequestDetails = ({ requestId }) => {
   //get request by id
   const fetchRequest = async () => {
     const getRequest = await GetRequestById(requestId);
+
+    const slmcIdImageBase64 = getRequest.request.slmcIdImage;
+
     setRequest(getRequest);
+    setImageSrc(`data:image/jpeg;base64,${slmcIdImageBase64}`);
     console.log("Request:", getRequest);
   };
 
@@ -245,6 +250,17 @@ const DoctorRequestDetails = ({ requestId }) => {
           </ul>
         </div>
       </div>
+      <div className="mt-6 text-center">
+        <div className="inline-block p-2 border rounded-2xl shadow-md hover:shadow-xl transition duration-300 ease-in-out">
+          <img
+            className="rounded-xl min-w-xl h-auto object-contain hover:scale-105 transition-transform duration-300"
+            src={imageSrc}
+            alt="SLMC ID"
+          />
+          <p className="mt-2 text-sm text-gray-500">SLMC ID Image</p>
+        </div>
+      </div>
+
       {request.request.requestStatus === "Pending" && (
         <div className="flex mt-6 space-x-6 justify-center">
           <div className="grid grid-cols-2 gap-10">

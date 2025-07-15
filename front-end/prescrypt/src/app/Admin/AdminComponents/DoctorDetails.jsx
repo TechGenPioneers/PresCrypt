@@ -47,12 +47,11 @@ export default function DoctorDetails({ doctorID }) {
       <div className="h-[650px] p-8 border-15 border-[#E9FAF2]">
         <h1 className="text-3xl font-bold mb-2"> Doctor Details</h1>
         <div className="h-[400px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
-          
           <div className="flex-grow flex items-center justify-center">
-              <p className="text-red-400 font-bold text-xl text-center mb-5">
+            <p className="text-red-400 font-bold text-xl text-center mb-5">
               Doctor not found
-              </p>
-            </div>
+            </p>
+          </div>
           <Link href="/Admin/AdminDoctor">
             <button
               className="w-full ml-1 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
@@ -105,11 +104,16 @@ export default function DoctorDetails({ doctorID }) {
         {/* Profile Card */}
         <div className="bg-[#E9FAF2] p-6 rounded-lg shadow-md sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 text-left">
           {/* Profile Photo */}
-          <div className="w-24 h-24 bg-red-500 rounded-full mx-auto mb-3">
+          <div className="w-52 h-52 bg-red-500 rounded-full mx-auto mb-3">
             <img
-              src={doctor.doctor.profilePhoto || "/profile2.png"}
+              src={
+                doctor.doctor.profilePhoto &&
+                doctor.doctor.profilePhoto.trim() !== ""
+                  ? `data:image/jpeg;base64,${doctor.doctor.profilePhoto}`
+                  : "/profile2.png"
+              }
               alt="Avatar"
-              className="rounded-full"
+              className="w-52 h-52 rounded-full object-cover"
             />
           </div>
 
@@ -187,7 +191,16 @@ export default function DoctorDetails({ doctorID }) {
           </ul>
         </div>
       </div>
-
+      <div className="mt-6 text-center">
+        <div className="inline-block p-2 border rounded-2xl shadow-md hover:shadow-xl transition duration-300 ease-in-out">
+          <img
+            className="rounded-xl min-w-xl h-auto object-contain hover:scale-105 transition-transform duration-300"
+            src={`data:image/jpeg;base64,${doctor.doctor.slmcIdImage}`}
+            alt="SLMC ID"
+          />
+          <p className="mt-2 text-sm text-gray-500">SLMC ID Image</p>
+        </div>
+      </div>
       <div className="mt-6 text-gray-500 text-right">
         <p>{formattedDate}</p>
         <p>{formattedTime}</p>

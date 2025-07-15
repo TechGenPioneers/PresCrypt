@@ -144,11 +144,16 @@ const PatientDetails = ({ patientId }) => {
                 {/* patient details */}
       <div className="flex mt-6 space-x-15 justify-center items-center">
         <div>
-          <div className="w-24 h-24 bg-red-500 rounded-full mx-auto mb-3">
-            <img
-              src={patientData.patient.profileImage || "/profile2.png"}
+          <div className="w-64 h-64 bg-red-500 rounded-full mx-auto mb-3">
+             <img
+              src={
+                patientData.patient.profileImage &&
+               patientData.patient.profileImage.trim() !== ""
+                  ? `data:image/jpeg;base64,${patientData.patient.profileImage}`
+                  : "/profile2.png"
+              }
               alt="Avatar"
-              className="rounded-full"
+              className="w-64 h-64 rounded-full object-cover"
             />
           </div>
           <div className="text-center">
