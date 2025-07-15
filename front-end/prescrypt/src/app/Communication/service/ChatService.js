@@ -1,6 +1,7 @@
-import axios from "axios";
-import * as signalR from "@microsoft/signalr";
-const baseUrl = "http://localhost:7021/api/ChatMsg";
+
+import axios from 'axios';
+import * as signalR from '@microsoft/signalr';
+const baseUrl = "https://localhost:7021/api/ChatMsg"
 const baseUrlVideo = "http://localhost:7021/api/DoctorPatientVideoCall";
 
 const GetUsers = async (userId) => {

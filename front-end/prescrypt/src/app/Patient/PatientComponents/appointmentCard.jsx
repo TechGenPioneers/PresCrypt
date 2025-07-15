@@ -24,6 +24,9 @@ const AppointmentCard = ({
   open,
   handleClose,
   specialization,
+  hospitalName,
+  hospitalId,
+  hospitalCharge,
 }) => {
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -119,6 +122,10 @@ const AppointmentCard = ({
           charge: doctorDetails.charge,
           selectedDate,
           appointmentTime,
+          specialization,
+          hospitalName,
+          hospitalId,
+          hospitalCharge,
         })
       );
       router.push(`/Patient/Bookings/Payments/${doctorId}`);
@@ -151,7 +158,7 @@ const AppointmentCard = ({
 
         <div className="bg-teal-700 text-white py-3 rounded-t-3xl text-center">
           <DialogTitle className="text-lg font-semibold">
-            Dr. {firstName} {lastName}
+            Dr. {firstName} {lastName} 
           </DialogTitle>
         </div>
 

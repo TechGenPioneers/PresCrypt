@@ -1,9 +1,19 @@
 import React, { useState } from "react";
 import AppointmentCard from "./appointmentCard";
 
-const BookingCard = ({ doctorId, firstName, lastName,appointmentTime, appointmentDay, imageUrl }) => {
+const BookingCard = ({
+  doctorId,
+  firstName,
+  lastName,
+  appointmentTime,
+  appointmentDay,
+  imageUrl,
+  hospitalName,
+  specialization,
+  hospitalId,
+  hospitalCharge,
+}) => {
   const [openDialog, setOpenDialog] = useState(false);
-
 
   const saveAppointmentToLocalStorage = () => {
     const appointmentData = {
@@ -13,44 +23,53 @@ const BookingCard = ({ doctorId, firstName, lastName,appointmentTime, appointmen
       appointmentTime,
       appointmentDay,
       imageUrl,
+      hospitalName,
+      specialization,
+      hospitalId,
+      hospitalCharge,
     };
-
-    // Save the appointment data to localStorage with a unique key for appointments
     localStorage.setItem("selectedAppointment", JSON.stringify(appointmentData));
-    console.log("Appointment saved to localStorage:", appointmentData); // Debugging
+    console.log("Appointment saved to localStorage:", appointmentData);
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center p-4 border border-gray-400 rounded-3xl shadow-md mb-4">
-      {/* Left Section: Date & Time */}
-      <div className="text-center md:text-left mr-4 mb-4 md:mb-0">
-        <p className="text-green-700 font-bold text-sm md:text-base">On Every {appointmentDay}</p>
-        <p className="text-sm md:text-base font-semibold">At {appointmentTime}</p>
+    <div className="bg-white p-4 rounded-lg shadow-md mb-4 w-[450px]">
+      <div className="flex gap-4 items-center">
+        <img
+          src={imageUrl}
+          alt={`${firstName} ${lastName}`}
+          className="w-16 h-16 rounded-full object-cover"
+          loading="lazy"
+        />
+        <div>
+          <h4 className="font-semibold text-lg">
+            Dr. {firstName} {lastName}
+          </h4>
+          <p className="text-sm text-gray-600">{specialization}</p>
+          <p className="text-sm text-gray-600">{hospitalName}</p>
+        </div>
       </div>
 
-      {/* Doctor Image */}
-      <img
-        src={imageUrl}
-        alt="Doctor"
-        className="w-16 h-16 rounded-full object-cover border border-gray-300 mb-4 md:mb-0"
-      />
+      <div className="mt-3 text-gray-700">
+        <p>
+          <strong>Appointment Day:</strong> {appointmentDay}
+        </p>
+        <p>
+          <strong>Time:</strong> {appointmentTime}
+        </p>
+      </div>
 
-      {/* Doctor Name */}
-      <p className="ml-4 text-lg font-semibold flex-1">{`Dr. ${firstName}  ${lastName}`}</p>
-
-      {/* Book Button */}
       <button
-        className="border border-green-700 text-green-700 font-semibold px-4 py-1 rounded-full hover:bg-green-50 ml-4 mt-4 md:mt-0"
+        className="mt-4 w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-600"
         onClick={() => {
-          console.log("Opening Dialog for:", doctorId, firstName); // Debugging
-          saveAppointmentToLocalStorage();  // Save appointment data to localStorage
-          setOpenDialog(true);  // Open the dialog
+          saveAppointmentToLocalStorage();
+          setOpenDialog(true);
         }}
       >
-        Book
+        Book Appointment
       </button>
 
-      {/* Dialog Component */}
+      {/* Appointment Dialog */}
       <AppointmentCard
         doctorId={doctorId}
         firstName={firstName}
@@ -58,7 +77,11 @@ const BookingCard = ({ doctorId, firstName, lastName,appointmentTime, appointmen
         appointmentTime={appointmentTime}
         appointmentDay={appointmentDay}
         imageUrl={imageUrl}
-        open={openDialog && firstName}
+        hospitalName={hospitalName}
+        specialization={specialization}
+        hospitalId={hospitalId}
+        hospitalCharge={hospitalCharge}
+        open={openDialog}
         handleClose={() => setOpenDialog(false)}
       />
     </div>
