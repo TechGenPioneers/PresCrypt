@@ -133,3 +133,14 @@ export const sendEmail = async (payload) => {
 export const sendNotification = async (payload) => {
   return await axios.post(`${BASE_URL}/PatientNotification/send`, payload);
 };
+
+
+export const getAppointmentsByPatientIdAndDate = async (patientId, date) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Appointments/patient/${patientId}/date/${date}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching appointments by patient and date:", error);
+    throw error;
+  }
+};
