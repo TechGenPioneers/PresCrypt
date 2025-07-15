@@ -1,5 +1,4 @@
 "use client";
-
 import Footer from "../../Components/footer/Footer";
 import Header from "../../Components/header/Header";
 import NavBar from "../PatientComponents/navBar";
