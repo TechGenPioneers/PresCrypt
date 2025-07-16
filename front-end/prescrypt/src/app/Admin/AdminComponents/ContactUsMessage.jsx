@@ -143,7 +143,7 @@ const MessageTable = () => {
         </div>
 
         {/* Messages Grid */}
-        <div className="grid gap-4">
+        <div className="grid gap-4 max-h-[600px] overflow-y-auto">
           {filteredMessages.map((msg) => (
             <div
               key={msg.inquiryId}
@@ -158,8 +158,8 @@ const MessageTable = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center">
-                        <User className="w-6 h-6 text-white" />
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#b6e1e8] to-[#09424D] flex items-center justify-center">
+                        <User className="w-6 h-6 text-[#09424D]" />
                       </div>
                     </div>
 
@@ -229,8 +229,8 @@ const MessageTable = () => {
               <div className="p-6 space-y-6">
                 {/* Sender Info */}
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center">
-                    <User className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b6e1e8] to-[#09424D] flex items-center justify-center">
+                    <User className="w-8 h-8 text-[#09424D]" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
