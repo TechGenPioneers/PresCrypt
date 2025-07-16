@@ -92,25 +92,10 @@ const DoctorRequestDetails = ({ requestId }) => {
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
-  // Date Formatting
-  const formattedDate = dateTime.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-
-  // Time Formatting
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
 
   if (!request) {
     return (
-      <div className="h-[650px] p-8 border-15 border-[#E9FAF2]">
+      <div className="h-[650px] p-8 border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
         {/*Title*/}
         <h1 className="text-3xl font-bold mb-2"> Doctor Request</h1>
         <div className="h-[400px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
@@ -330,11 +315,6 @@ const DoctorRequestDetails = ({ requestId }) => {
           </div>
         </div>
       )}
-
-      <div className="mt-6 text-gray-500 text-right">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
-      </div>
     </div>
   );
 };
