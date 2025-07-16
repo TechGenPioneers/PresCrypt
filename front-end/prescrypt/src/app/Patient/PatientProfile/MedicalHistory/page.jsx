@@ -206,12 +206,9 @@ const HealthRecord = () => {
     if (type.includes('spreadsheet') || type.includes('excel')) return '📊';
     return '📎';
   };
-
   useEffect(() => {
-    const fetchHealthData = async () => {
+    const fetchPatientData = async () => {
       try {
-        setLoading(true);
-        
         // Get patientId from localStorage or other state management
         const patientId = "P021";
         
@@ -220,33 +217,98 @@ const HealthRecord = () => {
           setLoading(false);
           return;
         }
-
-        // Fetch health data from the API
-        const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
-        const results = healthResponse.data.results || [];
-
-        // Categorize and set health data
-        const categorizedData = categorizeObservations(results);
+  
+        // Fetch patient basic data from the API
+        const response = await axios.get(`https://localhost:7021/api/PatientProfile/${patientId}/basic`);
         
-        setHealthData({
-          vitals: categorizedData.vitals,
-          measurements: categorizedData.measurements,
-          labResults: categorizedData.labResults,
-          personalInfo: {
-            bloodType: categorizedData.bloodType,
-            allergies: categorizedData.allergies.length > 0 ? categorizedData.allergies : ['No allergies recorded']
-          }
+        console.log('API Response:', response.data);
+        
+        // Transform API data to match component requirements
+        const apiData = response.data;
+        
+        // Note: You'll need to implement these helper functions or remove this section
+        // if you're only dealing with health data
+        /*
+        setPatientData({
+          patientId: apiData.patientId || patientId,
+          name: formatFullName(apiData.firstName, apiData.lastName),
+          firstName: apiData.firstName || 'Not provided',
+          lastName: apiData.lastName || 'Not provided',
+          title: formatFullName(apiData.firstName, apiData.lastName),
+          gender: apiData.gender || 'Not provided',
+          birthDate: formatDate(apiData.dob || apiData.DOB),
+          phone: apiData.contactNo || 'Not provided',
+          email: apiData.email || 'Not provided',
+          address: apiData.address || 'Not provided',
+          bloodGroup: apiData.bloodGroup || "Not recorded",
+          nic: apiData.nic || apiData.NIC || 'Not provided',
+          profileImage: convertBlobToImageUrl(apiData.profileImage),
+          status: apiData.status || 'Active',
+          createdAt: formatDate(apiData.createdAt),
+          updatedAt: formatDate(apiData.updatedAt),
+          lastLogin: formatDate(apiData.lastLogin)
         });
-
+        */
+  
+        // Fetch health data from the API
+        try {
+          const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
+          
+          console.log('Health API Response:', healthResponse.data);
+          
+          // Parse the nested JSON structure - UPDATED FOR NEW FORMAT
+          let results = [];
+          if (healthResponse.data && healthResponse.data.data) {
+            try {
+              // Parse the stringified JSON data
+              const parsedData = JSON.parse(healthResponse.data.data);
+              results = parsedData.results || [];
+            } catch (parseError) {
+              console.error('Error parsing health data JSON:', parseError);
+              results = [];
+            }
+          }
+  
+          console.log('Parsed results:', results);
+  
+          // Categorize the observations using the helper function
+          const categorizedData = categorizeObservations(results);
+          
+          // Set the health data using the categorized observations
+          setHealthData({
+            vitals: categorizedData.vitals,
+            measurements: categorizedData.measurements,
+            labResults: categorizedData.labResults,
+            personalInfo: {
+              bloodType: categorizedData.bloodType,
+              allergies: categorizedData.allergies.length > 0 ? categorizedData.allergies : ["No allergies recorded"]
+            }
+          });
+  
+        } catch (healthErr) {
+          console.error("Error fetching health data:", healthErr);
+          setError("Couldn't connect to the OpenMRS server");
+          // Set default health data
+          setHealthData({
+            vitals: [],
+            measurements: [],
+            labResults: [],
+            personalInfo: {
+              bloodType: "Not recorded",
+              allergies: ["No allergies recorded"]
+            }
+          });
+        }
+        
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching health data:", err);
-        setError("Failed to load health data. Please try again later.");
+        console.error("Error fetching patient data:", err);
+        setError("Failed to load patient data. Please try again later.");
         setLoading(false);
       }
     };
-
-    fetchHealthData();
+  
+    fetchPatientData();
   }, []);
 
   const getStatusColor = (status) => {
