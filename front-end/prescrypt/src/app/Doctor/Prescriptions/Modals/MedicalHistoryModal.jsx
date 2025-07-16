@@ -14,15 +14,38 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
     }
   }, [isOpen]);
 
-  // Simulate access request
   const handleRequestAccess = async () => {
     try {
       setError(null);
-      // Simulate delay for UX
-      await new Promise((res) => setTimeout(res, 500));
+
+      const token = localStorage.getItem("token"); // Your JWT token (already stored)
+
+      if (!token) {
+        throw new Error("Authentication token not found");
+      }
+
+      const response = await fetch("https://localhost:7021/api/Doctor/request-patient-access", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          doctorId: "D001", // 🔒 Hardcoded doctor ID (replace later)
+          patientId: patient?.patientId,
+          title: "Request to View Medical History",
+          message: "Doctor requests access to your medical history.",
+        }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData?.message || "Failed to request access.");
+      }
+
       setAccessRequested(true);
-    } catch {
-      setError("Failed to send access request");
+    } catch (err) {
+      setError(err.message || "An unexpected error occurred.");
     }
   };
 
@@ -53,12 +76,11 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
             </div>
           )}
 
-          {/* Access request or confirmation */}
+          {/* Access request confirmation */}
           {accessRequested ? (
             <div className="mb-6 p-4 bg-blue-100 text-blue-800 rounded-lg">
               <p>
-                Request has been sent to the patient. Once they allow you, you can view the
-                profile.
+                Request has been sent to the patient. Once they approve, you can view the profile.
               </p>
             </div>
           ) : (
