@@ -1,10 +1,10 @@
 "use client";
-import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getProfileImage, getPatientDetails } from "../services/PatientDataService";
 import axios from "axios";
+import { usePathname } from "next/navigation";
 
 const PatientNavBar = () => {
   const [patientId, setPatientId] = useState(null);
@@ -12,8 +12,8 @@ const PatientNavBar = () => {
   const [patientName, setPatientName] = useState("Patient Profile");
   const [joinDate, setJoinDate] = useState("31 December 1999");
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Load patientId from localStorage
   useEffect(() => {
     const loadPatientId = () => {
       const id = localStorage.getItem("patientId");
@@ -23,15 +23,12 @@ const PatientNavBar = () => {
     };
 
     loadPatientId();
-
     const onStorageChange = (e) => {
-      if (e.key === "patientId") {
-        loadPatientId();
-      }
+      if (e.key === "patientId") loadPatientId();
     };
 
     window.addEventListener("storage", onStorageChange);
-    const interval = setInterval(loadPatientId, 1000); // for same-tab updates
+    const interval = setInterval(loadPatientId, 1000);
 
     return () => {
       window.removeEventListener("storage", onStorageChange);
@@ -39,8 +36,7 @@ const PatientNavBar = () => {
     };
   }, [patientId]);
 
-  // Fetch patient data once patientId is available
-    useEffect(() => {
+  useEffect(() => {
     const fetchPatientData = async () => {
       if (!patientId) return;
 
@@ -65,19 +61,16 @@ const PatientNavBar = () => {
     fetchPatientData();
   }, [patientId]);
 
-
   const handleLogout = async () => {
     const ok = window.confirm("Are you sure you want to log out?");
     if (!ok) return;
 
     try {
-      await axios.post(
-        "https://localhost:7021/api/User/logout",
-        null,
-        { withCredentials: true }
-      );
+      await axios.post("https://localhost:7021/api/User/logout", null, {
+        withCredentials: true,
+      });
     } catch (err) {
-      console.warn("Backend logout failed (may not be using cookies):", err);
+      console.warn("Backend logout failed:", err);
     }
 
     localStorage.removeItem("token");
@@ -95,49 +88,79 @@ const PatientNavBar = () => {
   ];
 
   return (
-    <aside className="fixed top-0 left-0 h-full bg-white shadow-lg z-50 transition-all duration-300 group hover:w-[260px] w-[90px] flex flex-col justify-between">
-      {/* Profile Section */}
-      <div className="flex flex-col items-center px-4 pt-16">
-        <img
-          src={profileImage}
-          alt="Profile"
-          className="w-16 h-16 rounded-full border-2 border-gray-300 object-cover mb-2"
-        />
-        <div className="h-[45px] overflow-hidden transition-all duration-300 w-full text-center group-hover:text-left">
-          <h2 className="text-sm font-semibold text-[#047857] whitespace-nowrap overflow-hidden transition-all duration-300 opacity-0 group-hover:opacity-100">
-            {patientName}
-          </h2>
-          <p className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            Joined: {joinDate}
-          </p>
-        </div>
+    <aside className="fixed top-0 left-0 h-full bg-white shadow-2xl z-50 font-medium font-sans transition-all duration-300 ease-in-out flex flex-col group">
+      <div className="group-hover:w-[16rem] w-[6rem] transition-all duration-300 ease-in-out h-full flex flex-col">
+        {/* Logo */}
+        <div className="flex justify-center items-center mt-4 mb-8">
+        {/* Empty placeholder to preserve space */}
+        <div className="w-12 h-12" />
       </div>
 
-      {/* Nav Items */}
-      <nav className="flex flex-col space-y-2 mt-6 px-3">
-        {navItems.map((item, index) => (
-          <Link key={index} href={item.link} passHref>
-            <div className="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-[#E9FAF2] hover:border-[#047857] transition-all cursor-pointer w-full">
-              <img src={item.icon} alt={item.text} className="w-5 h-5 shrink-0" />
-              <span className="ml-4 text-sm text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                {item.text}
-              </span>
-            </div>
-          </Link>
-        ))}
-      </nav>
 
-      {/* Logout Button */}
-      <div className="px-3 pb-6">
-        <button
-          onClick={handleLogout}
-          className="flex items-center w-full p-3 rounded-lg border border-red-600 text-red-600 hover:bg-red-50 transition-all cursor-pointer"
-        >
-          <LogOut className="w-5 h-5 shrink-0" />
-          <span className="ml-4 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-            Logout
-          </span>
-        </button>
+        {/* Profile */}
+        <div className="flex items-center px-2 py-3">
+          <img
+            src={profileImage}
+            alt="Profile"
+            className="w-10 h-10 rounded-full border-2 border-gray-300 object-cover"
+          />
+          <div className="ml-4 whitespace-nowrap overflow-hidden transition-all duration-300 opacity-0 group-hover:opacity-100">
+            <p className="font-bold text-[#033A3D] text-[17px]">{patientName}</p>
+            <p className="text-xs text-gray-500">Joined: {joinDate}</p>
+          </div>
+        </div>
+
+  
+        <nav className="flex flex-col items-center p-2 text-black text-xl font-bold mt-4 flex-grow">
+          <ul className="flex flex-col items-center w-full">
+            {navItems.map((item, index) => (
+              <li key={index} className="mb-4 w-full flex justify-center">
+                <Link
+                  href={item.link}
+                  className={`flex items-center p-2 border-1 rounded-full transition-all duration-300 ${
+                    pathname === item.link
+                      ? "border-[#033A3D] bg-[#033A3D]/20 text-[#033A3D] font-bold shadow-md"
+                      : "border-transparent hover:border-[#033A3D] hover:bg-[#033a3d32] text-black"
+                  }`}
+                  style={{
+                    width: "90%",
+                    height: "50px",
+                    justifyContent: "flex-start",
+                    paddingLeft: "20px",
+                    borderRadius: "20px",
+                  }}
+                >
+                  <img src={item.icon} alt={item.text} className="w-5 h-5" />
+                  <span className="ml-2 text-[15px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {item.text}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Logout */}
+        <div className="w-full p-2 mt-5">
+          <li className="mb-4 w-full flex justify-center">
+            <button
+              onClick={handleLogout}
+              className="flex items-center p-2 hover:border-1 rounded-full transition-all duration-300 hover:border-[#033A3D] hover:bg-[#033a3d32]"
+              style={{
+                width: "90%",
+                height: "50px",
+                justifyContent: "flex-start",
+                paddingLeft: "20px",
+                borderRadius: "20px",
+              }}
+            >
+              <img src="/image28.png" alt="Logout" className="w-5 h-5" />
+              <span className="text-[#033A3D] text-[15px] whitespace-nowrap ml-2 font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                Logout
+              </span>
+            </button>
+          </li>
+        </div>
       </div>
     </aside>
   );
