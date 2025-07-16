@@ -14,8 +14,9 @@ import {
 } from "recharts";
 import AdminNotification from "./AdminNotification";
 import { GetAllDashboardData } from "../service/AdminDashboardService";
+import Dashboard from "@/app/Doctor/DoctorDashboard/page";
 
-const AdminDashboard = () => {
+const AdminDashboard = ({setAdminName}) => {
   const [dateTime, setDateTime] = useState(null);
   const [dashboardData, setDashboardData] = useState([]);
 
@@ -24,6 +25,7 @@ const AdminDashboard = () => {
     try {
       const response = await GetAllDashboardData();
       setDashboardData(response);
+      setAdminName(response.adminName);
     } catch (error) {
       console.error("Failed to get the data", error);
     }
@@ -87,17 +89,9 @@ const AdminDashboard = () => {
     month: "long",
     year: "numeric",
   });
-
-  // Formatting time 
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
   return (
     <>
-      <div className="flex min-h-screen bg-white border-15 border-[#E9FAF2]">
+      <div className="flex min-h-screen bg-white border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
         {/* Main Content */}
         <main className="overflow-auto flex-grow p-6">
           <div className="mb-10 pl-5 ">
@@ -107,7 +101,7 @@ const AdminDashboard = () => {
           {/* Welcome Section */}
           <div className="bg-[#E9FAF2] p-6 rounded-4xl mb-6">
             <h3 className="text-2xl text-[#094A4D] font-semibold ">
-              Welcome, Nimal
+              Welcome, {dashboardData.adminName}
             </h3>
             <p className="text-[#094A4D]">Have a nice day at work!</p>
           </div>
@@ -232,11 +226,6 @@ const AdminDashboard = () => {
                 <h4 className="text-lg font-semibold">Total Patients</h4>
                 <p className="text-3xl font-bold">{dashboardData.patients}</p>
               </div>
-            </div>
-            {/* Date & Time */}
-            <div className="mt-15 text-center text-[#094A4D]">
-              <p>{formattedDate}</p>
-              <p>{formattedTime}</p>
             </div>
           </div>
         </aside>

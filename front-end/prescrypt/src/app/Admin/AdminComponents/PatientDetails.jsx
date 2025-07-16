@@ -74,23 +74,9 @@ const PatientDetails = ({ patientId }) => {
 
   if (!dateTime) return null;
 
-  const formattedDate = dateTime.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-
   if (!patientData) {
     return (
-      <div className="h-[650px] p-8 border-15 border-[#E9FAF2]">
+      <div className="h-[650px] p-8 border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
         <h1 className="text-3xl font-bold mb-2">Patient</h1>
         <div className="h-[400px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
           <div className="flex-grow flex items-center justify-center">
@@ -144,11 +130,16 @@ const PatientDetails = ({ patientId }) => {
                 {/* patient details */}
       <div className="flex mt-6 space-x-15 justify-center items-center">
         <div>
-          <div className="w-24 h-24 bg-red-500 rounded-full mx-auto mb-3">
-            <img
-              src={patientData.patient.profileImage || "/profile2.png"}
+          <div className="w-64 h-64 bg-red-500 rounded-full mx-auto mb-3">
+             <img
+              src={
+                patientData.patient.profileImage &&
+               patientData.patient.profileImage.trim() !== ""
+                  ? `data:image/jpeg;base64,${patientData.patient.profileImage}`
+                  : "/profile2.png"
+              }
               alt="Avatar"
-              className="rounded-full"
+              className="w-64 h-64 rounded-full object-cover"
             />
           </div>
           <div className="text-center">
@@ -403,11 +394,6 @@ const PatientDetails = ({ patientId }) => {
                       </div>
                     </div>
                   )}
-
-      <div className="mt-6 text-gray-500 text-right">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
-      </div>
     </div>
   );
 };

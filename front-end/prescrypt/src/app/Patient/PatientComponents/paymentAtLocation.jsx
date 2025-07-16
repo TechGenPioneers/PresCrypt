@@ -33,8 +33,8 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
     doctorLastName,
     hospitalId,
     doctorId,
-    patientId = "P021",
-    email = "dewminkasmitha30@gmail.com",
+    patientId ,
+    email,
   } = useContext(AppointmentContext);
 
   const doctorName = `${doctorFirstName} ${doctorLastName}`;
@@ -115,7 +115,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
       paymentMethod: selectedMethod === "online" ? "Card" : "Location",
       paymentStatus: selectedMethod === "online" ? "Done" : "Pending",
     };
-
+    console.log("Creating payment with payload:", paymentPayload);
     try {
       await addPayment(paymentPayload);
       const appointmentData = {
@@ -129,6 +129,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
         typeOfAppointment: selectedMethod === "online" ? "Online" : "PayAtLocation",
         paymentId,
       };
+      console.log("Creating appointment with data:", appointmentData);
       await createAppointment(appointmentData);
       setCheckbox1Checked(false);
       setCheckbox2Checked(false);
