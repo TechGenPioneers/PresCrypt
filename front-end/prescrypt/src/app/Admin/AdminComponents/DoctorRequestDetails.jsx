@@ -16,6 +16,7 @@ const DoctorRequestDetails = ({ requestId }) => {
   const [dateTime, setDateTime] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
 
   const [mail, setMail] = useState({
     Receptor: "",
@@ -27,7 +28,11 @@ const DoctorRequestDetails = ({ requestId }) => {
   //get request by id
   const fetchRequest = async () => {
     const getRequest = await GetRequestById(requestId);
+
+    const slmcIdImageBase64 = getRequest.request.slmcIdImage;
+
     setRequest(getRequest);
+    setImageSrc(`data:image/jpeg;base64,${slmcIdImageBase64}`);
     console.log("Request:", getRequest);
   };
 
@@ -87,25 +92,10 @@ const DoctorRequestDetails = ({ requestId }) => {
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
-  // Date Formatting
-  const formattedDate = dateTime.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-
-  // Time Formatting
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
 
   if (!request) {
     return (
-      <div className="h-[650px] p-8 border-15 border-[#E9FAF2]">
+      <div className="h-[650px] p-8 border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
         {/*Title*/}
         <h1 className="text-3xl font-bold mb-2"> Doctor Request</h1>
         <div className="h-[400px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
@@ -245,6 +235,17 @@ const DoctorRequestDetails = ({ requestId }) => {
           </ul>
         </div>
       </div>
+      <div className="mt-6 text-center">
+        <div className="inline-block p-2 border rounded-2xl shadow-md hover:shadow-xl transition duration-300 ease-in-out">
+          <img
+            className="rounded-xl min-w-xl h-auto object-contain hover:scale-105 transition-transform duration-300"
+            src={imageSrc}
+            alt="SLMC ID"
+          />
+          <p className="mt-2 text-sm text-gray-500">SLMC ID Image</p>
+        </div>
+      </div>
+
       {request.request.requestStatus === "Pending" && (
         <div className="flex mt-6 space-x-6 justify-center">
           <div className="grid grid-cols-2 gap-10">
@@ -314,11 +315,6 @@ const DoctorRequestDetails = ({ requestId }) => {
           </div>
         </div>
       )}
-
-      <div className="mt-6 text-gray-500 text-right">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
-      </div>
     </div>
   );
 };
