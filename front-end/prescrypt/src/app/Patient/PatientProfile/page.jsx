@@ -122,7 +122,7 @@ const HealthRecord = () => {
           setLoading(false);
           return;
         }
-
+  
         // Fetch patient basic data from the API
         const response = await axios.get(`https://localhost:7021/api/PatientProfile/${patientId}/basic`);
         
@@ -150,12 +150,28 @@ const HealthRecord = () => {
           updatedAt: formatDate(apiData.updatedAt),
           lastLogin: formatDate(apiData.lastLogin)
         });
-
+  
         // Fetch health data from the API
         try {
-          const healthResponse = await axios.get(`https://localhost:7295/api/PatientObservations/${patientId}`);
-          const results = healthResponse.data.results || [];
-
+          const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
+          
+          console.log('Health API Response:', healthResponse.data);
+          
+          // Parse the nested JSON structure
+          let results = [];
+          if (healthResponse.data && healthResponse.data.data) {
+            try {
+              // Parse the stringified JSON data
+              const parsedData = JSON.parse(healthResponse.data.data);
+              results = parsedData.results || [];
+            } catch (parseError) {
+              console.error('Error parsing health data JSON:', parseError);
+              results = [];
+            }
+          }
+  
+          console.log('Parsed results:', results);
+  
           // Find the latest observations for each vital sign
           const heightObs = findLatestObservation(results, "Height (cm)");
           const weightObs = findLatestObservation(results, "Weight (kg)");
@@ -166,7 +182,11 @@ const HealthRecord = () => {
           const bloodSugarObs = findLatestObservation(results, "Serum glucose");
           const bloodTypeObs = findLatestObservation(results, "bloodType");
           const allergiesObs = findLatestObservation(results, "allergies");
-
+          const temperatureObs = findLatestObservation(results, "Temperature (c)");
+          const respiratoryRateObs = findLatestObservation(results, "Respiratory rate");
+          const oxygenSaturationObs = findLatestObservation(results, "Arterial blood oxygen saturation");
+          const armCircumferenceObs = findLatestObservation(results, "Mid-upper arm circumference");
+  
           // Extract values from observation display strings
           const height = heightObs ? extractValueFromDisplay(heightObs.display) : null;
           const weight = weightObs ? extractValueFromDisplay(weightObs.display) : null;
@@ -177,18 +197,54 @@ const HealthRecord = () => {
           const bloodSugar = bloodSugarObs ? extractValueFromDisplay(bloodSugarObs.display) : null;
           const bloodType = bloodTypeObs ? extractValueFromDisplay(bloodTypeObs.display) : null;
           const allergies = allergiesObs ? parseAllergies(allergiesObs.display) : ["No allergies recorded"];
-
+          const temperature = temperatureObs ? extractValueFromDisplay(temperatureObs.display) : null;
+          const respiratoryRate = respiratoryRateObs ? extractValueFromDisplay(respiratoryRateObs.display) : null;
+          const oxygenSaturation = oxygenSaturationObs ? extractValueFromDisplay(oxygenSaturationObs.display) : null;
+          const armCircumference = armCircumferenceObs ? extractValueFromDisplay(armCircumferenceObs.display) : null;
+  
+          // Calculate BMI if height and weight are available but BMI is not recorded
+          let calculatedBMI = bmi;
+          if (!bmi && height && weight) {
+            const heightInMeters = parseFloat(height) / 100;
+            const weightInKg = parseFloat(weight);
+            if (heightInMeters > 0 && weightInKg > 0) {
+              calculatedBMI = (weightInKg / (heightInMeters * heightInMeters)).toFixed(1);
+            }
+          }
+  
+          // Debug logging
+          console.log('Extracted values:', {
+            height,
+            weight,
+            bmi: calculatedBMI,
+            systolicBP,
+            diastolicBP,
+            pulse,
+            bloodSugar,
+            bloodType,
+            allergies,
+            temperature,
+            respiratoryRate,
+            oxygenSaturation,
+            armCircumference
+          });
+  
           // Set health data
           setHealthData({
             height: height ? `${height} cm` : "Not recorded",
             weight: weight ? `${weight} kg` : "Not recorded",
-            bmi: bmi || "Not recorded",
+            bmi: calculatedBMI || "Not recorded",
             bloodSugar: bloodSugar ? `${bloodSugar} mg/dL` : "Not recorded",
             heartRate: pulse ? `${pulse} bpm` : "Not recorded",
             bloodPressure: (systolicBP && diastolicBP) ? `${systolicBP}/${diastolicBP} mmHg` : "Not recorded",
             allergies: allergies,
-            bloodGroup: bloodType || (apiData.bloodGroup || "Not recorded")
+            bloodGroup: bloodType || (apiData.bloodGroup || "Not recorded"),
+            temperature: temperature ? `${temperature}°C` : "Not recorded",
+            respiratoryRate: respiratoryRate ? `${respiratoryRate} breaths/min` : "Not recorded",
+            oxygenSaturation: oxygenSaturation ? `${oxygenSaturation}%` : "Not recorded",
+            armCircumference: armCircumference ? `${armCircumference} cm` : "Not recorded"
           });
+  
         } catch (healthErr) {
           console.error("Error fetching health data:", healthErr);
           setHealthError("Couldn't connect to the OpenMRS server");
@@ -201,7 +257,11 @@ const HealthRecord = () => {
             heartRate: "Not recorded",
             bloodPressure: "Not recorded",
             allergies: ["No allergies recorded"],
-            bloodGroup: apiData.bloodGroup || "Not recorded"
+            bloodGroup: apiData.bloodGroup || "Not recorded",
+            temperature: "Not recorded",
+            respiratoryRate: "Not recorded",
+            oxygenSaturation: "Not recorded",
+            armCircumference: "Not recorded"
           });
         }
         
@@ -212,9 +272,119 @@ const HealthRecord = () => {
         setLoading(false);
       }
     };
-
+  
     fetchPatientData();
   }, []);
+
+  // useEffect(() => {
+  //   const fetchPatientData = async () => {
+  //     try {
+  //       // Get patientId from localStorage or other state management
+  //       const patientId = "P021";
+        
+  //       if (!patientId) {
+  //         setError("Patient ID not found. Please log in again.");
+  //         setLoading(false);
+  //         return;
+  //       }
+
+  //       // Fetch patient basic data from the API
+  //       const response = await axios.get(`https://localhost:7021/api/PatientProfile/${patientId}/basic`);
+        
+  //       console.log('API Response:', response.data);
+        
+  //       // Transform API data to match component requirements
+  //       const apiData = response.data;
+        
+  //       setPatientData({
+  //         patientId: apiData.patientId || patientId,
+  //         name: formatFullName(apiData.firstName, apiData.lastName),
+  //         firstName: apiData.firstName || 'Not provided',
+  //         lastName: apiData.lastName || 'Not provided',
+  //         title: formatFullName(apiData.firstName, apiData.lastName),
+  //         gender: apiData.gender || 'Not provided',
+  //         birthDate: formatDate(apiData.dob || apiData.DOB),
+  //         phone: apiData.contactNo || 'Not provided',
+  //         email: apiData.email || 'Not provided',
+  //         address: apiData.address || 'Not provided',
+  //         bloodGroup: apiData.bloodGroup || "Not recorded",
+  //         nic: apiData.nic || apiData.NIC || 'Not provided',
+  //         profileImage: convertBlobToImageUrl(apiData.profileImage),
+  //         status: apiData.status || 'Active',
+  //         createdAt: formatDate(apiData.createdAt),
+  //         updatedAt: formatDate(apiData.updatedAt),
+  //         lastLogin: formatDate(apiData.lastLogin)
+  //       });
+
+  //       // Fetch health data from the API
+  //       try {
+  //         const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
+  //         const results = healthResponse.data.results || [];
+  //         // Change to:
+  //         // const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
+  //         // // Parse the stringified JSON data
+  //         // const parsedData = JSON.parse(healthResponse.data.data);
+  //         // const results = parsedData.results || [];
+
+  //         // Find the latest observations for each vital sign
+  //         const heightObs = findLatestObservation(results, "Height (cm)");
+  //         const weightObs = findLatestObservation(results, "Weight (kg)");
+  //         const bmiObs = findLatestObservation(results, "Body mass index");
+  //         const systolicBPObs = findLatestObservation(results, "Systolic blood pressure");
+  //         const diastolicBPObs = findLatestObservation(results, "Diastolic blood pressure");
+  //         const pulseObs = findLatestObservation(results, "Pulse");
+  //         const bloodSugarObs = findLatestObservation(results, "Serum glucose");
+  //         const bloodTypeObs = findLatestObservation(results, "bloodType");
+  //         const allergiesObs = findLatestObservation(results, "allergies");
+
+  //         // Extract values from observation display strings
+  //         const height = heightObs ? extractValueFromDisplay(heightObs.display) : null;
+  //         const weight = weightObs ? extractValueFromDisplay(weightObs.display) : null;
+  //         const bmi = bmiObs ? extractValueFromDisplay(bmiObs.display) : null;
+  //         const systolicBP = systolicBPObs ? extractValueFromDisplay(systolicBPObs.display) : null;
+  //         const diastolicBP = diastolicBPObs ? extractValueFromDisplay(diastolicBPObs.display) : null;
+  //         const pulse = pulseObs ? extractValueFromDisplay(pulseObs.display) : null;
+  //         const bloodSugar = bloodSugarObs ? extractValueFromDisplay(bloodSugarObs.display) : null;
+  //         const bloodType = bloodTypeObs ? extractValueFromDisplay(bloodTypeObs.display) : null;
+  //         const allergies = allergiesObs ? parseAllergies(allergiesObs.display) : ["No allergies recorded"];
+
+  //         // Set health data
+  //         setHealthData({
+  //           height: height ? `${height} cm` : "Not recorded",
+  //           weight: weight ? `${weight} kg` : "Not recorded",
+  //           bmi: bmi || "Not recorded",
+  //           bloodSugar: bloodSugar ? `${bloodSugar} mg/dL` : "Not recorded",
+  //           heartRate: pulse ? `${pulse} bpm` : "Not recorded",
+  //           bloodPressure: (systolicBP && diastolicBP) ? `${systolicBP}/${diastolicBP} mmHg` : "Not recorded",
+  //           allergies: allergies,
+  //           bloodGroup: bloodType || (apiData.bloodGroup || "Not recorded")
+  //         });
+  //       } catch (healthErr) {
+  //         console.error("Error fetching health data:", healthErr);
+  //         setHealthError("Couldn't connect to the OpenMRS server");
+  //         // Set default health data with blood group from patient data
+  //         setHealthData({
+  //           height: "Not recorded",
+  //           weight: "Not recorded",
+  //           bmi: "Not recorded",
+  //           bloodSugar: "Not recorded",
+  //           heartRate: "Not recorded",
+  //           bloodPressure: "Not recorded",
+  //           allergies: ["No allergies recorded"],
+  //           bloodGroup: apiData.bloodGroup || "Not recorded"
+  //         });
+  //       }
+        
+  //       setLoading(false);
+  //     } catch (err) {
+  //       console.error("Error fetching patient data:", err);
+  //       setError("Failed to load patient data. Please try again later.");
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchPatientData();
+  // }, []);
 
   // Get BMI status text based on value
   const getBmiStatus = (bmi) => {
@@ -529,13 +699,13 @@ const HealthRecord = () => {
                           </div>
                         </div>
 
-                        {/* Blood Group */}
+                        {/* Blood Group
                         <div className="bg-white rounded-xl border border-gray-200 p-4">
                           <div className="flex items-center justify-between mb-3">
                             <p className="text-sm text-gray-600">Blood Group</p>
                           </div>
                           <p className="text-2xl font-bold text-gray-900">{healthData?.bloodGroup}</p>
-                        </div>
+                        </div> */}
 
                         {/* Blood Group */}
                         <div className="bg-white rounded-xl border border-gray-200 p-4">

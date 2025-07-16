@@ -213,7 +213,7 @@ const HealthRecord = () => {
         setLoading(true);
         
         // Get patientId from localStorage or other state management
-        const patientId = "3B879C95-267A-42EA-B546-59FFFB748CFD";
+        const patientId = "P021";
         
         if (!patientId) {
           setError("Patient ID not found. Please log in again.");
@@ -222,7 +222,7 @@ const HealthRecord = () => {
         }
 
         // Fetch health data from the API
-        const healthResponse = await axios.get(`https://localhost:7295/api/PatientObservations/${patientId}`);
+        const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
         const results = healthResponse.data.results || [];
 
         // Categorize and set health data
