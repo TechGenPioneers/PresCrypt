@@ -209,10 +209,14 @@ useEffect(() => {
             {/* Card Footer */}
             <div className="bg-gray-50 px-8 py-6 border-t border-gray-100">
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  href={`/Admin/DoctorRequestPage`}
+                >
                 <button className="flex items-center gap-4 px-8 py-3  bg-[#A9C9CD] text-[#09424D]  font-semibold rounded-xl hover:bg-[#91B4B8]  transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
                   <ArrowLeft className="w-4 h-4" />
                   <span>Go to Doctor Request List</span>
                 </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -610,7 +614,7 @@ useEffect(() => {
           <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
             <p className="text-slate-600 text-lg font-medium">
-              Loading Patient Details...
+              Loading Doctor Request Details...
             </p>
           </div>
         </div>

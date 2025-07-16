@@ -58,12 +58,12 @@ export default function DoctorDetails({ doctorID }) {
   //check the doctor
   if (showNotFound && !doctor) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+      <div className="min-h-screen bg-[#f3faf7] p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-200">
             <h1 className="text-4xl font-bold text-slate-900 flex items-center gap-3">
-              <Stethoscope className="w-8 h-8 text-blue-600" />
+              <Stethoscope className="w-8 h-8 text-[#09424D]" />
               Doctor Details
             </h1>
           </div>
@@ -104,7 +104,7 @@ export default function DoctorDetails({ doctorID }) {
               {/* Action Button */}
               <div className="p-8 bg-gradient-to-r from-slate-50 to-blue-50 border-t border-slate-200">
                 <Link href="/Admin/AdminDoctor">
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-4 px-8 rounded-xl hover:from-blue-700 hover:to-blue-800 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
+                  <button className="w-full bg-[#A9C9CD] text-[#09424D] font-semibold py-4 px-8 rounded-xl hover:bg-[#91B4B8] transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
                     <ArrowLeft className="w-5 h-5" />
                     Go to Doctor List
                   </button>
