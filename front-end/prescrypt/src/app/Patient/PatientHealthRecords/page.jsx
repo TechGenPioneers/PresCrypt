@@ -1,11 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import AppointmentList from "../PatientComponents/appointmentList";
-import Header from "../../Components/header/Header";
-import Footer from "../../Components/footer/Footer";
-import NavBar from "../PatientComponents/navBar";
 import useAuthGuard from "@/utils/useAuthGuard";
-import Chatbot from "../ChatbotComponents/chatbot";
 
 const HealthRecords = () => {
   useAuthGuard(["Patient"]);
@@ -23,7 +19,6 @@ const HealthRecords = () => {
 
   return (
     <div className="container mx-auto mt-8">
-      <Header />
       {patientId ? (
         <AppointmentList patientId={patientId} />
       ) : (
@@ -31,9 +26,6 @@ const HealthRecords = () => {
           Patient ID not found. Please log in again.
         </div>
       )}
-      <NavBar />
-      <Chatbot />
-      <Footer />
     </div>
   );
 };
