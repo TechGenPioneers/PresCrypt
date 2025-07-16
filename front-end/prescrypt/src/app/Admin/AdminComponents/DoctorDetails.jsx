@@ -293,7 +293,7 @@ export default function DoctorDetails({ doctorID }) {
                 <div className="mt-6 text-center">
                   <div className="inline-block p-2 border rounded-2xl shadow-md hover:shadow-xl transition duration-300 ease-in-out">
                     <img
-                      className="rounded-xl min-w-lg h-auto object-contain hover:scale-105 transition-transform duration-300"
+                      className="rounded-xl min-w-lg  h-auto object-contain hover:scale-105 transition-transform duration-300"
                       src={`data:image/jpeg;base64,${doctor.doctor.slmcIdImage}`}
                       alt="SLMC ID"
                     />
