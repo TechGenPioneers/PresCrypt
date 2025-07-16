@@ -42,120 +42,114 @@ const DoctorRequest = () => {
     year: "numeric",
   });
 
-
   return (
-    <div className=" p-6 border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2] bg-white">
+    <div className="p-6 border-[15px] border-b-0 border-[#E9FAF2] bg-white">
       {/* Title */}
-      <h1 className="text-2xl font-bold mb-2">Doctor's Requests</h1>
+      <h1 className="text-3xl font-bold text-slate-800 mb-1">
+        Doctor's Requests
+      </h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
 
-      {/* Table */}
-      <h3 className="text-2xl font-bold mb-1 mt-10">{title}</h3>
-      <div className="overflow-x-auto  h-[400px]">
-        <div className="rounded-lg overflow-hidden">
-          <div className="max-h-100 overflow-y-auto">
-            <table className="w-full mt-5 border-collapse">
-              <thead>
-                <tr className="bg-[#006369] text-[#094A4D]">
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Request Id
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Doctor
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    specialization
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    {statusFilter === "Pending"
-                      ? "Request Date"
-                      : statusFilter === "Approved"
-                      ? "Approved Date"
-                      : "Rejected Date"}
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-
-              {/* Table Body */}
-              <tbody>
-                {filteredRequests.map((request, index) => (
-                  <tr
-                    key={index}
-                    className={`border-t ${
-                      index % 2 === 0 ? "bg-[#E9FAF2]" : "bg-[#ffffff]"
-                    }`}
-                  >
-                    <td className="p-3 text-[#094A4D] space-x-3">{request.requestId}</td>
-                    <td className="p-3 flex items-center space-x-3">
-                      <div>
-                        <p className="font-semibold text-[#094A4D] space-x-3">
-                          {request.firstName} {request.lastName}
-                        </p>
-                        <p className="text-[#094A4D] text-sm">
-                          {request.gender}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="p-3 text-[#094A4D] space-x-3">
-                      {request.specialization}
-                    </td>
-                    <td className="p-3 text-[#094A4D] space-x-3">
-                      {statusFilter === "Pending"
-                        ? request.createdAt
-                        : statusFilter === "Approved"
-                        ? request.checkedAt
-                        : request.checkedAt}
-                    </td>
-
-                    <td className="p-3 space-x-3">
-                      <button className="px-4 py-2 text-[#094A4D] cursor-pointer rounded">
-                      <Link href={`/Admin/DoctorRequestDetailPage/${request.requestId}`}>View</Link>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div className="flex mt-6 space-x-6 justify-center">
-        <div className="grid grid-cols-3 gap-10">
+      {/* Filter Buttons */}
+      <div className="mt-8 flex justify-center">
+        <div className="flex flex-wrap gap-4">
           <button
-            className={`py-2 px-5 rounded-xl border-5 cursor-pointer ${
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition ${
               statusFilter === "Rejected"
-                ? "bg-red-700 text-white"
-                : "text-black border-red-600 hover:bg-red-900 hover:text-white"
+                ? "bg-red-600 text-white"
+                : "border border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
             }`}
             onClick={() => setStatusFilter("Rejected")}
           >
             Rejected Requests
           </button>
-
           <button
-            className={`py-2 px-5 rounded-xl border-5 cursor-pointer ${
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition ${
               statusFilter === "Pending"
-                ? "bg-[rgba(0,126,133,0.7)] text-white"
-                : "text-[#094A4D] border-[rgba(0,126,133,0.7)] hover:bg-[rgba(0,126,133,0.4)]"
+                ? "bg-[#007E85] text-white"
+                : "border border-[#007E85] text-[#007E85] hover:bg-[#007E85]/20"
             }`}
             onClick={() => setStatusFilter("Pending")}
           >
             Pending Requests
           </button>
-
           <button
-            className={`py-2 px-5 rounded-xl border-5 cursor-pointer ${
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition ${
               statusFilter === "Approved"
-                ? "bg-[rgba(0,126,133,0.7)] text-white"
-                : "text-[#094A4D] border-[rgba(0,126,133,0.7)] hover:bg-[rgba(0,126,133,0.4)]"
+                ? "bg-[#007E85] text-white"
+                : "border border-[#007E85] text-[#007E85] hover:bg-[#007E85]/20"
             }`}
             onClick={() => setStatusFilter("Approved")}
           >
             Approved Requests
           </button>
+        </div>
+      </div>
+
+      {/* Subtitle */}
+      <h3 className="text-2xl font-bold mt-10 mb-2 text-slate-800">{title}</h3>
+
+      {/* Table */}
+      <div className="overflow-x-auto h-[400px] rounded-xl border border-slate-200 mt-4">
+        <div className="max-h-96 overflow-y-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead className="sticky top-0 bg-[#B5D9DB] z-5 shadow">
+              <tr className="text-[#094A4D]">
+                <th className="p-4 text-left font-semibold">Request ID</th>
+                <th className="p-4 text-left font-semibold">Doctor</th>
+                <th className="p-4 text-left font-semibold">Specialization</th>
+                <th className="p-4 text-left font-semibold">
+                  {statusFilter === "Pending"
+                    ? "Request Date"
+                    : statusFilter === "Approved"
+                    ? "Approved Date"
+                    : "Rejected Date"}
+                </th>
+                <th className="p-4 text-left font-semibold">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRequests.map((request, index) => (
+                <tr
+                  key={index}
+                  className={`transition-all ${
+                    index % 2 === 0 ? "bg-[#F7FCFA]" : "bg-white"
+                  } hover:bg-[#E9FAF2]`}
+                >
+                  <td className="p-4 text-[#094A4D] font-medium">
+                    {request.requestId}
+                  </td>
+                  <td className="p-4 text-[#094A4D]">
+                    <div className="flex flex-col">
+                      <span className="font-semibold">
+                        {request.firstName} {request.lastName}
+                      </span>
+                      <span className="text-sm text-slate-600">
+                        {request.gender}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-4 text-[#094A4D]">
+                    {request.specialization}
+                  </td>
+                  <td className="p-4 text-[#094A4D]">
+                    {statusFilter === "Pending"
+                      ? request.createdAt
+                      : request.checkedAt}
+                  </td>
+                  <td className="p-4">
+                    <Link
+                      href={`/Admin/DoctorRequestDetailPage/${request.requestId}`}
+                    >
+                      <button className="px-4 py-2 bg-[#B5D9DB] text-[#094A4D] font-medium rounded-lg hover:bg-[#A2C5C7] transition">
+                        View
+                      </button>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
