@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useState, createContext } from "react";
-import Header from "../../../../components/header/header";
-import Footer from "../../../../components/footer/footer";
-import NavBar from "../../../PatientComponents/navBar";
 import PaymentView from "../../../PatientComponents/paymentView";
 
 export const AppointmentContext = createContext();
@@ -45,8 +42,6 @@ function PaymentClient({ id }) {
 
   return (
     <div>
-      <NavBar />
-      <Header />
       <div className="flex justify-between w-full max-w-6xl mx-auto gap-8">
         {appointmentData && (
           <AppointmentContext.Provider
@@ -70,7 +65,6 @@ function PaymentClient({ id }) {
           </AppointmentContext.Provider>
         )}
       </div>
-      <Footer />
     </div>
   );
 }

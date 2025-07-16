@@ -111,7 +111,7 @@ const AppointmentList = ({ patientId }) => {
   const cancelled = appointments.filter((a) => a.status.toLowerCase() === "cancelled").length;
 
   return (
-    <div className="ml-[90px] p-6 bg-[#f4fbfd] min-h-screen">
+    <div className="ml-[90px] p-6 bg-white/20 backdrop-blur-md min-h-screen rounded-xl shadow-lg">
       <AppointmentListStat
         patientName={patientDetails.name}
         age={patientDetails.age}
@@ -128,7 +128,7 @@ const AppointmentList = ({ patientId }) => {
           <div
             key={appt.appointmentId || index}
             className={`flex flex-col md:flex-row justify-between items-center rounded-xl shadow p-4 ${
-              index % 2 === 0 ? "bg-[#E8F4F2]" : "bg-white"
+              index % 2 === 0 ? "bg-white/40" : "bg-white/20"
             }`}
           >
             <div className="flex flex-col md:flex-row gap-4 w-full md:items-center">

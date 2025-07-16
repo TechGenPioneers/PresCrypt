@@ -1,10 +1,4 @@
-// app/team/page.jsx
 "use client";
-
-import Header from "../../Components/header/Header";
-import Footer from "../../Components/footer/Footer";
-import NavBar from "../PatientComponents/navBar";
-import Chatbot from "../ChatbotComponents/chatbot";
 import TeamCard from "../PatientComponents/teamCard";
 import React from "react";
 
@@ -19,13 +13,9 @@ export default function TeamPage() {
 
      
       <div className="relative z-10 flex flex-col min-h-screen">
-        <Header />
-        <NavBar />
         <main className="flex-grow">
           <TeamCard />
         </main>
-        <Chatbot />
-        <Footer />
       </div>
     </div>
   );
