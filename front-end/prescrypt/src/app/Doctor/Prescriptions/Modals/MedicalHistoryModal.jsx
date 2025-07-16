@@ -31,7 +31,7 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          doctorId: "D001", // 🔒 Hardcoded doctor ID (replace later)
+          doctorId: "D002", // 🔒 Hardcoded doctor ID (replace later)
           patientId: patient?.patientId,
           title: "Request to View Medical History",
           message: "Doctor requests access to your medical history.",
