@@ -60,7 +60,8 @@ const MessageTable = () => {
     }
   };
 
-  const filteredMessages = messages.filter((msg) => {
+ const filteredMessages = messages
+  .filter((msg) => {
     const matchSender =
       senderFilter === "all" || msg.senderType === senderFilter;
     const matchRead =
@@ -68,6 +69,11 @@ const MessageTable = () => {
       (readFilter === "read" && msg.isRead) ||
       (readFilter === "unread" && !msg.isRead);
     return matchSender && matchRead;
+  })
+  .sort((a, b) => {
+    // Sort so unread messages come first
+    if (a.isRead === b.isRead) return 0;
+    return a.isRead ? 1 : -1; // unread (false) comes before read (true)
   });
 
   const getSenderBadge = (type) => {
@@ -79,8 +85,8 @@ const MessageTable = () => {
   const getFilterButtonClass = (isActive) => {
     return `px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
       isActive
-        ? "bg-gradient-to-r from-slate-800 to-slate-700 text-white shadow-lg"
-        : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"
+        ? "bg-[#A9C9CD] text-[#09424D] shadow-lg"
+        : "bg-white text-slate-600 hover:bg-slate-50 border border-[#A9C9CD]"
     }`;
   };
 
@@ -266,6 +272,14 @@ const MessageTable = () => {
                     </h4>
                     <p className="text-slate-600">{selected.description}</p>
                   </div>
+                  {selected.isRead && (
+                    <div>
+                    <h4 className="font-semibold text-slate-800 mb-1">
+                      Reply Message
+                    </h4>
+                    <p className="text-slate-600">{selected.replyMessage}</p>
+                  </div>
+                  )}
                 </div>
 
                 {/* Actions */}
