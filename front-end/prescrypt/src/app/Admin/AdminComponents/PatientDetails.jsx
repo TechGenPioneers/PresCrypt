@@ -106,9 +106,6 @@ const PatientDetails = ({ patientId }) => {
 
   if (!dateTime) return null;
 
-
-
-
   if (showNotFound && !patientData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
@@ -185,7 +182,6 @@ const PatientDetails = ({ patientId }) => {
             {/* Bottom Gradient */}
             <div className="h-2 bg-gradient-to-r from-[#eef3f4]  via-[#A9C9CD]  to-[#eef3f4] "></div>
           </div>
-
         </div>
       </div>
     );
@@ -321,7 +317,7 @@ const PatientDetails = ({ patientId }) => {
                     <div>
                       <p className="text-sm text-gray-600">Contact</p>
                       <p className="font-semibold text-gray-900">
-                        {patientData.patient.contactNumber}
+                        {patientData.patient.phoneNumber}
                       </p>
                     </div>
                   </div>
@@ -363,18 +359,20 @@ const PatientDetails = ({ patientId }) => {
                       </p>
                     </div>
                   </div>
+                  {patientData.patient.lastLogin && (
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
+                        <Clock className="w-6 h-6 text-pink-600" />
+                      </div>
 
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-                      <Clock className="w-6 h-6 text-pink-600" />
+                      <div>
+                        <p className="text-sm text-gray-600">Last Login</p>
+                        <p className="font-semibold text-gray-900">
+                          {patientData.patient.lastLogin}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Last Login</p>
-                      <p className="font-semibold text-gray-900">
-                        {patientData.patient.lastLogin}
-                      </p>
-                    </div>
-                  </div>
+                  )}
 
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
