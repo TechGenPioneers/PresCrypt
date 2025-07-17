@@ -83,7 +83,7 @@ const Patients = () => {
       {/* Table */}
       <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[400px] overflow-y-auto">
         <table className="w-full border-collapse text-sm">
-          <thead className="sticky top-0 bg-[#B5D9DB] z-10 shadow text-[#094A4D]">
+          <thead className="sticky top-0 bg-[#B5D9DB] z-5 shadow text-[#094A4D]">
             <tr>
               <th className="p-4 text-left font-semibold">Patient ID</th>
               <th className="p-4 text-left font-semibold">Patient</th>
