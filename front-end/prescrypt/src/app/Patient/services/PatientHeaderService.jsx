@@ -16,25 +16,20 @@ export const markAsRead = async (id) => {
   });
 };
 
-export async function respondToRequest(notificationId, doctorId, accepted) {
-  const token = localStorage.getItem("token");
-
-  const response = await fetch("https://localhost:7021/api/AccessRequest/respond-to-access-request", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      doctorId: doctorId,
-      patientId: localStorage.getItem("userId"), // or pass explicitly
-      accepted: accepted,
-    }),
-  });
-
-  if (!response.ok) {
+export const respondToRequest = async ({ doctorId, accepted }) => {
+  try {
+    const response = await axios.post(
+      "https://localhost:7021/api/AccessRequest/respond-to-access-request",
+      {
+        doctorId,
+        patientId:"p021",
+        accepted,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("API Error Response:", error.response?.data || error.message);
     throw new Error("Failed to respond to access request");
   }
+};
 
-  return await response.json();
-}

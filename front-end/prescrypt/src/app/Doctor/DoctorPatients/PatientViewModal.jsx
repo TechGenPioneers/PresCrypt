@@ -95,7 +95,7 @@ useEffect(() => {
 
   const handleViewMedicalData = () => {
     // Navigate to medical data page
-    window.location.href = `/doctor/patient-medical-data/${patient.patientId}`;
+    window.location.href = `/Patient/PatientProfile/${patient.patientId}`;
   };
 
   const renderAccessStatus = () => {

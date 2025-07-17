@@ -27,6 +27,7 @@ export default function NotificationIcon({ patientId }) {
   const [confirmDialog, setConfirmDialog] = useState(false);
   const [responded, setResponded] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
+  const [responseMessage, setResponseMessage] = useState("");
   const open = Boolean(anchorEl);
 
   useEffect(() => {
@@ -129,18 +130,46 @@ export default function NotificationIcon({ patientId }) {
   //   }
   // };
 
-  const handleResponse = async (accepted) => {
-    try {
-      await respondToRequest(
-        selectedNotification.id,
-        selectedNotification.doctorId,
-        accepted
-      );
-      setResponded(true); // disable after 1st click
-    } catch (err) {
-      console.error("Failed to send response", err);
+
+const handleResponse = async (accepted) => {
+  if (!selectedNotification) return;
+  patientId:"P021";
+
+  try {
+    setResponded(true);
+
+    const patientId = localStorage.getItem("patientId"); // or sessionStorage or wherever you're storing it
+
+    if (!patientId) {
+      console.error("Missing patientId");
+      alert("User ID missing. Please login again.");
+      return;
     }
-  };
+
+    await respondToRequest({
+      doctorId: selectedNotification.doctorId,
+      patientId: patientId,
+      accepted: accepted,
+    });
+
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === selectedNotification.id ? { ...n, isRead: true } : n
+      )
+    );
+
+    setConfirmDialog(false);
+    setSelectedNotification(null);
+    alert(`You have ${accepted ? "granted" : "denied"} access.`);
+  } catch (error) {
+    console.error("Error responding to access request:", error);
+    setResponded(false);
+  }
+};
+
+
+
+
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -252,22 +281,25 @@ export default function NotificationIcon({ patientId }) {
           Doctor is requesting to access your medical health data. Are you sure
           you want to allow?
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => handleResponse(false)} color="error">
-            No, Deny
-          </Button>
-          <Button
-            disabled={responded}
-            onClick={() => handleResponse(true)}
-            className={`px-4 py-2 rounded ${
-              responded
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-green-500 hover:bg-green-600 text-white"
-            }`}
-          >
-             Yes, I’m OK
-          </Button>
-        </DialogActions>
+       <DialogActions>
+  <Button onClick={() => handleResponse(false)} color="error">
+    No, Deny
+  </Button>
+  <Button
+    disabled={responded}
+    onClick={() => handleResponse(true)}
+    className={`px-4 py-2 rounded ${
+      responded
+        ? "bg-gray-300 cursor-not-allowed"
+        : "bg-green-500 hover:bg-green-600 text-white"
+    }`}
+  >
+    Yes, I’m OK
+  </Button>
+</DialogActions>
+
+
+
       </Dialog>
     </>
   );
