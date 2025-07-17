@@ -11,7 +11,6 @@ import {
 import LoadingSpinner from "./loadingSpinner";
 
 
-const PatientDashboard = ({ id = "P025" }) => {
 
 const PatientDashboard = () => {
 
