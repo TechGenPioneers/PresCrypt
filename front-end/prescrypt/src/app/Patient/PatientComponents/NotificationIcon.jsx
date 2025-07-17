@@ -14,7 +14,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import buttonClasses from "@mui/material/Button";
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices"; // Large icon for dialog
 import {
   getNotifications,
   markAsRead,
@@ -106,12 +106,11 @@ export default function NotificationIcon({ patientId }) {
 
   const handleResponse = async (accepted) => {
     if (!selectedNotification) return;
-    patientId: localStorage.getItem("patientId"); // or sessionStorage or wherever you're storing it
 
     try {
       setResponded(true);
 
-      const patientId = localStorage.getItem("patientId"); // or sessionStorage or wherever you're storing it
+      const patientId = localStorage.getItem("patientId");
 
       if (!patientId) {
         console.error("Missing patientId");
@@ -133,7 +132,14 @@ export default function NotificationIcon({ patientId }) {
 
       setConfirmDialog(false);
       setSelectedNotification(null);
-      alert(`You have ${accepted ? "granted" : "denied"} access.`);
+      setResponseMessage(
+        accepted
+          ? "Your response has been sent to the doctor."
+          : "You have rejected the request from the doctor."
+      );
+      alert(
+        `You have ${accepted ? "granted" : "denied"} access.`
+      );
     } catch (error) {
       console.error("Error responding to access request:", error);
       setResponded(false);
@@ -236,50 +242,50 @@ export default function NotificationIcon({ patientId }) {
         )}
       </Menu>
 
-    <Dialog
-  open={confirmDialog}
-  onClose={() => setConfirmDialog(false)}
-  PaperProps={{
-    className: "rounded-xl p-4 bg-white shadow-xl w-[90%] max-w-md",
-  }}
->
-  <DialogTitle className="text-xl font-semibold align-middle text-gray-800 border-b pb-2">
-    Confirm Access
-  </DialogTitle>
+      <Dialog
+        open={confirmDialog}
+        onClose={() => setConfirmDialog(false)}
+        PaperProps={{
+          className: "rounded-xl p-6 bg-gradient-to-br from-green-50 to-white shadow-2xl w-[90%] max-w-md mx-auto transform scale-100 hover:scale-105 transition duration-300",
+        }}
+      >
+        <DialogTitle className="text-2xl font-bold text-center text-green-800 bg-gradient-to-r from-green-100 to-white p-4 rounded-t-xl">
+          Confirm Access
+        </DialogTitle>
 
-  <DialogContent className="py-4 text-gray-700 align-middle">
-    A Doctor is requesting to access your medical health data.
-    <br />
-    Are you sure you want to allow?
-  </DialogContent>
+        <DialogContent className="py-6 text-center text-gray-700 flex flex-col items-center">
+          <MedicalServicesIcon
+            sx={{ fontSize: 100, color: "#4CAF50" }}
+            className="mb-4 animate-pulse"
+          />
+          <p className="text-lg">A Doctor is requesting to access your medical health data.</p>
+          <p className="text-lg font-medium text-blue-600 mt-2">Are you sure you want to allow?</p>
+          {responseMessage && (
+            <p className="mt-4 text-sm text-gray-600">{responseMessage}</p>
+          )}
+        </DialogContent>
 
-  <DialogActions className="flex center-end space-x-3 px-4 pb-4">
-    <Button
-      disabled={responded}
-      onClick={() => handleResponse(false)}
-      className={`px-4 py-2 rounded-md font-medium transition duration-300 ${
-        responded
-          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-          : "bg-red-500 hover:bg-red-600 text-white"
-      }`}
-    >
-      No, Deny
-    </Button>
-
-    <Button
-      disabled={responded}
-      onClick={() => handleResponse(true)}
-      className={`px-4 py-2 rounded-md font-medium transition duration-300 ${
-        responded
-          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-          : "bg-green-500 hover:bg-green-600 text-white"
-      }`}
-    >
-      Yes, I’m OK
-    </Button>
-  </DialogActions>
-</Dialog>
-
+        <DialogActions className="flex justify-center space-x-6 px-4 pb-6">
+          <Button
+            disabled={responded}
+            onClick={() => handleResponse(false)}
+            className={`px-6 py-3 rounded-lg font-semibold bg-red-500 hover:bg-red-600 text-white transition duration-300 transform hover:scale-105 ${
+              responded ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            No, Deny
+          </Button>
+          <Button
+            disabled={responded}
+            onClick={() => handleResponse(true)}
+            className={`px-6 py-3 rounded-lg font-semibold bg-green-500 hover:bg-green-600 text-white transition duration-300 transform hover:scale-105 ${
+              responded ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            Yes, I’m OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

@@ -4,6 +4,12 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Snackbar, Alert } from "@mui/material";
 import { useRouter } from "next/navigation";
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices"; // Icon for Medical History
+import PersonIcon from "@mui/icons-material/Person"; // Icon for Patient Info
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // Icon for Approved
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty"; // Icon for Pending
+import CancelIcon from "@mui/icons-material/Cancel"; // Icon for Denied
+import WarningIcon from "@mui/icons-material/Warning"; // Icon for Unknown
 
 const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
   const [error, setError] = useState(null);
@@ -107,38 +113,51 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
           </button>
 
           {/* Header */}
-          <h2 className="text-2xl font-semibold text-[#094A4D] mb-1">
-            Medical History Access
-          </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <MedicalServicesIcon color="primary" />
+            <h2 className="text-2xl font-semibold text-[#094A4D]">
+              Medical History Access
+            </h2>
+          </div>
           <p className="text-sm text-gray-600 mb-4">
             You can request permission to view this patient's health records.
           </p>
 
           {/* Patient Info */}
           <div className="bg-[#F3F8F6] p-4 rounded-md mb-4 text-sm text-gray-800">
-            <p><span className="font-semibold">Patient ID:</span> {patient?.patientId}</p>
-            <p><span className="font-semibold">Name:</span> {patient?.patientName}</p>
+            <div className="flex items-center gap-2">
+              <PersonIcon color="action" />
+              <p><span className="font-semibold">Patient ID:</span> {patient?.patientId}</p>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <PersonIcon color="action" />
+              <p><span className="font-semibold">Name:</span> {patient?.patientName}</p>
+            </div>
           </div>
 
           {/* Status display */}
           {accessStatus === "Approved" && (
-            <div className="mb-4 text-teal-600 bg-teal-100 px-4 py-2 rounded">
-              ✅ Access approved by patient. You may now view the records.
+            <div className="mb-4 flex items-center gap-2 text-teal-600 bg-teal-100 px-4 py-2 rounded">
+              <CheckCircleIcon />
+              Access approved by patient. You may now view the records.
             </div>
           )}
           {accessStatus === "Pending" && (
-            <div className="mb-4 text-blue-600 bg-blue-100 px-4 py-2 rounded">
-              ⏳ Access request is pending. Please wait for patient approval.
+            <div className="mb-4 flex items-center gap-2 text-blue-600 bg-blue-100 px-4 py-2 rounded">
+              <HourglassEmptyIcon />
+               Access request is pending. Please wait for patient approval.
             </div>
           )}
           {accessStatus === "Denied" && (
-            <div className="mb-4 text-red-600 bg-red-100 px-4 py-2 rounded">
+            <div className="mb-4 flex items-center gap-2 text-red-600 bg-red-100 px-4 py-2 rounded">
+              <CancelIcon />
               ❌ Access denied by patient. You may try again later.
             </div>
           )}
           {accessStatus === "Unknown" && (
-            <div className="mb-4 text-yellow-600 bg-yellow-100 px-4 py-2 rounded">
-              ⚠️ Unable to determine access status at the moment.
+            <div className="mb-4 flex items-center gap-2 text-yellow-600 bg-yellow-100 px-4 py-2 rounded">
+              <WarningIcon />
+               Unable to determine access status at the moment.
             </div>
           )}
 
@@ -146,20 +165,22 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
           {accessStatus === "Approved" ? (
             <button
               onClick={handleViewHealthRecord}
-              className="mt-3 w-full bg-teal-600 hover:bg-green-700 text-white py-2 rounded-lg transition"
+              className="mt-3 w-full bg-teal-600 hover:bg-green-700 text-white py-2 rounded-lg transition flex items-center justify-center gap-2"
             >
+              <MedicalServicesIcon />
               View Medical Health Record
             </button>
           ) : (
             <button
               onClick={handleRequestAccess}
               disabled={accessRequested || accessStatus === "Pending"}
-              className={`mt-3 w-full py-2 rounded-lg transition ${
+              className={`mt-3 w-full py-2 rounded-lg transition flex items-center justify-center gap-2 ${
                 accessRequested || accessStatus === "Pending"
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-[#094A4D] hover:bg-[#006469] text-white"
               }`}
             >
+              <MedicalServicesIcon />
               {accessRequested || accessStatus === "Pending"
                 ? "Access Request Sent – Awaiting Response"
                 : "Request Access"}
