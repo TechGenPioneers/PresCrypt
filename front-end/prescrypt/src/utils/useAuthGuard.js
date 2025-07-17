@@ -19,6 +19,7 @@ export default function useAuthGuard(expectedRole) {
       const role = localStorage.getItem('userRole');
       const username = localStorage.getItem('username');
       
+      
       if (!token || !role) {
         router.replace(`/Auth/login?session=expired`);
         return;
@@ -42,7 +43,7 @@ export default function useAuthGuard(expectedRole) {
         }, timeLeft);
         
         if (expectedRole && !expectedRole.includes(role)) {
-          router.replace('/Auth/MainPage');
+          router.replace('/');
         }
       } catch (error) {
         console.error("Invalid token:", error);

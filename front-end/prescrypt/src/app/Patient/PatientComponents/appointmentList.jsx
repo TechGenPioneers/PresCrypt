@@ -12,7 +12,7 @@ import {
 import {
   getPatientDetails,
   getProfileImage
-} from "../services/PatientDataService"; // updated import
+} from "../services/PatientDataService"; 
 
 const AppointmentList = ({ patientId }) => {
   const [appointments, setAppointments] = useState([]);
@@ -22,6 +22,7 @@ const AppointmentList = ({ patientId }) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
+    console.log("🔥 Received patientId in AppointmentList:", patientId);
     const fetchData = async () => {
       try {
         const [appointmentsRes, patientRes, imageRes] = await Promise.all([
@@ -29,6 +30,7 @@ const AppointmentList = ({ patientId }) => {
           getPatientDetails(patientId),
           getProfileImage(patientId)
         ]);
+        
 
         const sortedAppointments = appointmentsRes.sort((a, b) => new Date(b.date) - new Date(a.date));
         const calculatedAge = calculateAge(patientRes.dob);
@@ -109,7 +111,7 @@ const AppointmentList = ({ patientId }) => {
   const cancelled = appointments.filter((a) => a.status.toLowerCase() === "cancelled").length;
 
   return (
-    <div className="ml-[90px] p-6 bg-[#f4fbfd] min-h-screen">
+    <div className="ml-[90px] p-6 bg-white/20 backdrop-blur-md min-h-screen rounded-xl shadow-lg">
       <AppointmentListStat
         patientName={patientDetails.name}
         age={patientDetails.age}
@@ -118,6 +120,7 @@ const AppointmentList = ({ patientId }) => {
         total={total}
         accepted={accepted}
         cancelled={cancelled}
+        patientId={patientId}
       />
 
       <div className="rounded-lg space-y-4">
@@ -125,7 +128,7 @@ const AppointmentList = ({ patientId }) => {
           <div
             key={appt.appointmentId || index}
             className={`flex flex-col md:flex-row justify-between items-center rounded-xl shadow p-4 ${
-              index % 2 === 0 ? "bg-[#E8F4F2]" : "bg-white"
+              index % 2 === 0 ? "bg-white/40" : "bg-white/20"
             }`}
           >
             <div className="flex flex-col md:flex-row gap-4 w-full md:items-center">
@@ -174,13 +177,6 @@ const AppointmentList = ({ patientId }) => {
           </div>
         ))}
 
-        {appointments.length > 5 && (
-          <div className="text-center">
-            <button className="bg-[#5da9a7] hover:bg-[#4c9995] text-white px-6 py-2 rounded-full shadow">
-              Load more..
-            </button>
-          </div>
-        )}
       </div>
 
       {selectedAppointment && (

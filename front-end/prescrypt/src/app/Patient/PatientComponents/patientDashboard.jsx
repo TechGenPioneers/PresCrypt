@@ -4,34 +4,64 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardActionArea, CardContent, Typography } from "@mui/material";
-import { getPatientDetails } from "../services/PatientDataService";
+import {
+  getPatientIdByEmail,
+  getPatientDetails,
+} from "../services/PatientDataService";
+import LoadingSpinner from "./loadingSpinner";
 
-const PatientDashboard = ({ id = "P021" }) => {
+
+const PatientDashboard = ({ id = "P025" }) => {
+
+const PatientDashboard = () => {
+
   const [patient, setPatient] = useState(null);
 
   useEffect(() => {
-    const fetchDetails = async () => {
+    const fetchPatient = async () => {
       try {
-        const data = await getPatientDetails(id);
-        setPatient(data);
+        const email = localStorage.getItem("username");
+        if (!email) {
+          console.error("No email found in localStorage.");
+          return;
+        }
+
+        let patientId = localStorage.getItem("patientId");
+
+        if (!patientId) {
+          // Fetch patient ID using email and store it
+          patientId = await getPatientIdByEmail(email);
+          if (!patientId) {
+            console.error("Patient ID not found for email.");
+            return;
+          }
+          localStorage.setItem("patientId", patientId);
+        }
+
+        // Fetch patient details with the patient ID
+        const details = await getPatientDetails(patientId);
+        setPatient(details);
       } catch (error) {
-        console.error("Failed to fetch patient details:", error);
+        console.error("Failed to fetch patient data:", error);
       }
     };
 
-    fetchDetails();
-  }, [id]);
+    fetchPatient();
+  }, []);
+
+  if (!patient) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[85vh] py-10">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-12 min-h-[85vh] py-10">
-
       <h2 className="text-3xl font-bold text-green-700 text-center">
-        {patient?.name && (
-          <>
-            Hi! {patient.name}
-            <br />
-          </>
-        )}
+        Hi! {patient.name}
+        <br />
         Welcome to your Personal Health Hub
       </h2>
 
@@ -81,11 +111,12 @@ const PatientDashboard = ({ id = "P021" }) => {
             </CardActionArea>
           </Card>
         </Link>
+
         <Link href="/Patient/PatientContactUs">
           <Card className="w-96 h-64 rounded-2xl shadow-md border border-green-200 hover:shadow-xl transition duration-300">
             <CardActionArea className="h-full rounded-2xl overflow-hidden">
               <Image
-                src="/ContactUs.jpg" 
+                src="/ContactUs.jpg"
                 alt="Contact Us"
                 width={384}
                 height={192}
@@ -103,7 +134,6 @@ const PatientDashboard = ({ id = "P021" }) => {
             </CardActionArea>
           </Card>
         </Link>
-
       </div>
     </div>
   );

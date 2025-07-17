@@ -166,23 +166,32 @@ const AdminNotification = () => {
           onClick={toggleSidebar}
           className="p-3 fixed right-5 top-5 focus:outline-none cursor-pointer flex items-center bg-white shadow-lg rounded-full transition-transform hover:scale-110 z-50"
         >
-          <Bell className="w-6 h-6 text-gray-700" />
+          <Bell
+            className={`w-6 h-6 text-gray-700 ${
+              unreadCount > 0 ? "animate-pulse" : ""
+            }`}
+          />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full animate-bounce">
               {unreadCount}
             </span>
           )}
         </button>
       </div>
 
+
+
       {/* Notification Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed top-16 right-0 h-[70%] w-72 sm:w-96 md:w-[28rem] lg:w-[32rem] bg-[#CEE4E6] text-[#094A4D] rounded-l-xl shadow-xl p-4 transition-all duration-500 ease-in-out transform ${
+        className={`fixed right-5 h-[70%] w-72 sm:w-96 md:w-[28rem] lg:w-[32rem] bg-[#CEE4E6] text-[#094A4D] rounded-l-xl shadow-xl p-4 transition-all duration-500 ease-in-out transform overflow-hidden z-40${
           isSidebarVisible
-            ? "translate-x-0 opacity-100"
-            : "translate-x-full opacity-0"
+            ? "top-16 h-[70%] w-72 sm:w-96 md:w-[28rem] lg:w-[32rem] opacity-100 scale-100"
+            : "top-5 h-12 w-12 opacity-0 scale-75"
         } overflow-hidden z-40`}
+         style={{
+          transformOrigin: 'top right'
+        }}
       >
         {/* notification Header */}
         <div className="flex justify-between items-center border-b pb-2 mb-4">

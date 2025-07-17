@@ -234,13 +234,6 @@ export default function DoctorRegistrationForm() {
     year: "numeric",
   });
 
-  // Time Formatting
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
 
   return (
     <div className="p-6 ml-15 bg-white rounded-lg shadow-md">
@@ -578,10 +571,6 @@ export default function DoctorRegistrationForm() {
           </div>
         </div>
       )}
-      <div className="mt-6 text-gray-500 text-right">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
-      </div>
     </div>
   );
 }

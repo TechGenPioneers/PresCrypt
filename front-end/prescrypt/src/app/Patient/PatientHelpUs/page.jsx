@@ -117,13 +117,8 @@ const HelpUsPage = () => {
 
   return (
   <div className="min-h-screen flex flex-col bg-gray-50">
-    {/* Header */}
-    <Header />
-
-    {/* Main content */}
     <div className="flex flex-grow">
-      {/* Sidebar */}
-      <NavBar />
+     
 
      {/* Page content wrapper */}
         <div className="ml-[90px] group-hover:ml-[260px] w-full transition-all duration-300 pt-5 px-10 flex flex-col lg:flex-row justify-between gap-8 mt-10">
@@ -250,11 +245,6 @@ const HelpUsPage = () => {
       </div>
     </div>
 
-    {/* Footer */}
-    <Footer />
-
-    {/* Chatbot */}
-    <Chatbot />
   </div>
 );
 
