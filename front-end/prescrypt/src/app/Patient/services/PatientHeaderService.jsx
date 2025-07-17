@@ -16,28 +16,19 @@ export const markAsRead = async (id) => {
   });
 };
 
-// Respond to a doctor's request to review a prescription
-// export const respondToRequest = async (notificationId, doctorId, accepted) => {
-//   return await axios.post(`${BASE_URL}/PatientNotification/respond-request`, {
-//     notificationId,
-//     doctorId,
-//     accepted,
-//   });
-// };
-
 export async function respondToRequest(notificationId, doctorId, accepted) {
   const token = localStorage.getItem("token");
 
-  const response = await fetch("https://localhost:7021/api/Doctor/respond-to-request", {
+  const response = await fetch("https://localhost:7021/api/AccessRequest/respond-to-access-request", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      notificationId,
-      doctorId,
-      accepted,
+      doctorId: doctorId,
+      patientId: localStorage.getItem("userId"), // or pass explicitly
+      accepted: accepted,
     }),
   });
 

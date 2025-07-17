@@ -25,6 +25,7 @@ export default function NotificationIcon({ patientId }) {
   const [notifications, setNotifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState(false);
+  const [responded, setResponded] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -46,7 +47,9 @@ export default function NotificationIcon({ patientId }) {
     fetchNotifications();
 
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`https://localhost:7021/patientNotificationHub?patientId=${patientId}`)
+      .withUrl(
+        `https://localhost:7021/patientNotificationHub?patientId=${patientId}`
+      )
       .withAutomaticReconnect()
       .build();
 
@@ -98,31 +101,44 @@ export default function NotificationIcon({ patientId }) {
     setConfirmDialog(true);
   };
 
-  const handleResponse = async (accepted) => {
-    if (!selectedNotification) return;
+  // const handleResponse = async (accepted) => {
+  //   if (!selectedNotification) return;
 
+  //   try {
+  //     if (accepted) {
+  //       // Call the API to respond to the access request
+  //       await respondToRequest(selectedNotification.id, selectedNotification.doctorId, true);
+  //       setNotifications((prev) =>
+  //         prev.map((n) =>
+  //           n.id === selectedNotification.id ? { ...n, isRead: true } : n
+  //         )
+  //       );
+  //     } else {
+  //       // Handle deny response
+  //       await respondToRequest(selectedNotification.id, selectedNotification.doctorId, false);
+  //       setNotifications((prev) =>
+  //         prev.map((n) =>
+  //           n.id === selectedNotification.id ? { ...n, isRead: true } : n
+  //         )
+  //       );
+  //     }
+  //     setConfirmDialog(false);
+  //     setSelectedNotification(null);
+  //   } catch (err) {
+  //     console.error("Failed to respond to request", err);
+  //   }
+  // };
+
+  const handleResponse = async (accepted) => {
     try {
-      if (accepted) {
-        // Call the API to respond to the access request
-        await respondToRequest(selectedNotification.id, selectedNotification.doctorId, true);
-        setNotifications((prev) =>
-          prev.map((n) =>
-            n.id === selectedNotification.id ? { ...n, isRead: true } : n
-          )
-        );
-      } else {
-        // Handle deny response
-        await respondToRequest(selectedNotification.id, selectedNotification.doctorId, false);
-        setNotifications((prev) =>
-          prev.map((n) =>
-            n.id === selectedNotification.id ? { ...n, isRead: true } : n
-          )
-        );
-      }
-      setConfirmDialog(false);
-      setSelectedNotification(null);
+      await respondToRequest(
+        selectedNotification.id,
+        selectedNotification.doctorId,
+        accepted
+      );
+      setResponded(true); // disable after 1st click
     } catch (err) {
-      console.error("Failed to respond to request", err);
+      console.error("Failed to send response", err);
     }
   };
 
@@ -233,18 +249,23 @@ export default function NotificationIcon({ patientId }) {
       <Dialog open={confirmDialog} onClose={() => setConfirmDialog(false)}>
         <DialogTitle>Confirm Access</DialogTitle>
         <DialogContent>
-          Doctor is requesting to access your medical health data. Are you sure you want to allow?
+          Doctor is requesting to access your medical health data. Are you sure
+          you want to allow?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleResponse(false)} color="error">
             No, Deny
           </Button>
           <Button
+            disabled={responded}
             onClick={() => handleResponse(true)}
-            color="primary"
-            autoFocus
+            className={`px-4 py-2 rounded ${
+              responded
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-green-500 hover:bg-green-600 text-white"
+            }`}
           >
-            Yes, I’m OK
+             Yes, I’m OK
           </Button>
         </DialogActions>
       </Dialog>

@@ -22,29 +22,28 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
     }
   }, [isOpen, patient]);
 
-  const checkAccessStatus = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+const checkAccessStatus = async () => {
+  try {
+    const response = await fetch(`/api/AccessRequest/check-access-status?doctorId=d001&patientId=p021`);
+    const data = await response.json();
 
-      const response = await fetch(
-        `https://localhost:7021/api/Doctor/access-status?doctorId=${doctorId}&patientId=${patient.patientId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setAccessStatus(data.status);
-        setAccessExpiry(data.accessExpiry);
-      }
-    } catch (err) {
-      console.error("Error checking access status:", err);
+    if (data.status === "Approved") {
+      setStatus("Approved");
+    } else if (data.status === "Expired") {
+      setStatus("Expired");
+    } else {
+      setStatus("Pending");
     }
-  };
+  } catch (error) {
+    console.error("Error checking access status:", error);
+  }
+};
+
+// Call this inside useEffect when component loads
+useEffect(() => {
+  checkAccessStatus();
+}, []);
+
 
   const handleRequestAccess = async () => {
     try {
@@ -56,7 +55,7 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
         throw new Error("Authentication token not found");
       }
 
-      const response = await fetch("https://localhost:7021/api/Doctor/request-patient-access", {
+      const response = await fetch("https://localhost:7021/api/AccessRequest/request-patient-access", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +79,7 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
       // Start polling for status updates
       const pollInterval = setInterval(async () => {
         await checkAccessStatus();
-      }, 3000); // Check every 3 seconds
+      }, 2000); // Check every 3 seconds
 
       // Clean up interval after 5 minutes
       setTimeout(() => {
