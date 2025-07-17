@@ -28,7 +28,7 @@ export default function AppointmentsPage() {
   const calendarRef = useRef(null);
 
   //const doctorId = user?.id;
-  const doctorId = "D002";
+  const doctorId = "D034";
 
   useEffect(() => {
     const handleClickOutside = (event) => {
