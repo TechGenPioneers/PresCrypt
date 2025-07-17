@@ -146,7 +146,7 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
           {accessStatus === "Approved" ? (
             <button
               onClick={handleViewHealthRecord}
-              className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition"
+              className="mt-3 w-full bg-teal-600 hover:bg-green-700 text-white py-2 rounded-lg transition"
             >
               View Medical Health Record
             </button>
