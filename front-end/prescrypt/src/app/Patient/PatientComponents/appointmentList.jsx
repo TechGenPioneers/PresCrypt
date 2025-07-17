@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import AppointmentListStat from "./appointmentListStat";
 import CancelAppointmentDialog from "./cancelAppointmentConfirmation";
+import ViewHealthRecordsDialog from "./viewHealthRecordsDialog";
 import {
   getAppointmentsByPatient,
   deleteAppointment,
@@ -19,6 +20,7 @@ const AppointmentList = ({ patientId }) => {
   const [patientDetails, setPatientDetails] = useState({});
   const [profileImage, setProfileImage] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+  const [openHealthRecordsDialog, setOpenHealthRecordsDialog] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
@@ -58,6 +60,11 @@ const AppointmentList = ({ patientId }) => {
   const confirmCancelAppointment = (appointment) => {
     setSelectedAppointment(appointment);
     setOpenDialog(true);
+  };
+
+  const handleViewHealthRecords = (appointment) => {
+    setSelectedAppointment(appointment);
+    setOpenHealthRecordsDialog(true);
   };
 
   const handleCancelConfirmed = async () => {
@@ -154,6 +161,7 @@ const AppointmentList = ({ patientId }) => {
             </div>
 
             <div className="flex gap-2 mt-2 md:mt-0">
+              {/* Show Cancel button only for pending appointments */}
               {appt.status.toLowerCase() === "pending" && (
                 <button
                   onClick={() => confirmCancelAppointment(appt)}
@@ -162,10 +170,12 @@ const AppointmentList = ({ patientId }) => {
                   Cancel Appointment
                 </button>
               )}
+              
+              {/* Show View Health Records button only for completed appointments */}
               {appt.status.toLowerCase() === "completed" && (
                 <button
-                  onClick={() => alert(`Viewing health records for appointment ${appt.appointmentId}`)}
-                  className="bg-blue-500 hover:bg-blue-300 rounded-lg text-white px-3 py-0.5 text-sm shadow"
+                  onClick={() => handleViewHealthRecords(appt)}
+                  className="bg-[#5da9a7] hover:bg-[#4c9995] rounded-lg text-white px-3 py-1 text-sm shadow"
                 >
                   View Health Records
                 </button>
@@ -192,6 +202,18 @@ const AppointmentList = ({ patientId }) => {
           date={selectedAppointment.date}
           time={selectedAppointment.time}
           hospitalName={selectedAppointment.hospitalName}
+        />
+      )}
+
+      {selectedAppointment && (
+        <ViewHealthRecordsDialog
+          open={openHealthRecordsDialog}
+          onClose={() => setOpenHealthRecordsDialog(false)}
+          doctorName={selectedAppointment.doctorName}
+          date={selectedAppointment.date}
+          time={selectedAppointment.time}
+          hospitalName={selectedAppointment.hospitalName}
+          appointmentId={selectedAppointment.appointmentId}
         />
       )}
     </div>
