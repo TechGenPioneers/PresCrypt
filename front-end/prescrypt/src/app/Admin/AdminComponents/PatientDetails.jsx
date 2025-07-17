@@ -18,6 +18,7 @@ import {
   Activity,
 } from "lucide-react";
 import { X, UserX, ArrowLeft, Search, Users } from "lucide-react";
+import { set } from "date-fns";
 const PatientDetails = ({ patientId }) => {
   const [patientData, setPatientsData] = useState(null);
   const [dateTime, setDateTime] = useState(null);
@@ -28,6 +29,7 @@ const PatientDetails = ({ patientId }) => {
   // Inside your component
   const [filterStatus, setFilterStatus] = useState("All");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   //get patient by id
   const getPatientData = async () => {
@@ -95,21 +97,20 @@ const PatientDetails = ({ patientId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     try {
       const sent = await ChangePatientStatus(
         patientData.patient.patientId,
         status
       );
-      console.log(sent);
 
       getPatientData();
     } catch (err) {
       console.error("Failed to send mail", err);
-      alert("Failed to send mail!", err);
+      setErrorMessage("Failed to update patient status. Please try again.");
     }
-    setIsLoading(false);
+    setIsSubmitting(false);
     setShowModal(false);
   };
 
@@ -280,7 +281,7 @@ const PatientDetails = ({ patientId }) => {
                             : "bg-red-700 text-red-700"
                         }`}
                       ></span>
-                      {patientData.patient.status ? "Active" : "Inactive"}
+                      {patientData.patient.status}
                     </div>
                   </div>
                 </div>
@@ -494,6 +495,19 @@ const PatientDetails = ({ patientId }) => {
                         </th>
                       </tr>
                     </thead>
+                    {filteredAppointments.length === 0 ? ( 
+                      <tbody>
+                    <tr>
+                      <td colSpan="6">
+                        <div className="flex items-center justify-center h-[300px]">
+                          <p className="text-slate-600 text-lg font-medium">
+                            No Appointments Found.
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                  ):(
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filteredAppointments.map((appointment, index) => (
                         <tr
@@ -574,6 +588,7 @@ const PatientDetails = ({ patientId }) => {
                         </tr>
                       ))}
                     </tbody>
+                    )}
                   </table>
                 </div>
               </div>
@@ -700,7 +715,13 @@ const PatientDetails = ({ patientId }) => {
                   ))}
                 </div>
               </div>
-
+              {/* Error Message */}
+              {errorMessage && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                  <p className="text-red-700 font-medium">{errorMessage}</p>
+                </div>
+              )}
               {/* Action Buttons */}
               <div className="flex gap-3 mt-8">
                 <button
