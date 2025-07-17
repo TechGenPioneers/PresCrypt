@@ -28,7 +28,7 @@ export const markAsRead = async (id) => {
 export async function respondToRequest(notificationId, doctorId, accepted) {
   const token = localStorage.getItem("token");
 
-  const response = await fetch("https://localhost:7021/api/Patient/respond-to-request", {
+  const response = await fetch("https://localhost:7021/api/Doctor/respond-to-request", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

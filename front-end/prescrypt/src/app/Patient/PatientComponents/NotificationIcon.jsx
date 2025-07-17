@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 import IconButton from "@mui/material/IconButton";
@@ -9,7 +10,10 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CheckIcon from "@mui/icons-material/Check";
-
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
 import {
   getNotifications,
   markAsRead,
@@ -20,6 +24,8 @@ export default function NotificationIcon({ patientId }) {
   const [connection, setConnection] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
   const open = Boolean(anchorEl);
 
   useEffect(() => {
@@ -27,8 +33,6 @@ export default function NotificationIcon({ patientId }) {
       console.log("patientId is not ready yet. Skipping connection.");
       return;
     }
-
-    console.log("Using patientId:", patientId);
 
     const fetchNotifications = async () => {
       try {
@@ -89,12 +93,34 @@ export default function NotificationIcon({ patientId }) {
     }
   };
 
-  const handleResponse = async (id, doctorId, accepted) => {
+  const confirmAccept = (notification) => {
+    setSelectedNotification(notification);
+    setConfirmDialog(true);
+  };
+
+  const handleResponse = async (accepted) => {
+    if (!selectedNotification) return;
+
     try {
-      await respondToRequest(id, doctorId, accepted);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-      );
+      if (accepted) {
+        // Call the API to respond to the access request
+        await respondToRequest(selectedNotification.id, selectedNotification.doctorId, true);
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === selectedNotification.id ? { ...n, isRead: true } : n
+          )
+        );
+      } else {
+        // Handle deny response
+        await respondToRequest(selectedNotification.id, selectedNotification.doctorId, false);
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === selectedNotification.id ? { ...n, isRead: true } : n
+          )
+        );
+      }
+      setConfirmDialog(false);
+      setSelectedNotification(null);
     } catch (err) {
       console.error("Failed to respond to request", err);
     }
@@ -167,7 +193,7 @@ export default function NotificationIcon({ patientId }) {
                     variant="contained"
                     color="primary"
                     size="small"
-                    onClick={() => handleResponse(n.id, n.doctorId, true)}
+                    onClick={() => confirmAccept(n)}
                   >
                     Accept
                   </Button>
@@ -175,7 +201,7 @@ export default function NotificationIcon({ patientId }) {
                     variant="outlined"
                     color="error"
                     size="small"
-                    onClick={() => handleResponse(n.id, n.doctorId, false)}
+                    onClick={() => handleResponse(false)}
                   >
                     Deny
                   </Button>
@@ -203,6 +229,25 @@ export default function NotificationIcon({ patientId }) {
           ))
         )}
       </Menu>
+
+      <Dialog open={confirmDialog} onClose={() => setConfirmDialog(false)}>
+        <DialogTitle>Confirm Access</DialogTitle>
+        <DialogContent>
+          Doctor is requesting to access your medical health data. Are you sure you want to allow?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleResponse(false)} color="error">
+            No, Deny
+          </Button>
+          <Button
+            onClick={() => handleResponse(true)}
+            color="primary"
+            autoFocus
+          >
+            Yes, I’m OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
