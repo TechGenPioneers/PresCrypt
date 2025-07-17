@@ -12,10 +12,11 @@ import {
   StartVideoCall,
 } from "../service/ChatService";
 import { EllipsisVertical, Trash2, Check, Clock } from "lucide-react";
+import * as signalR from "@microsoft/signalr";
 import VideoCallRoom from "../VideoCall/VideoCallRoom";
 import { useVideoCall } from "../VideoCallProvider";
+import IncomingCallModal from "../VideoCall/IncomingCallModal";
 
-// Utility functions
 const formatMessageTime = (date) =>
   new Date(date).toLocaleTimeString([], {
     hour: "2-digit",
@@ -50,31 +51,82 @@ const ChatWindow = ({
   userRole,
   fetchUsers,
   connection,
+  videoCallConnection,
   setNewMessage,
   newMessage,
-  doctorName,
-  patientName,
+  doctorName, // This is the full doctorName object { fullName: "...", firstName: null, lastName: null }
+  patientName, // This is the full patientName object { fullName: "...", firstName: null, lastName: null }
 }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const messageEndRef = useRef(null);
   const menuRef = useRef(null);
-  const [activeCall, setActiveCall] = useState(null);
 
-  const currentUserName =
-    userRole === "Doctor"
-      ? `Dr. ${doctorName || ""}`.trim()
-      : patientName || "Patient";
+  // These correctly hold the full name objects
+  const currentUserName = userRole === "Doctor" ? doctorName : patientName;
+  const otherUserName = userRole === "Doctor" ? patientName : doctorName;
 
-  const otherUserName =
-    userRole === "Doctor"
-      ? patientName || "Patient"
-      : `Dr. ${doctorName || ""}`.trim();
+  const {
+    incomingCall,
+    callerInfo,
+    roomUrl,
+    activeCall,
+    startCall,
+    endCall,
+    resetCallState,
+    setCallStatus,
+  } = useVideoCall();
 
-  // Video call hooks
-  const { incomingCall, callerInfo, roomUrl, receiveCall, resetCallState } =
-    useVideoCall();
+  const handleStartCall = async () => {
+    if (!selectedUser?.receiverId || !videoCallConnection) return;
+
+    try {
+      const response = await StartVideoCall(userId, selectedUser.receiverId);
+      if (!response?.roomUrl) throw new Error("No room URL");
+
+      if (videoCallConnection.state !== signalR.HubConnectionState.Connected) {
+        await videoCallConnection.start();
+      }
+
+      // When initiating, otherUserName is correctly passed (e.g., patientName object if doctor is calling)
+      startCall(response.roomUrl, otherUserName);
+    } catch (error) {
+      alert(`Could not start call: ${error.message}`);
+    }
+  };
+
+  // FIX STARTS HERE
+  const handleCallAccepted = useCallback(
+    ({ roomUrl }) => {
+      console.log("Call accepted, starting call with URL:", roomUrl);
+
+      // Use the 'otherUserName' derived from ChatWindow's props.
+      // This 'otherUserName' will be the doctor's name object when the userRole is Patient.
+      startCall(roomUrl, otherUserName);
+      setCallStatus("active");
+
+      // Force state update if necessary (though React's state updates should handle this)
+      setTimeout(() => {
+        setSelectedUser((prev) => ({ ...prev }));
+      }, 100);
+    },
+    [startCall, setCallStatus, setSelectedUser, otherUserName] // Add otherUserName to dependencies
+  );
+  // FIX ENDS HERE
+
+  const handleEndCall = () => {
+    endCall();
+    resetCallState();
+  };
+
+  const handleRejectCall = () => {
+    resetCallState();
+  };
+
+  useEffect(() => {
+    console.log("activeCall updated:", activeCall);
+  }, [activeCall]);
 
   const [, setTimeTick] = useState(0);
   useEffect(() => {
@@ -84,18 +136,19 @@ const ChatWindow = ({
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (!connection) return;
+    connection.on("MessageReceived", handleNewMessage);
+    return () => connection.off("MessageReceived", handleNewMessage);
+  }, [connection]);
+
   const fetchMessages = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = await GetAllMessages(userId, selectedUser.receiverId);
       setMessages(data);
     } catch (err) {
-      if (err.response && err.response.status === 404) {
-        console.warn("No messages found for this conversation.");
-        setMessages([]); // Clear messages or handle as needed
-      } else {
-        console.error("Error loading messages:", err);
-      }
+      setMessages([]);
     } finally {
       setIsLoading(false);
     }
@@ -103,68 +156,31 @@ const ChatWindow = ({
 
   const markAsRead = useCallback(async () => {
     try {
-      console.log("Marking messages as read for user:", userId);
       await MarkMessagesAsRead(userId, selectedUser.receiverId);
       fetchUsers();
-    } catch (error) {
-      console.error("Error marking messages as read:", error);
-    }
-  }, [userId, selectedUser.receiverId]); // add userId and fetchUsers to deps
+    } catch {}
+  }, [userId, selectedUser.receiverId]);
 
-  // Handle video call events
-  const handleStartCall = async () => {
-    if (!selectedUser?.receiverId) return;
-
-    try {
-      const response = await StartVideoCall(userId, selectedUser.receiverId);
-      setActiveCall({
-        roomUrl: response.roomUrl,
-        otherUserName: selectedUser.fullName || selectedUser.userName,
-      });
-    } catch (error) {
-      console.error("Failed to start video call", error);
-    }
-  };
-
-  const handleEndCall = () => {
-    setActiveCall(null);
-  };
-  // Handle incoming call for current chat
-  useEffect(() => {
+  const handleNewMessage = (newMsg) => {
     if (
-      incomingCall &&
-      callerInfo?.callerId === selectedUser?.receiverId &&
-      roomUrl
+      newMsg.senderId === selectedUser.receiverId ||
+      newMsg.receiverId === selectedUser.sender
     ) {
-      setActiveCall({
-        roomUrl: roomUrl,
-        otherUserName: callerInfo.callerName,
-      });
-      resetCallState();
+      setMessages((prev) => [...prev, newMsg]);
+      markAsRead();
+      fetchUsers();
     }
-  }, [
-    incomingCall,
-    callerInfo,
-    roomUrl,
-    selectedUser?.receiverId,
-    resetCallState,
-  ]);
-  // for handling the video call event
-  useEffect(() => {
-    const handleCallEvent = (e) => {
-      const { roomUrl, otherUserName } = e.detail;
-      setActiveCall({ roomUrl, otherUserName });
-    };
+  };
 
-    window.addEventListener("startVideoCall", handleCallEvent);
-    return () => window.removeEventListener("startVideoCall", handleCallEvent);
-  }, []);
+  useEffect(() => {
+    fetchMessages();
+    markAsRead();
+  }, [selectedUser, fetchMessages, markAsRead]); // Added fetchMessages and markAsRead to dependencies
+
   useEffect(() => {
     if (!connection) return;
 
     const handleMessageRead = (payload) => {
-      console.log("MessageRead event received:", payload);
-      // Defensive: Check payload shape and data type
       if (!payload || !Array.isArray(payload.messageIds)) return;
 
       setMessages((prev) =>
@@ -175,16 +191,8 @@ const ChatWindow = ({
     };
 
     connection.on("MessageRead", handleMessageRead);
-
-    return () => {
-      connection.off("MessageRead", handleMessageRead);
-    };
+    return () => connection.off("MessageRead", handleMessageRead);
   }, [connection]);
-
-  useEffect(() => {
-    fetchMessages();
-    markAsRead();
-  }, [selectedUser]);
 
   useEffect(() => {
     if (!connection) return;
@@ -194,32 +202,23 @@ const ChatWindow = ({
     };
 
     connection.on("MessageDeleted", handleDeleted);
-
-    return () => {
-      connection.off("MessageDeleted", handleDeleted);
-    };
+    return () => connection.off("MessageDeleted", handleDeleted);
   }, [connection]);
 
   useEffect(() => {
     const container = messageEndRef.current;
     if (!container) return;
-
-    // Check if user is near bottom before update
     const isNearBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight <
       50;
 
     if (isNearBottom) {
-      // Scroll to bottom smoothly
       messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-    // else do nothing, so user scroll position stays where it is
   }, [messages]);
 
   useEffect(() => {
     if (!newMessage) return;
-
-    console.log("New message received:", newMessage);
 
     if (
       newMessage.senderId === selectedUser.receiverId ||
@@ -233,7 +232,7 @@ const ChatWindow = ({
       fetchUsers();
       setNewMessage(null);
     }
-  }, [newMessage]);
+  }, [newMessage, selectedUser, markAsRead, fetchUsers, setNewMessage]); // Added dependencies
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -242,22 +241,21 @@ const ChatWindow = ({
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleDeleteMessage = async (messageId) => {
     try {
-      await DeleteMessage(messageId); // Your API method that triggers SignalR
-
-      // UI updates automatically via `MessageDeleted` event
+      await DeleteMessage(messageId);
       setMenuOpenId(null);
-      fetchUsers(); // Update last message if needed
+      fetchUsers();
     } catch (err) {
       console.error("Failed to delete message", err);
     }
   };
+
+  const shouldShowIncomingModal =
+    incomingCall && callerInfo?.callerId === selectedUser?.receiverId;
 
   if (isLoading) {
     return (
@@ -274,18 +272,28 @@ const ChatWindow = ({
       <ChatHeader
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
-        onStartCall={userRole === "Doctor" ? handleStartCall : null} // Only doctors can initiate calls
+        onStartCall={userRole === "Doctor" ? handleStartCall : undefined}
+        userRole={userRole}
+        isCallActive={!!activeCall}
       />
+
+      {shouldShowIncomingModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <IncomingCallModal
+            callerName={callerInfo?.callerName} // This callerName might be just a string
+            onAccept={() => handleCallAccepted({ roomUrl })}
+            onReject={handleRejectCall}
+          />
+        </div>
+      )}
+
       {activeCall ? (
         <VideoCallRoom
           roomUrl={activeCall.roomUrl}
           onLeave={handleEndCall}
-          userName={
-            currentUserName || (userRole === "Doctor" ? "Dr." : "Patient")
-          }
-          otherUserName={
-            otherUserName || (userRole === "Doctor" ? "Patient" : "Dr.")
-          }
+          userName={currentUserName}
+          // The critical prop: Pass the full name object derived from ChatWindow's scope
+          otherUserName={activeCall.otherUserName}
           userRole={userRole}
         />
       ) : (
@@ -299,12 +307,10 @@ const ChatWindow = ({
 
             {(() => {
               let lastDate = null;
-
               return messages.map((msg, i) => {
                 const currentDate = new Date(msg.sendAt).toDateString();
                 const showDate = currentDate !== lastDate;
                 lastDate = currentDate;
-
                 const isSelf = msg.senderId === userId;
 
                 return (
@@ -316,7 +322,6 @@ const ChatWindow = ({
                         </span>
                       </div>
                     )}
-
                     <div
                       ref={i === messages.length - 1 ? messageEndRef : null}
                       className={`flex items-end ${
@@ -334,7 +339,6 @@ const ChatWindow = ({
                           </div>
                         </div>
                       )}
-
                       <div className="max-w-[70%] relative">
                         {isSelf && (
                           <button
@@ -343,8 +347,7 @@ const ChatWindow = ({
                                 menuOpenId === msg.id ? null : msg.id
                               )
                             }
-                            className="absolute top-2 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out cursor-pointer z-10"
-                            aria-label="Open message menu"
+                            className="absolute top-2 right-0 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10"
                           >
                             <EllipsisVertical className="w-5 h-5 text-gray-500 hover:text-gray-700" />
                           </button>
@@ -363,29 +366,25 @@ const ChatWindow = ({
                                 msg.imageMimeType || "image/png"
                               };base64,${msg.image}`}
                               alt="attachment"
-                              className="sm:max-w-auto rounded-md mb-1"
+                              className="rounded-md mb-1"
                             />
                           )}
                           {msg.text && <p>{msg.text}</p>}
                           <div className="flex items-center justify-end gap-1 mt-1">
-                            <time className="text-xs text-right opacity-50">
+                            <time className="text-xs opacity-50">
                               {formatMessageTime(msg.sendAt)}
                             </time>
                             {isSelf && (
                               <>
                                 {!msg.isReceived ? (
-                                  <span className="text-gray-500 text-xs">
-                                    <Clock className="w-3 h-3" />
-                                  </span>
+                                  <Clock className="w-3 h-3 text-gray-500" />
                                 ) : msg.isRead ? (
-                                  <span className="flex items-center gap-[1px] text-blue-500 text-xs">
+                                  <span className="flex gap-[1px] text-blue-500">
                                     <Check className="w-3 h-3" />
                                     <Check className="w-3 h-3 -ml-1.5" />
                                   </span>
                                 ) : (
-                                  <span className="flex items-center gap-[1px] text-gray-500 text-xs">
-                                    <Check className="w-3 h-3" />
-                                  </span>
+                                  <Check className="w-3 h-3 text-gray-500" />
                                 )}
                               </>
                             )}
@@ -395,12 +394,12 @@ const ChatWindow = ({
                         {menuOpenId === msg.id && (
                           <ul
                             ref={menuRef}
-                            className="absolute top-0 right-0 z-0 w-48 rounded-md border bg-white p-2 shadow-xl space-y-1"
+                            className="absolute top-0 right-0 z-0 w-48 rounded-md border bg-white p-2 shadow-xl"
                           >
                             <li>
                               <button
                                 onClick={() => handleDeleteMessage(msg.id)}
-                                className="w-full flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 p-2 rounded-md transition"
+                                className="w-full flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 p-2 rounded-md"
                               >
                                 <Trash2 /> delete
                               </button>

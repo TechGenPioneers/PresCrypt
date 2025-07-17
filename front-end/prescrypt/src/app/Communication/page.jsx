@@ -1,12 +1,18 @@
+"use client";
 import React from "react";
 import Footer from "../Components/footer/Footer";
-import Header from "../Components/header/Header";
+import { VideoCallProvider } from "./VideoCallProvider";
 import Layout from "./Layout";
 
 export default function Chat() {
+  // const userId = "D002";
+  // const userRole = "Doctor";
+
   return (
     <div>
-      <Layout />
+      <VideoCallProvider>
+        <Layout userId={userId} userRole={userRole} />
+      </VideoCallProvider>
       <Footer />
     </div>
   );
