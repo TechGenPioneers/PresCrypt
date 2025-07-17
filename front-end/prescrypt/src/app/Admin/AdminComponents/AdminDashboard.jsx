@@ -2,16 +2,9 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Search, UserPlus, Users, Calendar, Bell, TrendingUp, Activity, Stethoscope } from 'lucide-react';
+
 import AdminNotification from "./AdminNotification";
 import { GetAllDashboardData } from "../service/AdminDashboardService";
 import Dashboard from "@/app/Doctor/DoctorDashboard/page";
@@ -76,162 +69,174 @@ const AdminDashboard = ({setAdminName}) => {
 
   if (!dateTime) return null; // Prevent SSR mismatch
 
-  // Formatting date
-  const formattedDate = dateTime.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+ const getCurrentDate = () => {
+    const today = new Date();
+    return today.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
 
-  const todayDate = dateTime.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toLocaleDateString('en-US', {
+      Year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
   return (
     <>
-      <div className="flex min-h-screen bg-white border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
-        {/* Main Content */}
-        <main className="overflow-auto flex-grow p-6">
-          <div className="mb-10 pl-5 ">
-            <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
-            <p className="text-gray-500">{formattedDate}</p>
-          </div>
-          {/* Welcome Section */}
-          <div className="bg-[#E9FAF2] p-6 rounded-4xl mb-6">
-            <h3 className="text-2xl text-[#094A4D] font-semibold ">
-              Welcome, {dashboardData.adminName}
-            </h3>
-            <p className="text-[#094A4D]">Have a nice day at work!</p>
-          </div>
+       <div className="flex min-h-screen bg-white border-t-[15px] border-l-[15px] border-r-[15px] border-b-0 border-[#E9FAF2]">
+      {/* Main Content */}
+      <main className="overflow-auto flex-grow p-6">
+        {/* Header */}
+        <div className="mb-10 pl-5">
+          <h2 className="text-3xl font-bold mb-4 text-[#094A4D]">Dashboard</h2>
+          <p className="text-gray-500 text-lg">{getCurrentDate()}</p>
+        </div>
 
-          {/* Search & Add Doctor */}
-          <div className="grid grid-cols-2 ml-10 gap-20 mb-6 ">
-            <button className="flex items-center cursor-pointer justify-center bg-[#E9FAF2] p-5 rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.5)] hover:bg-gray-100 transition">
-            <Link href={`/Admin/AdminPatient`}>
-              <img
-                src="/image22.png"
-                className="w-6 h-6 mr-2 text-[#006369] "
-              />
-              Search Patients
-              </Link>
-            </button>
-            <button className="flex items-center cursor-pointer justify-center bg-[#E9FAF2] p-5 rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.5)] hover:bg-gray-100 transition">
-              <img src="/image27.png" className="w-6 h-6 mr-2 text-[#006369]" />
-              <Link href={`/Admin/DoctorRequestPage`}>
-              Doctor Request
-              </Link>
-            </button>
-          </div>
-          
-          {/* Stats & Chart */}
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <div className="flex text-[#094A4D] bg-[#E9FAF2] p-6 rounded-lg shadow-[0px_10px_5px_rgba(0,0,0,0.5)] m-10">
-                <img
-                  src="/image12.png"
-                  alt="icon"
-                  className="w-18 h-18 mr-2 mt-2"
-                />
-                <div className="ml-5">
-                  <h4 className="text-xl font-semibold">Patient Visits</h4>
-                  <p className="text-3xl font-bold mt-2">
-                    {dashboardData.patientVisit}
-                  </p>
-                  <p className="text-[#094A4D]">{todayDate}</p>
-                </div>
+        {/* Welcome Section */}
+        <div className="bg-gradient-to-r from-[#E9FAF2] to-[#CEE4E6] p-8 rounded-2xl mb-8 shadow-lg">
+          <h3 className="text-3xl text-[#094A4D] font-bold mb-2">
+            Welcome back, {dashboardData.adminName}
+          </h3>
+          <p className="text-[#094A4D] text-lg opacity-80">Have a productive day managing your healthcare system!</p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 px-4">
+          <Link  className="group flex items-center justify-center bg-[#E9FAF2] p-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-[#094A4D]" href={`/Admin/AdminPatient`}>
+            <Search className="w-7 h-7 mr-3 text-[#006369] group-hover:text-[#094A4D] transition-colors" />
+            <span className="text-lg font-semibold text-[#094A4D]">Search Patients</span>
+          </Link>
+          <Link className="group flex items-center justify-center bg-[#E9FAF2] p-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-[#094A4D]" href={`/Admin/DoctorRequestPage`}>
+            <UserPlus className="w-7 h-7 mr-3 text-[#006369] group-hover:text-[#094A4D] transition-colors" />
+            <span className="text-lg font-semibold text-[#094A4D]">Doctor Requests</span>
+          </Link>
+        </div>
+
+        {/* Stats & Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Stats Cards */}
+          <div className="space-y-6">
+            <div className="flex items-center bg-[#E9FAF2] p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="bg-white p-4 rounded-full mr-6">
+                <Activity className="w-8 h-8 text-[#006369]" />
               </div>
-
-              <div className="flex text-[#094A4D] bg-[#E9FAF2] p-6 rounded-lg shadow-[0px_10px_5px_rgba(0,0,0,0.5)] m-10">
-                <img
-                  src="/image26.png"
-                  alt="icon"
-                  className="w-18 h-18 mr-2 mt-2"
-                />
-                <div className="ml-5">
-                  <h4 className="text-xl font-semibold">Appointments</h4>
-                  <p className="text-3xl font-bold mt-2">
-                    {dashboardData.appointments}
-                  </p>
-                  <p className="text-[#094A4D]">{todayDate}</p>
-                </div>
+              <div>
+                <h4 className="text-xl font-semibold text-[#094A4D]">Patient Visits</h4>
+                <p className="text-4xl font-bold mt-2 text-[#094A4D]">{dashboardData.patientVisit}</p>
+                <p className="text-[#094A4D] opacity-70">{getTodayDate()}</p>
               </div>
             </div>
 
-            {/* Chart */}
-            <div className="bg-white text-[#094A4D] p-6 rounded-lg shadow-md w-full h-[300px] md:h-[400px] lg:h-[500px]">
-              <h4 className="text-xl font-semibold mb-4">
-                Appointments Over Time
-              </h4>
-              <ResponsiveContainer width="100%" height="80%">
-                <LineChart data={sortedAppointmentsData}>
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="total"
-                    stroke="#8884d8"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="completed"
-                    stroke="#4CAF50"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="missed"
-                    stroke="#FF0000"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="flex items-center bg-[#E9FAF2] p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="bg-white p-4 rounded-full mr-6">
+                <Calendar className="w-8 h-8 text-[#006369]" />
+              </div>
+              <div>
+                <h4 className="text-xl font-semibold text-[#094A4D]">Appointments</h4>
+                <p className="text-4xl font-bold mt-2 text-[#094A4D]">{dashboardData.appointments}</p>
+                <p className="text-[#094A4D] opacity-70">{getTodayDate()}</p>
+              </div>
             </div>
           </div>
-        </main>
 
-        <aside className="w-100 bg-[#CEE4E6] p-5 shadow-md relative">
-          {/* Notifications */}
-          
-          {/* Button to toggle the Notification Bar */}
+          {/* Chart */}
+          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            <div className="flex items-center mb-6">
+              <TrendingUp className="w-6 h-6 text-[#094A4D] mr-2" />
+              <h4 className="text-xl font-semibold text-[#094A4D]">Appointments Over Time</h4>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={sortedAppointmentsData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E9FAF2" />
+                <XAxis dataKey="day" stroke="#094A4D" />
+                <YAxis stroke="#094A4D" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#E9FAF2', 
+                    border: '1px solid #094A4D',
+                    borderRadius: '8px'
+                  }} 
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#006369"
+                  strokeWidth={3}
+                  name="Total"
+                  dot={{ fill: '#006369', strokeWidth: 2, r: 4 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="completed"
+                  stroke="#4CAF50"
+                  strokeWidth={3}
+                  name="Completed"
+                  dot={{ fill: '#4CAF50', strokeWidth: 2, r: 4 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="missed"
+                  stroke="#FF5252"
+                  strokeWidth={3}
+                  name="Missed"
+                  dot={{ fill: '#FF5252', strokeWidth: 2, r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </main>
+
+      {/* Sidebar */}
+      <aside className="w-80 bg-[#CEE4E6] p-6 shadow-lg relative">
+        {/* Notifications */}
+         {/* Button to toggle the Notification Bar */}
           <AdminNotification />
 
-          {/* Total Counts */}
-          <div className="mt-15 p-7 bg-white">
-            <img src="/image23.png" alt="image" />
-            <div className="flex mt-15 bg-[#E9FAF2] p-4 rounded-lg mb-4 text-[#094A4D] shadow-[0px_10px_5px_rgba(0,0,0,0.5)]">
-              <img
-                src="/image19.png"
-                alt="icon"
-                className="w-10 h-12 mr-2 mt-2"
-              />
-              <div className=" pl-5">
-                <h4 className="text-lg font-semibold">Total Doctors</h4>
-                <p className="text-3xl font-bold">{dashboardData.doctors}</p>
-              </div>
+        {/* Total Counts */}
+        <div className="my-20 space-y-6">
+          <div className="flex items-center bg-[#E9FAF2] p-5 rounded-xl shadow-lg text-[#094A4D] hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white p-3 rounded-full mr-4">
+              <Stethoscope  className="w-8 h-8 text-[#006369]" />
             </div>
-
-            <div className="flex mt-15 bg-[#E9FAF2] p-4 rounded-lg text-[#094A4D] shadow-[0px_10px_5px_rgba(0,0,0,0.5)]">
-              <img
-                src="/image25.png"
-                alt="icon"
-                className="w-10 h-12 mr-2 mt-2"
-              />
-              <div className=" pl-5">
-                <h4 className="text-lg font-semibold">Total Patients</h4>
-                <p className="text-3xl font-bold">{dashboardData.patients}</p>
-              </div>
+            <div>
+              <h4 className="text-lg font-semibold">Total Doctors</h4>
+              <p className="text-3xl font-bold">{dashboardData.doctors}</p>
             </div>
           </div>
-        </aside>
-      </div>
+
+          <div className="flex items-center bg-[#E9FAF2] p-5 rounded-xl shadow-lg text-[#094A4D] hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white p-3 rounded-full mr-4">
+              <Users className="w-8 h-8 text-[#006369]" />
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold">Total Patients</h4>
+              <p className="text-3xl font-bold">{dashboardData.patients}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-8 bg-white p-5 rounded-xl shadow-lg">
+          <h4 className="text-lg font-semibold text-[#094A4D] mb-4">More Actions</h4>
+          <div className="space-y-3">
+            <button className="w-full text-left p-3 rounded-lg bg-[#E9FAF2] hover:bg-[#CEE4E6] transition-colors text-[#094A4D]">
+              System Analyses
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
     </>
   );
 };
 
 export default AdminDashboard;
+
