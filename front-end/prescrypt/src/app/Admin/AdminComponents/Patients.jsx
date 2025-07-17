@@ -33,15 +33,15 @@ const Patients = () => {
   function calculateAge(dobString) {
     const dob = new Date(dobString);
     const today = new Date();
-  
+
     let age = today.getFullYear() - dob.getFullYear();
     const monthDiff = today.getMonth() - dob.getMonth();
     const dayDiff = today.getDate() - dob.getDate();
-  
+
     if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       age--; // Birthday hasn't occurred yet this year
     }
-  
+
     return age;
   }
 
@@ -55,146 +55,124 @@ const Patients = () => {
     year: "numeric",
   });
 
-  // Formatting time as "11:15 AM"
-  const formattedTime = dateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-
   // Filtered patients based on search query (searching by id or name)
   const filteredPatients = patients.filter(
     (patient) =>
       patient.patientId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+      `${patient.firstName} ${patient.lastName}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
   );
   return (
-    <div className="p-6 border-15 border-[#E9FAF2] bg-white ">
+    <div className="p-6 bg-white border-t-[15px] border-l-[15px] border-r-[15px] border-[#E9FAF2]">
       {/* Title */}
-      <h1 className="text-2xl font-bold mb-2">Patients</h1>
+      <h1 className="text-3xl font-bold text-slate-800 mb-1">Patients</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
 
       {/* Search Input */}
-      <div className="mt-4 mb-6">
+      <div className="mt-6 mb-4">
         <input
           type="text"
-          placeholder="Enter Patient Id or Name..."
+          placeholder="Search Patient ID or Name..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-3 bg-[#E9FAF2] border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent"
+          className="w-full p-3 bg-[#F4FAF7] border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-[#B5D9DB]"
         />
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
-        <div className="rounded-lg overflow-hidden">
-          <div className="max-h-80 overflow-y-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-[#006369] text-[#094A4D]">
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Patient Id
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Patient
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Last Appointment
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Last Appointment Status
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Last Login
-                  </th>
-                  <th className="p-3 text-left sticky top-0 bg-[#B5D9DB] z-5">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-
-              {/* Table Body */}
-              <tbody>
-                {filteredPatients.map((patient, index) => (
-                  <tr
-                    key={index}
-                    className={`border-t ${
-                      index % 2 === 0 ? "bg-[#E9FAF2]" : "bg-[#ffffff]"
+      <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[400px] overflow-y-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead className="sticky top-0 bg-[#B5D9DB] z-10 shadow text-[#094A4D]">
+            <tr>
+              <th className="p-4 text-left font-semibold">Patient ID</th>
+              <th className="p-4 text-left font-semibold">Patient</th>
+              <th className="p-4 text-left font-semibold">Last Appointment</th>
+              <th className="p-4 text-left font-semibold">Status</th>
+              <th className="p-4 text-left font-semibold">Last Login</th>
+              <th className="p-4 text-left font-semibold">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPatients.map((patient, index) => (
+              <tr
+                key={index}
+                className={`transition-all ${
+                  index % 2 === 0 ? "bg-[#F7FCFA]" : "bg-white"
+                } hover:bg-[#E9FAF2]`}
+              >
+                <td className="p-4 text-[#094A4D] font-medium">
+                  {patient.patientId}
+                </td>
+                <td className="p-4">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={
+                        patient.profileImage &&
+                        patient.profileImage.trim() !== ""
+                          ? `data:image/jpeg;base64,${patient.profileImage}`
+                          : "/profile2.png"
+                      }
+                      alt="Avatar"
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-semibold text-[#094A4D]">
+                        {patient.firstName} {patient.lastName}
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        {patient.gender} • {calculateAge(patient.dob)} years
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="p-4 text-[#094A4D]">
+                  <p className="font-semibold">
+                    {patient.lastAppointmentDoctorName}
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    {patient.lastAppointmentDoctorID} •{" "}
+                    {patient.lastAppointmentDate}
+                  </p>
+                </td>
+                <td className="p-4">
+                  <span
+                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+                      patient.status === "Completed"
+                        ? "bg-green-100 text-green-700"
+                        : patient.status === "Cancelled"
+                        ? "bg-red-100 text-red-700"
+                        : patient.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-gray-100 text-gray-600"
                     }`}
                   >
-                    <td className="p-3 text-[#094A4D]">{patient.patientId}</td>
-                    <td className="p-3 flex items-center space-x-3">
-                      <img
-                        src={patient.profileImage || "/profile2.png"} // Use profilePhoto if available
-                        alt="Avatar"
-                        className="w-10 h-10 rounded-full"
-                      />
-                      <div>
-                        <p className="font-semibold text-[#094A4D]">
-                          {patient.firstName} {patient.lastName}
-                        </p>
-                        <p className="text-[#094A4D] text-sm">
-                          {patient.gender} • {calculateAge(patient.dob)} years
-                        </p>
-                      </div>
-                    </td>
-                    <td className="p-3  items-center space-x-3">
-                      <div>
-                        <p className="font-semibold text-[#094A4D]">
-                          {patient.lastAppointmentDoctorName}
-                        </p>
-                        <p className="text-[#094A4D] text-sm">
-                          {patient.lastAppointmentDoctorID} •{" "}
-                          {patient.lastAppointmentDate}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="p-3 text-[#094A4D]">
-                      <span
-                        className={` text-md flex items-center gap-2 ${
-                          patient.status === "Completed"
-                            ? "text-green-500"
-                            : patient.status === "Cancelled"
-                            ? "text-red-500"
-                            :  patient.status === "Pending"
-                            ? "text-yellow-500"
-                            : ""
-                        }`}
-                      >
-                        <span
-                          className={`w-3 h-3 rounded-full ${
-                            patient.status === "Completed"
-                              ? "bg-green-500"
-                              : patient.status === "Cancelled"
-                              ? "bg-red-500"
-                              :  patient.status === "Pending"
-                              ? "text-yellow-500"
-                              : ""
-                          }`}
-                        ></span>
-                        {patient.status}
-                      </span>
-                    </td>
-                    <td className="p-3 text-[#094A4D]">{patient.lastLogin}</td>
-                    <td className="p-3 space-x-3">
-                      <button className="px-4 py-2 text-[#094A4D] cursor-pointer rounded">
-                        <Link href={`/Admin/PatientDetailsPage/${patient.patientId}`}>
-                        View
-                        </Link>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 text-gray-500 flex flex-col items-end">
-        <p>{formattedDate}</p>
-        <p>{formattedTime}</p>
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        patient.status === "Completed"
+                          ? "bg-green-500"
+                          : patient.status === "Cancelled"
+                          ? "bg-red-500"
+                          : patient.status === "Pending"
+                          ? "bg-yellow-500"
+                          : "bg-gray-400"
+                      }`}
+                    ></span>
+                    {patient.status || "N/A"}
+                  </span>
+                </td>
+                <td className="p-4 text-[#094A4D]">{patient.lastLogin}</td>
+                <td className="p-4">
+                  <Link href={`/Admin/PatientDetailsPage/${patient.patientId}`}>
+                    <button className="px-4 py-2 bg-[#B5D9DB] text-[#094A4D] rounded-lg hover:bg-[#A2C5C7] transition font-medium shadow-sm">
+                      View
+                    </button>
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

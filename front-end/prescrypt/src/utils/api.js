@@ -88,6 +88,14 @@ export const resetPassword = async (data) => {
     return error.response?.data || { success: false, message: "Error resetting password." };
   }
 };
+export const requestPatientAccess = async (payload) => {
+  try {
+    const response = await axios.post("https://localhost:7021/api/Doctor/request-patient-access", payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Request failed" };
+  }
+};
 
 // Logout Function (Optional)
 export const logout = () => {

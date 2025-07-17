@@ -11,7 +11,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { sendEmail, sendNotification } from "../services/PatientPaymentServices";
 import {generatePdf} from "../services/PatientDataService"; 
-import { AppointmentContext } from "../Bookings/Payments/[id]/page"; // Assuming this path is correct
+import { AppointmentContext } from "../Bookings/Payments/[id]/page"; 
 
 const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformCharge}) => {
   const {
@@ -44,7 +44,7 @@ const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformC
       const sendNotificationFlow = async () => {
         try {
           const notificationPayload = {
-            patientId:'P021',
+            patientId:patientId,
             title: "Appointment Booking",
             type: "Appointment",
             message: `Your appointment with Dr. ${doctorName} has been successfully scheduled on ${appointmentDate} at ${appointmentTime} at ${hospitalName}.`,
@@ -53,7 +53,7 @@ const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformC
 
           const pdfPayload = {
             paymentId,
-            patientId:'P021',
+            patientId,
             doctorName,
             hospitalName,
             appointmentDate,
