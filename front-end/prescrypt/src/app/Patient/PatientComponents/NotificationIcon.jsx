@@ -14,6 +14,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import buttonClasses from "@mui/material/Button";
 import {
   getNotifications,
   markAsRead,
@@ -28,6 +29,7 @@ export default function NotificationIcon({ patientId }) {
   const [responded, setResponded] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [responseMessage, setResponseMessage] = useState("");
+  const [snackOpen, setSnackOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   useEffect(() => {
@@ -102,74 +104,41 @@ export default function NotificationIcon({ patientId }) {
     setConfirmDialog(true);
   };
 
-  // const handleResponse = async (accepted) => {
-  //   if (!selectedNotification) return;
+  const handleResponse = async (accepted) => {
+    if (!selectedNotification) return;
+    patientId: localStorage.getItem("patientId"); // or sessionStorage or wherever you're storing it
 
-  //   try {
-  //     if (accepted) {
-  //       // Call the API to respond to the access request
-  //       await respondToRequest(selectedNotification.id, selectedNotification.doctorId, true);
-  //       setNotifications((prev) =>
-  //         prev.map((n) =>
-  //           n.id === selectedNotification.id ? { ...n, isRead: true } : n
-  //         )
-  //       );
-  //     } else {
-  //       // Handle deny response
-  //       await respondToRequest(selectedNotification.id, selectedNotification.doctorId, false);
-  //       setNotifications((prev) =>
-  //         prev.map((n) =>
-  //           n.id === selectedNotification.id ? { ...n, isRead: true } : n
-  //         )
-  //       );
-  //     }
-  //     setConfirmDialog(false);
-  //     setSelectedNotification(null);
-  //   } catch (err) {
-  //     console.error("Failed to respond to request", err);
-  //   }
-  // };
+    try {
+      setResponded(true);
 
+      const patientId = localStorage.getItem("patientId"); // or sessionStorage or wherever you're storing it
 
-const handleResponse = async (accepted) => {
-  if (!selectedNotification) return;
-  patientId:"P021";
+      if (!patientId) {
+        console.error("Missing patientId");
+        alert("User ID missing. Please login again.");
+        return;
+      }
 
-  try {
-    setResponded(true);
+      await respondToRequest({
+        doctorId: selectedNotification.doctorId,
+        patientId: patientId,
+        accepted: accepted,
+      });
 
-    const patientId = localStorage.getItem("patientId"); // or sessionStorage or wherever you're storing it
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === selectedNotification.id ? { ...n, isRead: true } : n
+        )
+      );
 
-    if (!patientId) {
-      console.error("Missing patientId");
-      alert("User ID missing. Please login again.");
-      return;
+      setConfirmDialog(false);
+      setSelectedNotification(null);
+      alert(`You have ${accepted ? "granted" : "denied"} access.`);
+    } catch (error) {
+      console.error("Error responding to access request:", error);
+      setResponded(false);
     }
-
-    await respondToRequest({
-      doctorId: selectedNotification.doctorId,
-      patientId: patientId,
-      accepted: accepted,
-    });
-
-    setNotifications((prev) =>
-      prev.map((n) =>
-        n.id === selectedNotification.id ? { ...n, isRead: true } : n
-      )
-    );
-
-    setConfirmDialog(false);
-    setSelectedNotification(null);
-    alert(`You have ${accepted ? "granted" : "denied"} access.`);
-  } catch (error) {
-    console.error("Error responding to access request:", error);
-    setResponded(false);
-  }
-};
-
-
-
-
+  };
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -240,15 +209,7 @@ const handleResponse = async (accepted) => {
                     size="small"
                     onClick={() => confirmAccept(n)}
                   >
-                    Accept
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    onClick={() => handleResponse(false)}
-                  >
-                    Deny
+                    View Request
                   </Button>
                 </Box>
               )}
@@ -275,32 +236,50 @@ const handleResponse = async (accepted) => {
         )}
       </Menu>
 
-      <Dialog open={confirmDialog} onClose={() => setConfirmDialog(false)}>
-        <DialogTitle>Confirm Access</DialogTitle>
-        <DialogContent>
-          Doctor is requesting to access your medical health data. Are you sure
-          you want to allow?
-        </DialogContent>
-       <DialogActions>
-  <Button onClick={() => handleResponse(false)} color="error">
-    No, Deny
-  </Button>
-  <Button
-    disabled={responded}
-    onClick={() => handleResponse(true)}
-    className={`px-4 py-2 rounded ${
-      responded
-        ? "bg-gray-300 cursor-not-allowed"
-        : "bg-green-500 hover:bg-green-600 text-white"
-    }`}
-  >
-    Yes, I’m OK
-  </Button>
-</DialogActions>
+    <Dialog
+  open={confirmDialog}
+  onClose={() => setConfirmDialog(false)}
+  PaperProps={{
+    className: "rounded-xl p-4 bg-white shadow-xl w-[90%] max-w-md",
+  }}
+>
+  <DialogTitle className="text-xl font-semibold align-middle text-gray-800 border-b pb-2">
+    Confirm Access
+  </DialogTitle>
 
+  <DialogContent className="py-4 text-gray-700 align-middle">
+    A Doctor is requesting to access your medical health data.
+    <br />
+    Are you sure you want to allow?
+  </DialogContent>
 
+  <DialogActions className="flex center-end space-x-3 px-4 pb-4">
+    <Button
+      disabled={responded}
+      onClick={() => handleResponse(false)}
+      className={`px-4 py-2 rounded-md font-medium transition duration-300 ${
+        responded
+          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+          : "bg-red-500 hover:bg-red-600 text-white"
+      }`}
+    >
+      No, Deny
+    </Button>
 
-      </Dialog>
+    <Button
+      disabled={responded}
+      onClick={() => handleResponse(true)}
+      className={`px-4 py-2 rounded-md font-medium transition duration-300 ${
+        responded
+          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+          : "bg-green-500 hover:bg-green-600 text-white"
+      }`}
+    >
+      Yes, I’m OK
+    </Button>
+  </DialogActions>
+</Dialog>
+
     </>
   );
 }
