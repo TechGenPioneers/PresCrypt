@@ -43,7 +43,7 @@ export default function useAuthGuard(expectedRole) {
         }, timeLeft);
         
         if (expectedRole && !expectedRole.includes(role)) {
-          router.replace('/Auth/MainPage');
+          router.replace('/');
         }
       } catch (error) {
         console.error("Invalid token:", error);

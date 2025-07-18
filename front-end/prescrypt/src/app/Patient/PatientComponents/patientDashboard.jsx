@@ -11,7 +11,6 @@ import {
 import LoadingSpinner from "./loadingSpinner";
 
 
-
 const PatientDashboard = () => {
 
   const [patient, setPatient] = useState(null);
@@ -138,4 +137,4 @@ const PatientDashboard = () => {
   );
 };
 
-export default PatientDashboard;
+ export default PatientDashboard;

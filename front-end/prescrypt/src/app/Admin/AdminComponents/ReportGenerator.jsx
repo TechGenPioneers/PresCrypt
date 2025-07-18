@@ -3,6 +3,8 @@ import React, { useState, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { GetAllDetails, GetReportDetails } from "../service/AdminReportService";
+import { Calendar, FileText, Download, Filter, AlertCircle, User, Stethoscope, Building } from 'lucide-react';
+
 
 //searchable dropdown
 const SearchableDropdown = ({
@@ -11,10 +13,11 @@ const SearchableDropdown = ({
   onChange,
   disabled,
   placeholder,
+  required ,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showOptions, setShowOptions] = useState(false);
-  const dropdownRef = useRef(null);
+   const [dropdownRef, setDropdownRef] = useState(null);
 
   const filteredOptions = options.filter((opt) =>
     opt.label.toLowerCase().includes(searchTerm.toLowerCase())
@@ -33,20 +36,24 @@ const SearchableDropdown = ({
     setSearchTerm("");
   };
 
-  //  Close on outside click
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setShowOptions(false);
-      }
-    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+
+   // Close dropdown when clicking outside
+ useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (dropdownRef && !dropdownRef.contains(event.target)) {
+      setShowOptions(false);
+    }
+  };
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, [dropdownRef]);
+
 
   return (
-    <div ref={dropdownRef} className="relative w-full">
+    <div ref={setDropdownRef} className="relative w-full">
       <input
         type="text"
         value={selectedLabel || searchTerm}
@@ -54,32 +61,40 @@ const SearchableDropdown = ({
         onFocus={() => !disabled && setShowOptions(true)}
         disabled={disabled}
         placeholder={placeholder}
-        className={`w-full pr-10 p-2 text-[#09424D] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
-          disabled ? "opacity-65 cursor-not-allowed" : ""
+        required={required}
+        className={`w-full px-4 py-3 pr-10 text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+          disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:border-gray-300'
         }`}
       />
       {value && !disabled && (
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 cursor-pointer"
+          className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
         >
-          &times;
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       )}
+      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+        <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showOptions ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
       {showOptions && !disabled && (
-        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-y-auto shadow-md">
+        <ul className="absolute z-5 w-full bg-white border border-gray-200 rounded-xl mt-1 max-h-48 overflow-y-auto shadow-lg">
           {filteredOptions.map((opt) => (
             <li
               key={opt.value}
               onMouseDown={() => handleSelect(opt.value)}
-              className="px-4 py-2 hover:bg-[#CEE4E6] cursor-pointer"
+              className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors first:rounded-t-xl last:rounded-b-xl"
             >
               {opt.label}
             </li>
           ))}
           {filteredOptions.length === 0 && (
-            <li className="px-4 py-2 text-gray-500">No results found</li>
+            <li className="px-4 py-3 text-gray-500 text-center">No results found</li>
           )}
         </ul>
       )}
@@ -96,7 +111,7 @@ export default function ReportGenerator() {
   const [reportType, setReportType] = useState("");
   const [dateTime, setDateTime] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-
+ const [isGenerating, setIsGenerating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportData, setReportData] = useState(null);
   const reportRef = useRef(null);
@@ -107,7 +122,7 @@ export default function ReportGenerator() {
       return;
     }
     setErrorMessage("");
-
+    setIsGenerating(true);
     let finalDoctor = doctor;
     let finalPatient = patient;
     let finalFromDate = fromDate;
@@ -152,6 +167,7 @@ export default function ReportGenerator() {
     } catch (err) {
       console.error("Failed to get the report data", err);
     }
+    setIsGenerating(true);
   };
 
   useEffect(() => {
@@ -266,130 +282,192 @@ export default function ReportGenerator() {
       : reportTypeOptions; // Show all other options when none of the above conditions are true
 
   return (
-    <div className="p-6 bg-white  border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
-      {/* Title */}
-      <h1 className="text-2xl font-bold mb-2">Reports</h1>
-      <p className="text-[#09424D] text-sm">{formattedDate}</p>
-
-      <div className="mt-10 flex justify-center px-4 sm:px-0">
-        <div className="w-full max-w-md md:max-w-lg lg:max-w-xl">
-          <div className="bg-[#E9FAF2] p-6 shadow-lg rounded-xl">
-            {/* Section Title (optional) */}
-            <h2 className="text-xl font-semibold text-[#09424D] mb-6 text-center">
-              Generate Report
-            </h2>
-
-            <div className="flex flex-col gap-5 mb-6">
-              {/* Date Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#09424D] mb-1">
-                    From Date
-                  </label>
-                  <input
-                    type="date"
-                    name="fromDate"
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                    disabled={["summary", "detailed", "activity"].includes(
-                      reportType
-                    )}
-                    className={`w-full px-3 py-2 text-[#09424D] bg-white border border-gray-300 rounded-md transition focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
-                      ["summary", "detailed", "activity"].includes(reportType)
-                        ? "opacity-60 cursor-not-allowed"
-                        : ""
-                    }`}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#09424D] mb-1">
-                    To Date
-                  </label>
-                  <input
-                    type="date"
-                    name="toDate"
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                    disabled={["summary", "detailed", "activity"].includes(
-                      reportType
-                    )}
-                    className={`w-full px-3 py-2 text-[#09424D] bg-white border border-gray-300 rounded-md transition focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] ${
-                      ["summary", "detailed", "activity"].includes(reportType)
-                        ? "opacity-60 cursor-not-allowed"
-                        : ""
-                    }`}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Dropdowns */}
-              <div className="space-y-4">
-                <SearchableDropdown
-                  options={patientOptions}
-                  value={patient}
-                  onChange={setPatient}
-                  disabled={
-                    doctor === "all" ||
-                    (reportType === "detailed" && doctor !== "") ||
-                    (reportType === "summary" && doctor !== "") ||
-                    (reportType === "summary" && specialty !== "")
-                  }
-                  placeholder="-- Select Patient --"
-                />
-
-                <SearchableDropdown
-                  options={doctorOptions}
-                  value={doctor}
-                  onChange={setDoctor}
-                  disabled={
-                    patient === "all" ||
-                    specialty !== "" ||
-                    (reportType === "detailed" && patient !== "") ||
-                    (reportType === "summary" && patient !== "")
-                  }
-                  placeholder="-- Select Doctor --"
-                />
-
-                <SearchableDropdown
-                  options={specialtyOptions}
-                  value={specialty}
-                  onChange={setSpecialty}
-                  disabled={
-                    doctor !== "" ||
-                    (patient === "all" && reportType !== "appointment") ||
-                    patient === "all" ||
-                    reportType === "activity"
-                  }
-                  placeholder="-- Select Specialty --"
-                />
-
-                <SearchableDropdown
-                  options={filteredReportTypeOptions}
-                  value={reportType}
-                  onChange={setReportType}
-                  placeholder="-- Select Report Type --"
-                  required
-                />
-              </div>
+     <div className="min-h-screen bg-[#f3faf7] p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900">Reports</h1>
+              <p className="text-gray-600 mt-1">{formattedDate}</p>
             </div>
+          </div>
+        </div>
 
-            {/* Error Message */}
-            {errorMessage && (
-              <p className="text-red-500 font-semibold text-center mb-4">
-                {errorMessage}
-              </p>
-            )}
+        {/* Main Content */}
+        <div className="flex justify-center">
+          <div className="w-full max-w-2xl">
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-visible">
+              {/* Form Header */}
+              <div className="bg-[#c1d7cd] px-8 py-6 rounded-md">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-[#09424D]/20 rounded-lg flex items-center justify-center">
+                    <Filter className="w-4 h-4 text-[#09424D]" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-[#09424D]">Generate Report</h2>
+                    <p className="text-[#09424D] text-sm">Configure your report parameters</p>
+                  </div>
+                </div>
+              </div>
 
-            {/* Button */}
-            <div className="flex justify-end">
-              <button
-                className="mt-2 px-8 py-2 bg-[#007e85] text-white rounded-md hover:bg-[#006369] transition duration-200"
-                onClick={handleGenerate}
-              >
-                Generate
-              </button>
+              {/* Form Body */}
+              <div className="p-8 space-y-6">
+                {/* Date Range Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Calendar className="w-4 h-4 text-[#09424D]" />
+                    <h3 className="text-lg font-semibold text-gray-900">Date Range</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        From Date
+                      </label>
+                      <input
+                        type="date"
+                        value={fromDate}
+                        onChange={(e) => setFromDate(e.target.value)}
+                        disabled={["summary", "detailed", "activity"].includes(reportType)}
+                        className={`w-full px-4 py-3 text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                          ["summary", "detailed", "activity"].includes(reportType)
+                            ? "opacity-50 cursor-not-allowed bg-gray-50"
+                            : "hover:border-gray-300"
+                        }`}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        To Date
+                      </label>
+                      <input
+                        type="date"
+                        value={toDate}
+                        onChange={(e) => setToDate(e.target.value)}
+                        disabled={["summary", "detailed", "activity"].includes(reportType)}
+                        className={`w-full px-4 py-3 text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                          ["summary", "detailed", "activity"].includes(reportType)
+                            ? "opacity-50 cursor-not-allowed bg-gray-50"
+                            : "hover:border-gray-300"
+                        }`}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Filters Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Filter className="w-4 h-4 text-[#09424D]" />
+                    <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <User className="w-4 h-4" />
+                        <span>Patient</span>
+                      </label>
+                      <SearchableDropdown
+                        options={patientOptions}
+                        value={patient}
+                        onChange={setPatient}
+                        disabled={
+                          doctor === "all" ||
+                          (reportType === "detailed" && doctor !== "") ||
+                          (reportType === "summary" && doctor !== "") ||
+                          (reportType === "summary" && specialty !== "")
+                        }
+                        placeholder="-- Select Patient --"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <Stethoscope className="w-4 h-4" />
+                        <span>Doctor</span>
+                      </label>
+                      <SearchableDropdown
+                        options={doctorOptions}
+                        value={doctor}
+                        onChange={setDoctor}
+                        disabled={
+                          patient === "all" ||
+                          specialty !== "" ||
+                          (reportType === "detailed" && patient !== "") ||
+                          (reportType === "summary" && patient !== "")
+                        }
+                        placeholder="-- Select Doctor --"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <Building className="w-4 h-4" />
+                        <span>Specialty</span>
+                      </label>
+                      <SearchableDropdown
+                        options={specialtyOptions}
+                        value={specialty}
+                        onChange={setSpecialty}
+                        disabled={
+                          doctor !== "" ||
+                          (patient === "all" && reportType !== "appointment") ||
+                          patient === "all" ||
+                          reportType === "activity"
+                        }
+                        placeholder="-- Select Specialty --"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <FileText className="w-4 h-4" />
+                        <span>Report Type <span className="text-red-500">*</span></span>
+                      </label>
+                      <SearchableDropdown
+                        options={filteredReportTypeOptions}
+                        value={reportType}
+                        onChange={setReportType}
+                        placeholder="-- Select Report Type --"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Error Message */}
+                {errorMessage && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                    <p className="text-red-700 font-medium">{errorMessage}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Form Footer */}
+              <div className="bg-gray-50 px-8 py-6 border-t border-gray-100">
+                <div className="flex justify-end">
+                  <button
+                   onClick={handleGenerate}
+                    disabled={isGenerating}
+                    className="flex items-center gap-4 px-8 py-3  bg-[#A9C9CD] text-[#09424D]  font-semibold rounded-xl hover:bg-[#91B4B8]  transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    {isGenerating ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4" />
+                        <span>Generate Report</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

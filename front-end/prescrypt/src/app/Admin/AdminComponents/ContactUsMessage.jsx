@@ -60,7 +60,8 @@ const MessageTable = () => {
     }
   };
 
-  const filteredMessages = messages.filter((msg) => {
+ const filteredMessages = messages
+  .filter((msg) => {
     const matchSender =
       senderFilter === "all" || msg.senderType === senderFilter;
     const matchRead =
@@ -68,6 +69,11 @@ const MessageTable = () => {
       (readFilter === "read" && msg.isRead) ||
       (readFilter === "unread" && !msg.isRead);
     return matchSender && matchRead;
+  })
+  .sort((a, b) => {
+    // Sort so unread messages come first
+    if (a.isRead === b.isRead) return 0;
+    return a.isRead ? 1 : -1; // unread (false) comes before read (true)
   });
 
   const getSenderBadge = (type) => {
@@ -79,8 +85,8 @@ const MessageTable = () => {
   const getFilterButtonClass = (isActive) => {
     return `px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
       isActive
-        ? "bg-gradient-to-r from-slate-800 to-slate-700 text-white shadow-lg"
-        : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"
+        ? "bg-[#A9C9CD] text-[#09424D] shadow-lg"
+        : "bg-white text-slate-600 hover:bg-slate-50 border border-[#A9C9CD]"
     }`;
   };
 
@@ -137,7 +143,7 @@ const MessageTable = () => {
         </div>
 
         {/* Messages Grid */}
-        <div className="grid gap-4">
+        <div className="grid gap-4 max-h-[600px] overflow-y-auto">
           {filteredMessages.map((msg) => (
             <div
               key={msg.inquiryId}
@@ -152,8 +158,8 @@ const MessageTable = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center">
-                        <User className="w-6 h-6 text-white" />
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#b6e1e8] to-[#09424D] flex items-center justify-center">
+                        <User className="w-6 h-6 text-[#09424D]" />
                       </div>
                     </div>
 
@@ -223,8 +229,8 @@ const MessageTable = () => {
               <div className="p-6 space-y-6">
                 {/* Sender Info */}
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center">
-                    <User className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b6e1e8] to-[#09424D] flex items-center justify-center">
+                    <User className="w-8 h-8 text-[#09424D]" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -266,6 +272,14 @@ const MessageTable = () => {
                     </h4>
                     <p className="text-slate-600">{selected.description}</p>
                   </div>
+                  {selected.isRead && (
+                    <div>
+                    <h4 className="font-semibold text-slate-800 mb-1">
+                      Reply Message
+                    </h4>
+                    <p className="text-slate-600">{selected.replyMessage}</p>
+                  </div>
+                  )}
                 </div>
 
                 {/* Actions */}
