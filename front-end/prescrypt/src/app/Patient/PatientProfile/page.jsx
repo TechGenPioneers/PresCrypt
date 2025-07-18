@@ -114,11 +114,11 @@ const HealthRecord = () => {
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
-        // Get patientId from localStorage or other state management
-        const patientId = "P021";
+        // Get patientId from localStorage
+        const patientId = localStorage.getItem('patientId');
         
         if (!patientId) {
-          setError("Patient ID not found. Please log in again.");
+          setError("Patient ID not found in storage. Please log in again.");
           setLoading(false);
           return;
         }
@@ -588,14 +588,6 @@ const HealthRecord = () => {
                             <div className="h-1 w-1/4 bg-red-300 rounded"></div>
                           </div>
                         </div>
-
-                        {/* Blood Group
-                        <div className="bg-white rounded-xl border border-gray-200 p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <p className="text-sm text-gray-600">Blood Group</p>
-                          </div>
-                          <p className="text-2xl font-bold text-gray-900">{healthData?.bloodGroup}</p>
-                        </div> */}
 
                         {/* Blood Group */}
                         <div className="bg-white rounded-xl border border-gray-200 p-4">
