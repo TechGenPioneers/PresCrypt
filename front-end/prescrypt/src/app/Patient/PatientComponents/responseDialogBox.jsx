@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import axios from "axios";
 
 const ResponseDialogBox = ({
   open,
@@ -18,12 +19,13 @@ const ResponseDialogBox = ({
   paymentMethod,
   appointmentDate,
   appointmentTime,
+  paymentAmount,
+  payHereObjectId,
 }) => {
   // Combine appointmentDate + appointmentTime into JS Date object
   const appointmentDateTime = useMemo(() => {
     if (!appointmentDate || !appointmentTime) return null;
-    const date = new Date(`${appointmentDate}T${appointmentTime}`);
-    return date;
+    return new Date(`${appointmentDate}T${appointmentTime}`);
   }, [appointmentDate, appointmentTime]);
 
   // Calculate hours until appointment
@@ -31,27 +33,49 @@ const ResponseDialogBox = ({
     if (!appointmentDateTime) return null;
     const now = new Date();
     const diffMs = appointmentDateTime - now;
-    return diffMs / (1000 * 60 * 60); // Convert ms to hours
+    return diffMs / (1000 * 60 * 60); // ms to hours
   }, [appointmentDateTime]);
 
-  // Decide warning message
-  const warningMessage = useMemo(() => {
-    if (!paymentMethod || hoursUntilAppointment === null) return null;
+  // Calculate refund details and generate message
+  const refundInfo = useMemo(() => {
+    if (paymentMethod !== "Card" || !paymentAmount || hoursUntilAppointment === null)
+      return null;
 
-    if (paymentMethod === "Location") {
-      return `Since your payment method was "Pay At Location" and cancelling more appointments in near days may result in permanent account inactivation.`;
-    }
+    const isWithin48Hours = hoursUntilAppointment <= 48;
+    const refundPercent = isWithin48Hours ? 0.8 : 1.0;
+    const refundAmount = Math.round(paymentAmount * refundPercent * 100) / 100;
 
-    if (paymentMethod === "Card") {
-      if (hoursUntilAppointment <= 48) {
-        return `Since your appointment is Card payment and you are cancelling this appointment within 48 hours prior to the appointment, only 80% will be refunded to your paid account.`;
-      } else {
-        return `Since your appointment is Card payment and you are cancelling this appointment beyond 48 hours prior to the appointment, the full payment will be credited to your account.`;
+    const refundMessage = isWithin48Hours
+      ? `Your appointment scheduled on ${appointmentDate} at ${appointmentTime} has been cancelled and requested from PayHere with the payment ID: ${payHereObjectId}. You will receive 80% refund due to cancellation within 48 hours. Refunded amount: Rs. ${refundAmount.toFixed(2)}.`
+      : `Your appointment scheduled on ${appointmentDate} at ${appointmentTime} has been cancelled and requested from PayHere with the Payment ID: ${payHereObjectId}. You will receive a full refund. Refunded amount: Rs. ${refundAmount.toFixed(2)}.`;
+
+    return {
+      refundAmount,
+      refundMessage,
+      refundPercent: refundPercent * 100,
+    };
+  }, [paymentMethod, paymentAmount, hoursUntilAppointment, appointmentDate, appointmentTime, payHereObjectId]);
+
+  
+  useEffect(() => {
+  const sendRefundRequest = async () => {
+    if (open && paymentMethod === "Card" && payHereObjectId && refundAmount != null) {
+      try {
+        await axios.post("http://localhost:3000/api/payhere-refund", {
+          payment_id: payHereObjectId,
+          reason: "Customer changed their mind",
+          refund_amount: refundAmount,
+        });
+        console.log("Refund request sent successfully");
+      } catch (error) {
+        console.error("Failed to send refund request:", error);
       }
     }
+  };
 
-    return null;
-  }, [paymentMethod, hoursUntilAppointment]);
+  sendRefundRequest();
+}, [open, paymentMethod, payHereObjectId, refundAmount]);
+
 
   return (
     <Dialog
@@ -90,15 +114,16 @@ const ResponseDialogBox = ({
             Payment Method: <strong>{paymentMethod}</strong>
           </Typography>
         )}
+
         {appointmentDate && appointmentTime && (
           <Typography variant="body2" sx={{ mt: 0.5, color: "#777" }}>
             Appointment: <strong>{appointmentDate} at {appointmentTime}</strong>
           </Typography>
         )}
 
-        {warningMessage && (
+        {refundInfo && (
           <Typography variant="body2" sx={{ mt: 2, color: "#d84315", fontWeight: 500 }}>
-            {warningMessage}
+            {refundInfo.refundMessage}
           </Typography>
         )}
       </DialogContent>

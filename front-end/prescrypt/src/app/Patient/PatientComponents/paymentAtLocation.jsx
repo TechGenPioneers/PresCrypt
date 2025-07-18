@@ -110,13 +110,13 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
     }
   };
 
-  const handleCreateAppointment = async () => {
+  const handleCreateAppointment = async (orderId) => {
     const paymentPayload = {
       paymentId,
       paymentAmount: totalCharge,
       paymentMethod: selectedMethod === "online" ? "Card" : "Location",
       paymentStatus: selectedMethod === "online" ? "Done" : "Pending",
-      payHereObjectId:payhereOrderId,
+      payHereObjectId:orderId,
     };
     console.log("Creating payment with payload:", paymentPayload);
     try {
@@ -172,8 +172,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
         const obj = await res.json();
 
         window.payhere.onCompleted = function (orderId) {
-          handleCreateAppointment();
-          console.log("Payment completed with orderId:", orderId);
+          handleCreateAppointment(orderId);
           setPayhereOrderId(orderId);
         };
 

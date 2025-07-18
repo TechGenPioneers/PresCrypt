@@ -29,6 +29,9 @@ const AppointmentList = ({ patientId }) => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [payHereObjectId, setPayHereObjectId] = useState("");
+
 
 
   useEffect(() => {
@@ -94,10 +97,13 @@ const AppointmentList = ({ patientId }) => {
 
   try {
     const res = await deleteAppointment(appointmentId);
+    console.log("Payhere Object Id:", res.payhereObjectId);
     setResponseMessage(res.message || "Wrong there");
     setPaymentMethod(res.paymentMethod || "N/A");
     setAppointmentDate(res.appointmentDate);
     setAppointmentTime(res.appointmentTime);
+    setPaymentAmount(res.paymentAmount );
+    setPayHereObjectId(res.payHereObjectId);
     setResponseDialogOpen(true);
 
     if (cancelledAppt) {
@@ -245,6 +251,8 @@ const AppointmentList = ({ patientId }) => {
           paymentMethod={paymentMethod}
           appointmentDate={appointmentDate}
           appointmentTime={appointmentTime}
+          payHereObjectId={payHereObjectId}
+          paymentAmount={paymentAmount}
         />
       )}
 
