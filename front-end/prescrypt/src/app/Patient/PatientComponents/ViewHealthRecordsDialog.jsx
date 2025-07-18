@@ -15,23 +15,12 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import DownloadIcon from "@mui/icons-material/Download";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const ViewHealthRecordsDialog = ({
   open,
   onClose,
-  doctorName,
-  date,
-  time,
-  hospitalName,
   appointmentId,
 }) => {
-  const handleViewRecord = () => {
-    // Handle view record logic here
-    console.log(`Viewing health record for appointment ${appointmentId}`);
-    // You can add navigation logic here
-  };
-
   const handleDownloadRecord = () => {
     // Handle download record logic here
     console.log(`Downloading health record for appointment ${appointmentId}`);
@@ -67,26 +56,8 @@ const ViewHealthRecordsDialog = ({
           Health Records Available
         </Typography>
         
-        <Box sx={{ mt: 2, p: 2, backgroundColor: "#f0f8f7", borderRadius: "8px", width: "100%" }}>
-          <Typography variant="body2" sx={{ color: "#555", fontWeight: "600" }}>
-            Appointment Details:
-          </Typography>
-          <Typography variant="body2" sx={{ color: "#666", mt: 1 }}>
-            <strong>Doctor:</strong> Dr. {doctorName}
-          </Typography>
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            <strong>Date:</strong> {date}
-          </Typography>
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            <strong>Time:</strong> {time}
-          </Typography>
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            <strong>Hospital:</strong> {hospitalName}
-          </Typography>
-        </Box>
-
         <Typography variant="body1" sx={{ mt: 2, color: "#555", maxWidth: "480px" }}>
-          Your health records for this appointment are ready to view. You can access your medical reports, 
+          Your health records are ready to view. You can access your medical reports, 
           prescriptions, and treatment notes. All records are securely stored and can be downloaded for your reference.
         </Typography>
 
@@ -102,24 +73,6 @@ const ViewHealthRecordsDialog = ({
       </DialogContent>
 
       <DialogActions sx={{ justifyContent: "center", mt: 2, gap: 2 }}>
-        <Button
-          onClick={handleViewRecord}
-          variant="contained"
-          startIcon={<VisibilityIcon />}
-          sx={{
-            backgroundColor: "#5da9a7",
-            color: "#fff",
-            "&:hover": {
-              backgroundColor: "#4c9995",
-            },
-            borderRadius: "8px",
-            padding: "10px 20px",
-            fontWeight: 600,
-          }}
-        >
-          View Records
-        </Button>
-        
         <Button
           onClick={handleDownloadRecord}
           variant="outlined"
