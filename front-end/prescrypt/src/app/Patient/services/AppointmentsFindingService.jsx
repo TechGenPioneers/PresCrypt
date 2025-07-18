@@ -119,11 +119,11 @@ export const getAppointmentsByPatient = async (patientId) => {
   return res.data;
 };
 
-// Delete an appointment
+// Cancel an appointment
 export const deleteAppointment = async (appointmentId) => {
-  return await axios.delete(`${BASE_URL}/Appointments/${appointmentId}`);
+  const response = await axios.put(`${BASE_URL}/Appointments/cancel/${appointmentId}`);
+  return response.data; 
 };
-
 // Send appointment email
 export const sendEmail = async (payload) => {
   return await axios.post(`${BASE_URL}/PatientEmail`, payload);

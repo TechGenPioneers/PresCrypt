@@ -8,7 +8,7 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
     <div className="fixed bg-[#ffffffc0] inset-0 flex items-center justify-center z-50">
       <div className="bg-[#E9FAF2] rounded-[20px] shadow-2xl p-1 max-w-3xl w-full">
         <div className="p-6 rounded-[20px] flex flex-col md:flex-row relative border-2 border-dashed border-black">
-        <button
+          <button
             onClick={onClose}
             className="absolute top-4 right-4 p-1 rounded-full cursor-pointer"
             aria-label="Close modal"
@@ -28,7 +28,8 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                     src={`data:image/jpeg;base64,${patient.profileImage}`}
                     alt="Patient"
                     className="w-30 h-30 rounded-full object-cover border-2 border-[#094A4D]"
-                  /> {/* add default image */}
+                  />{" "}
+                  {/* add default image */}
                   <div>
                     <h3 className="text-lg font-semibold">
                       {patient.patientName}
