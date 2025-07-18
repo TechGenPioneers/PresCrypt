@@ -2,44 +2,51 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // Import usePathname
+import { usePathname, useRouter } from "next/navigation"; // added useRouter for navigation
 import axios from "axios";
-import { DayPicker } from "react-day-picker";
+import DoctorDashboardService from "../services/DoctorDashboardService";
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const pathname = usePathname(); // Get the current URL path
-  const [userName, setUserName] = useState("Dr. Nimal Fernando"); // Replace with dynamic data from API
-  //const doctorId = localStorage.getItem("userId");
-  
- const handleLogout = async () => {
-     const ok = window.confirm("Are you sure you want to log out?");
-     if (!ok) return;
- 
-     try {
-       await axios.post(
-         "https://localhost:7021/api/User/logout",
-         null,
-         { withCredentials: true }
-       );
-     } catch (err) {
-       console.warn("Backend logout failed (may not be using cookies):", err);
-     }
-  
-     localStorage.removeItem("token");
-     sessionStorage.removeItem("token");
-   
-     router.push("/Auth/login");
-   };
+  const pathname = usePathname();
+  const router = useRouter(); // for redirect after logout
+  const doctorId =
+    typeof window !== "undefined" ? localStorage.getItem("doctorId") : null;
+  const [userName, setUserName] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
-    // Fetch user name from API when authentication is implemented
-    // Example:
-    // fetch("api")
-    //   .then(response => response.json())
-    //   .then(data => setUserName(data.name))
-    //   .catch(error => console.error("Error fetching user profile:", error));
-  }, []);
+    async function fetchProfile() {
+      const profile = await DoctorDashboardService.getProfile(doctorId);
+      if (profile.name) {
+        setUserName(profile.name);
+      }
+      if (profile.image) {
+        setProfileImage(profile.image);
+      }
+    }
+    fetchProfile();
+  }, [doctorId]);
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    const ok = window.confirm("Are you sure you want to log out?");
+    if (!ok) return;
+
+    try {
+      await axios.post("https://localhost:7021/api/User/logout", null, {
+        withCredentials: true,
+      });
+    } catch (err) {
+      console.warn("Backend logout failed (may not be using cookies):", err);
+    }
+    localStorage.removeItem("doctorId");
+    localStorage.clear(); // remove other items if needed
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+
+    router.push("/Auth/login");
+  };
 
   return (
     <div
@@ -57,11 +64,21 @@ export default function Sidebar() {
 
       {/* Profile */}
       <div className="flex justify-center p-2">
-        <Image src="/profile.png" alt="profile" width={40} height={40} />
+        {profileImage ? (
+          <Image
+            src={profileImage}
+            alt="profile"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+        ) : (
+          <Image src="/profile.png" alt="profile" width={40} height={40} />
+        )}
         {isExpanded && (
           <div className="flex justify-center ml-4 whitespace-nowrap mt-2">
             <p className="font-bold text-[#033A3D] text-[17px]">
-              {userName} {/* Update dynamically later */}
+              {userName || "Loading..."}
             </p>
           </div>
         )}
@@ -94,7 +111,7 @@ export default function Sidebar() {
             {
               img: "/image18.png",
               label: "TeleHealth",
-              path: "/Doctor/Chat",
+              path: "/Communication",
             },
             {
               img: "/image20.png",
@@ -106,8 +123,8 @@ export default function Sidebar() {
               <Link
                 href={item.path}
                 className={`flex items-center p-2 border-1 rounded-full transition-all duration-300 ${
-                  pathname === item.path // Check if the current URL matches the tab's path
-                    ? "border-[#033A3D] bg-[#033A3D]/20 text-[#033A3D] font-bold shadow-md" // Styles for selected tab
+                  pathname === item.path
+                    ? "border-[#033A3D] bg-[#033A3D]/20 text-[#033A3D] font-bold shadow-md"
                     : "border-transparent hover:border-[#033A3D] hover:bg-[#033a3d32] text-black"
                 }`}
                 style={{

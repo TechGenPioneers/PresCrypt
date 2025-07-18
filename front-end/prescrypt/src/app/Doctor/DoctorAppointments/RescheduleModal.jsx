@@ -5,7 +5,7 @@ import "react-day-picker/dist/style.css";
 import { X } from "lucide-react";
 import AppointmentsRescheduleService from "../services/AppointmentsRescheduleService";
 
-export default function RescheduleModal({ isOpen, onClose, doctorId = "D002" }) {
+export default function RescheduleModal({ isOpen, onClose, doctorId }) {
   // Initialize date to today's date, setting hours, minutes, seconds, and milliseconds to 0
   const [date, setDate] = useState(() => {
     const today = new Date();
@@ -169,7 +169,7 @@ export default function RescheduleModal({ isOpen, onClose, doctorId = "D002" }) 
             {/* Calendar */}
             <div className="w-1/2 border-r p-6">
               <h2 className="text-2xl font-bold mb-6 text-[#094A4D]">
-                Select Date to View Appointments
+                Select a Date to Reschedule Appointments
               </h2>
               <DayPicker
                 mode="single"
