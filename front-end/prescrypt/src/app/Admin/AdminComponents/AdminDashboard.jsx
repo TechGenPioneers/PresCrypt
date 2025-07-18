@@ -26,11 +26,12 @@ import {
 import AdminNotification from "./AdminNotification";
 import { GetAllDashboardData } from "../service/AdminDashboardService";
 import Dashboard from "@/app/Doctor/DoctorDashboard/page";
+import SystemAnalyze from "./SystemAnalyse";
 
 const AdminDashboard = ({ setAdminName }) => {
   const [dateTime, setDateTime] = useState(null);
   const [dashboardData, setDashboardData] = useState([]);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   //get dashboard data
   const getDashboardData = async () => {
     try {
@@ -264,14 +265,22 @@ const AdminDashboard = ({ setAdminName }) => {
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-8 bg-white p-5 rounded-xl shadow">
+          <div className="mt-18 bg-white p-5 rounded-xl shadow ">
             <h4 className="text-lg font-semibold text-[#09424D] mb-4">
               More Actions
             </h4>
             <div className="space-y-3">
-              <button className="w-full text-left p-3 rounded-lg bg-[#E9FAF2] hover:bg-[#CEE4E6] transition-colors text-[#09424D]">
+              <button
+                className="w-full text-left p-3 rounded-lg bg-[#E9FAF2] hover:bg-[#CEE4E6] transition-colors text-[#09424D]"
+                onClick={() => setIsModalOpen(true)}
+              >
                 System Analyses
               </button>
+              <Link href={"/Admin/HospitalsPage"}>
+                <button className="w-full text-left p-3 rounded-lg bg-[#E9FAF2] hover:bg-[#CEE4E6] transition-colors text-[#09424D]">
+                  Hospitals
+                </button>
+              </Link>
             </div>
           </div>
 
@@ -282,6 +291,9 @@ const AdminDashboard = ({ setAdminName }) => {
           />
         </aside>
       </div>
+      {isModalOpen ? (
+        <SystemAnalyze closeModal={() => setIsModalOpen(false)} />
+      ) : null}
     </>
   );
 };

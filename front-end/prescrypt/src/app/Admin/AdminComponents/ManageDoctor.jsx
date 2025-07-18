@@ -8,6 +8,7 @@ import {
 } from "../service/AdminDoctorService";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@material-tailwind/react";
+import { ArrowLeft, Check } from "lucide-react";
 
 export default function ManageDoctor({ doctorData }) {
   const [schedule, setSchedule] = useState([]);
@@ -580,7 +581,7 @@ export default function ManageDoctor({ doctorData }) {
                             )
                           }
                         >
-                          {hospital.hospitalName}
+                          {hospital.hospitalName} - {hospital.city}
                         </div>
                       ))}
                     </div>
@@ -698,27 +699,31 @@ export default function ManageDoctor({ doctorData }) {
           </form>
         </div>
       ) : (
-        <div className="h-[500px] ">
-          <div className="h-[500px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
-            <h1 className="text-2xl font-bold text-center mb-2">
-              Update Status
-            </h1>
-            <div className="flex-grow flex items-center justify-center">
-              <p className="text-green-600 font-bold text-xl text-center mb-5">
-                {successMessage}
-              </p>
-            </div>
-            <div className="justify-center">
-              <button
-                className="ml-1 mt-10 px-10 py-2 bg-[#A9C9CD] text-[#09424D] font-semibold rounded-lg 
-      hover:bg-[#91B4B8] transition duration-300 cursor-pointer w-full"
-                onClick={handleBack}
-              >
-                Back to Doctor Details
-              </button>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 h-2"></div>
+            <div className="p-8">
+              <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+                  <Check className="w-10 h-10 text-emerald-600" />
+                </div>
+                <h1 className="text-3xl font-bold text-slate-800 mb-4">Success!</h1>
+                <p className="text-emerald-600 text-xl font-semibold mb-8">
+                  {successMessage}
+                </p>
+                <button
+                  onClick={handleBack}
+                  className="inline-flex items-center px-6 py-3  bg-[#A9C9CD] text-[#09424D] font-semibold rounded-xl hover:bg-[#91B4B8]  transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-2" />
+                  Back to Doctor Details
+                </button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
       )}
       {isLoading && (
               <div className="fixed inset-0 z-50 flex items-center justify-center">
