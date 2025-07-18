@@ -47,6 +47,8 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
   const [otpDialogOpen, setOtpDialogOpen] = useState(false);
   const [generatedOtp, setGeneratedOtp] = useState("");
   const [enteredOtp, setEnteredOtp] = useState(Array(6).fill(""));
+  const [payhereOrderId, setPayhereOrderId] = useState(null);
+
 
   const inputRefs = useRef([]);
 
@@ -108,12 +110,13 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
     }
   };
 
-  const handleCreateAppointment = async () => {
+  const handleCreateAppointment = async (orderId) => {
     const paymentPayload = {
       paymentId,
       paymentAmount: totalCharge,
       paymentMethod: selectedMethod === "online" ? "Card" : "Location",
       paymentStatus: selectedMethod === "online" ? "Done" : "Pending",
+      payHereObjectId:orderId,
     };
     console.log("Creating payment with payload:", paymentPayload);
     try {
@@ -169,7 +172,8 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
         const obj = await res.json();
 
         window.payhere.onCompleted = function (orderId) {
-          handleCreateAppointment();
+          handleCreateAppointment(orderId);
+          setPayhereOrderId(orderId);
         };
 
         window.payhere.onDismissed = function () {

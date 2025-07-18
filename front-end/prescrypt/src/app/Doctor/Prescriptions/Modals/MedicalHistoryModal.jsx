@@ -11,7 +11,7 @@ import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty"; // Icon for
 import CancelIcon from "@mui/icons-material/Cancel"; // Icon for Denied
 import WarningIcon from "@mui/icons-material/Warning"; // Icon for Unknown
 
-const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
+const MedicalHistoryModal = ({ isOpen, onClose, patient, doctorId }) => {
   const [error, setError] = useState(null);
   const [accessRequested, setAccessRequested] = useState(false);
   const [accessStatus, setAccessStatus] = useState(null);
@@ -39,7 +39,7 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
       if (!token) throw new Error("Authentication token not found");
 
       const response = await fetch(
-        `https://localhost:7021/api/AccessRequest/status?doctorId=D001&patientId=${patient?.patientId}`,
+        `https://localhost:7021/api/AccessRequest/status?doctorId=${doctorId}&patientId=${patient?.patientId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            doctorId: "D001",
+            doctorId: doctorId,
             patientId: patient?.patientId,
             title: "Request to View Medical History",
             message: "Doctor requests access to your medical history.",
@@ -95,7 +95,7 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
   };
 
   const handleViewHealthRecord = () => {
-    router.push(`/doctor/view-records/${patient.patientId}`);
+    router.push(`http://localhost:3000/Patient/PatientProfile/MedicalHistory/${patient.patientId}`);
   };
 
   if (!isOpen) return null;
