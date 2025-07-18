@@ -16,13 +16,14 @@ export const markAsRead = async (id) => {
   });
 };
 
-export const respondToRequest = async ({ doctorId, accepted }) => {
+export const respondToRequest = async ({ doctorId, accepted ,patientId}) => {
   try {
+
     const response = await axios.post(
       "https://localhost:7021/api/AccessRequest/respond-to-access-request",
       {
         doctorId,
-        patientId:"p021",
+        patientId,
         accepted,
       }
     );

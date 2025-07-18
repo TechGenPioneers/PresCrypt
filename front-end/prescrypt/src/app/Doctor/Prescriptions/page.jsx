@@ -182,6 +182,7 @@ export default function Page() {
         onClose={closeModals}
         patient={selectedPatient}
         calculateAge={calculateAge}
+        doctorId={doctorId}
       />
     </div>
   );
