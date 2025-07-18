@@ -11,7 +11,7 @@ import {
 import LoadingSpinner from "./loadingSpinner";
 
 
-const PatientDashboard = ({ id = "P025" }) => {
+//const PatientDashboard = ({ id = "P025" }) => {
 
 const PatientDashboard = () => {
 
@@ -139,4 +139,4 @@ const PatientDashboard = () => {
   );
 };
 
-export default PatientDashboard;
+ export default PatientDashboard;
