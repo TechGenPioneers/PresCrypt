@@ -95,7 +95,7 @@ const MedicalHistoryModal = ({ isOpen, onClose, patient }) => {
   };
 
   const handleViewHealthRecord = () => {
-    router.push(`/doctor/view-records/${patient.patientId}`);
+    router.push(`http://localhost:3000/Patient/PatientProfile/MedicalHistory/${patient.patientId}`);
   };
 
   if (!isOpen) return null;
