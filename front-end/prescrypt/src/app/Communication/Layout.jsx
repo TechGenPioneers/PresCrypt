@@ -9,10 +9,9 @@ import {
   GetUsers,
   GetUserNames,
 } from "./service/ChatService";
-import * as signalR from "@microsoft/signalr";
 import useVideoCallSignalR from "./VideoCall/hooks/useVideoCallSignalR";
 import useIncomingCallHandler from "./VideoCall/IncomingCallHandler";
-import { useVideoCall } from "./VideoCallProvider";
+import { VideoCallProvider, useVideoCall } from "./VideoCallProvider";
 import IncomingCallModal from "./VideoCall/IncomingCallModal";
 
 const Layout = ({ userId, userRole }) => {
@@ -22,22 +21,35 @@ const Layout = ({ userId, userRole }) => {
   const [users, setUsers] = useState([]);
   const [isUsersLoading, setIsUsersLoading] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
-  const [connection, setConnection] = useState();
-  const { incomingCall, callerInfo, roomUrl, resetCallState } = useVideoCall();
+  const [connection, setConnection] = useState(); // This seems to be the chat connection
+
   const [userNames, setUserNames] = useState({
     DoctorName: "",
     PatientName: "",
   });
 
-  const videoCallConnection = useVideoCallSignalR(userId, userRole);
+  const {
+    incomingCall,
+    callerInfo,
+    roomUrl, // This will be the incoming room URL, used by the modal
+    callStatus,
+    callError,
+    receiveCall, // This is called by useVideoCallSignalR when a call is received
+    setCallStatus,
+    setCallError,
+  } = useVideoCall();
+
+  const {
+    connection: videoCallConnection,
+    status: videoCallHubStatus,
+  } = useVideoCallSignalR(userId, userRole);
 
   const { handleAcceptCall, handleRejectCall } = useIncomingCallHandler({
-    users,
+    users, // Pass users if needed by the hook for other logic
     userId,
     userRole,
-    setSelectedUser,
-    roomUrl,
-    resetCallState,
+    setSelectedUser, // Pass setSelectedUser to allow the hook to set it on accept
+    videoCallConnection,
   });
 
   const fetchUsers = async () => {
@@ -51,20 +63,16 @@ const Layout = ({ userId, userRole }) => {
       setIsUsersLoading(false);
     }
   };
-  // SignalR setup
+
   useEffect(() => {
     const newConnection = EstablishSignalRConnection();
-    setConnection(newConnection);
+    setConnection(newConnection); // Set chatConnection
   }, []);
 
-  // Update this in Layout.jsx
   const fetchUserNames = async () => {
     try {
-      // Corrected ID assignment - always use userId as the current user
-      const doctorId =
-        userRole === "Doctor" ? userId : selectedUser?.receiverId;
-      const patientId =
-        userRole === "Patient" ? userId : selectedUser?.receiverId;
+      const doctorId = userRole === "Doctor" ? userId : selectedUser?.receiverId;
+      const patientId = userRole === "Patient" ? userId : selectedUser?.receiverId;
 
       if (!doctorId || !patientId) return;
 
@@ -79,8 +87,12 @@ const Layout = ({ userId, userRole }) => {
   };
 
   useEffect(() => {
-    fetchUsers(); // Initial fetch when component mounts
-  }, [userId]); // Re-fetch when userId changes
+    console.log("Video call connection status:", videoCallHubStatus);
+  }, [videoCallHubStatus]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [userId]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -99,7 +111,7 @@ const Layout = ({ userId, userRole }) => {
           setUsers={setUsers}
           users={users}
           isUsersLoading={isUsersLoading}
-          connection={chatConnection}
+          connection={chatConnection} // Ensure this is `chatConnection`
         />
       </div>
 
@@ -110,7 +122,8 @@ const Layout = ({ userId, userRole }) => {
             setSelectedUser={setSelectedUser}
             userId={userId}
             userRole={userRole}
-            connection={chatConnection}
+            connection={chatConnection} // Ensure this is `chatConnection`
+            videoCallConnection={videoCallConnection}
             fetchUsers={fetchUsers}
             newMessage={newMessage}
             setNewMessage={setNewMessage}
@@ -122,13 +135,20 @@ const Layout = ({ userId, userRole }) => {
         )}
       </div>
 
+      {/* This is the correct place for the IncomingCallModal */}
       {incomingCall && callerInfo && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <IncomingCallModal
-            callerName={callerInfo.callerName || "Unknown Caller"}
-            onAccept={() => handleAcceptCall(callerInfo)}
-            onReject={handleRejectCall}
+            callerName={callerInfo.callerName}
+            onAccept={handleAcceptCall} // This calls the hook's accept logic
+            onReject={handleRejectCall} // This calls the hook's reject logic
           />
+        </div>
+      )}
+
+      {callError && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-600 text-white p-3 rounded-md z-50">
+          {callError}
         </div>
       )}
     </div>
