@@ -13,7 +13,7 @@ import LoadingSpinner from "./loadingSpinner";
 
 
 
-const PatientDashboard = ({ id = "P025" }) => {
+const PatientDashboard = () => {
   const [patient, setPatient] = useState(null);
 
   useEffect(() => {

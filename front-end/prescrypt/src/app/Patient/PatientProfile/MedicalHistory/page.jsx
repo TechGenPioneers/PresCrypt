@@ -344,7 +344,7 @@ const HealthRecord = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50">
-        <Header />
+        
         <Sidebar />
         <div className="ml-16 sm:ml-20 md:ml-24 lg:ml-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -360,7 +360,7 @@ const HealthRecord = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50">
-        <Header />
+        
         <Sidebar />
         <div className="ml-16 sm:ml-20 md:ml-24 lg:ml-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -386,8 +386,8 @@ const HealthRecord = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50">
-      <Header />
+    <div className="min-h-screen ">
+     
       <Sidebar />
       
       <div className="ml-16 sm:ml-20 md:ml-24 lg:ml-32">
