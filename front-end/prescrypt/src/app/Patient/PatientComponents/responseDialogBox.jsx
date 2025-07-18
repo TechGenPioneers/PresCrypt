@@ -36,10 +36,10 @@ const ResponseDialogBox = ({
     return diffMs / (1000 * 60 * 60); // ms to hours
   }, [appointmentDateTime]);
 
-  // Calculate refund details and generate message
+
   const refundInfo = useMemo(() => {
-    if (paymentMethod !== "Card" || !paymentAmount || hoursUntilAppointment === null)
-      return null;
+  if (paymentMethod === "Card") {
+    if (!paymentAmount || hoursUntilAppointment === null) return null;
 
     const isWithin48Hours = hoursUntilAppointment <= 48;
     const refundPercent = isWithin48Hours ? 0.8 : 1.0;
@@ -54,17 +54,35 @@ const ResponseDialogBox = ({
       refundMessage,
       refundPercent: refundPercent * 100,
     };
-  }, [paymentMethod, paymentAmount, hoursUntilAppointment, appointmentDate, appointmentTime, payHereObjectId]);
+  }
+
+  if (paymentMethod === "Location") {
+    const warningMessage = `Your appointment on ${appointmentDate} at ${appointmentTime} has been successfully cancelled. Please note: Cancelling appointments on short notice may lead to permanent account inactivation.`;
+    return {
+      refundAmount: null,
+      refundMessage: warningMessage,
+      refundPercent: null,
+    };
+  }
+
+  return null;
+}, [paymentMethod, paymentAmount, hoursUntilAppointment, appointmentDate, appointmentTime, payHereObjectId]);
+
 
   
   useEffect(() => {
   const sendRefundRequest = async () => {
-    if (open && paymentMethod === "Card" && payHereObjectId && refundAmount != null) {
+    if (
+      open &&
+      paymentMethod === "Card" &&
+      payHereObjectId &&
+      refundInfo?.refundAmount != null
+    ) {
       try {
         await axios.post("http://localhost:3000/api/payhere-refund", {
           payment_id: payHereObjectId,
           reason: "Customer changed their mind",
-          refund_amount: refundAmount,
+          refund_amount: refundInfo.refundAmount,
         });
         console.log("Refund request sent successfully");
       } catch (error) {
@@ -74,7 +92,8 @@ const ResponseDialogBox = ({
   };
 
   sendRefundRequest();
-}, [open, paymentMethod, payHereObjectId, refundAmount]);
+}, [open, paymentMethod, payHereObjectId, refundInfo]);
+
 
 
   return (

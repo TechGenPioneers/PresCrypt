@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { sendPatientContactUs } from "../services/PatientDataService"; 
-
-// TermsDialog component to show terms & conditions popup
+import AlertDialogBox from "./alertDialogBox"; 
 import {
   Dialog,
   DialogTitle,
@@ -14,6 +13,9 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+
+
+
 
 const TermsDialog = ({ open, onClose }) => {
   return (
@@ -100,6 +102,10 @@ const ContactUsForm = () => {
 
   // Dialog state to show/hide terms popup
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const userId = localStorage.getItem("patientId");
+  const role = localStorage.getItem("userRole");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -113,12 +119,14 @@ const ContactUsForm = () => {
     e.preventDefault();
 
     if (!formData.termsAccepted) {
-      alert("You must accept the terms before submitting.");
+      setAlertMessage("Please accept the terms and conditions to proceed");
+      setAlertOpen(true);
       return;
     }
 
     const dataload = {
-      patientId: "P021",
+      userId: userId,
+      role:role ? role.toLowerCase() : "", 
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
@@ -130,7 +138,8 @@ const ContactUsForm = () => {
     try {
       console.log("Submitting data:", dataload);
       await sendPatientContactUs(dataload);
-      alert("Message submitted successfully!");
+      setAlertMessage("Submission successful! We will get back to you soon.");
+      setAlertOpen(true);
       setFormData({
         firstName: "",
         lastName: "",
@@ -142,7 +151,8 @@ const ContactUsForm = () => {
       });
     } catch (error) {
       console.error("Submission failed", error);
-      alert("There was a problem submitting the form.");
+      setAlertMessage("Submission failed.");
+      setAlertOpen(true);
     }
   };
 
@@ -254,6 +264,11 @@ const ContactUsForm = () => {
 
       {/* Terms and Conditions Dialog */}
       <TermsDialog open={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
+        <AlertDialogBox
+          open={alertOpen}
+          onClose={() => setAlertOpen(false)}
+          message={alertMessage}
+        />
     </>
   );
 };
