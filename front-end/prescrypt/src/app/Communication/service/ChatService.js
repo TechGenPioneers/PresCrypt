@@ -1,8 +1,7 @@
-
-import axios from 'axios';
-import * as signalR from '@microsoft/signalr';
-const baseUrl = "https://localhost:7021/api/ChatMsg"
-const baseUrlVideo = "http://localhost:7021/api/DoctorPatientVideoCall";
+import axios from "axios";
+import * as signalR from "@microsoft/signalr";
+const baseUrl = "https://localhost:7021/api/ChatMsg";
+const baseUrlVideo = "https://localhost:7021/api/DoctorPatientVideoCall";
 
 const GetUsers = async (userId) => {
   try {
@@ -62,7 +61,7 @@ const DeleteMessage = async (messageId) => {
 
 const EstablishSignalRConnection = () => {
   const newConnection = new signalR.HubConnectionBuilder()
-    .withUrl(`http://localhost:7021/chatHub`, {
+    .withUrl(`https://localhost:7021/chatHub`, {
       skipNegotiation: true,
       transport: signalR.HttpTransportType.WebSockets,
     })
@@ -81,23 +80,45 @@ const EstablishSignalRConnection = () => {
 
   return newConnection;
 };
+
+const EstablishVideoSignalRConnection = (userId) => {
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl(`https://localhost:7021/videoCallHub?userId=${userId}`, {
+      skipNegotiation: true,
+      transport: signalR.HttpTransportType.WebSockets,
+    })
+    .withAutomaticReconnect({
+      nextRetryDelayInMilliseconds: (retryContext) => {
+        if (retryContext.elapsedMilliseconds < 60000) {
+          return Math.min(retryContext.previousRetryCount * 2000, 10000);
+        }
+        return null; // Stop retrying after 60 seconds
+      }
+    })
+    .configureLogging(signalR.LogLevel.Warning)
+    .build();
+
+  return connection;
+};
+
 const StartVideoCall = async (doctorId, patientId) => {
   try {
     const response = await axios.post(
       `${baseUrlVideo}/start-call?doctorId=${doctorId}&patientId=${patientId}`
     );
-    return response.data; // This data should contain { roomUrl }
+    return response.data;
   } catch (error) {
-    console.error("Failed to start video call", error);
+    console.error("Start call API error:", error);
     throw error;
   }
 };
+
 const GetUserNames = async (doctorId, patientId) => {
   try {
     const response = await axios.get(
       `${baseUrlVideo}/user-names?doctorId=${doctorId}&patientId=${patientId}`
     );
-    return response.data; // { DoctorName, PatientName }
+    return response.data;
   } catch (error) {
     console.error("Failed to fetch user names", error);
     throw error;
@@ -108,22 +129,13 @@ const GetVideoCallRoom = async (patientId) => {
   try {
     const response = await axios.get(
       `${baseUrlVideo}/create-room?patientId=${patientId}`
+      
     );
     return response.data;
   } catch (error) {
     console.error("Failed to get video call room", error);
     throw error;
   }
-};
-
-const EstablishVideoSignalRConnection = (userId) => {
-  const newConnection = new signalR.HubConnectionBuilder()
-    .withUrl(`http://localhost:7021/videoCallHub?userId=${userId}`)
-    .withAutomaticReconnect()
-    .configureLogging(signalR.LogLevel.Information)
-    .build();
-
-  return newConnection;
 };
 
 export {
