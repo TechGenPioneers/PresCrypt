@@ -90,63 +90,75 @@ export default function DoctorConfirmForm({ requestId }) {
 
   //add available table
   const handleAddTime = () => {
-    if (
-      availableData.availability.length > 0 &&
-      availableData.startTime &&
-      availableData.endTime &&
-      availableData.HospitalId &&
-      availableData.HospitalName
-    ) {
-      const newSchedule = availableData.availability.map((day) => ({
-        day,
-        startTime: availableData.startTime,
-        endTime: availableData.endTime,
-        HospitalId: availableData.HospitalId,
-        HospitalName: availableData.HospitalName,
-      }));
+    // Clear any previous error
+    setTimeErrorMessage("");
 
-      // Check if start time is before end time
-      if (newSchedule.some((item) => item.startTime >= item.endTime)) {
-        setTimeErrorMessage("Start time must be before end time.");
-        return;
-      }
-
-      if (newSchedule.some((item) => item.HospitalName === "")) {
-        setTimeErrorMessage("Please select a hospital.");
-        return;
-      }
-
-      if (newSchedule.some((item) => item.day === "")) {
-        setTimeErrorMessage("Please select at least one day.");
-        return;
-      }
-
-      const isDuplicate = newSchedule.some((newItem) =>
-        schedule.some(
-          (existing) =>
-            existing.day === newItem.day &&
-            existing.startTime === newItem.startTime &&
-            existing.endTime === newItem.endTime &&
-            existing.HospitalId === newItem.HospitalId
-        )
-      );
-
-      if (!isDuplicate) {
-        setSchedule((prev) => [...prev, ...newSchedule]);
-        setAvailableData({
-          availability: [],
-          startTime: "",
-          endTime: "",
-          HospitalId: "",
-          HospitalName: "",
-        });
-        setErrorMessage("");
-      } else {
-        setTimeErrorMessage(
-          "Selected time slot already exists. Please check again!"
-        );
-      }
+    // Validate hospital
+    if (!availableData.HospitalId || !availableData.HospitalName) {
+      setTimeErrorMessage("Please select a hospital.");
+      return;
     }
+
+    // Validate days
+    if (
+      !availableData.availability ||
+      availableData.availability.length === 0
+    ) {
+      setTimeErrorMessage("Please select at least one day.");
+      return;
+    }
+
+    // Validate time
+    if (!availableData.startTime || !availableData.endTime) {
+      setTimeErrorMessage("Please select both start time and end time.");
+      return;
+    }
+
+    const newSchedule = availableData.availability.map((day) => ({
+      day,
+      startTime: availableData.startTime,
+      endTime: availableData.endTime,
+      HospitalId: availableData.HospitalId,
+      HospitalName: availableData.HospitalName,
+    }));
+
+    // Ensure start time is before end time
+    if (newSchedule.some((item) => item.startTime >= item.endTime)) {
+      setTimeErrorMessage("Start time must be before end time.");
+      return;
+    }
+
+    // Check for duplicate entry
+    const isDuplicate = newSchedule.some((newItem) =>
+      schedule.some(
+        (existing) =>
+          existing.day === newItem.day &&
+          existing.startTime === newItem.startTime &&
+          existing.endTime === newItem.endTime &&
+          existing.HospitalId === newItem.HospitalId
+      )
+    );
+
+    if (isDuplicate) {
+      setTimeErrorMessage(
+        "Selected time slot already exists. Please check again!"
+      );
+      return;
+    }
+
+    // All good — Add to schedule
+    setSchedule((prev) => [...prev, ...newSchedule]);
+
+    // Clear fields
+    setAvailableData({
+      availability: [],
+      startTime: "",
+      endTime: "",
+      HospitalId: "",
+      HospitalName: "",
+    });
+
+    setTimeErrorMessage("");
   };
 
   // Remove a time slot from the table
@@ -311,9 +323,7 @@ export default function DoctorConfirmForm({ requestId }) {
       <div className="flex items-center justify-center h-[400px]">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
-          <p className="text-slate-600 text-lg font-medium">
-            Loading...
-          </p>
+          <p className="text-slate-600 text-lg font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -323,9 +333,7 @@ export default function DoctorConfirmForm({ requestId }) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
-          <p className="text-slate-600 text-lg font-medium">
-            Loading...
-          </p>
+          <p className="text-slate-600 text-lg font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -397,47 +405,90 @@ export default function DoctorConfirmForm({ requestId }) {
                     Personal Information
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <InputField
-                      label="First Name"
-                      name="FirstName"
-                      placeholder="Enter first name"
-                      value={newDoctor.FirstName}
-                      onChange={handleChange}
-                      icon={User}
-                    />
-                    <InputField
-                      label="Last Name"
-                      name="LastName"
-                      placeholder="Enter last name"
-                      value={newDoctor.LastName}
-                      onChange={handleChange}
-                      icon={User}
-                    />
-                    <InputField
-                      label="Email Address"
-                      name="Email"
-                      type="email"
-                      placeholder="Enter email address"
-                      value={newDoctor.Email}
-                      onChange={handleChange}
-                      icon={Mail}
-                    />
-                    <InputField
-                      label="Contact Number"
-                      name="ContactNumber"
-                      placeholder="Enter contact number"
-                      value={newDoctor.ContactNumber}
-                      onChange={handleChange}
-                      icon={Phone}
-                    />
-                    <InputField
-                      label="NIC Number"
-                      name="NIC"
-                      placeholder="Enter NIC number"
-                      value={newDoctor.NIC}
-                      onChange={handleChange}
-                      icon={CreditCard}
-                    />
+                    {/* First Name */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 font-semibold text-gray-700">
+                        <User size={16} className="text-[#006369]" />
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        name="FirstName"
+                        placeholder="Enter first name"
+                        value={newDoctor.FirstName}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        required
+                      />
+                    </div>
+
+                    {/* Last Name */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 font-semibold text-gray-700">
+                        <User size={16} className="text-[#006369]" />
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        name="LastName"
+                        placeholder="Enter last name"
+                        value={newDoctor.LastName}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        required
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 font-semibold text-gray-700">
+                        <Mail size={16} className="text-[#006369]" />
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        name="Email"
+                        placeholder="Enter email address"
+                        value={newDoctor.Email}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        required
+                      />
+                    </div>
+
+                    {/* Contact Number */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 font-semibold text-gray-700">
+                        <Phone size={16} className="text-[#006369]" />
+                        Contact Number
+                      </label>
+                      <input
+                        type="text"
+                        name="ContactNumber"
+                        placeholder="Enter contact number"
+                        value={newDoctor.ContactNumber}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        required
+                      />
+                    </div>
+
+                    {/* NIC */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 font-semibold text-gray-700">
+                        <CreditCard size={16} className="text-[#006369]" />
+                        NIC Number
+                      </label>
+                      <input
+                        type="text"
+                        name="NIC"
+                        placeholder="Enter NIC number"
+                        value={newDoctor.NIC}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        required
+                      />
+                    </div>
 
                     {/* Gender Selection */}
                     <div className="space-y-2">
@@ -492,30 +543,56 @@ export default function DoctorConfirmForm({ requestId }) {
                     Professional Information
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <InputField
-                      label="Specialization"
-                      name="specialization"
-                      placeholder="Enter specialization"
-                      value={newDoctor.specialization}
-                      onChange={handleChange}
-                      icon={Award}
-                    />
-                    <InputField
-                      label="SLMC License Number"
-                      name="SlmcLicense"
-                      placeholder="Enter SLMC license number"
-                      value={newDoctor.SlmcLicense}
-                      onChange={handleChange}
-                      icon={FileText}
-                    />
-                    <InputField
-                      label="Consultation Fee (LKR)"
-                      name="Charge"
-                      placeholder="Enter consultation fee"
-                      value={newDoctor.Charge}
-                      onChange={handleChange}
-                      icon={DollarSign}
-                    />
+                    {/* Specialization */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 font-semibold text-gray-700">
+                        <Award size={16} className="text-[#006369]" />
+                        Specialization
+                      </label>
+                      <input
+                        type="text"
+                        name="specialization"
+                        placeholder="Enter specialization"
+                        value={newDoctor.specialization}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        required
+                      />
+                    </div>
+
+                    {/* SLMC License Number */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 font-semibold text-gray-700">
+                        <FileText size={16} className="text-[#006369]" />
+                        SLMC License Number
+                      </label>
+                      <input
+                        type="text"
+                        name="SlmcLicense"
+                        placeholder="Enter SLMC license number"
+                        value={newDoctor.SlmcLicense}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        required
+                      />
+                    </div>
+
+                    {/* Consultation Fee (LKR) */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 font-semibold text-gray-700">
+                        <DollarSign size={16} className="text-[#006369]" />
+                        Consultation Fee (LKR)
+                      </label>
+                      <input
+                        type="text"
+                        name="Charge"
+                        placeholder="Enter consultation fee"
+                        value={newDoctor.Charge}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
 
