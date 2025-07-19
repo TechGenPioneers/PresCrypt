@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 const ChatHeaderSkeleton = () => {
   return (
-    <div className="p-4 border-b border-gray-200 bg-white shadow-sm sticky top-0 z-50">
+    <div className="p-4 border-b border-[#09424D] bg-[#E9FAF2] shadow-sm sticky top-0 z-50">
       <div className="flex items-center justify-between animate-pulse">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-full bg-gray-300" />
