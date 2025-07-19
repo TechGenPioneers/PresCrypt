@@ -45,6 +45,7 @@ const getDateLabel = (date) => {
 };
 
 const ChatWindow = ({
+  users,
   selectedUser,
   setSelectedUser,
   userId,
@@ -54,17 +55,17 @@ const ChatWindow = ({
   videoCallConnection,
   setNewMessage,
   newMessage,
-  doctorName, // This is the full doctorName object { fullName: "...", firstName: null, lastName: null }
-  patientName, // This is the full patientName object { fullName: "...", firstName: null, lastName: null }
+  doctorName,
+  patientName,
 }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const messageEndRef = useRef(null);
   const menuRef = useRef(null);
-
-  // These correctly hold the full name objects
+  const messageContainerRef = useRef(null);
   const currentUserName = userRole === "Doctor" ? doctorName : patientName;
+
   const otherUserName = userRole === "Doctor" ? patientName : doctorName;
 
   const {
@@ -90,7 +91,7 @@ const ChatWindow = ({
       }
 
       // When initiating, otherUserName is correctly passed (e.g., patientName object if doctor is calling)
-      startCall(response.roomUrl, otherUserName);
+      startCall(response.roomUrl, currentUserName, otherUserName);
     } catch (error) {
       alert(`Could not start call: ${error.message}`);
     }
@@ -99,21 +100,29 @@ const ChatWindow = ({
   // FIX STARTS HERE
   const handleCallAccepted = useCallback(
     ({ roomUrl }) => {
-      console.log("Call accepted, starting call with URL:", roomUrl);
+      // Ensure we have the correct selectedUser for the call
+      if (callerInfo?.callerId !== selectedUser?.receiverId) {
+        const callerUser = users.find(
+          (user) => user.receiverId === callerInfo?.callerId
+        );
+        if (callerUser) {
+          setSelectedUser(callerUser);
+        }
+      }
 
-      // Use the 'otherUserName' derived from ChatWindow's props.
-      // This 'otherUserName' will be the doctor's name object when the userRole is Patient.
-      startCall(roomUrl, otherUserName);
+      startCall(roomUrl, currentUserName, otherUserName);
       setCallStatus("active");
-
-      // Force state update if necessary (though React's state updates should handle this)
-      setTimeout(() => {
-        setSelectedUser((prev) => ({ ...prev }));
-      }, 100);
     },
-    [startCall, setCallStatus, setSelectedUser, otherUserName] // Add otherUserName to dependencies
+    [
+      startCall,
+      setCallStatus,
+      currentUserName,
+      otherUserName,
+      callerInfo,
+      selectedUser,
+      users,
+    ]
   );
-  // FIX ENDS HERE
 
   const handleEndCall = () => {
     endCall();
@@ -206,8 +215,9 @@ const ChatWindow = ({
   }, [connection]);
 
   useEffect(() => {
-    const container = messageEndRef.current;
+    const container = messageContainerRef.current;
     if (!container) return;
+
     const isNearBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight <
       50;
@@ -268,7 +278,7 @@ const ChatWindow = ({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
+    <div ref={messageContainerRef} className="flex flex-col flex-1 min-h-0">
       <ChatHeader
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
@@ -291,9 +301,8 @@ const ChatWindow = ({
         <VideoCallRoom
           roomUrl={activeCall.roomUrl}
           onLeave={handleEndCall}
-          userName={currentUserName}
-          // The critical prop: Pass the full name object derived from ChatWindow's scope
-          otherUserName={activeCall.otherUserName}
+          userName={activeCall.currentUserName || currentUserName}
+          otherUserName={activeCall.otherUserName || otherUserName}
           userRole={userRole}
         />
       ) : (
@@ -412,6 +421,7 @@ const ChatWindow = ({
                 );
               });
             })()}
+            
           </div>
 
           <MessageInput

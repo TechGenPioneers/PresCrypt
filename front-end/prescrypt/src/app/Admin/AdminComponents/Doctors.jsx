@@ -15,6 +15,7 @@ const Doctors = () => {
     const loadData = async () => {
       const doctorDetails = await GetDoctors();
       setDoctorData(doctorDetails); // Set doctor data as an array
+      setLoading(false);
       const updateDateTime = () => setDateTime(new Date());
       updateDateTime(); // Set initial time
       const interval = setInterval(updateDateTime, 1000);
