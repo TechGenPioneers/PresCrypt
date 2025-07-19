@@ -869,8 +869,7 @@ export default function DoctorConfirmForm({ requestId }) {
                         Registration Successful!
                       </h1>
                       <p className="text-emerald-600 text-xl font-semibold mb-8">
-                        Dr. {newDoctor.FirstName} {newDoctor.LastName} has been
-                        successfully registered.
+                        Doctor has been successfully registered.
                       </p>
                       <Link href={"/Admin/AdminDoctor"}>
                         <button className="inline-flex items-center px-6 py-3  bg-[#A9C9CD] text-[#09424D] font-semibold rounded-xl hover:bg-[#91B4B8]  transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">

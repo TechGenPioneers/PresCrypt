@@ -104,7 +104,7 @@ const Patients = () => {
 
         {/* Status Dropdown */}
         <div className="ml-5 w-full md:w-1/3 flex items-center gap-4">
-          {["All", "Active", "Inactive"].map((status) => (
+          {["All", "Active", "InActive"].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
