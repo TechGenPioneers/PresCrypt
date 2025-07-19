@@ -308,7 +308,7 @@ const ChatWindow = ({
         />
       ) : (
         <>
-          <div className="flex-1 p-4 space-y-4 overflow-y-auto flex flex-col">
+          <div className="flex-1 bg-[#f3faf7] p-4 space-y-4 overflow-y-auto flex flex-col">
             {messages.length === 0 && (
               <p className="text-center text-zinc-400 italic mt-10">
                 No messages yet. Start the conversation!

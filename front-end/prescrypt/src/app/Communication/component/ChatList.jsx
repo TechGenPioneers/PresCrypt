@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import ChatListSkeleton from "./skeletons/ChatListSkeleton";
 import { GetAllMessages } from "../service/ChatService";
-import { Clock, Check, Image } from "lucide-react";
+import { Clock, Check, Image, MessageCircle } from "lucide-react";
 
 const formatMessageTime = (date) => {
   const msgDate = new Date(date);
@@ -185,19 +185,17 @@ const ChatList = ({
   if (isUsersLoading) return <ChatListSkeleton />;
 
   return (
-    <aside className="flex flex-col w-full transition-all duration-200">
-      {/* Sticky Header */}
-      <div className="w-full p-5 border-b border-base-300 bg-white sticky top-0 z-10">
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-2xl">TeleHealth</span>
+    <aside className="flex flex-col w-full min-h-screen transition-all duration-300 bg-base-100 border-r border-[#09424D]">
+      <div className="w-full p-5 border-b border-[#09424D] bg-[#E9FAF2] sticky top-0 z-10">
+        <div className="flex items-center justify-between">
+          <span className="text-2xl font-bold text-[#09424D]">TeleHealth</span>
         </div>
 
-        <div className="w-full mt-3">
+        <div className="mt-3">
           <input
             type="text"
             placeholder="Search contacts..."
-            className="w-full max-w-5xl p-2 bg-white border border-gray-300 rounded-md
-            focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-1.5"
+            className="w-full p-2 px-3 text-sm border rounded-md focus:ring-2 focus:ring-emerald-200 focus:outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -205,7 +203,7 @@ const ChatList = ({
       </div>
 
       {/* Scrollable User List */}
-      <div className="w-full py-3 h-screen overflow-auto scroll-smooth">
+      <div className="h-screen overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-300 scrollbar-track-transparent py-3 px-1">
         {filteredUsers.map((user) => {
           const unread = unreadCounts[user.receiverId] || 0;
 
@@ -213,66 +211,50 @@ const ChatList = ({
             <button
               key={user.receiverId}
               onClick={() => setSelectedUser(user)}
-              className={`w-full p-3 flex items-center gap-3 rounded-lg transition-colors duration-200 cursor-pointer select-none
-              ${
-                selectedUser && selectedUser.receiverId === user.receiverId
-                  ? "bg-[#E9FAF2] text-gray-600 shadow-md"
-                  : "bg-transparent text-gray-900 hover:bg-[#E9FAF2]/50"
+              className={`w-full flex items-center p-3 my-1 rounded-xl transition-all border hover:border-emerald-400 ${
+                selectedUser?.receiverId === user.receiverId
+                  ? "bg-[#E9FAF2] border-emerald-400 shadow-sm"
+                  : "border-emerald-200/50 hover:bg-emerald-50/40"
               }`}
             >
               {/* Avatar */}
-              <div className="relative">
-                <div className="avatar">
-                  <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-emerald-200">
-                    <img
-                      src={
-                        `data:image/jpeg;base64,${user.profileImage}` ||
-                        "/profile.png"
-                      }
-                      alt={user.fullName}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
+              <div className="relative shrink-0 mr-3">
+                <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-emerald-200">
+                  <img
+                    src={
+                      user.profileImage
+                        ? `data:image/jpeg;base64,${user.profileImage}`
+                        : "/profile.png"
+                    }
+                    alt={user.fullName}
+                    className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+                  />
                 </div>
               </div>
 
               {/* User Info */}
-              <div className="flex flex-col justify-between w-full text-left relative">
-                <div className="flex justify-between items-center">
-                  <div className="font-medium truncate" title={user.fullName}>
+              <div className="flex flex-col w-full">
+                <div className="flex justify-between items-center mb-0.5">
+                  <div className="font-medium truncate text-gray-900">
                     {user.fullName}
                   </div>
-                  <div className="flex flex-col items-end gap-0 ml-2">
-                    <div className="flex items-center justify-end gap-1 mt-1">
-                      <time className="text-xs text-right opacity-50">
-                        {formatMessageTime(user.sendAt)}
-                      </time>
-                      {user.lastMessageSenderId === userId &&
-                        (!user.isReceived ? ( // not received yet
-                          <span className="text-gray-500 text-xs">
-                            <Clock className="w-3 h-3" />
-                          </span>
-                        ) : user.isRead ? ( // received and read
-                          <span className="flex items-center gap-[1px] text-blue-500 text-xs">
-                            <Check className="w-3 h-3" />
-                            <Check className="w-3 h-3 -ml-1.5" />
-                          </span>
-                        ) : (
-                          // received but not read yet
-                          <span className="flex items-center gap-[1px] text-gray-500 text-xs">
-                            <Check className="w-3 h-3" />
-                          </span>
-                        ))}
-                    </div>
-                    {unread > 0 && (
-                      <span className="bg-emerald-500 text-white text-xs font-semibold px-2 py-0.5  rounded-full mt-0.5">
-                        {unread}
-                      </span>
-                    )}
+                  <div className="flex items-center gap-1 text-xs text-gray-400">
+                    <time>{formatMessageTime(user.sendAt)}</time>
+                    {user.lastMessageSenderId === userId &&
+                      (!user.isReceived ? (
+                        <Clock className="w-3 h-3" />
+                      ) : user.isRead ? (
+                        <span className="flex gap-[1px] text-blue-500">
+                          <Check className="w-3 h-3" />
+                          <Check className="w-3 h-3 -ml-1.5" />
+                        </span>
+                      ) : (
+                        <Check className="w-3 h-3 text-gray-400" />
+                      ))}
                   </div>
                 </div>
 
-                <div className="space-y-0.5">
+                <div className="flex flex-col gap-0.5">
                   {user.image && (
                     <div
                       className={`flex items-center gap-1 text-sm truncate ${
@@ -303,13 +285,25 @@ const ChatList = ({
                     </div>
                   )}
                 </div>
+
+                {unread > 0 && (
+                  <span className="mt-1 self-start text-xs font-semibold text-white bg-emerald-500 px-2 py-0.5 rounded-full">
+                    {unread}
+                  </span>
+                )}
               </div>
             </button>
           );
         })}
 
         {filteredUsers.length === 0 && (
-          <div className="py-4 text-center text-zinc-500">No users found</div>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <MessageCircle className="w-12 h-12 text-gray-300 mb-4" />
+            <p className="text-gray-500 font-medium">No Chat found</p>
+            <p className="text-gray-400 text-sm">
+              Try adjusting your search terms
+            </p>
+          </div>
         )}
       </div>
     </aside>
