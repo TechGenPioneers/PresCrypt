@@ -341,7 +341,10 @@ const ChatWindow = ({
                         <div className="avatar mr-2">
                           <div className="w-10 h-10 rounded-full border border-emerald-600 overflow-hidden">
                             <img
-                              src={selectedUser.image || "/profile.png"}
+                              src={
+                                `data:image/jpeg;base64,${selectedUser.profileImage}` ||
+                                "/profile.png"
+                              }
                               alt="user"
                               className="object-cover w-full h-full"
                             />
@@ -421,7 +424,6 @@ const ChatWindow = ({
                 );
               });
             })()}
-            
           </div>
 
           <MessageInput
