@@ -1,13 +1,15 @@
 "use client";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useVideoCall } from "../VideoCallProvider";
 import * as signalR from "@microsoft/signalr";
 
 const useIncomingCallHandler = ({
-  users, // We'll now use this to find the caller's chat object
+  users, // Array of all available users/chats
   userId,
   userRole,
-  setSelectedUser, // This is crucial for opening the chat
+  doctorName,
+  patientName,
+  setSelectedUser, // Function to set the active chat
   videoCallConnection,
 }) => {
   const {
@@ -26,6 +28,22 @@ const useIncomingCallHandler = ({
 
     const handleCallReceived = (data) => {
       console.log("📞 Incoming call received:", data);
+
+      const callerUser = users.find(
+        (user) => user.receiverId === data.doctorId
+      );
+
+      if (callerUser) {
+        console.log(
+          "🔁 Switching chat to:",
+          callerUser.fullName || data.doctorName
+        );
+        setSelectedUser(callerUser);
+      } else {
+        console.warn("⚠️ Caller not found in user list");
+      }
+
+      // Set video call details
       setCallerInfo({
         callerId: data.doctorId,
         callerName: data.doctorName,
@@ -35,11 +53,21 @@ const useIncomingCallHandler = ({
       setIncomingCall(true);
       setCallStatus("incoming");
     };
-
+    const handleCallRejected = (data) => {
+      console.log("Call was rejected by the other party:", data);
+      resetCallState();
+      window.dispatchEvent(
+        new CustomEvent("callRejected", {
+          detail: { rejectedBy: data.rejectedBy },
+        })
+      );
+    };
     videoCallConnection.on("CallReceived", handleCallReceived);
+    videoCallConnection.on("CallRejected", handleCallRejected);
 
     return () => {
       videoCallConnection.off("CallReceived", handleCallReceived);
+      videoCallConnection.off("CallRejected", handleCallRejected);
     };
   }, [
     videoCallConnection,
@@ -47,52 +75,54 @@ const useIncomingCallHandler = ({
     setRoomUrl,
     setIncomingCall,
     setCallStatus,
+    users,
+    setSelectedUser,
   ]);
+
+  const acceptCall = async (roomUrl, doctorId, patientId) => {
+    if (
+      !videoCallConnection ||
+      videoCallConnection.state !== signalR.HubConnectionState.Connected
+    ) {
+      throw new Error("Video call connection is not ready");
+    }
+
+    await videoCallConnection
+      .invoke("AcceptCall", doctorId, patientId, roomUrl)
+      .then(() => {
+        console.log("✅ Call accepted successfully");
+      })
+      .catch((error) => {
+        console.error("❌ Failed to accept the call:", error);
+      });
+  };
 
   const handleAcceptCall = async () => {
     try {
-      if (!callerInfo || !videoCallConnection || !callerInfo.roomUrl) {
-        console.error("Missing callerInfo or videoCallConnection or roomUrl");
-        setCallError("Call information is incomplete.");
+      if (!callerInfo || !callerInfo.roomUrl || !callerInfo.callerName) {
+        console.warn("Caller info incomplete", callerInfo);
         return;
       }
 
-      if (videoCallConnection.state !== signalR.HubConnectionState.Connected) {
-        await videoCallConnection.start();
-      }
+      const { roomUrl, callerId: otherUserId } = callerInfo;
 
-      await videoCallConnection.invoke(
-        "AcceptCall",
-        callerInfo.callerId,
-        userId,
-        callerInfo.roomUrl
-      );
+      // Determine roles
+      const doctorId = userRole === "Doctor" ? userId : otherUserId;
+      const patientId = userRole === "Patient" ? userId : otherUserId;
 
-      console.log("Call accepted, joining room:", callerInfo.roomUrl);
+      console.log("Accepting call with:", roomUrl, callerInfo.callerName);
 
-      // --- NEW LOGIC HERE ---
-      // Find the user object for the caller from the 'users' list
-      const callerChatUser = users.find(
-        (user) => user.receiverId === callerInfo.callerId
-      );
+      await acceptCall(roomUrl, doctorId, patientId);
 
-      if (callerChatUser) {
-        // Automatically set the selectedUser to the caller
-        setSelectedUser(callerChatUser);
-        console.log("Automatically opened chat for:", callerChatUser.fullName);
-      } else {
-        console.warn(
-          "Caller chat user not found in the list. Cannot open chat automatically."
-        );
-      }
-      // --- END NEW LOGIC ---
+      const currentUser = userRole === "Doctor" ? doctorName : patientName;
+      const otherUser = userRole === "Doctor" ? patientName : doctorName;
 
-      startCall(callerInfo.roomUrl, callerInfo.callerName);
-      setCallStatus("active");
-      setIncomingCall(false); // Hide the incoming call modal after accepting
+      startCall(roomUrl, currentUser, otherUser);
+
+      setIncomingCall(false);
+      setCallStatus("in-call");
     } catch (error) {
-      console.error("Failed to accept call:", error);
-      setCallError("Unable to accept the call: " + error.message);
+      console.error("❌ Failed to accept the call:", error);
     }
   };
 
