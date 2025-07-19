@@ -10,6 +10,9 @@ import DatePickerInput from "../components/DatePickerInput";
 import FormSelect from "../components/FormSelect";
 import SubmitButton from "../components/SubmitButton";
 import FormTextarea from "../components/FormTextArea";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+
 export default function PatientRegistration() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -33,6 +36,16 @@ export default function PatientRegistration() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: "" });
+  };
+  const Alert = (props) => {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  };
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // "error", "info", etc.
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
   };
 
   const handleDateChange = (date) => {
@@ -100,8 +113,13 @@ export default function PatientRegistration() {
       const data = await response.text();
       if (!response.ok) throw new Error(data);
 
-      alert("Registration Successful!");
-      router.push("../Patient/PatientDashboard");
+      setSnackbarMessage("🎉 Registration Successful!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+
+      setTimeout(() => {
+        router.push("../Patient/PatientDashboard");
+      }, 2000); // Give user time to see the toast
     } catch (err) {
       setErrors({ general: err.message });
     } finally {
@@ -153,7 +171,7 @@ export default function PatientRegistration() {
         onChange={handleChange}
         error={errors.contactNumber}
       />
-     
+
       <DatePickerInput
         selected={formData.dob}
         onChange={(date) => {
