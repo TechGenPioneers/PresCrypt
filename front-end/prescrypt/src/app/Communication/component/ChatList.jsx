@@ -140,15 +140,14 @@ const ChatList = ({
         await connection.invoke("JoinGroup", userId);
 
         // Remove any existing handler and register the correct one
+        console.log("setNewMessage:", setNewMessage);
         connection.off("ReceiveMessage");
         connection.on("ReceiveMessage", (msg) => {
-          if (selectedUser) {
-            if (msg.senderId === selectedUser.receiverId) {
-              if (newMessage === null || newMessage.length === 0) {
-                setNewMessage([msg]);
-              } else {
-                setNewMessage((prev) => [...prev, msg]);
-              }
+          if (selectedUser && msg.senderId === selectedUser.receiverId) {
+            if (!Array.isArray(newMessage) || newMessage.length === 0) {
+              setNewMessage([msg]);
+            } else {
+              setNewMessage((prev) => [...prev, msg]);
             }
           }
           fetchUsers();
