@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Footer from "../../Components/footer/Footer";
+//import Footer from "../../Components/footer/Footer";
 export default function MainLayout({ children }) {
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -9,7 +9,7 @@ export default function MainLayout({ children }) {
           {children}
         </div>
       </main>
-      <Footer />
+     
     </div>
   );
 }

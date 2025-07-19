@@ -10,15 +10,11 @@ import RoleSelection from "./Components/MainPage/RoleSelection";
 export default function MainPage() {
 
   return (
-//      <div className="relative min-h-screen overflow-hidden">
-//       <VantaWavesBackground />
-// <div className="relative z-10">
         <MainLayout>
           <Header />
           <HeroSection />
           <RoleSelection />
         </MainLayout>
-    //   </div>
-    // </div>
+   
   );
 }
