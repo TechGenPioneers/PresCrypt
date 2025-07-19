@@ -1,4 +1,3 @@
-// app/Auth/PatientRegistration/page.jsx
 "use client";
 
 import { useState } from "react";
@@ -29,6 +28,10 @@ export default function PatientRegistration() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
   const passwordPattern =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
 
@@ -37,14 +40,15 @@ export default function PatientRegistration() {
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: "" });
   };
+
   const Alert = (props) => {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   };
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // "error", "info", etc.
 
-  const handleCloseSnackbar = () => {
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
     setSnackbarOpen(false);
   };
 
@@ -86,7 +90,12 @@ export default function PatientRegistration() {
   };
 
   const handleRegister = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      setSnackbarMessage("Please fix the form errors before submitting.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
 
     setLoading(true);
 
@@ -111,17 +120,19 @@ export default function PatientRegistration() {
       );
 
       const data = await response.text();
-      if (!response.ok) throw new Error(data);
+      if (!response.ok) throw new Error(data || "Registration failed.");
 
-      setSnackbarMessage("🎉 Registration Successful!");
+      setSnackbarMessage(" Registration Successful! Redirecting...");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
 
       setTimeout(() => {
         router.push("../Patient/PatientDashboard");
-      }, 2000); // Give user time to see the toast
+      }, 2000);
     } catch (err) {
-      setErrors({ general: err.message });
+      setSnackbarMessage(err.message || "An error occurred during registration.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
@@ -171,13 +182,9 @@ export default function PatientRegistration() {
         onChange={handleChange}
         error={errors.contactNumber}
       />
-
       <DatePickerInput
         selected={formData.dob}
-        onChange={(date) => {
-          setFormData({ ...formData, dob: date });
-          setErrors({ ...errors, dob: "" });
-        }}
+        onChange={handleDateChange}
         error={errors.dob}
       />
       <FormTextarea
@@ -209,7 +216,7 @@ export default function PatientRegistration() {
         loading={loading}
         disabled={loading}
         text="Create Account"
-        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg"
+        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
       >
         {loading ? "Registering..." : "Create Account"}
       </SubmitButton>
@@ -222,6 +229,21 @@ export default function PatientRegistration() {
           Log in here
         </a>
       </p>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        className="mt-4"
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          className={`w-full max-w-md ${snackbarSeverity === "success" ? "bg-teal-600" : "bg-red-600"} text-white font-medium rounded-lg shadow-lg`}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </RegistrationLayout>
   );
 }
