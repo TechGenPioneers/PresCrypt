@@ -5,7 +5,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import SpecializationDialog from "./specializationBox";
 import LocationDialog from "./locationSelectBox";
 import DoctorNameDialog from "./doctorNameDialog";
-
+import AlertBoxDialog from "./alertDialogBox";
 import { findDoctors } from "../services/AppointmentsFindingService";
 
 const SearchBar = ({ setDoctors }) => {
@@ -19,6 +19,8 @@ const SearchBar = ({ setDoctors }) => {
 
   const [loading, setLoading] = useState(false);
   const [showNameInput, setShowNameInput] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const isNameSearchActive = selectedName.trim().length > 0;
   const isCategorySearchActive =
@@ -26,7 +28,8 @@ const SearchBar = ({ setDoctors }) => {
 
   const handleFindDoctor = async () => {
     if (!selectedName && (!selectedSpecialization || !selectedLocation)) {
-      alert("Please select either a doctor name or both specialization and location.");
+      setAlertMessage("Please select a specialization and location or a doctor to make an appointment.");
+      setAlertOpen(true);
       return;
     }
 
@@ -42,7 +45,8 @@ const SearchBar = ({ setDoctors }) => {
       console.log("Doctors found:", doctorsData);
     } catch (error) {
       console.error("Error fetching doctors:", error);
-      alert("Failed to fetch doctor details. Please try again.");
+      setAlertMessage("Failed to fetch doctor details. Please try again.");
+      setAlertOpen(true);
     } finally {
       setLoading(false);
     }
@@ -107,34 +111,36 @@ const SearchBar = ({ setDoctors }) => {
             </span>
           </button>
 
-          {/* Doctor Name selection via dialog */}
-          {showNameInput && (
-            <button
-              className={`w-full p-4 text-md border rounded-md text-gray-700 shadow-sm text-left ${
-                isCategorySearchActive
-                  ? "bg-gray-200 border-gray-300 cursor-not-allowed"
-                  : "bg-white border-green-700"
-              }`}
-              onClick={() => !isCategorySearchActive && setDoctorNameOpen(true)}
-              disabled={isCategorySearchActive}
-            >
-              <span className="text-gray-400 text-sm">Doctor Name</span>
-              <br />
-              <span className="font-medium text-green-700 flex items-center justify-between">
-                {selectedName || "Select Doctor Name"}
-                {selectedName && !isCategorySearchActive && (
-                  <CloseIcon
-                    fontSize="small"
-                    className="cursor-pointer ml-2 text-gray-400 hover:text-gray-700"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedName("");
-                    }}
-                  />
-                )}
-              </span>
-            </button>
-          )}
+          {/* Doctor Name selection via dialog with smooth transition */}
+          <Fade in={showNameInput} timeout={400}>
+            <div>
+              <button
+                className={`w-full p-4 text-md border rounded-md text-gray-700 shadow-sm text-left ${
+                  isCategorySearchActive
+                    ? "bg-gray-200 border-gray-300 cursor-not-allowed"
+                    : "bg-white border-green-700"
+                }`}
+                onClick={() => !isCategorySearchActive && setDoctorNameOpen(true)}
+                disabled={isCategorySearchActive}
+              >
+                <span className="text-gray-400 text-sm">Doctor Name</span>
+                <br />
+                <span className="font-medium text-green-700 flex items-center justify-between">
+                  {selectedName || "Select Doctor Name"}
+                  {selectedName && !isCategorySearchActive && (
+                    <CloseIcon
+                      fontSize="small"
+                      className="cursor-pointer ml-2 text-gray-400 hover:text-gray-700"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedName("");
+                      }}
+                    />
+                  )}
+                </span>
+              </button>
+            </div>
+          </Fade>
         </div>
 
         {/* Right column */}
@@ -165,33 +171,33 @@ const SearchBar = ({ setDoctors }) => {
               )}
             </span>
           </button>
+
+          {/* Buttons positioned below location */}
+          <div className="flex gap-4 justify-end">
+            <button
+              className="px-6 py-3 border border-gray-300 rounded-md text-white bg-red-600 hover:bg-gray-500 shadow-sm"
+              onClick={() => setShowNameInput(!showNameInput)}
+            >
+              More Options
+            </button>
+
+            <button
+              className="px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center relative min-w-[160px]"
+              onClick={handleFindDoctor}
+              disabled={loading}
+            >
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  thickness={4}
+                  color="inherit"
+                  className="absolute left-4"
+                />
+              )}
+              Find My Doctor
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* Buttons */}
-      <div className="flex gap-4 mt-6 justify-end">
-        <button
-          className="px-6 py-3 border border-gray-300 rounded-md text-white bg-red-600 hover:bg-gray-500 shadow-sm"
-          onClick={() => setShowNameInput(!showNameInput)}
-        >
-          More Options
-        </button>
-
-        <button
-          className="px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center relative min-w-[160px]"
-          onClick={handleFindDoctor}
-          disabled={loading}
-        >
-          {loading && (
-            <CircularProgress
-              size={24}
-              thickness={4}
-              color="inherit"
-              className="absolute left-4"
-            />
-          )}
-          Find Doctor
-        </button>
       </div>
 
       {/* Dialogs */}
@@ -223,6 +229,11 @@ const SearchBar = ({ setDoctors }) => {
         TransitionComponent={Fade}
         transitionDuration={300}
       />
+      <AlertBoxDialog
+        open={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        message={alertMessage}
+       />
     </div>
   );
 };

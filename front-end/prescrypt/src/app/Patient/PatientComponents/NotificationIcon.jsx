@@ -20,16 +20,21 @@ import {
   markAsRead,
   respondToRequest,
 } from "../services/PatientHeaderService";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 export default function NotificationIcon({ patientId }) {
   const [connection, setConnection] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState(false);
-  const [responded, setResponded] = useState(false);
+  const [responded, setResponded] = useState("");
   const [selectedNotification, setSelectedNotification] = useState(null);
-  const [responseMessage, setResponseMessage] = useState("");
+  const [responseMessage, setResponseMessage] = useState(false);
   const [snackOpen, setSnackOpen] = useState(false);
+  const [alreadyRespondedSnackbarOpen, setAlreadyRespondedSnackbarOpen] =
+    useState(false);
+
   const open = Boolean(anchorEl);
 
   useEffect(() => {
@@ -92,7 +97,11 @@ export default function NotificationIcon({ patientId }) {
     try {
       await markAsRead(id);
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+        prev.map((n) =>
+          n.id === selectedNotification.id
+            ? { ...n, isRead: true, responseSent: true, accepted: accepted }
+            : n
+        )
       );
     } catch (err) {
       console.error("Failed to mark notification as read", err);
@@ -108,8 +117,6 @@ export default function NotificationIcon({ patientId }) {
     if (!selectedNotification) return;
 
     try {
-      setResponded(true);
-
       const patientId = localStorage.getItem("patientId");
 
       if (!patientId) {
@@ -124,25 +131,18 @@ export default function NotificationIcon({ patientId }) {
         accepted: accepted,
       });
 
+      
+      setResponded(true); // Mark as responded
       setNotifications((prev) =>
         prev.map((n) =>
           n.id === selectedNotification.id ? { ...n, isRead: true } : n
         )
       );
-
-      setConfirmDialog(false);
-      setSelectedNotification(null);
-      setResponseMessage(
-        accepted
-          ? "Your response has been sent to the doctor."
-          : "You have rejected the request from the doctor."
-      );
-      alert(
-        `You have ${accepted ? "granted" : "denied"} access.`
-      );
     } catch (error) {
       console.error("Error responding to access request:", error);
-      setResponded(false);
+      setAlreadyRespondedSnackbarOpen(true);
+
+      setResponded(false); // Reset state on error
     }
   };
 
@@ -246,7 +246,8 @@ export default function NotificationIcon({ patientId }) {
         open={confirmDialog}
         onClose={() => setConfirmDialog(false)}
         PaperProps={{
-          className: "rounded-xl p-6 bg-gradient-to-br from-green-50 to-white shadow-2xl w-[90%] max-w-md mx-auto transform scale-100 hover:scale-105 transition duration-300",
+          className:
+            "rounded-xl p-6 bg-gradient-to-br from-green-50 to-white shadow-2xl w-[90%] max-w-md mx-auto transform scale-100 hover:scale-105 transition duration-300",
         }}
       >
         <DialogTitle className="text-2xl font-bold text-center text-green-800 bg-gradient-to-r from-green-100 to-white p-4 rounded-t-xl">
@@ -258,33 +259,60 @@ export default function NotificationIcon({ patientId }) {
             sx={{ fontSize: 100, color: "#4CAF50" }}
             className="mb-4 animate-pulse"
           />
-          <p className="text-lg">A Doctor is requesting to access your medical health data.</p>
-          <p className="text-lg font-medium text-blue-600 mt-2">Are you sure you want to allow?</p>
+          <p className="text-lg">
+            A Doctor is requesting to access your medical health data.
+          </p>
+          <p className="text-lg font-medium text-blue-600 mt-2">
+            Are you sure you want to allow?
+          </p>
           {responseMessage && (
             <p className="mt-4 text-sm text-gray-600">{responseMessage}</p>
           )}
         </DialogContent>
 
-        <DialogActions className="flex justify-center space-x-6 px-4 pb-6">
-          <Button
-            disabled={responded}
-            onClick={() => handleResponse(false)}
-            className={`px-6 py-3 rounded-lg font-semibold bg-red-500 hover:bg-red-600 text-white transition duration-300 transform hover:scale-105 ${
-              responded ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            No, Deny
-          </Button>
-          <Button
-            disabled={responded}
-            onClick={() => handleResponse(true)}
-            className={`px-6 py-3 rounded-lg font-semibold bg-green-500 hover:bg-green-600 text-white transition duration-300 transform hover:scale-105 ${
-              responded ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            Yes, I’m OK
-          </Button>
+        <DialogActions className="flex flex-col items-center space-y-4 px-4 pb-6">
+          {!responded ? (
+            <div className="flex space-x-6">
+              <Button
+                disabled={responded}
+                onClick={() => handleResponse(false)}
+                className={`px-6 py-3 rounded-lg font-semibold bg-red-500 hover:bg-red-600 text-white transition duration-300 transform hover:scale-105 ${
+                  responded ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                No, Deny
+              </Button>
+              <Button
+                disabled={responded}
+                onClick={() => handleResponse(true)}
+                className={`px-6 py-3 rounded-lg font-semibold bg-green-500 hover:bg-green-600 text-white transition duration-300 transform hover:scale-105 ${
+                  responded ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                Yes, I’m OK
+              </Button>
+            </div>
+          ) : (
+            <p className="text-green-600 font-semibold text-lg">
+              ✅ Your response has been sent.
+            </p>
+          )}
         </DialogActions>
+        <Snackbar
+          open={alreadyRespondedSnackbarOpen}
+          autoHideDuration={4000}
+          onClose={() => setAlreadyRespondedSnackbarOpen(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <MuiAlert
+            onClose={() => setAlreadyRespondedSnackbarOpen(false)}
+            severity="info"
+            elevation={6}
+            variant="filled"
+          >
+            You have already sent a response to this request.
+          </MuiAlert>
+        </Snackbar>
       </Dialog>
     </>
   );

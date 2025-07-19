@@ -22,6 +22,7 @@ const DoctorRequest = () => {
     const fetchDoctorRequests = async () => {
       const getDoctorRequest = await GetDoctorRequest();
       setRequests(getDoctorRequest);
+      setLoading(false);
       console.log("Requests:", getDoctorRequest);
     };
     fetchDoctorRequests();

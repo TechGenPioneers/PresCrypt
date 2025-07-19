@@ -5,6 +5,20 @@ import { useRouter } from "next/navigation";
 import { AddNewDoctor, GetHospitals } from "../service/AdminDoctorService";
 import { GetRequestById } from "../service/AdminDoctorRequestService";
 import { Spinner } from "@material-tailwind/react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+  Mail,
+  Phone,
+  FileText,
+  DollarSign,
+  Award,
+  CreditCard,
+  Check,
+  ArrowLeft,
+} from "lucide-react";
 
 export default function DoctorConfirmForm({ requestId }) {
   const [schedule, setSchedule] = useState([]);
@@ -42,9 +56,8 @@ export default function DoctorConfirmForm({ requestId }) {
   const [dateTime, setDateTime] = useState(null);
 
   //set error message
-  const [errorMessage, setErrorMessage] = useState(" ");
-  const [successMessage, setSuccessMessage] = useState(" ");
-  const [timeErrorMessage, setTimeErrorMessage] = useState(" ");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [timeErrorMessage, setTimeErrorMessage] = useState("");
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -95,6 +108,16 @@ export default function DoctorConfirmForm({ requestId }) {
       // Check if start time is before end time
       if (newSchedule.some((item) => item.startTime >= item.endTime)) {
         setTimeErrorMessage("Start time must be before end time.");
+        return;
+      }
+
+      if (newSchedule.some((item) => item.HospitalName === "")) {
+        setTimeErrorMessage("Please select a hospital.");
+        return;
+      }
+
+      if (newSchedule.some((item) => item.day === "")) {
+        setTimeErrorMessage("Please select at least one day.");
         return;
       }
 
@@ -206,7 +229,6 @@ export default function DoctorConfirmForm({ requestId }) {
           Charge: 0.0,
         });
         setIsSubmitted(true);
-        setSuccessMessage("Doctor Added Successfully!");
         setSchedule([]); // Reset schedule
         setErrorMessage(""); // Clear any error message
         setIsLoading(false);
@@ -284,8 +306,30 @@ export default function DoctorConfirmForm({ requestId }) {
   }, [request]); //  This effect only runs when request changes
 
   // set date and time
-  if (!dateTime) return null;
-
+  if (!dateTime) {
+    return (
+      <div className="flex items-center justify-center h-[400px]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
+          <p className="text-slate-600 text-lg font-medium">
+            Loading...
+          </p>
+        </div>
+      </div>
+    );
+  }
+  if (!newDoctor) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
+          <p className="text-slate-600 text-lg font-medium">
+            Loading...
+          </p>
+        </div>
+      </div>
+    );
+  }
   // Date Formatting
   const formattedDate = dateTime.toLocaleDateString("en-GB", {
     weekday: "long",
@@ -294,371 +338,477 @@ export default function DoctorConfirmForm({ requestId }) {
     year: "numeric",
   });
 
+  const InputField = ({
+    label,
+    name,
+    type = "text",
+    placeholder,
+    value,
+    onChange,
+    required = true,
+    icon: Icon,
+  }) => (
+    <div className="space-y-2">
+      <label className="flex items-center gap-2 font-semibold text-gray-700">
+        {Icon && <Icon size={16} className="text-[#006369]" />}
+        {label}
+      </label>
+      <input
+        type={type}
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className="w-full p-3 bg-white border border-gray-200 rounded-xl
+          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent
+          transition-all duration-200 hover:border-gray-300"
+        required={required}
+      />
+    </div>
+  );
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md border-t-[15px] border-l-[15px] border-r-[15px] border-b-0  border-[#E9FAF2]">
-      {/* Title */}
-      <h1 className="text-2xl font-bold mb-2">
-        Doctor Registration Form - {newDoctor.FirstName} {newDoctor.LastName}
-      </h1>
-      <p className="text-[#09424D] text-sm">{formattedDate}</p>
-      {!isSubmitted ? (
-        <div className="mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-[100%]">
-          <form onSubmit={handleSubmit}>
-            {/* Text Inputs */}
-            <div className="grid grid-cols-2 gap-10">
-              <div>
-                <label className="block font-semibold mb-2 mt-5">
-                  First Name:
-                </label>
-                <input
-                  type="text"
-                  name="FirstName"
-                  placeholder="First Name"
-                  value={newDoctor.FirstName}
-                  onChange={handleChange}
-                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-1.5"
-                  required
-                />
-                <label className="block font-semibold mb-2 mt-3">
-                  Last Name:
-                </label>
-                <input
-                  type="text"
-                  name="LastName"
-                  placeholder="Last Name"
-                  value={newDoctor.LastName}
-                  onChange={handleChange}
-                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
-                  required
-                />
-                <label className="block font-semibold mb-2 mt-3">
-                  Specialization:
-                </label>
-                <input
-                  type="text"
-                  name="specialization"
-                  placeholder="Specialization"
-                  value={newDoctor.specialization}
-                  onChange={handleChange}
-                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
-                  required
-                />
-                <label className="block font-semibold mb-2 mt-3">
-                  SLMC License:
-                </label>
-                <input
-                  type="text"
-                  name="SlmcLicense"
-                  placeholder="SLMC License Number"
-                  value={newDoctor.SlmcLicense}
-                  onChange={handleChange}
-                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
-                  required
-                />
-                <label className="block font-semibold mb-2 mt-3">NIC:</label>
-                <input
-                  type="text"
-                  name="NIC"
-                  placeholder="NIC"
-                  value={newDoctor.NIC}
-                  onChange={handleChange}
-                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
-                  required
-                />
-                <label className="block font-semibold mb-2 mt-3">
-                  Contact Number:
-                </label>
-                <input
-                  type="text"
-                  name="ContactNumber"
-                  placeholder="Contact Number"
-                  value={newDoctor.ContactNumber}
-                  onChange={handleChange}
-                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-2 mt-5">E Mail:</label>
-                <input
-                  type="email"
-                  name="Email"
-                  placeholder="Email"
-                  value={newDoctor.Email}
-                  onChange={handleChange}
-                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-1.5"
-                  required
-                />
-                <label className="block font-semibold mb-2 mt-3">
-                  Doctor Fee:
-                </label>
-                <input
-                  type="text"
-                  name="Charge"
-                  placeholder="Doctor Fee"
-                  value={newDoctor.Charge}
-                  onChange={handleChange}
-                  className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2.5"
-                  required
-                />
-                <label className="block font-semibold mb-2 mt-2">Gender:</label>
-                <div className="grid grid-cols-2 gap-2 items-center mt-2">
-                  <div className="ml-3">
-                    <input
-                      type="radio"
-                      id="male"
-                      name="Gender"
-                      value="Male"
-                      onChange={handleGenderChange}
-                      checked={newDoctor.Gender === "Male"}
-                      className="mr-2 bg-[#007e8556] cursor-pointer"
+    <div className="min-h-screen p-4">
+      <div className="max-w-full mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl border-t-4 border-[#E9FAF2] overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-[#E9FAF2] to-[#CEE4E6] p-8">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Doctor Registration Form
+            </h1>
+            {newDoctor.FirstName && newDoctor.LastName && (
+              <p className="text-xl text-[#09424D] mb-2">
+                Dr. {newDoctor.FirstName} {newDoctor.LastName}
+              </p>
+            )}
+            <p className="text-[#09424D] text-sm flex items-center gap-2">
+              <Calendar size={16} />
+              {formattedDate}
+            </p>
+          </div>
+
+          {!isSubmitted ? (
+            <div className="p-8">
+              <div className="space-y-8">
+                {/* Personal Information */}
+                <div className="bg-[#E9FAF2] p-6 rounded-xl">
+                  <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <User size={20} className="text-[#006369]" />
+                    Personal Information
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <InputField
+                      label="First Name"
+                      name="FirstName"
+                      placeholder="Enter first name"
+                      value={newDoctor.FirstName}
+                      onChange={handleChange}
+                      icon={User}
                     />
-                    <label htmlFor="male" className="font-small text-[#5E6767]">
-                      Male
-                    </label>
-                  </div>
-
-                  <div className="ml-3">
-                    <input
-                      type="radio"
-                      id="female"
-                      name="Gender"
-                      value="Female"
-                      onChange={handleGenderChange}
-                      checked={newDoctor.Gender === "Female"}
-                      className="mr-2 bg-[#007e8556] cursor-pointer"
+                    <InputField
+                      label="Last Name"
+                      name="LastName"
+                      placeholder="Enter last name"
+                      value={newDoctor.LastName}
+                      onChange={handleChange}
+                      icon={User}
                     />
-                    <label
-                      htmlFor="female"
-                      className="font-small text-[#5E6767]"
-                    >
-                      Female
-                    </label>
-                  </div>
-                </div>
-                {/* Availability */}
-                {/* checkboxes */}
-                <label className="block font-semibold mb-2 mt-2">
-                  Availability:
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday",
-                    "Saturday",
-                    "Sunday",
-                  ].map((day) => (
-                    <label
-                      key={day}
-                      className="flex items-center space-x-3 py-1 px-3"
-                    >
-                      <input
-                        type="checkbox"
-                        className="w-4 h-5 bg-[#007e8556] cursor-pointer"
-                        checked={availableData.availability.includes(day)}
-                        onChange={() => handleCheckboxChange(day)}
-                      />
-                      <span className="font-small text-[#5E6767]">{day}</span>
-                    </label>
-                  ))}
-                </div>
+                    <InputField
+                      label="Email Address"
+                      name="Email"
+                      type="email"
+                      placeholder="Enter email address"
+                      value={newDoctor.Email}
+                      onChange={handleChange}
+                      icon={Mail}
+                    />
+                    <InputField
+                      label="Contact Number"
+                      name="ContactNumber"
+                      placeholder="Enter contact number"
+                      value={newDoctor.ContactNumber}
+                      onChange={handleChange}
+                      icon={Phone}
+                    />
+                    <InputField
+                      label="NIC Number"
+                      name="NIC"
+                      placeholder="Enter NIC number"
+                      value={newDoctor.NIC}
+                      onChange={handleChange}
+                      icon={CreditCard}
+                    />
 
-                <div className="mb-4">
-                  <div className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-5">
-                    {/* Display Selected Hospital */}
-                    {availableData.HospitalId && (
-                      <div className="bg-[#E9FAF2] text-[#09424D] px-2 rounded-md flex items-center ">
-                        {availableData.HospitalName}
-                        <span
-                          className="ml-2 cursor-pointer text-red-400 font-bold "
-                          onClick={() =>
-                            setAvailableData((prev) => ({
-                              ...prev,
-                              HospitalName: "",
-                              HospitalId: "",
-                            }))
-                          }
-                        >
-                          ✕
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Input Field */}
-                    {!availableData.HospitalName && (
-                      <input
-                        type="text"
-                        placeholder="Hospital"
-                        name="HospitalName"
-                        value={input}
-                        onChange={handleHospitalInputChange}
-                        className="border-none outline-none flex-1"
-                        onFocus={() => setShowSuggestions(true)}
-                      />
-                    )}
-                  </div>
-
-                  {/* Dropdown Suggestions */}
-                  {showSuggestions && suggestions.length > 0 && (
-                    <div className="absolute bg-[#E9FAF2] border mt-1 shadow-lg rounded-md w-full max-w-5xl">
-                      {suggestions.map((hospital, index) => (
-                        <div
-                          key={index}
-                          className="p-2 hover:bg-gray-200 cursor-pointer"
-                          onClick={() =>
-                            handleSelectHospital(
-                              hospital.hospitalName,
-                              hospital.hospitalId
-                            )
-                          }
-                        >
-                          {hospital.hospitalName}
+                    {/* Gender Selection */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 font-semibold text-gray-700">
+                        <User size={16} className="text-[#006369]" />
+                        Gender
+                      </label>
+                      <div className="flex gap-6 p-3 bg-white rounded-xl border border-gray-200">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            id="male"
+                            name="Gender"
+                            value="Male"
+                            onChange={handleGenderChange}
+                            checked={newDoctor.Gender === "Male"}
+                            className="w-4 h-4 text-[#006369] cursor-pointer"
+                          />
+                          <label
+                            htmlFor="male"
+                            className="text-gray-700 cursor-pointer"
+                          >
+                            Male
+                          </label>
                         </div>
-                      ))}
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            id="female"
+                            name="Gender"
+                            value="Female"
+                            onChange={handleGenderChange}
+                            checked={newDoctor.Gender === "Female"}
+                            className="w-4 h-4 text-[#006369] cursor-pointer"
+                          />
+                          <label
+                            htmlFor="female"
+                            className="text-gray-700 cursor-pointer"
+                          >
+                            Female
+                          </label>
+                        </div>
+                      </div>
                     </div>
+                  </div>
+                </div>
+
+                {/* Professional Information */}
+                <div className="bg-[#E9FAF2] p-6 rounded-xl">
+                  <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <Award size={20} className="text-[#006369]" />
+                    Professional Information
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <InputField
+                      label="Specialization"
+                      name="specialization"
+                      placeholder="Enter specialization"
+                      value={newDoctor.specialization}
+                      onChange={handleChange}
+                      icon={Award}
+                    />
+                    <InputField
+                      label="SLMC License Number"
+                      name="SlmcLicense"
+                      placeholder="Enter SLMC license number"
+                      value={newDoctor.SlmcLicense}
+                      onChange={handleChange}
+                      icon={FileText}
+                    />
+                    <InputField
+                      label="Consultation Fee (LKR)"
+                      name="Charge"
+                      placeholder="Enter consultation fee"
+                      value={newDoctor.Charge}
+                      onChange={handleChange}
+                      icon={DollarSign}
+                    />
+                  </div>
+                </div>
+
+                {/* Availability & Schedule */}
+                <div className="bg-[#E9FAF2] p-6 rounded-xl">
+                  <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <Clock size={20} className="text-[#006369]" />
+                    Availability & Schedule
+                  </h2>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Days Selection */}
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-gray-700">
+                        Available Days
+                      </h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          "Monday",
+                          "Tuesday",
+                          "Wednesday",
+                          "Thursday",
+                          "Friday",
+                          "Saturday",
+                          "Sunday",
+                        ].map((day) => (
+                          <label
+                            key={day}
+                            className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
+                          >
+                            <input
+                              type="checkbox"
+                              className="w-4 h-4 text-[#006369] rounded cursor-pointer"
+                              checked={availableData.availability.includes(day)}
+                              onChange={() => handleCheckboxChange(day)}
+                            />
+                            <span className="text-gray-700">{day}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Time and Hospital Selection */}
+                    <div className="space-y-4">
+                      {/* Hospital Selection */}
+                      <div className="relative">
+                        <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
+                          <MapPin size={16} className="text-[#006369]" />
+                          Hospital
+                        </label>
+                        <div className="w-full p-3 bg-white border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-[#CEE4E6] focus-within:border-transparent">
+                          {availableData.HospitalId ? (
+                            <div className="bg-[#E9FAF2] text-[#09424D] px-3 py-2 rounded-lg flex items-center justify-between">
+                              <span>{availableData.HospitalName}</span>
+                              <button
+                                type="button"
+                                className="text-red-500 hover:text-red-700 font-bold"
+                                onClick={() =>
+                                  setAvailableData((prev) => ({
+                                    ...prev,
+                                    HospitalName: "",
+                                    HospitalId: "",
+                                  }))
+                                }
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ) : (
+                            <input
+                              type="text"
+                              placeholder="Search hospital..."
+                              value={input}
+                              onChange={handleHospitalInputChange}
+                              className="w-full border-none outline-none"
+                              onFocus={() => setShowSuggestions(true)}
+                            />
+                          )}
+                        </div>
+
+                        {showSuggestions && suggestions.length > 0 && (
+                          <div className="absolute z-10 w-full bg-white border border-gray-200 mt-1 shadow-lg rounded-xl overflow-hidden">
+                            {suggestions.map((hospital, index) => (
+                              <div
+                                key={index}
+                                className="p-3 hover:bg-[#E9FAF2] cursor-pointer transition-colors"
+                                onClick={() =>
+                                  handleSelectHospital(
+                                    hospital.hospitalName,
+                                    hospital.hospitalId
+                                  )
+                                }
+                              >
+                                <span className="font-medium">
+                                  {hospital.hospitalName}
+                                </span>
+                                <span className="text-gray-500 ml-2">
+                                  - {hospital.city}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Time Selection */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block font-semibold text-gray-700 mb-2">
+                            Start Time
+                          </label>
+                          <input
+                            type="time"
+                            name="startTime"
+                            value={availableData.startTime}
+                            onChange={handleTime}
+                            className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-semibold text-gray-700 mb-2">
+                            End Time
+                          </label>
+                          <input
+                            type="time"
+                            name="endTime"
+                            value={availableData.endTime}
+                            onChange={handleTime}
+                            className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent"
+                          />
+                        </div>
+                      </div>
+
+                      {timeErrorMessage && (
+                        <p className="text-red-500 font-medium text-center">
+                          {timeErrorMessage}
+                        </p>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={handleAddTime}
+                        className="w-full bg-[#007e8556] text-[#006369] py-3 px-6 rounded-xl hover:bg-[#007e8589] transition-colors font-semibold"
+                      >
+                        Add Time Slot
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Schedule Table */}
+                {schedule.length > 0 && (
+                  <div className="bg-white p-6 rounded-xl border border-gray-200">
+                    <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <Clock size={20} className="text-[#006369]" />
+                      Selected Time Slots
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-[#E9FAF2]">
+                            <th className="p-3 text-left font-semibold text-gray-700 rounded-tl-lg">
+                              ID
+                            </th>
+                            <th className="p-3 text-left font-semibold text-gray-700">
+                              Day
+                            </th>
+                            <th className="p-3 text-left font-semibold text-gray-700">
+                              Start Time
+                            </th>
+                            <th className="p-3 text-left font-semibold text-gray-700">
+                              End Time
+                            </th>
+                            <th className="p-3 text-left font-semibold text-gray-700">
+                              Hospital
+                            </th>
+                            <th className="p-3 text-left font-semibold text-gray-700">
+                              Hospital ID
+                            </th>
+                            <th className="p-3 text-left font-semibold text-gray-700 rounded-tr-lg">
+                              Action
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {schedule.map((slot, index) => (
+                            <tr
+                              key={index}
+                              className={`border-t ${
+                                index % 2 === 0 ? "bg-[#E9FAF2]" : "bg-white"
+                              }`}
+                            >
+                              <td className="p-3 text-sm text-gray-600">
+                                {slot.AvailabilityId}
+                              </td>
+                              <td className="p-3 font-medium">{slot.day}</td>
+                              <td className="p-3">{slot.startTime}</td>
+                              <td className="p-3">{slot.endTime}</td>
+                              <td className="p-3">{slot.HospitalName}</td>
+                              <td className="p-3 text-sm text-gray-600">
+                                {slot.HospitalId}
+                              </td>
+                              <td className="p-3">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveSlot(index)}
+                                  className="text-red-500 hover:text-red-700 font-medium hover:underline transition-colors"
+                                >
+                                  Remove
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 font-semibold text-gray-700">
+                    <FileText size={16} className="text-[#006369]" />
+                    Description
+                  </label>
+                  <textarea
+                    name="Description"
+                    placeholder="Enter additional information about the doctor..."
+                    value={newDoctor.Description}
+                    onChange={handleChange}
+                    className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                    required
+                    rows="4"
+                  />
+                </div>
+
+                {/* Error Message */}
+                {errorMessage && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <p className="text-red-600 font-medium text-center">
+                      {errorMessage}
+                    </p>
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <button
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                  className="w-full bg-[#007e8556] text-[#006369] py-4 px-6 rounded-xl hover:bg-[#007e8589] transition-colors font-bold text-lg shadow-lg hover:shadow-xl"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Registering...</span>
+                    </div>
+                  ) : (
+                    <>Register Doctor</>
                   )}
-                </div>
-                {/* give custom Time */}
-                <div className="flex gap-5">
-                  <input
-                    type="time"
-                    name="startTime"
-                    placeholder="startTime"
-                    value={availableData.startTime}
-                    onChange={handleTime}
-                    className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
-                  />
-                  <input
-                    type="time"
-                    name="endTime"
-                    placeholder="endTime"
-                    value={availableData.endTime}
-                    onChange={handleTime}
-                    className="w-full max-w-5xl p-2 bg-white border-1 border-gray-300 rounded-md
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-2"
-                  />
-                </div>
-                <p className="text-red-500 font-bold text-center my-5">
-                  {timeErrorMessage}
-                </p>
-                <div className="mt-3 w-[100%]">
-                  <button
-                    type="button"
-                    onClick={handleAddTime}
-                    className=" bg-[#007e8556] text-[#006369] p-2 w-[100%] rounded-lg hover:bg-[#007e8589] cursor-pointer"
-                  >
-                    Add Time
-                  </button>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+              <div className="max-w-4xl mx-auto">
+                <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+                  <div className="bg-gradient-to-r from-emerald-500 to-teal-600 h-2"></div>
+                  <div className="p-8">
+                    <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+                      <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+                        <Check className="w-10 h-10 text-emerald-600" />
+                      </div>
+                      <h1 className="text-3xl font-bold text-slate-800 mb-4">
+                        Registration Successful!
+                      </h1>
+                      <p className="text-emerald-600 text-xl font-semibold mb-8">
+                        Dr. {newDoctor.FirstName} {newDoctor.LastName} has been
+                        successfully registered.
+                      </p>
+                      <Link href={"/Admin/AdminDoctor"}>
+                        <button className="inline-flex items-center px-6 py-3  bg-[#A9C9CD] text-[#09424D] font-semibold rounded-xl hover:bg-[#91B4B8]  transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                          <ArrowLeft className="w-5 h-5 mr-2" />
+                          Back to Doctor Details
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <h3 className="font-semibold mb-2 mt-4">Selected Time Slots:</h3>
-
-            <div className="rounded-xl">
-              <table className="w-full mt-5 border border-gray-200 rounded-xl">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="p-2">AvailabilityId</th>
-                    <th className="p-2">Day</th>
-                    <th className="p-2">Start Time</th>
-                    <th className="p-2">End Time</th>
-                    <th className="p-2">Hospital Name</th>
-                    <th className="p-2">Hospital Id</th>
-                    <th className="p-2">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {schedule.map((slot, index) => (
-                    <tr
-                      key={index}
-                      className={`border-t ${
-                        index % 2 === 0 ? "bg-[#E9FAF2]" : "bg-[#ffffff]"
-                      }`}
-                    >
-                      <td className="p-2 text-center">{slot.AvailabilityId}</td>
-                      <td className="p-2 text-center">{slot.day}</td>
-                      <td className="p-2 text-center">{slot.startTime}</td>
-                      <td className="p-2 text-center">{slot.endTime}</td>
-                      <td className="p-2 text-center">{slot.HospitalName}</td>
-                      <td className="p-2 text-center">{slot.HospitalId}</td>
-                      <td className="p-2 text-center">
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveSlot(index)}
-                          className="text-red-500 cursor-pointer hover:underline"
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <textarea
-              name="Description"
-              placeholder="Description"
-              value={newDoctor.Description}
-              onChange={handleChange}
-              className="w-full  p-2 bg-white border border-gray-300 rounded-md
-  focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] mt-6"
-              required
-              rows="4"
-            ></textarea>
-
-            {/* Submit Button */}
-            <p className="text-red-500 font-bold text-center mb-5">
-              {errorMessage}
-            </p>
-            <div className="mt-5 w-[100%]">
-              <p className="text-red-500 font-bold text-center mb-5">
-                {errorMessage}
-              </p>
-              <button
-                type="submit"
-                className=" bg-[#007e8556] text-[#006369] p-2 w-[100%] rounded-lg hover:bg-[#007e8589] cursor-pointer"
-              >
-                Register
-              </button>
-            </div>
-          </form>
+          )}
         </div>
-      ) : (
-        <div className="h-[500px] ">
-          <div className="h-[500px] mt-10 bg-[#E9FAF2] p-6 rounded-lg shadow-md w-full flex flex-col">
-            <h1 className="text-2xl font-bold text-center mb-2">Add Status</h1>
-            <div className="flex-grow flex items-center justify-center">
-              <p className="text-green-600 font-bold text-xl text-center mb-5">
-                {successMessage}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-      {/*loading component*/}
-      {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <p className="mb-4 text-lg font-semibold text-[rgba(0,126,133,0.7)]">
-              Please wait...
-            </p>
-            <Spinner className="h-10 w-10 text-[rgba(0,126,133,0.7)]" />
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

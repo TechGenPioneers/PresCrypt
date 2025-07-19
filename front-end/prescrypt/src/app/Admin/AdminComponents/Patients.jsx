@@ -15,6 +15,7 @@ const Patients = () => {
     try {
       const patients = await GetPatients();
       setPatients(patients);
+      setLoading(false);
       console.log(patients);
     } catch (error) {
       console.error("Failed to get the data", error);

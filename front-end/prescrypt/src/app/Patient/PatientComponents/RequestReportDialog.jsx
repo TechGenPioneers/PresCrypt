@@ -16,11 +16,14 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { getAppointmentsByDate } from "../services/AppointmentsFindingService";
 import { generateAppointmentReport } from "../services/PatientDataService";
+import AlertBoxDialog from "./alertDialogBox";
 
 const RequestReportDialog = ({ open, handleClose, patientId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const handleDownloadReport = async () => {
   setLoading(true);
@@ -49,7 +52,8 @@ const RequestReportDialog = ({ open, handleClose, patientId }) => {
     handleClose();
   } catch (error) {
     console.error("Failed to generate report:", error);
-    alert("Something went wrong. Please try again.");
+    setAlertMessage("Failed to generate report. Please try again.");
+    setAlertOpen(true);
   } finally {
     setLoading(false);
   }
@@ -57,6 +61,7 @@ const RequestReportDialog = ({ open, handleClose, patientId }) => {
 
 
   return (
+    <>
     <Dialog
       open={open}
       onClose={handleClose}
@@ -131,6 +136,13 @@ const RequestReportDialog = ({ open, handleClose, patientId }) => {
         </DialogActions>
       </div>
     </Dialog>
+    <AlertBoxDialog
+        open={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        message={alertMessage}
+    />
+    </>
+    
   );
 };
 

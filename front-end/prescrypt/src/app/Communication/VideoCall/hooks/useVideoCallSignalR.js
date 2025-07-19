@@ -1,82 +1,80 @@
-import { useState, useEffect, useRef } from "react"; // Import useRef
+import { useState, useEffect, useRef } from "react";
 import { EstablishVideoSignalRConnection } from "../../service/ChatService";
+import * as signalR from "@microsoft/signalr";
 
 export default function useVideoCallSignalR(userId, userRole) {
   const [videoCallConnection, setVideoCallConnection] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState("disconnected");
-  const connectionRef = useRef(null); // Use a ref to hold the connection instance
+  const connectionRef = useRef(null); // This is the ref we'll use
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      if (
+        connectionRef.current &&
+        connectionRef.current.state !== signalR.HubConnectionState.Disconnected
+      ) {
+        connectionRef.current
+          .stop()
+          .catch((err) =>
+            console.error("Cleanup stop error (no userId):", err)
+          );
+      }
+      setVideoCallConnection(null);
+      setConnectionStatus("disconnected");
+      return;
+    }
 
     const connection = EstablishVideoSignalRConnection(userId);
-    connectionRef.current = connection; // Store connection in ref
+    connectionRef.current = connection;
 
     let isMounted = true;
+    let isStarting = true;
 
     const setupConnection = async () => {
+      if (connectionRef.current !== connection) return;
+
       try {
+        console.log("Attempting to start SignalR connection...");
         setConnectionStatus("connecting");
-        
-        connection.onreconnecting(() => {
-          console.log("SignalR reconnecting...");
-          setConnectionStatus("reconnecting");
-        });
-
-        connection.onclose(async (error) => {
-          if (isMounted) {
-            console.log("SignalR connection closed", error);
-            setConnectionStatus("disconnected");
-            // Only attempt reconnect if it's the current connection
-            if (connectionRef.current === connection) { 
-              await new Promise(resolve => setTimeout(resolve, 5000));
-              try {
-                await connection.start();
-                setConnectionStatus("connected");
-              } catch (err) {
-                console.error("Reconnection failed:", err);
-                setConnectionStatus("failed");
-              }
-            }
-          }
-        });
-
         await connection.start();
+        isStarting = false;
+
+        if (!isMounted) {
+          await connection.stop(); // stop safely if component unmounted
+          return;
+        }
+
         console.log("SignalR connected successfully");
+        setVideoCallConnection(connection);
         setConnectionStatus("connected");
 
-        try {
-          await connection.invoke("JoinGroup", userId);
-          console.log(`Joined group ${userId}`);
-        } catch (invokeError) {
-          console.error("Failed to join group:", invokeError);
-        }
-
-        if (isMounted) {
-          setVideoCallConnection(connection);
-        }
+        await connection.invoke("JoinGroup", userId);
+        console.log(`Joined group ${userId}`);
 
         if (userRole === "Doctor") {
           connection.on("CallAccepted", ({ roomUrl, patientId }) => {
-            console.log("Call accepted:", { roomUrl, patientId });
             window.dispatchEvent(
               new CustomEvent("startVideoCall", {
-                detail: { roomUrl, otherUserName: patientId }
+                detail: { roomUrl, otherUserName: patientId },
               })
             );
           });
 
           connection.on("CallRejected", ({ patientId }) => {
             console.log(`Call rejected by ${patientId}`);
+
+            // Dispatch to globally notify UI
+            window.dispatchEvent(
+              new CustomEvent("callRejected", {
+                detail: { rejectedBy: patientId },
+              })
+            );
           });
         }
-
-      } catch (startError) {
-        console.error("Initial connection failed:", startError);
+      } catch (err) {
+        console.error("Connection start failed:", err);
         setConnectionStatus("failed");
-        if (isMounted && connectionRef.current === connection) { // Add condition here
-          setTimeout(setupConnection, 3000);
-        }
+        isStarting = false;
       }
     };
 
@@ -84,16 +82,42 @@ export default function useVideoCallSignalR(userId, userRole) {
 
     return () => {
       isMounted = false;
-      // Only stop if the connection was actually established or is in the process
-      // And it's the current connection instance
-      if (connectionRef.current === connection && connection.state !== "Disconnected") {
-        connection.off("CallAccepted");
-        connection.off("CallRejected");
-        connection.stop().catch(err => 
-          console.error("Cleanup stop error:", err)
-        );
+
+      const conn = connectionRef.current;
+      if (conn && conn.state !== signalR.HubConnectionState.Disconnected) {
+        if (isStarting) {
+          // Wait for connection to finish starting before stopping
+          const interval = setInterval(() => {
+            if (
+              !isStarting &&
+              conn.state !== signalR.HubConnectionState.Disconnected
+            ) {
+              conn
+                .stop()
+                .then(() => console.log("SignalR stopped safely after start."))
+                .catch((err) =>
+                  console.error(
+                    "Error stopping SignalR connection during cleanup:",
+                    err
+                  )
+                );
+              clearInterval(interval);
+            }
+          }, 200);
+        } else {
+          conn
+            .stop()
+            .then(() => console.log("SignalR stopped during cleanup."))
+            .catch((err) =>
+              console.error(
+                "Error stopping SignalR connection during cleanup:",
+                err
+              )
+            );
+        }
       }
-      connectionRef.current = null; // Clear the ref
+      connectionRef.current = null;
+      setVideoCallConnection(null);
     };
   }, [userId, userRole]);
 
