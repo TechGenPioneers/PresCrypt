@@ -8,7 +8,7 @@ import AuthForm from "../components/AuthForm";
 import PasswordInput from "../components/PasswordInput";
 import Notification from "../components/Notification";
 import { loginUser } from "@/utils/api";
-
+import { logout } from "@/utils/api";
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
@@ -22,14 +22,15 @@ export default function LoginPage() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   useEffect(() => {
     // Check for role parameter
+    localStorage.clear();
     const roleParam = searchParams.get("role");
     if (roleParam && ["patient", "doctor", "admin"].includes(roleParam)) {
       setRole(roleParam);
     }
-    
+
     // Check for session parameter
     const sessionParam = searchParams.get("session");
     if (sessionParam === "expired") {
@@ -87,20 +88,20 @@ export default function LoginPage() {
   };
 
   const completeLogin = async (response) => {
-    localStorage.setItem("token", response.token);
-    localStorage.setItem("username", response.user?.username);
-    localStorage.setItem("userRole", response.user?.role);
-    localStorage.setItem("username", response.user?.username);
+    // localStorage.setItem("token", response.token);
+    // localStorage.setItem("username", response.user?.username);
+    // localStorage.setItem("userRole", response.user?.role);
+    // localStorage.setItem("username", response.user?.username);
 
-    await fetch("/api/set-cookie", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: response.token,
-        role: response.user?.role,
-        username: response.user?.username,
-      }),
-    });
+    //await fetch("/api/set-cookie", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({
+    //     token: response.token,
+    //     role: response.user?.role,
+    //     username: response.user?.username,
+    //   }),
+    // });
 
     switch (response.user?.role) {
       case "Patient":
@@ -111,6 +112,7 @@ export default function LoginPage() {
         break;
       case "Admin":
         router.push("/Admin/AdminDashboard");
+
         break;
       default:
         router.push("/Auth/MainPage");
@@ -177,13 +179,13 @@ export default function LoginPage() {
             onChange={handleChange}
             error={error}
             required
-            inputClassName="text-white"
+            inputclassname="text-white"
           />
 
           <p className="text-sm text-center text-teal-600 hover:underline mt-2">
             <Link href="/Auth/ForgotPassword">Forgot Password?</Link>
           </p>
-          
+
           <button
             type="submit"
             className="w-full py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition disabled:opacity-50 mt-4"
