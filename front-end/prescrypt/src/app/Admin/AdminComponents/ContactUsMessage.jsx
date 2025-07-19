@@ -23,11 +23,14 @@ const MessageTable = () => {
   const [reply, setReply] = useState("");
   const [senderFilter, setSenderFilter] = useState("all");
   const [readFilter, setReadFilter] = useState("all");
+  const [sending, setSending] = useState(false);
+  const [marking, setMarking] = useState(false);
 
   const fetchAllMessages = async () => {
     const response = await GetAllContactUsMessages();
     setMessages(response);
-    console.log("Messages fetched from API:", response); // log the fresh data directly
+    console.log("Messages fetched from API:", response);
+    return response; // log the fresh data directly
   };
 
   useEffect(() => {
@@ -36,45 +39,71 @@ const MessageTable = () => {
 
   const handleMarkAsRead = async (inquiryId) => {
     if (!selected) return;
+    setMarking(true);
+
     const updateMessage = await MarkAsRead(inquiryId);
 
     if (updateMessage.status === 200) {
-      fetchAllMessages();
-      setSelected(null);
+      const updatedMessages = await fetchAllMessages(); // wait for refresh
+      const updated = updatedMessages.find((m) => m.inquiryId === inquiryId);
+
+      if (updated) setSelected(updated);
+
       setReply("");
       setError(null);
     } else {
       setError("Failed to mark message as read");
     }
+
+    setMarking(false);
   };
 
   const handleSubmit = async () => {
-    const response = await SendReply(selected.inquiryId, reply);
-    if (response.status === 200) {
-     await fetchAllMessages();
-      setSelected(null);
-      setReply("");
-      setError(null);
-    } else {
+    setSending(true);
+    if (!reply.trim()) {
+      setError("Reply message cannot be empty.");
+      setSending(false);
+      return;
+    }
+    try {
+      const response = await SendReply(selected.inquiryId, reply);
+
+      if (response.status === 200) {
+        const updatedMessages = await fetchAllMessages(); // ✅ get fresh data
+        const updated = updatedMessages.find(
+          (m) => m.inquiryId === selected.inquiryId
+        );
+        if (updated) {
+          setSelected(updated);
+        }
+
+        setReply("");
+        setError(null);
+      } else {
+        setError("Failed to send reply");
+      }
+    } catch (e) {
       setError("Failed to send reply");
     }
+
+    setSending(false);
   };
 
- const filteredMessages = messages
-  .filter((msg) => {
-    const matchSender =
-      senderFilter === "all" || msg.senderType === senderFilter;
-    const matchRead =
-      readFilter === "all" ||
-      (readFilter === "read" && msg.isRead) ||
-      (readFilter === "unread" && !msg.isRead);
-    return matchSender && matchRead;
-  })
-  .sort((a, b) => {
-    // Sort so unread messages come first
-    if (a.isRead === b.isRead) return 0;
-    return a.isRead ? 1 : -1; // unread (false) comes before read (true)
-  });
+  const filteredMessages = messages
+    .filter((msg) => {
+      const matchSender =
+        senderFilter === "all" || msg.senderType === senderFilter;
+      const matchRead =
+        readFilter === "all" ||
+        (readFilter === "read" && msg.isRead) ||
+        (readFilter === "unread" && !msg.isRead);
+      return matchSender && matchRead;
+    })
+    .sort((a, b) => {
+      // Sort so unread messages come first
+      if (a.isRead === b.isRead) return 0;
+      return a.isRead ? 1 : -1; // unread (false) comes before read (true)
+    });
 
   const getSenderBadge = (type) => {
     return type === "doctor"
@@ -218,6 +247,7 @@ const MessageTable = () => {
                   onClick={() => {
                     setSelected(null);
                     setReply("");
+                    setError(null);
                   }}
                   className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                 >
@@ -272,13 +302,13 @@ const MessageTable = () => {
                     </h4>
                     <p className="text-slate-600">{selected.description}</p>
                   </div>
-                  {selected.isRead && (
+                  {selected.isRead && selected?.replyMessage && (
                     <div>
-                    <h4 className="font-semibold text-slate-800 mb-1">
-                      Reply Message
-                    </h4>
-                    <p className="text-slate-600">{selected.replyMessage}</p>
-                  </div>
+                      <h4 className="font-semibold text-slate-800 mb-1">
+                        Reply Message
+                      </h4>
+                      <p className="text-slate-600">{selected.replyMessage}</p>
+                    </div>
                   )}
                 </div>
 
@@ -290,14 +320,14 @@ const MessageTable = () => {
                         Reply
                       </label>
                       <textarea
-                        className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-colors"
+                        className="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-[#09424D] resize-none transition-colors"
                         rows={4}
                         placeholder="Type your reply..."
                         value={reply}
                         onChange={(e) => setReply(e.target.value)}
                       />
                     </div>
-                    
+
                     {error && (
                       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                         <div className="flex items-center gap-2">
@@ -308,18 +338,38 @@ const MessageTable = () => {
                     )}
                     <div className="flex justify-end gap-3">
                       <button
+                        disabled={marking}
                         onClick={() => handleMarkAsRead(selected.inquiryId)}
                         className="flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
                       >
-                        <Check className="w-4 h-4" />
-                        Mark as Read
+                        {marking ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Marking...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Check className="w-4 h-4" />
+                            Mark as Read
+                          </>
+                        )}
                       </button>
                       <button
                         onClick={handleSubmit}
-                        className="flex items-center gap-2 bg-gradient-to-r  text-[#09424D]  bg-[#A9C9CD] px-6 py-2 rounded-lg hover:bg-[#91B4B8] transition-all shadow-lg"
+                        disabled={sending}
+                        className="flex items-center gap-2 px-6 py-2 rounded-lg text-[#09424D] bg-[#A9C9CD] hover:bg-[#91B4B8] transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Send className="w-4 h-4" />
-                        Send Reply
+                        {sending ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Sending...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-4 h-4" />
+                            <span>Send Reply</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -328,7 +378,10 @@ const MessageTable = () => {
                     <div className="flex items-center gap-2">
                       <Check className="w-5 h-5 text-green-600" />
                       <p className="text-green-800 font-medium">
-                        Message already marked as read
+                        Message already read
+                        {selected.replyMessage
+                          ? " With Message"
+                          : ""}
                       </p>
                     </div>
                   </div>

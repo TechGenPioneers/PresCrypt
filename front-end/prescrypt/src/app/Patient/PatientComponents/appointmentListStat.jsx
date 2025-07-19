@@ -9,9 +9,10 @@ const AppointmentListStat = ({
   total,
   accepted,
   cancelled,
+  rescheduled,
   patientId,
   email,
-  onFilterSelect, // <-- use this to send filter status
+  onFilterSelect, 
 }) => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
@@ -73,6 +74,14 @@ const AppointmentListStat = ({
           >
             <p className="text-base font-bold text-yellow-700">{pending}</p>
             <p className="text-sm text-yellow-700">Pending</p>
+          </div>
+
+          <div
+            className="cursor-pointer w-24 px-6 py-2 rounded-md bg-red-100 hover:bg-red-200 text-center flex flex-col items-center justify-center"
+            onClick={() => onFilterSelect("rescheduled")}
+          >
+            <p className="text-base font-bold text-red-700">{rescheduled}</p>
+            <p className="text-sm text-red-700">Rescheduled</p>
           </div>
 
           <div
