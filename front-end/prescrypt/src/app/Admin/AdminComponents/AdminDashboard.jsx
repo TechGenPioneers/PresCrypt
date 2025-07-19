@@ -26,7 +26,7 @@ import {
 import AdminNotification from "./AdminNotification";
 import { GetAllDashboardData } from "../service/AdminDashboardService";
 import Dashboard from "@/app/Doctor/DoctorDashboard/page";
-import SystemAnalyze from "./SystemAnalyse";
+//import SystemAnalyze from "./SystemAnalyse";
 
 const AdminDashboard = ({ setAdminName }) => {
   const [dateTime, setDateTime] = useState(null);

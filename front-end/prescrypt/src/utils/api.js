@@ -30,15 +30,18 @@ export const loginUser = async (loginData) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      validateStatus: (status) => status < 500 // Allow custom error handling
+      validateStatus: (status) => status < 500
     });
 
     console.log('Full response:', response);
 
     if (response.data.token) {
-      //  Store token and role in cookies
-      Cookies.set("token", response.data.token, { expires: 1 }); // 1 day expiry
-      Cookies.set("role", response.data.user.role, { expires: 1 });
+      // Store ONLY in localStorage - REMOVE COOKIES
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userRole", response.data.user.role);
+      if (response.data.user.username) {
+        localStorage.setItem("username", response.data.user.username);
+      }
 
       return {
         success: true,
@@ -68,7 +71,6 @@ export const loginUser = async (loginData) => {
     };
   }
 };
-
 // Forgot Password
 export const forgotPassword = async (data) => {
   try {
@@ -90,8 +92,66 @@ export const resetPassword = async (data) => {
 };
 
 
-// Logout Function (Optional)
-export const logout = () => {
-  Cookies.remove("token");
-  Cookies.remove("role");
+//Logout Function
+export const logout = async () => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/User/logout`, {}, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    // Clear localStorage only
+    localStorage.clear();
+    
+  } catch (error) {
+    console.error("Logout error:", error);
+    // Clear localStorage even on error
+    localStorage.clear();
+    throw error;
+  }
 };
+// export const logout = async () => {
+//   try {
+//     console.log("🔄 Starting logout process...");
+    
+//     // Debug BEFORE clearing
+//     console.log("BEFORE logout - localStorage contents:");
+//     console.log("Token exists:", !!localStorage.getItem('token'));
+//     console.log("Role exists:", !!localStorage.getItem('userRole'));
+//     console.log("Username exists:", !!localStorage.getItem('username'));
+//     console.log("Total items:", localStorage.length);
+
+//     // Clear localStorage FIRST
+//     localStorage.removeItem('token');
+//     localStorage.removeItem('userRole');
+//     localStorage.removeItem('username');
+//     localStorage.clear(); // Clear everything else too
+
+//     // Debug AFTER clearing
+//     console.log("AFTER clearing - localStorage contents:");
+//     console.log("Token exists:", !!localStorage.getItem('token'));
+//     console.log("Role exists:", !!localStorage.getItem('userRole'));
+//     console.log("Username exists:", !!localStorage.getItem('username'));
+//     console.log("Total items:", localStorage.length);
+
+//     // Make API call
+//     const response = await axios.post(`${API_BASE_URL}/User/logout`, {}, {
+//       headers: {
+//         'Content-Type': 'application/json'
+//       }
+//     });
+    
+//     console.log("✅ Logout API call successful");
+    
+//     // Force redirect to login
+//     window.location.href = '/Auth/login?session=expired';
+    
+//   } catch (error) {
+//     console.error("❌ Logout error:", error);
+//     // Ensure localStorage is cleared even on API error
+//     localStorage.clear();
+//     // Force redirect even on error
+//     window.location.href = '/Auth/login?session=expired';
+//   }
+// };
