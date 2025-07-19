@@ -9,6 +9,7 @@ export default function useAuthGuard(expectedRole) {
   const router = useRouter();
   const pathname = usePathname();
   
+  
   useEffect(() => {
     let logoutTimeout;
     
