@@ -302,7 +302,7 @@ const MessageTable = () => {
                     </h4>
                     <p className="text-slate-600">{selected.description}</p>
                   </div>
-                  {selected.isRead && (
+                  {selected.isRead && selected?.replyMessage && (
                     <div>
                       <h4 className="font-semibold text-slate-800 mb-1">
                         Reply Message
@@ -378,7 +378,10 @@ const MessageTable = () => {
                     <div className="flex items-center gap-2">
                       <Check className="w-5 h-5 text-green-600" />
                       <p className="text-green-800 font-medium">
-                        Message already marked as read
+                        Message already read
+                        {selected.replyMessage
+                          ? " With Message"
+                          : ""}
                       </p>
                     </div>
                   </div>

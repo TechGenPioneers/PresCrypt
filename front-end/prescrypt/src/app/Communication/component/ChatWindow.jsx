@@ -63,11 +63,10 @@ const ChatWindow = ({
   const [menuOpenId, setMenuOpenId] = useState(null);
   const messageEndRef = useRef(null);
   const menuRef = useRef(null);
-
+  const messageContainerRef = useRef(null);
   const currentUserName = userRole === "Doctor" ? doctorName : patientName;
-
   const otherUserName = userRole === "Doctor" ? patientName : doctorName;
-
+  const[isDelete,setIsDelete]=useState(false)
   const {
     incomingCall,
     callerInfo,
@@ -99,20 +98,30 @@ const ChatWindow = ({
 
   // FIX STARTS HERE
   const handleCallAccepted = useCallback(
-  ({ roomUrl }) => {
-    // Ensure we have the correct selectedUser for the call
-    if (callerInfo?.callerId !== selectedUser?.receiverId) {
-      const callerUser = users.find(user => user.receiverId === callerInfo?.callerId);
-      if (callerUser) {
-        setSelectedUser(callerUser);
+    ({ roomUrl }) => {
+      // Ensure we have the correct selectedUser for the call
+      if (callerInfo?.callerId !== selectedUser?.receiverId) {
+        const callerUser = users.find(
+          (user) => user.receiverId === callerInfo?.callerId
+        );
+        if (callerUser) {
+          setSelectedUser(callerUser);
+        }
       }
-    }
 
-    startCall(roomUrl, currentUserName, otherUserName);
-    setCallStatus("active");
-  },
-  [startCall, setCallStatus, currentUserName, otherUserName, callerInfo, selectedUser, users]
-);
+      startCall(roomUrl, currentUserName, otherUserName);
+      setCallStatus("active");
+    },
+    [
+      startCall,
+      setCallStatus,
+      currentUserName,
+      otherUserName,
+      callerInfo,
+      selectedUser,
+      users,
+    ]
+  );
 
   const handleEndCall = () => {
     endCall();
@@ -205,8 +214,9 @@ const ChatWindow = ({
   }, [connection]);
 
   useEffect(() => {
-    const container = messageEndRef.current;
+    const container = messageContainerRef.current;
     if (!container) return;
+
     const isNearBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight <
       50;
@@ -244,13 +254,15 @@ const ChatWindow = ({
   }, []);
 
   const handleDeleteMessage = async (messageId) => {
+    setIsDelete(true)
     try {
       await DeleteMessage(messageId);
       setMenuOpenId(null);
       fetchUsers();
     } catch (err) {
       console.error("Failed to delete message", err);
-    }
+    } 
+    setIsDelete(false) 
   };
 
   const shouldShowIncomingModal =
@@ -267,7 +279,7 @@ const ChatWindow = ({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
+    <div ref={messageContainerRef} className="flex flex-col flex-1 min-h-0">
       <ChatHeader
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
@@ -296,7 +308,7 @@ const ChatWindow = ({
         />
       ) : (
         <>
-          <div className="flex-1 p-4 space-y-4 overflow-y-auto flex flex-col">
+          <div className="flex-1 bg-[#f3faf7] p-4 space-y-4 overflow-y-auto flex flex-col">
             {messages.length === 0 && (
               <p className="text-center text-zinc-400 italic mt-10">
                 No messages yet. Start the conversation!
@@ -330,7 +342,10 @@ const ChatWindow = ({
                         <div className="avatar mr-2">
                           <div className="w-10 h-10 rounded-full border border-emerald-600 overflow-hidden">
                             <img
-                              src={selectedUser.image || "/profile.png"}
+                              src={
+                                `data:image/jpeg;base64,${selectedUser.profileImage}` ||
+                                "/profile.png"
+                              }
                               alt="user"
                               className="object-cover w-full h-full"
                             />
@@ -397,7 +412,12 @@ const ChatWindow = ({
                             <li>
                               <button
                                 onClick={() => handleDeleteMessage(msg.id)}
-                                className="w-full flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 p-2 rounded-md"
+                                disabled={isDelete}
+                                className={`w-full flex items-center gap-2 text-sm p-2 rounded-md ${
+                                  isDelete
+                                    ? "text-gray-400 cursor-not-allowed"
+                                    : "text-red-600 hover:bg-red-50"
+                                }`}
                               >
                                 <Trash2 /> delete
                               </button>
