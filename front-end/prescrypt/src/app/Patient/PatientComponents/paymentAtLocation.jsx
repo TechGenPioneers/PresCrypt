@@ -347,6 +347,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
           email={email}
           totalCharge={totalCharge}
           platformCharge={onlineFee}
+          paymentId ={paymentId}
         />
       </div>
 
