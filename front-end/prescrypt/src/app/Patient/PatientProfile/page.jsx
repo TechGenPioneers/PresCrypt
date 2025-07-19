@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation'; 
 import { FaUser, FaEnvelope, FaBirthdayCake, FaPhone, FaMapMarkerAlt, FaEdit, FaPlus, FaInfoCircle, FaIdCard } from 'react-icons/fa';
-import Header from '@/app/Components/header/Header';
+
 import Sidebar from '@/app/Patient/PatientComponents/navBar';
 import axios from 'axios';
 
