@@ -18,14 +18,22 @@ export const VideoCallProvider = ({ children }) => {
     setCallStatus("incoming");
   }, []);
 
-  const startCall = useCallback((roomUrl, otherUserName) => {
-    // Ensure this sets the activeCall state correctly
-    setActiveCall({ roomUrl, otherUserName });
-    setCallStatus("active");
-    setIncomingCall(false); // Hide the incoming call modal
-    setCallerInfo(null); // Clear caller info once call is active
-    setRoomUrl(null); // Clear room URL once call is active
-  }, []);
+  const startCall = useCallback(
+    (roomUrl, currentUserName, otherUserName, callerId, receiverId) => {
+      setActiveCall({
+        roomUrl,
+        currentUserName,
+        otherUserName,
+        callerId,
+        receiverId,
+      });
+      setCallStatus("active");
+      setIncomingCall(false);
+      setCallerInfo(null);
+      setRoomUrl(null);
+    },
+    []
+  );
 
   const endCall = useCallback(() => {
     setActiveCall(null);

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import AppointmentListStat from "./appointmentListStat";
 import CancelAppointmentDialog from "./cancelAppointmentConfirmation";
 import ResponseDialogBox from "./responseDialogBox";
+import AlertDialogBox from "./alertDialogBox";
 import {
   getAppointmentsByPatient,
   deleteAppointment,
@@ -31,6 +32,8 @@ const AppointmentList = ({ patientId }) => {
   const [appointmentTime, setAppointmentTime] = useState("");
   const [paymentAmount, setPaymentAmount] = useState("");
   const [payHereObjectId, setPayHereObjectId] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
 
 
@@ -132,13 +135,17 @@ const AppointmentList = ({ patientId }) => {
       await sendEmail(doctorEmailPayload);
       await sendNotification(notificationPayload);
     }
-  } catch (err) {
-    console.error("Failed to cancel appointment", err);
-    alert("Failed to cancel appointment.");
-    const res = await getAppointmentsByPatient(patientId);
-    setAppointments(res);
-  }
-};
+    } catch (err) {
+      console.error("Failed to cancel appointment", err);
+      <AlertDialogBox
+          open={alertOpen}
+          onClose={() => setAlertOpen(false)}
+          message={alertMessage}
+      />
+      const res = await getAppointmentsByPatient(patientId);
+      setAppointments(res);
+    }
+  };
 
 
   const total = appointments.length;
@@ -148,6 +155,9 @@ const AppointmentList = ({ patientId }) => {
   const cancelled = appointments.filter(
     (a) => a.status.toLowerCase() === "cancelled"
   ).length;
+  const rescheduled = appointments.filter(
+  (a) => a.status.toLowerCase() === "rescheduled"
+).length;
 
   return (
     <div className="ml-[90px] p-6 bg-white/20 backdrop-blur-md min-h-screen rounded-xl shadow-lg">
@@ -159,6 +169,7 @@ const AppointmentList = ({ patientId }) => {
         total={total}
         accepted={accepted}
         cancelled={cancelled}
+        rescheduled={rescheduled}
         onFilterSelect={setFilter}
         selectedFilter={filter}
       />
@@ -197,7 +208,7 @@ const AppointmentList = ({ patientId }) => {
                 <div className="flex-1 text-gray-600 text-sm">{appt.time}</div>
               </div>
 
-            <div className="flex gap-2 mt-2 md:mt-0">
+            <div className="flex gap-2 mt-2 md:mt-0 min-h-[36px]"> {/* Ensures minimum height */}
               {appt.status.toLowerCase() === "pending" && (
                 <button
                   onClick={() => confirmCancelAppointment(appt)}
@@ -212,16 +223,26 @@ const AppointmentList = ({ patientId }) => {
                   onClick={() =>
                     alert(`Viewing health records for appointment ${appt.appointmentId}`)
                   }
-                  className="bg-blue-500 hover:bg-blue-300 rounded-lg text-white px-3 py-0.5 text-sm shadow"
+                  className="bg-blue-500 hover:bg-blue-300 rounded-lg text-white px-3 py-1 text-sm shadow"
                 >
                   View Health Records
                 </button>
               )}
 
               {appt.status.toLowerCase() === "cancelled" && (
-                <div className="rounded-lg px-3 py-1 text-sm shadow w-fit"></div>
+                <div className="h-[32px] w-[140px] invisible">
+                  <button className="w-full h-full">Placeholder</button>
+                </div>
+              )}
+
+              {appt.status.toLowerCase() === "rescheduled" && (
+                <div className="h-[32px] w-[140px] invisible">
+                  <button className="w-full h-full">Placeholder</button>
+                </div>
               )}
             </div>
+
+
 
 
             </div>

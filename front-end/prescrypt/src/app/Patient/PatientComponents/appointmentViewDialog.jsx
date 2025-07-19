@@ -10,9 +10,19 @@ import {
   IconButton,
   Typography,
   Divider,
+  Box,
+  Chip,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { getAppointmentsByPatientIdAndDate } from "../services/AppointmentsFindingService";
+
+const statusColor = {
+  completed: "success",
+  cancelled: "error",
+  rescheduled: "warning",
+  pending: "info",
+};
 
 const AppointmentViewDialog = ({ open, onClose, date, patientId }) => {
   const [appointments, setAppointments] = useState([]);
@@ -47,10 +57,10 @@ const AppointmentViewDialog = ({ open, onClose, date, patientId }) => {
       sx={{
         "& .MuiDialog-paper": {
           borderRadius: "20px",
-          padding: "20px",
+          padding: "24px",
           border: "2px solid #2e7d32",
-          backgroundColor: "#ffffff",
-          boxShadow: "0px 6px 30px rgba(0, 0, 0, 0.15)",
+          backgroundColor: "#f9fdfb",
+          boxShadow: "0px 8px 40px rgba(0, 0, 0, 0.2)",
           position: "relative",
         },
       }}
@@ -67,34 +77,54 @@ const AppointmentViewDialog = ({ open, onClose, date, patientId }) => {
           fontWeight: "bold",
           textAlign: "center",
           color: "#2e7d32",
-          fontSize: "1.5rem",
-          paddingTop: "32px", 
+          fontSize: "1.7rem",
+          paddingTop: "36px",
         }}
       >
         Appointments on {date?.format("MMMM DD, YYYY")}
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ mt: 1 }}>
         {loading ? (
-          <Typography align="center" sx={{ mt: 2 }}>
-            Loading...
-          </Typography>
+          <Box display="flex" justifyContent="center" mt={4}>
+            <CircularProgress color="success" />
+          </Box>
         ) : appointments.length === 0 ? (
-          <Typography align="center" sx={{ mt: 2 }}>
+          <Typography align="center" sx={{ mt: 4, fontSize: "1.1rem", fontWeight: 500 }}>
             No appointments found on this date.
           </Typography>
         ) : (
           appointments.map((a, index) => (
-            <div key={index} className="mb-4">
-              <Typography variant="subtitle1">
-                Doctor: <strong>{a.doctorName}</strong>
+            <Box
+              key={index}
+              sx={{
+                backgroundColor: "#fff",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                padding: "16px 20px",
+                mb: 3,
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+                Dr. {a.doctorName}
               </Typography>
-              <Typography variant="body2">Specialization: {a.specialization}</Typography>
-              <Typography variant="body2">Hospital: {a.hospitalName}</Typography>
-              <Typography variant="body2">Time: {a.appointmentTime}</Typography>
-              <Typography variant="body2">Status: {a.status}</Typography>
-              {index < appointments.length - 1 && <Divider className="mt-3 mb-3" />}
-            </div>
+              <Typography variant="body2" color="text.secondary">
+                Specialization: {a.specialization}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Hospital: {a.hospitalName}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Time: {a.appointmentTime}
+              </Typography>
+              <Box mt={1}>
+                <Chip
+                  label={a.status}
+                  color={statusColor[a.status.toLowerCase()] || "default"}
+                  sx={{ textTransform: "capitalize", fontWeight: 600 }}
+                />
+              </Box>
+            </Box>
           ))
         )}
       </DialogContent>

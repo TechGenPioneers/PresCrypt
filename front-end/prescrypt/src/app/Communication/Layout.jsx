@@ -39,10 +39,8 @@ const Layout = ({ userId, userRole }) => {
     setCallError,
   } = useVideoCall();
 
-  const {
-    connection: videoCallConnection,
-    status: videoCallHubStatus,
-  } = useVideoCallSignalR(userId, userRole);
+  const { connection: videoCallConnection, status: videoCallHubStatus } =
+    useVideoCallSignalR(userId, userRole);
 
   const { handleAcceptCall, handleRejectCall } = useIncomingCallHandler({
     users, // Pass users if needed by the hook for other logic
@@ -50,6 +48,8 @@ const Layout = ({ userId, userRole }) => {
     userRole,
     setSelectedUser, // Pass setSelectedUser to allow the hook to set it on accept
     videoCallConnection,
+    doctorName: userNames.DoctorName,
+    patientName: userNames.PatientName,
   });
 
   const fetchUsers = async () => {
@@ -71,8 +71,10 @@ const Layout = ({ userId, userRole }) => {
 
   const fetchUserNames = async () => {
     try {
-      const doctorId = userRole === "Doctor" ? userId : selectedUser?.receiverId;
-      const patientId = userRole === "Patient" ? userId : selectedUser?.receiverId;
+      const doctorId =
+        userRole === "Doctor" ? userId : selectedUser?.receiverId;
+      const patientId =
+        userRole === "Patient" ? userId : selectedUser?.receiverId;
 
       if (!doctorId || !patientId) return;
 
@@ -139,9 +141,10 @@ const Layout = ({ userId, userRole }) => {
       {incomingCall && callerInfo && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <IncomingCallModal
-            callerName={callerInfo.callerName}
+            callerName={callerInfo?.callerName || "Caller"}
             onAccept={handleAcceptCall} // This calls the hook's accept logic
             onReject={handleRejectCall} // This calls the hook's reject logic
+            userId={userId}
           />
         </div>
       )}

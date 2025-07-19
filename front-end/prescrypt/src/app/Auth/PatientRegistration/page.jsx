@@ -1,4 +1,3 @@
-// app/Auth/PatientRegistration/page.jsx
 "use client";
 
 import { useState } from "react";
@@ -10,6 +9,9 @@ import DatePickerInput from "../components/DatePickerInput";
 import FormSelect from "../components/FormSelect";
 import SubmitButton from "../components/SubmitButton";
 import FormTextarea from "../components/FormTextArea";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+
 export default function PatientRegistration() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -26,6 +28,10 @@ export default function PatientRegistration() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
   const passwordPattern =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
 
@@ -33,6 +39,17 @@ export default function PatientRegistration() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: "" });
+  };
+
+  const Alert = (props) => {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   const handleDateChange = (date) => {
@@ -72,10 +89,115 @@ export default function PatientRegistration() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleRegister = async () => {
-    if (!validateForm()) return;
+  // Enhanced function to parse backend validation errors
+  const parseBackendErrors = (errorResponse) => {
+    try {
+      // Try to parse as JSON first
+      let parsedError;
+      if (typeof errorResponse === 'string') {
+        try {
+          parsedError = JSON.parse(errorResponse);
+        } catch {
+          parsedError = errorResponse;
+        }
+      } else {
+        parsedError = errorResponse;
+      }
+
+      // Handle different error response formats
+      if (parsedError && typeof parsedError === 'object') {
+        const backendErrors = {};
+        
+        // Format 1: { "errors": { "Email": ["Email already exists"], "FirstName": ["Invalid name"] } }
+        if (parsedError.errors) {
+          Object.keys(parsedError.errors).forEach(field => {
+            const fieldErrors = parsedError.errors[field];
+            if (Array.isArray(fieldErrors) && fieldErrors.length > 0) {
+              // Map backend field names to frontend field names if needed
+              const frontendFieldName = mapBackendFieldToFrontend(field);
+              backendErrors[frontendFieldName] = fieldErrors[0]; // Take first error
+            }
+          });
+        }
+        
+        // Format 2: { "Email": "Email already exists", "Password": "Weak password" }
+        else if (!parsedError.message && !parsedError.title) {
+          Object.keys(parsedError).forEach(field => {
+            if (typeof parsedError[field] === 'string') {
+              const frontendFieldName = mapBackendFieldToFrontend(field);
+              backendErrors[frontendFieldName] = parsedError[field];
+            }
+          });
+        }
+        
+        // Format 3: { "message": "Validation failed", "details": {...} }
+        else if (parsedError.details) {
+          Object.keys(parsedError.details).forEach(field => {
+            const frontendFieldName = mapBackendFieldToFrontend(field);
+            backendErrors[frontendFieldName] = parsedError.details[field];
+          });
+        }
+
+        // If we found field-specific errors, return them
+        if (Object.keys(backendErrors).length > 0) {
+          console.log('Parsed backend errors:', backendErrors);
+          return { fieldErrors: backendErrors };
+        }
+      }
+
+      // If no field-specific errors found, return general message
+      const generalMessage = parsedError?.message || parsedError?.title || parsedError || "Registration failed.";
+      console.log('General backend error:', generalMessage);
+      return { generalMessage };
+
+    } catch (error) {
+      console.error('Error parsing backend response:', error);
+      return { generalMessage: errorResponse || "An error occurred during registration." };
+    }
+  };
+
+  // Helper function to map backend field names to frontend field names
+  const mapBackendFieldToFrontend = (backendField) => {
+    const fieldMapping = {
+      'Email': 'email',
+      'email': 'email',
+      'Password': 'password',
+      'password': 'password',
+      'ConfirmPassword': 'confirmPassword',
+      'confirmPassword': 'confirmPassword',
+      'FirstName': 'FirstName',
+      'firstName': 'FirstName',
+      'LastName': 'LastName',
+      'lastName': 'LastName',
+      'ContactNumber': 'contactNumber',
+      'contactNumber': 'contactNumber',
+      'PhoneNumber': 'contactNumber',
+      'phoneNumber': 'contactNumber',
+      'Address': 'address',
+      'address': 'address',
+      'DateOfBirth': 'dob',
+      'dateOfBirth': 'dob',
+      'DOB': 'dob',
+      'dob': 'dob',
+      'Role': 'role',
+      'role': 'role'
+    };
+    
+    return fieldMapping[backendField] || backendField;
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      setSnackbarMessage("Please fix the form errors before submitting.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
 
     setLoading(true);
+    // Clear previous errors
+    setErrors({});
 
     try {
       const response = await fetch(
@@ -98,12 +220,57 @@ export default function PatientRegistration() {
       );
 
       const data = await response.text();
-      if (!response.ok) throw new Error(data);
+      
+      if (!response.ok) {
+        // Parse backend errors
+        const { fieldErrors, generalMessage } = parseBackendErrors(data);
+        
+        if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+          // Set field-specific errors
+          setErrors(prevErrors => ({ ...prevErrors, ...fieldErrors }));
+          setSnackbarMessage("Please fix the validation errors below.");
+          setSnackbarSeverity("error");
+        } else {
+          // Set general error
+          setErrors(prevErrors => ({ ...prevErrors, general: generalMessage }));
+          setSnackbarMessage(generalMessage);
+          setSnackbarSeverity("error");
+        }
+        setSnackbarOpen(true);
+        throw new Error(generalMessage || "Registration failed.");
+      }
 
-      alert("Registration Successful!");
-      router.push("../Patient/PatientDashboard");
+      // Success case
+      let responseData;
+      try {
+        responseData = JSON.parse(data);
+      } catch {
+        // If response is not JSON, treat as success with text response
+        responseData = { token: data };
+      }
+
+      setSnackbarMessage("Registration Successful! Redirecting...");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+      
+      // Store tokens if available
+      if (responseData.token) {
+        localStorage.setItem("token", responseData.token);
+      }
+      if (responseData.role) {
+        localStorage.setItem("userRole", responseData.role);
+      }
+      if (responseData.username) {
+        localStorage.setItem("username", responseData.username);
+      }
+
+      setTimeout(() => {
+        router.push("../Patient/PatientDashboard");
+      }, 1000);
+      
     } catch (err) {
-      setErrors({ general: err.message });
+      console.error('Registration error:', err);
+      // Error handling is already done above, no need to duplicate
     } finally {
       setLoading(false);
     }
@@ -120,7 +287,6 @@ export default function PatientRegistration() {
         onChange={(role) => {
           setFormData({ ...formData, role });
           if (role === "Doctor") router.push("/Auth/DoctorRegistration");
-          if (role === "Admin") router.push("/Auth/AdminRegistration");
         }}
         error={errors.role}
       />
@@ -153,13 +319,9 @@ export default function PatientRegistration() {
         onChange={handleChange}
         error={errors.contactNumber}
       />
-     
       <DatePickerInput
         selected={formData.dob}
-        onChange={(date) => {
-          setFormData({ ...formData, dob: date });
-          setErrors({ ...errors, dob: "" });
-        }}
+        onChange={handleDateChange}
         error={errors.dob}
       />
       <FormTextarea
@@ -191,7 +353,7 @@ export default function PatientRegistration() {
         loading={loading}
         disabled={loading}
         text="Create Account"
-        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg"
+        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
       >
         {loading ? "Registering..." : "Create Account"}
       </SubmitButton>
@@ -204,6 +366,23 @@ export default function PatientRegistration() {
           Log in here
         </a>
       </p>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        className="mt-4"
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          className={`w-full max-w-md ${
+            snackbarSeverity === "success" ? "bg-teal-600" : "bg-red-600"
+          } text-white font-medium rounded-lg shadow-lg`}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </RegistrationLayout>
   );
 }

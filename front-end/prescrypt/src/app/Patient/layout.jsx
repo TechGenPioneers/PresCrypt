@@ -10,7 +10,7 @@ export default function PatientLayout({ children }) {
     <div className="relative min-h-screen flex flex-col">
       {/* Background image with opacity */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-30 z-0"
+        className="fixed inset-0 bg-cover bg-center opacity-30 z-0"
         style={{ backgroundImage: "url('/BGImage.png')" }}
       ></div>
 
