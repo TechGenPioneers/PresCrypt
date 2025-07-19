@@ -225,7 +225,10 @@ const ChatList = ({
                 <div className="avatar">
                   <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-emerald-200">
                     <img
-                      src={user.image || "profile.png"}
+                      src={
+                        `data:image/jpeg;base64,${user.profileImage}` ||
+                        "/profile.png"
+                      }
                       alt={user.fullName}
                       className="object-cover w-full h-full"
                     />
@@ -245,16 +248,17 @@ const ChatList = ({
                         {formatMessageTime(user.sendAt)}
                       </time>
                       {user.lastMessageSenderId === userId &&
-                        (user.isReceived ? (
+                        (!user.isReceived ? ( // not received yet
                           <span className="text-gray-500 text-xs">
                             <Clock className="w-3 h-3" />
                           </span>
-                        ) : user.isRead ? (
+                        ) : user.isRead ? ( // received and read
                           <span className="flex items-center gap-[1px] text-blue-500 text-xs">
                             <Check className="w-3 h-3" />
                             <Check className="w-3 h-3 -ml-1.5" />
                           </span>
                         ) : (
+                          // received but not read yet
                           <span className="flex items-center gap-[1px] text-gray-500 text-xs">
                             <Check className="w-3 h-3" />
                           </span>

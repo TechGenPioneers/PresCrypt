@@ -65,9 +65,8 @@ const ChatWindow = ({
   const menuRef = useRef(null);
   const messageContainerRef = useRef(null);
   const currentUserName = userRole === "Doctor" ? doctorName : patientName;
-
   const otherUserName = userRole === "Doctor" ? patientName : doctorName;
-
+  const[isDelete,setIsDelete]=useState(false)
   const {
     incomingCall,
     callerInfo,
@@ -255,13 +254,15 @@ const ChatWindow = ({
   }, []);
 
   const handleDeleteMessage = async (messageId) => {
+    setIsDelete(true)
     try {
       await DeleteMessage(messageId);
       setMenuOpenId(null);
       fetchUsers();
     } catch (err) {
       console.error("Failed to delete message", err);
-    }
+    } 
+    setIsDelete(false) 
   };
 
   const shouldShowIncomingModal =
@@ -341,7 +342,10 @@ const ChatWindow = ({
                         <div className="avatar mr-2">
                           <div className="w-10 h-10 rounded-full border border-emerald-600 overflow-hidden">
                             <img
-                              src={selectedUser.image || "/profile.png"}
+                              src={
+                                `data:image/jpeg;base64,${selectedUser.profileImage}` ||
+                                "/profile.png"
+                              }
                               alt="user"
                               className="object-cover w-full h-full"
                             />
@@ -408,7 +412,12 @@ const ChatWindow = ({
                             <li>
                               <button
                                 onClick={() => handleDeleteMessage(msg.id)}
-                                className="w-full flex items-center gap-2 text-sm text-red-600 hover:bg-red-50 p-2 rounded-md"
+                                disabled={isDelete}
+                                className={`w-full flex items-center gap-2 text-sm p-2 rounded-md ${
+                                  isDelete
+                                    ? "text-gray-400 cursor-not-allowed"
+                                    : "text-red-600 hover:bg-red-50"
+                                }`}
                               >
                                 <Trash2 /> delete
                               </button>
@@ -421,7 +430,6 @@ const ChatWindow = ({
                 );
               });
             })()}
-            
           </div>
 
           <MessageInput
