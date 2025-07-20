@@ -8,6 +8,7 @@ const GetUsers = async (userId) => {
     const response = await axios.get(
       `${baseUrl}/GetChatUsers?senderId=${userId}`
     );
+    console.log("re",response)
     return response.data;
   } catch (error) {
     console.error("Failed to fetch users", error);
