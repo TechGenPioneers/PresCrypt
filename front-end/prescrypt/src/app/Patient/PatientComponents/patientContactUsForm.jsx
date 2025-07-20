@@ -190,12 +190,9 @@ const ContactUsForm = () => {
     <>
       <div className="flex items-center justify-center p-4">
         <form
-          onSubmit={handleSubmit}
-          className="bg-white/70 backdrop-blur-md p-6 md:p-8 rounded-3xl shadow-xl w-full max-w-2xl mx-auto space-y-5 border border-green-300/30"
-          style={{
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(76, 175, 80, 0.1)"
-          }}
-        >
+        onSubmit={handleSubmit}
+        className="p-6 md:p-8 rounded-3xl shadow-xl w-full max-w-2xl mx-auto space-y-5 border border-green-300/30"
+      >
           <div className="text-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold text-green-700 mb-2">Contact Us</h2>
             <p className="text-green-600/80 text-sm md:text-base">Your Personal Health Hub</p>
