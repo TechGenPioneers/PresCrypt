@@ -23,7 +23,7 @@ const AppointmentList = ({ patientId }) => {
   const [filter, setFilter] = useState("all");
 
   const [patientDetails, setPatientDetails] = useState({});
-  const [profileImage, setProfileImage] = useState("");
+  const [profileImage, setProfileImage] = useState(null); // Changed from "" to null
   const [openDialog, setOpenDialog] = useState(false);
   const [openHealthRecordsDialog, setOpenHealthRecordsDialog] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -36,8 +36,6 @@ const AppointmentList = ({ patientId }) => {
   const [payHereObjectId, setPayHereObjectId] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +53,8 @@ const AppointmentList = ({ patientId }) => {
 
         setAppointments(sortedAppointments);
         setPatientDetails({ ...patientRes, age: calculatedAge });
-        setProfileImage(imageRes);
+        // Only set profile image if it's not empty
+        setProfileImage(imageRes && imageRes.trim() !== "" ? imageRes : null);
       } catch (error) {
         console.error("Error fetching patient data:", error);
       }
@@ -98,62 +97,61 @@ const AppointmentList = ({ patientId }) => {
   };
 
   const handleCancelConfirmed = async () => {
-  const appointmentId = selectedAppointment.appointmentId;
-  const cancelledAppt = selectedAppointment;
-  setOpenDialog(false);
-  setAppointments((prev) =>
-    prev.filter((appt) => appt.appointmentId !== appointmentId)
-  );
+    const appointmentId = selectedAppointment.appointmentId;
+    const cancelledAppt = selectedAppointment;
+    setOpenDialog(false);
+    setAppointments((prev) =>
+      prev.filter((appt) => appt.appointmentId !== appointmentId)
+    );
 
-  try {
-    const res = await deleteAppointment(appointmentId);
-    console.log("Payhere Object Id:", res.payhereObjectId);
-    setResponseMessage(res.message || "Wrong there");
-    setPaymentMethod(res.paymentMethod || "N/A");
-    setAppointmentDate(res.appointmentDate);
-    setAppointmentTime(res.appointmentTime);
-    setPaymentAmount(res.paymentAmount );
-    setPayHereObjectId(res.payHereObjectId);
-    setResponseDialogOpen(true);
+    try {
+      const res = await deleteAppointment(appointmentId);
+      console.log("Payhere Object Id:", res.payhereObjectId);
+      setResponseMessage(res.message || "Wrong there");
+      setPaymentMethod(res.paymentMethod || "N/A");
+      setAppointmentDate(res.appointmentDate);
+      setAppointmentTime(res.appointmentTime);
+      setPaymentAmount(res.paymentAmount);
+      setPayHereObjectId(res.payHereObjectId);
+      setResponseDialogOpen(true);
 
-    if (cancelledAppt) {
-      const patientEmailPayload = {
-        receptor: cancelledAppt.patientEmail,
-        title: "Cancelled the Appointment",
-        message: `Your appointment with Dr. ${cancelledAppt.doctorName} on ${cancelledAppt.date} at ${cancelledAppt.time} at ${cancelledAppt.hospitalName} has been cancelled on your request.`,
-        attachment: { fileName: "", contentType: "", base64Content: "" },
-      };
+      if (cancelledAppt) {
+        const patientEmailPayload = {
+          receptor: cancelledAppt.patientEmail,
+          title: "Cancelled the Appointment",
+          message: `Your appointment with Dr. ${cancelledAppt.doctorName} on ${cancelledAppt.date} at ${cancelledAppt.time} at ${cancelledAppt.hospitalName} has been cancelled on your request.`,
+          attachment: { fileName: "", contentType: "", base64Content: "" },
+        };
 
-      const doctorEmailPayload = {
-        receptor: cancelledAppt.doctorEmail,
-        title: "Cancelled the Appointment",
-        message: `Your patient Mr/Mrs/Ms ${cancelledAppt.patientName} booked on ${cancelledAppt.date} at ${cancelledAppt.time} at ${cancelledAppt.hospitalName} has confirmed their cancellation.`,
-        attachment: { fileName: "", contentType: "", base64Content: "" },
-      };
+        const doctorEmailPayload = {
+          receptor: cancelledAppt.doctorEmail,
+          title: "Cancelled the Appointment",
+          message: `Your patient Mr/Mrs/Ms ${cancelledAppt.patientName} booked on ${cancelledAppt.date} at ${cancelledAppt.time} at ${cancelledAppt.hospitalName} has confirmed their cancellation.`,
+          attachment: { fileName: "", contentType: "", base64Content: "" },
+        };
 
-      const notificationPayload = {
-        patientId,
-        title: "Appointment Cancellation",
-        type: "Cancellation",
-        message: `Your appointment with Dr. ${cancelledAppt.doctorName} on ${cancelledAppt.date} at ${cancelledAppt.time} at ${cancelledAppt.hospitalName} has been cancelled as per your request.`,
-      };
+        const notificationPayload = {
+          patientId,
+          title: "Appointment Cancellation",
+          type: "Cancellation",
+          message: `Your appointment with Dr. ${cancelledAppt.doctorName} on ${cancelledAppt.date} at ${cancelledAppt.time} at ${cancelledAppt.hospitalName} has been cancelled as per your request.`,
+        };
 
-      await sendEmail(patientEmailPayload);
-      await sendEmail(doctorEmailPayload);
-      await sendNotification(notificationPayload);
-    }
+        await sendEmail(patientEmailPayload);
+        await sendEmail(doctorEmailPayload);
+        await sendNotification(notificationPayload);
+      }
     } catch (err) {
       console.error("Failed to cancel appointment", err);
-      <AlertDialogBox
-          open={alertOpen}
-          onClose={() => setAlertOpen(false)}
-          message={alertMessage}
-      />
+      setAlertMessage("Failed to cancel appointment. Please try again.");
+      setAlertOpen(true);
+
+      // Refresh appointments on error
+
       const res = await getAppointmentsByPatient(patientId);
       setAppointments(res);
     }
   };
-
 
   const total = appointments.length;
   const accepted = appointments.filter(
@@ -163,8 +161,8 @@ const AppointmentList = ({ patientId }) => {
     (a) => a.status.toLowerCase() === "cancelled"
   ).length;
   const rescheduled = appointments.filter(
-  (a) => a.status.toLowerCase() === "rescheduled"
-).length;
+    (a) => a.status.toLowerCase() === "rescheduled"
+  ).length;
 
   return (
     <div className="ml-[90px] p-6 bg-white/20 backdrop-blur-md min-h-screen rounded-xl shadow-lg">
@@ -215,6 +213,7 @@ const AppointmentList = ({ patientId }) => {
                 <div className="flex-1 text-gray-600 text-sm">{appt.time}</div>
               </div>
 
+
             <div className="flex gap-2 mt-2 md:mt-0">
               {appt.status.toLowerCase() === "pending" && (
                 <button
@@ -226,7 +225,7 @@ const AppointmentList = ({ patientId }) => {
               )}
               {appt.status.toLowerCase() === "completed" && (
                 <button
-                  onClick={() => alert(`Viewing health records for appointment ${appt.appointmentId}`)}
+                  onClick={() => handleViewHealthRecords(appt)}
                   className="bg-blue-500 hover:bg-blue-300 rounded-lg text-white px-3 py-0.5 text-sm shadow"
                 >
                   View Health Records
@@ -247,8 +246,6 @@ const AppointmentList = ({ patientId }) => {
             </div>
 
 
-
-
             </div>
           ))
         ) : (
@@ -256,6 +253,7 @@ const AppointmentList = ({ patientId }) => {
         )}
       </div>
 
+      {/* Cancel Appointment Dialog */}
       {selectedAppointment && (
         <CancelAppointmentDialog
           open={openDialog}
@@ -267,6 +265,35 @@ const AppointmentList = ({ patientId }) => {
           hospitalName={selectedAppointment.hospitalName}
         />
       )}
+
+      {/* View Health Records Dialog */}
+      {selectedAppointment && (
+        <ViewHealthRecordsDialog
+          open={openHealthRecordsDialog}
+          onClose={() => setOpenHealthRecordsDialog(false)}
+          appointment={selectedAppointment}
+        />
+      )}
+
+      {/* Response Dialog */}
+      <ResponseDialogBox
+        open={responseDialogOpen}
+        onClose={() => setResponseDialogOpen(false)}
+        message={responseMessage}
+        paymentMethod={paymentMethod}
+        appointmentDate={appointmentDate}
+        appointmentTime={appointmentTime}
+        paymentAmount={paymentAmount}
+        payHereObjectId={payHereObjectId}
+      />
+
+      {/* Alert Dialog */}
+
+      <AlertDialogBox
+        open={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        message={alertMessage}
+      />
     </div>
   );
 };

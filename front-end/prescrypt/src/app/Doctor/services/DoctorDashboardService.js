@@ -32,10 +32,13 @@ const DoctorDashboardService = {
 
   async getDashboardStats(doctorId) {
     try {
-      const response = await axiosInstance.get(`/DoctorDashboard/dashboard-stats`, {
-        params: { doctorId },
-        validateStatus: (status) => status < 500,
-      });
+      const response = await axiosInstance.get(
+        `/DoctorDashboard/dashboard-stats`,
+        {
+          params: { doctorId },
+          validateStatus: (status) => status < 500,
+        }
+      );
 
       if (!response.data) {
         console.warn("[DoctorDashboardService] Empty stats response");
@@ -43,6 +46,7 @@ const DoctorDashboardService = {
           upcomingAppointments: 0,
           cancelledAppointments: 0,
           bookedPatients: 0,
+          hospitalAppointments: [],
         };
       }
 
@@ -50,6 +54,7 @@ const DoctorDashboardService = {
         upcomingAppointments: response.data.upcomingAppointments || 0,
         cancelledAppointments: response.data.cancelledAppointments || 0,
         bookedPatients: response.data.bookedPatients || 0,
+        hospitalAppointments: response.data.hospitalAppointments || [],
       };
     } catch (error) {
       console.error("[DoctorDashboardService] Stats fetch error:", {
@@ -60,18 +65,25 @@ const DoctorDashboardService = {
         upcomingAppointments: 0,
         cancelledAppointments: 0,
         bookedPatients: 0,
+        hospitalAppointments: [],
       };
     }
   },
 
   async getNotifications(doctorId) {
     try {
-      const response = await axiosInstance.get(`/DoctorNotifications/doctor/${doctorId}`, {
-        validateStatus: (status) => status < 500,
-      });
+      const response = await axiosInstance.get(
+        `/DoctorNotifications/doctor/${doctorId}`,
+        {
+          validateStatus: (status) => status < 500,
+        }
+      );
 
       if (!Array.isArray(response.data)) {
-        console.warn("[DoctorDashboardService] Invalid notifications format:", response.data);
+        console.warn(
+          "[DoctorDashboardService] Invalid notifications format:",
+          response.data
+        );
         return [];
       }
 
@@ -81,7 +93,9 @@ const DoctorDashboardService = {
         message: notification.message || "",
         type: notification.type || "general",
         isRead: notification.isRead || false,
-        createdAt: notification.createdAt ? new Date(notification.createdAt) : new Date(),
+        createdAt: notification.createdAt
+          ? new Date(notification.createdAt)
+          : new Date(),
       }));
     } catch (error) {
       console.error("[DoctorDashboardService] Notifications fetch error:", {
@@ -94,7 +108,9 @@ const DoctorDashboardService = {
 
   async markNotificationAsRead(notificationId) {
     try {
-      const response = await axiosInstance.post(`/DoctorNotifications/mark-as-read/${notificationId}`);
+      const response = await axiosInstance.post(
+        `/DoctorNotifications/mark-as-read/${notificationId}`
+      );
       return response.data;
     } catch (error) {
       console.error(
@@ -107,7 +123,9 @@ const DoctorDashboardService = {
 
   async deleteNotification(notificationId) {
     try {
-      const response = await axiosInstance.delete(`/DoctorNotifications/${notificationId}`);
+      const response = await axiosInstance.delete(
+        `/DoctorNotifications/${notificationId}`
+      );
       return response.data;
     } catch (error) {
       console.error(
