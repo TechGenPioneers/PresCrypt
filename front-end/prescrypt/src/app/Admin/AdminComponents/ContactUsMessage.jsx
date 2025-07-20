@@ -119,6 +119,29 @@ const MessageTable = () => {
     }`;
   };
 
+  const [showModel,setShowModel]=useState(true);
+
+  useEffect(() => {
+    // Minimum 5 second delay
+    const timer = setTimeout(() => {
+      setShowModel(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // set date and time
+  if (showModel || !messages ) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
+          <p className="text-slate-600 text-lg font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-7xl mx-auto">
