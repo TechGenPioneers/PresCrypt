@@ -8,7 +8,8 @@ import AuthForm from "../components/AuthForm";
 import PasswordInput from "../components/PasswordInput";
 import Notification from "../components/Notification";
 import { loginUser } from "@/utils/api";
-
+import { logout } from "@/utils/api";
+import HealthcareAnimatedBackground from "../../Components/MainPage/AnimatedWaveBackground";
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
@@ -22,14 +23,15 @@ export default function LoginPage() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   useEffect(() => {
     // Check for role parameter
+    localStorage.clear();
     const roleParam = searchParams.get("role");
     if (roleParam && ["patient", "doctor", "admin"].includes(roleParam)) {
       setRole(roleParam);
     }
-    
+
     // Check for session parameter
     const sessionParam = searchParams.get("session");
     if (sessionParam === "expired") {
@@ -87,20 +89,6 @@ export default function LoginPage() {
   };
 
   const completeLogin = async (response) => {
-    localStorage.setItem("token", response.token);
-    localStorage.setItem("username", response.user?.username);
-    localStorage.setItem("userRole", response.user?.role);
-    localStorage.setItem("username", response.user?.username);
-
-    await fetch("/api/set-cookie", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: response.token,
-        role: response.user?.role,
-        username: response.user?.username,
-      }),
-    });
 
     switch (response.user?.role) {
       case "Patient":
@@ -111,6 +99,7 @@ export default function LoginPage() {
         break;
       case "Admin":
         router.push("/Admin/AdminDashboard");
+
         break;
       default:
         router.push("/Auth/MainPage");
@@ -134,7 +123,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white relative">
+    <div className="flex flex-col items-center justify-center overflow-hidden min-h-screen bg-white relative ">
+      <HealthcareAnimatedBackground />
       {sessionExpired && (
         <div className="w-full max-w-md mb-4 px-4 py-3 bg-red-400 border border-red-700 rounded-md text-white text-center">
           Your session has timed out. Please log in again.
@@ -150,7 +140,7 @@ export default function LoginPage() {
       )}
 
       <AuthCard imageSrc="/loginimage.jpg" imageAlt="Login Illustration">
-        <h2 className="text-2xl font-bold text-teal-700 text-center mb-2">
+        <h2 className="text-2xl font-bold text-teal-700 text-center mb-4">
           WELCOME BACK!
         </h2>
         <p className="text-gray-600 text-center mb-6">
@@ -177,13 +167,13 @@ export default function LoginPage() {
             onChange={handleChange}
             error={error}
             required
-            inputClassName="text-white"
+            inputclassname="text-white"
           />
 
           <p className="text-sm text-center text-teal-600 hover:underline mt-2">
             <Link href="/Auth/ForgotPassword">Forgot Password?</Link>
           </p>
-          
+
           <button
             type="submit"
             className="w-full py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition disabled:opacity-50 mt-4"
@@ -203,5 +193,6 @@ export default function LoginPage() {
         </Link>
       </AuthCard>
     </div>
+  
   );
 }

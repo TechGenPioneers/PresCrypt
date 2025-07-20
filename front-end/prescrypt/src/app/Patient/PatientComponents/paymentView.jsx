@@ -1,6 +1,110 @@
 import React, { useState, useContext } from "react";
 import { AppointmentContext } from "../Bookings/Payments/[id]/page";
 import PaymentAtLocation from "./paymentAtLocation";
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  IconButton,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+
+const RefundPolicyDialog = ({ open, onClose }) => {
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      sx={{
+        "& .MuiDialog-paper": {
+          borderRadius: "20px",
+          padding: "24px 20px",
+          border: "2px solid #4CAF50",
+          backgroundColor: "#fffdfd",
+          boxShadow: "0px 6px 30px rgba(0, 0, 0, 0.15)",
+          minWidth: "400px",
+          maxWidth: "500px",
+        },
+      }}
+    >
+      <IconButton
+        onClick={onClose}
+        sx={{ 
+          position: "absolute", 
+          top: 12, 
+          right: 12,
+          color: "#4CAF50",
+          "&:hover": { backgroundColor: "rgba(76, 175, 80, 0.1)" }
+        }}
+      >
+        <CloseIcon />
+      </IconButton>
+
+      <DialogContent className="flex flex-col items-center text-center" sx={{ pt: 2 }}>
+        <InfoOutlinedIcon sx={{ fontSize: 60, color: "#4CAF50", mb: 2 }} />
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "700", color: "#2E7D32", mb: 3 }}
+        >
+          Refund Policy
+        </Typography>
+        
+        <div className="text-left w-full space-y-3">
+          <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded-r-lg">
+            <Typography
+              variant="body2"
+              sx={{ color: "#B71C1C", fontWeight: "600", fontSize: "0.9rem" }}
+            >
+              • Cancelling 3 Pay At Location appointments in a month will result in permanent inactivation of the patient account reviewed by the admin team.
+            </Typography>
+          </div>
+          
+          <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg">
+            <Typography
+              variant="body2"
+              sx={{ color: "#2E7D32", fontWeight: "500", fontSize: "0.9rem" }}
+            >
+              • Cancelling Online Paid booking before 48 hours to the appointment will result in full appointment payment refund.
+            </Typography>
+          </div>
+          
+          <div className="bg-orange-50 border-l-4 border-orange-400 p-3 rounded-r-lg">
+            <Typography
+              variant="body2"
+              sx={{ color: "#E65100", fontWeight: "500", fontSize: "0.9rem" }}
+            >
+              • Cancelling Online Paid booking within 48 hours to the appointment will result in 80% of the appointment payment refund.
+            </Typography>
+          </div>
+        </div>
+      </DialogContent>
+
+      <DialogActions sx={{ justifyContent: "center", pt: 2 }}>
+        <Button
+          onClick={onClose}
+          variant="contained"
+          sx={{
+            backgroundColor: "#4CAF50",
+            color: "#fff",
+            "&:hover": { backgroundColor: "#388E3C" },
+            borderRadius: "20px",
+            px: 4,
+            py: 1,
+            fontWeight: "600",
+            fontSize: "0.9rem",
+            textTransform: "none",
+            boxShadow: "0px 3px 8px rgba(76, 175, 80, 0.3)",
+          }}
+        >
+          I Understood and Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 const PaymentView = () => {
   const {
@@ -14,6 +118,7 @@ const PaymentView = () => {
   const totalCharge = hospitalFee + doctorFee + onlineFee;
 
   const [selectedMethod, setSelectedMethod] = useState(null);
+  const [refundPolicyOpen, setRefundPolicyOpen] = useState(false);
 
   const buttonBaseClass =
     "border-2 rounded-xl py-4 px-8 font-semibold transition-all duration-300 shadow-sm hover:shadow-lg";
@@ -61,6 +166,17 @@ const PaymentView = () => {
               </div>
             </button>
           </div>
+
+          {/* Refund Policy Button */}
+          <div className="mt-6 text-center">
+            <button
+              className="px-4 py-2 border border-green-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center mx-auto min-w-[180px] transition-all duration-200"
+              onClick={() => setRefundPolicyOpen(true)}
+            >
+              <InfoOutlinedIcon sx={{ fontSize: 18, mr: 1 }} />
+              View Our Refund Policy
+            </button>
+          </div>
         </div>
 
         {/* Pricing Breakdown */}
@@ -97,6 +213,12 @@ const PaymentView = () => {
           onlineFee={onlineFee}
         />
       </div>
+
+      {/* Refund Policy Dialog */}
+      <RefundPolicyDialog
+        open={refundPolicyOpen}
+        onClose={() => setRefundPolicyOpen(false)}
+      />
     </div>
   );
 };

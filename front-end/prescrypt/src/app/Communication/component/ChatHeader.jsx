@@ -2,7 +2,14 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Video, Ban, Info } from "lucide-react";
 
-const ChatHeader = ({ selectedUser, setSelectedUser, onStartCall, onCloseChat, userRole, isCallActive, }) => {
+const ChatHeader = ({
+  selectedUser,
+  setSelectedUser,
+  onStartCall,
+  onCloseChat,
+  userRole,
+  isCallActive,
+}) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -38,7 +45,12 @@ const ChatHeader = ({ selectedUser, setSelectedUser, onStartCall, onCloseChat, u
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <div className="avatar w-11 h-11 rounded-full overflow-hidden ring-2 ring-emerald-200">
-            <img src={selectedUser.profilePic || "profile.png"} alt="avatar" />
+            <img
+              src={`data:image/jpeg;base64,${selectedUser.profileImage}`
+                  || "/profile.png"
+              }
+              alt="avatar"
+            />
           </div>
           <h3 className="text-base font-semibold text-gray-800">
             {selectedUser.fullName}
@@ -66,8 +78,8 @@ const ChatHeader = ({ selectedUser, setSelectedUser, onStartCall, onCloseChat, u
               disabled={isCallActive}
               title={isCallActive ? "Call in progress" : "Start video call"}
               className={`p-2 rounded-full transition-colors ${
-                isCallActive 
-                  ? "cursor-not-allowed opacity-50" 
+                isCallActive
+                  ? "cursor-not-allowed opacity-50"
                   : "hover:bg-emerald-100 cursor-pointer"
               }`}
               aria-label="Start video call"

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import Sidebar from "./DoctorComponents/DoctorSidebar";
-import Footer from "../Components/footer/Footer";
+import Footer from "./DoctorComponents/Footer";
 import { getDoctorIdFromServer } from "./services/DoctorService";
 
 export default function DoctorLayout({ children }) {

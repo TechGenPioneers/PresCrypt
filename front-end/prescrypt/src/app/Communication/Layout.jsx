@@ -66,7 +66,7 @@ const Layout = ({ userId, userRole }) => {
 
   useEffect(() => {
     const newConnection = EstablishSignalRConnection();
-    setConnection(newConnection); // Set chatConnection
+    setChatConnection(newConnection); // Set chatConnection
   }, []);
 
   const fetchUserNames = async () => {
@@ -111,6 +111,7 @@ const Layout = ({ userId, userRole }) => {
           userId={userId}
           fetchUsers={fetchUsers}
           setUsers={setUsers}
+          setNewMessage={setNewMessage}
           users={users}
           isUsersLoading={isUsersLoading}
           connection={chatConnection} // Ensure this is `chatConnection`

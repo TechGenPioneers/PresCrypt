@@ -11,7 +11,8 @@ import SubmitButton from "../components/SubmitButton";
 import FormTextarea from "../components/FormTextArea";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 export default function PatientRegistration() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -23,6 +24,7 @@ export default function PatientRegistration() {
     contactNumber: "",
     address: "",
     dob: null,
+    gender: "", // Added gender field
     role: "Patient",
   });
 
@@ -57,6 +59,11 @@ export default function PatientRegistration() {
     setErrors({ ...errors, dob: "" });
   };
 
+  const handleGenderChange = (gender) => {
+    setFormData({ ...formData, gender });
+    setErrors({ ...errors, gender: "" });
+  };
+
   const validateForm = () => {
     let newErrors = {};
     if (!formData.FirstName.trim())
@@ -83,6 +90,7 @@ export default function PatientRegistration() {
       newErrors.contactNumber = "Contact Number is required.";
     if (!formData.address.trim()) newErrors.address = "Address is required.";
     if (!formData.dob) newErrors.dob = "Date of Birth is required.";
+    if (!formData.gender) newErrors.gender = "Gender is required."; // Added gender validation
     if (!formData.role) newErrors.role = "Role is required.";
 
     setErrors(newErrors);
@@ -179,6 +187,8 @@ export default function PatientRegistration() {
       'dateOfBirth': 'dob',
       'DOB': 'dob',
       'dob': 'dob',
+      'Gender': 'gender',
+      'gender': 'gender',
       'Role': 'role',
       'role': 'role'
     };
@@ -214,6 +224,7 @@ export default function PatientRegistration() {
             contactNumber: formData.contactNumber,
             address: formData.address,
             dob: formData.dob?.toISOString().split("T")[0],
+            gender: formData.gender, // Added gender to the request
             status: "Active",
           }),
         }
@@ -249,7 +260,7 @@ export default function PatientRegistration() {
         responseData = { token: data };
       }
 
-      setSnackbarMessage("Registration Successful! Redirecting...");
+      setSnackbarMessage("Registration Successful! Redirecting to dashboard...");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
       
@@ -264,125 +275,169 @@ export default function PatientRegistration() {
         localStorage.setItem("username", responseData.username);
       }
 
+      // Keep loading state active during redirect
       setTimeout(() => {
         router.push("../Patient/PatientDashboard");
-      }, 1000);
+      }, 2000); // Increased timeout to show success message longer
       
     } catch (err) {
       console.error('Registration error:', err);
       // Error handling is already done above, no need to duplicate
-    } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading on error
     }
+    // Note: Don't set loading to false on success - keep it until redirect
   };
 
   return (
-    <RegistrationLayout
-      title="JOIN US FOR A HEALTHIER TOMORROW!"
-      subtitle="Create your account"
-    >
-      <FormSelect
-        options={["Patient", "Doctor"]}
-        selected={formData.role}
-        onChange={(role) => {
-          setFormData({ ...formData, role });
-          if (role === "Doctor") router.push("/Auth/DoctorRegistration");
+    <>
+      {/* Backdrop with blur effect and loading spinner */}
+      <Backdrop
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backdropFilter: 'blur(8px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
         }}
-        error={errors.role}
-      />
-      <FormInput
-        name="FirstName"
-        placeholder="First Name"
-        value={formData.FirstName}
-        onChange={handleChange}
-        error={errors.FirstName}
-      />
-      <FormInput
-        name="LastName"
-        placeholder="Last Name"
-        value={formData.LastName}
-        onChange={handleChange}
-        error={errors.LastName}
-      />
-      <FormInput
-        name="email"
-        type="email"
-        placeholder="Email"
-        value={formData.email}
-        onChange={handleChange}
-        error={errors.email}
-      />
-      <FormInput
-        name="contactNumber"
-        placeholder="Contact Number"
-        value={formData.contactNumber}
-        onChange={handleChange}
-        error={errors.contactNumber}
-      />
-      <DatePickerInput
-        selected={formData.dob}
-        onChange={handleDateChange}
-        error={errors.dob}
-      />
-      <FormTextarea
-        name="address"
-        placeholder="Address"
-        value={formData.address}
-        onChange={handleChange}
-        error={errors.address}
-      />
-      <PasswordInput
-        name="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={handleChange}
-        error={errors.password}
-      />
-      <PasswordInput
-        name="confirmPassword"
-        placeholder="Confirm Password"
-        value={formData.confirmPassword}
-        onChange={handleChange}
-        error={errors.confirmPassword}
-      />
-      {errors.general && (
-        <p className="text-red-500 text-sm mb-4">{errors.general}</p>
-      )}
-      <SubmitButton
-        onClick={handleRegister}
-        loading={loading}
-        disabled={loading}
-        text="Create Account"
-        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+        open={loading}
       >
-        {loading ? "Registering..." : "Create Account"}
-      </SubmitButton>
-      <p className="text-center text-gray-600 mt-4">
-        Already registered?{" "}
-        <a
-          href="/Auth/login"
-          className="text-teal-600 hover:underline font-medium"
+        <div className="flex flex-col items-center justify-center">
+          <CircularProgress 
+            color="inherit" 
+            size={60}
+            thickness={4}
+            sx={{
+              color: '#14b8a6', // Teal color to match your theme
+              marginBottom: 2
+            }}
+          />
+          <p className="text-white text-lg font-medium mt-4">
+            {snackbarSeverity === 'success' && snackbarOpen 
+              ? 'Loading Dashboard...' 
+              : 'Creating Your Account...'
+            }
+          </p>
+          <p className="text-gray-300 text-sm mt-2">
+            Please wait while we set up your account
+          </p>
+        </div>
+      </Backdrop>
+      
+      {/* Registration Form */}
+      <RegistrationLayout
+        title="JOIN US FOR A HEALTHIER TOMORROW!"
+        subtitle="Create your account"
+      >
+        <FormSelect
+          options={["Patient", "Doctor"]}
+          selected={formData.role}
+          onChange={(role) => {
+            setFormData({ ...formData, role });
+            if (role === "Doctor") router.push("/Auth/DoctorRegistration");
+          }}
+          error={errors.role}
+        />
+        <FormInput
+          name="FirstName"
+          placeholder="First Name"
+          value={formData.FirstName}
+          onChange={handleChange}
+          error={errors.FirstName}
+        />
+        <FormInput
+          name="LastName"
+          placeholder="Last Name"
+          value={formData.LastName}
+          onChange={handleChange}
+          error={errors.LastName}
+        />
+        <FormInput
+          name="email"
+          type="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          error={errors.email}
+        />
+        <FormInput
+          name="contactNumber"
+          placeholder="Contact Number"
+          value={formData.contactNumber}
+          onChange={handleChange}
+          error={errors.contactNumber}
+        />
+        <DatePickerInput
+          selected={formData.dob}
+          onChange={handleDateChange}
+          error={errors.dob}
+        />
+        {/* Added Gender Selection */}
+        <FormSelect
+          options={["Male", "Female"]}
+          selected={formData.gender}
+          onChange={handleGenderChange}
+          error={errors.gender}
+          placeholder="Select Gender"
+        />
+        <FormTextarea
+          name="address"
+          placeholder="Address"
+          value={formData.address}
+          onChange={handleChange}
+          error={errors.address}
+        />
+        <PasswordInput
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          error={errors.password}
+        />
+        <PasswordInput
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          error={errors.confirmPassword}
+        />
+        {errors.general && (
+          <p className="text-red-500 text-sm mb-4">{errors.general}</p>
+        )}
+        <SubmitButton
+          onClick={handleRegister}
+          loading={loading}
+          disabled={loading}
+          text="Create Account"
+          className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Log in here
-        </a>
-      </p>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        className="mt-4"
-      >
-        <Alert
+          {loading ? "Creating Account..." : "Create Account"}
+        </SubmitButton>
+        <p className="text-center text-gray-600 mt-4">
+          Already registered?{" "}
+          <a
+            href="/Auth/login"
+            className="text-teal-600 hover:underline font-medium"
+          >
+            Log in here
+          </a>
+        </p>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={snackbarSeverity === 'success' ? 3000 : 6000}
           onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          className={`w-full max-w-md ${
-            snackbarSeverity === "success" ? "bg-teal-600" : "bg-red-600"
-          } text-white font-medium rounded-lg shadow-lg`}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          className="mt-4"
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </RegistrationLayout>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbarSeverity}
+            className={`w-full max-w-md ${
+              snackbarSeverity === "success" ? "bg-teal-600" : "bg-red-600"
+            } text-white font-medium rounded-lg shadow-lg`}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </RegistrationLayout>
+    </>
   );
 }
