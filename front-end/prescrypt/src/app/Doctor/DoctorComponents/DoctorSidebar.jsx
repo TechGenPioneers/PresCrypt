@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import axios from "axios";
 import DoctorDashboardService from "../services/DoctorDashboardService";
 import DoctorProfileImageService from "../services/DoctorProfileImageService";
+import LogoutConfirmationDialog from "./LogoutConfirmationDialog"; // Import the component
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -13,6 +14,7 @@ export default function Sidebar() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false); // Add state for dialog
   const pathname = usePathname();
   const router = useRouter();
   const doctorId =
@@ -33,11 +35,18 @@ export default function Sidebar() {
     fetchProfile();
   }, [doctorId]);
 
-  const handleLogout = async (e) => {
+  const handleLogoutClick = (e) => {
     e.preventDefault();
-    const ok = window.confirm("Are you sure you want to log out?");
-    if (!ok) return;
+    setLogoutDialogOpen(true);
+  };
 
+  const handleLogoutCancel = () => {
+    setLogoutDialogOpen(false);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setLogoutDialogOpen(false);
+    
     try {
       await axios.post("https://localhost:7021/api/User/logout", null, {
         withCredentials: true,
@@ -94,18 +103,20 @@ export default function Sidebar() {
   };
 
   return (
-    <div
-      className={`h-full bg-white shadow-2xl font-medium font-sans transition-all duration-300 ease-in-out flex flex-col fixed left-0 top-0 z-50`}
-      style={{
-        width: isExpanded ? "16rem" : "8rem",
-      }}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
-    >
-      {/* Logo */}
-      <div className="flex justify-center items-center mt-4 mb-8">
-        <Image src="/logo.png" alt="logo" width={100} height={100} />
-      </div>
+    <>
+    
+      <div
+        className={`h-full bg-white shadow-2xl font-medium font-sans transition-all duration-300 ease-in-out flex flex-col fixed left-0 top-0 z-50`}
+        style={{
+          width: isExpanded ? "16rem" : "8rem",
+        }}
+        onMouseEnter={() => setIsExpanded(true)}
+        onMouseLeave={() => setIsExpanded(false)}
+      >
+        {/* Logo */}
+        <div className="flex justify-center items-center mt-4 mb-8">
+          <Image src="/logo.png" alt="logo" width={100} height={100} />
+        </div>
 
       {/* Profile */}
       <div className="flex justify-center p-2">
@@ -326,40 +337,44 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      {/* Logout Button */}
-      <div
-        className="w-full p-2 mt-5"
-        style={{
-          width: isExpanded ? "16rem" : "8rem",
-        }}
-      >
-        <li className="mb-4 w-full flex justify-center">
-          <a
-            href="/Auth/login"
-            className="flex items-center p-2 hover:border-1 rounded-full transition-all duration-300 hover:border-red-800 hover:bg-red-200"
-            onClick={handleLogout}
-            style={{
-              width: isExpanded ? "90%" : "50px",
-              height: "50px",
-              justifyContent: isExpanded ? "flex-start" : "center",
-              paddingLeft: isExpanded ? "20px" : "8px",
-              borderRadius: isExpanded ? "20px" : "100%",
-            }}
-          >
-            <img src="/image28.png" alt="Logout" className="w-5 h-5" />
-            <span 
-              className={`text-red-600 text-[15px] whitespace-nowrap ml-2 font-bold transition-opacity duration-300 ${
-                isExpanded ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{ 
-                display: isExpanded ? 'inline' : 'none'
+        {/* Logout Button */}
+        <div
+          className="w-full p-2 mt-5"
+          style={{
+            width: isExpanded ? "16rem" : "8rem",
+          }}
+        >
+          <li className="mb-4 w-full flex justify-center">
+            <button
+              onClick={handleLogoutClick}
+              className="flex items-center p-2 hover:border-1 rounded-full transition-all duration-300 hover:border-[#033A3D] hover:bg-[#033a3d32]"
+              style={{
+                width: isExpanded ? "90%" : "50px",
+                height: "50px",
+                justifyContent: isExpanded ? "flex-start" : "center",
+                paddingLeft: isExpanded ? "20px" : "8px",
+                borderRadius: isExpanded ? "20px" : "100%",
               }}
             >
-              Logout
-            </span>
-          </a>
-        </li>
+              <img src="/image28.png" alt="Logout" className="w-5 h-5" />
+              {isExpanded && (
+                <span className="text-[#033A3D] text-[15px] whitespace-nowrap ml-2 font-bold">
+                  Logout
+                </span>
+              )}
+            </button>
+          </li>
+        </div>
       </div>
-    </div>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmationDialog
+        open={logoutDialogOpen}
+        onClose={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+        title="Doctor Logout"
+        message="Are you sure you want to log out of your doctor account? You'll need to sign in again to access your dashboard."
+      />
+    </>
   );
 }
