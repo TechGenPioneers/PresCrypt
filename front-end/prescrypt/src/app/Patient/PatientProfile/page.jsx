@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation'; 
 import { FaUser, FaEnvelope, FaBirthdayCake, FaPhone, FaMapMarkerAlt, FaEdit, FaPlus, FaInfoCircle, FaIdCard } from 'react-icons/fa';
-import Header from '@/app/Components/header/Header';
+
 import Sidebar from '@/app/Patient/PatientComponents/navBar';
 import axios from 'axios';
 
@@ -85,17 +85,17 @@ const HealthRecord = () => {
 
   // Helper function to find the most recent value from observations
   const findLatestObservation = (results, displayStartsWith) => {
-    const matchingObs = results.filter(obs => 
+    const matchingObs = results.filter(obs =>
       obs.display && obs.display.startsWith(displayStartsWith)
     );
-    return matchingObs.length > 0 ? matchingObs[matchingObs.length - 1] : null;
+    return matchingObs.length > 0 ? matchingObs[0] : null;
   };
 
   // OpenMRS Health Information Header Indicator Component
   const HealthInfoIndicator = () => {
     return (
       <div className="group relative inline-block">
-        <div className="flex items-center space-x-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+        <div className="flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-blue-200 rounded-lg px-3 py-2">
           <FaInfoCircle className="w-4 h-4 text-blue-600" />
           <span className="text-xs font-medium text-blue-700">
             ⚕️ Synced via OpenMRS API
@@ -114,11 +114,11 @@ const HealthRecord = () => {
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
-        // Get patientId from localStorage or other state management
-        const patientId = "P021";
+        // Get patientId from localStorage
+        const patientId = localStorage.getItem('patientId');
         
         if (!patientId) {
-          setError("Patient ID not found. Please log in again.");
+          setError("Patient ID not found in storage. Please log in again.");
           setLoading(false);
           return;
         }
@@ -154,6 +154,7 @@ const HealthRecord = () => {
         // Fetch health data from the API
         try {
           const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
+          
           
           console.log('Health API Response:', healthResponse.data);
           
@@ -276,116 +277,6 @@ const HealthRecord = () => {
     fetchPatientData();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchPatientData = async () => {
-  //     try {
-  //       // Get patientId from localStorage or other state management
-  //       const patientId = "P021";
-        
-  //       if (!patientId) {
-  //         setError("Patient ID not found. Please log in again.");
-  //         setLoading(false);
-  //         return;
-  //       }
-
-  //       // Fetch patient basic data from the API
-  //       const response = await axios.get(`https://localhost:7021/api/PatientProfile/${patientId}/basic`);
-        
-  //       console.log('API Response:', response.data);
-        
-  //       // Transform API data to match component requirements
-  //       const apiData = response.data;
-        
-  //       setPatientData({
-  //         patientId: apiData.patientId || patientId,
-  //         name: formatFullName(apiData.firstName, apiData.lastName),
-  //         firstName: apiData.firstName || 'Not provided',
-  //         lastName: apiData.lastName || 'Not provided',
-  //         title: formatFullName(apiData.firstName, apiData.lastName),
-  //         gender: apiData.gender || 'Not provided',
-  //         birthDate: formatDate(apiData.dob || apiData.DOB),
-  //         phone: apiData.contactNo || 'Not provided',
-  //         email: apiData.email || 'Not provided',
-  //         address: apiData.address || 'Not provided',
-  //         bloodGroup: apiData.bloodGroup || "Not recorded",
-  //         nic: apiData.nic || apiData.NIC || 'Not provided',
-  //         profileImage: convertBlobToImageUrl(apiData.profileImage),
-  //         status: apiData.status || 'Active',
-  //         createdAt: formatDate(apiData.createdAt),
-  //         updatedAt: formatDate(apiData.updatedAt),
-  //         lastLogin: formatDate(apiData.lastLogin)
-  //       });
-
-  //       // Fetch health data from the API
-  //       try {
-  //         const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
-  //         const results = healthResponse.data.results || [];
-  //         // Change to:
-  //         // const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
-  //         // // Parse the stringified JSON data
-  //         // const parsedData = JSON.parse(healthResponse.data.data);
-  //         // const results = parsedData.results || [];
-
-  //         // Find the latest observations for each vital sign
-  //         const heightObs = findLatestObservation(results, "Height (cm)");
-  //         const weightObs = findLatestObservation(results, "Weight (kg)");
-  //         const bmiObs = findLatestObservation(results, "Body mass index");
-  //         const systolicBPObs = findLatestObservation(results, "Systolic blood pressure");
-  //         const diastolicBPObs = findLatestObservation(results, "Diastolic blood pressure");
-  //         const pulseObs = findLatestObservation(results, "Pulse");
-  //         const bloodSugarObs = findLatestObservation(results, "Serum glucose");
-  //         const bloodTypeObs = findLatestObservation(results, "bloodType");
-  //         const allergiesObs = findLatestObservation(results, "allergies");
-
-  //         // Extract values from observation display strings
-  //         const height = heightObs ? extractValueFromDisplay(heightObs.display) : null;
-  //         const weight = weightObs ? extractValueFromDisplay(weightObs.display) : null;
-  //         const bmi = bmiObs ? extractValueFromDisplay(bmiObs.display) : null;
-  //         const systolicBP = systolicBPObs ? extractValueFromDisplay(systolicBPObs.display) : null;
-  //         const diastolicBP = diastolicBPObs ? extractValueFromDisplay(diastolicBPObs.display) : null;
-  //         const pulse = pulseObs ? extractValueFromDisplay(pulseObs.display) : null;
-  //         const bloodSugar = bloodSugarObs ? extractValueFromDisplay(bloodSugarObs.display) : null;
-  //         const bloodType = bloodTypeObs ? extractValueFromDisplay(bloodTypeObs.display) : null;
-  //         const allergies = allergiesObs ? parseAllergies(allergiesObs.display) : ["No allergies recorded"];
-
-  //         // Set health data
-  //         setHealthData({
-  //           height: height ? `${height} cm` : "Not recorded",
-  //           weight: weight ? `${weight} kg` : "Not recorded",
-  //           bmi: bmi || "Not recorded",
-  //           bloodSugar: bloodSugar ? `${bloodSugar} mg/dL` : "Not recorded",
-  //           heartRate: pulse ? `${pulse} bpm` : "Not recorded",
-  //           bloodPressure: (systolicBP && diastolicBP) ? `${systolicBP}/${diastolicBP} mmHg` : "Not recorded",
-  //           allergies: allergies,
-  //           bloodGroup: bloodType || (apiData.bloodGroup || "Not recorded")
-  //         });
-  //       } catch (healthErr) {
-  //         console.error("Error fetching health data:", healthErr);
-  //         setHealthError("Couldn't connect to the OpenMRS server");
-  //         // Set default health data with blood group from patient data
-  //         setHealthData({
-  //           height: "Not recorded",
-  //           weight: "Not recorded",
-  //           bmi: "Not recorded",
-  //           bloodSugar: "Not recorded",
-  //           heartRate: "Not recorded",
-  //           bloodPressure: "Not recorded",
-  //           allergies: ["No allergies recorded"],
-  //           bloodGroup: apiData.bloodGroup || "Not recorded"
-  //         });
-  //       }
-        
-  //       setLoading(false);
-  //     } catch (err) {
-  //       console.error("Error fetching patient data:", err);
-  //       setError("Failed to load patient data. Please try again later.");
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchPatientData();
-  // }, []);
-
   // Get BMI status text based on value
   const getBmiStatus = (bmi) => {
     if (!bmi || bmi === "Not recorded") return "";
@@ -434,7 +325,7 @@ const HealthRecord = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex justify-center items-center">
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-md w-full">
+        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md max-w-md w-full">
           <div className="text-red-500 text-center mb-4">
             <svg className="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -469,16 +360,16 @@ const HealthRecord = () => {
   const bmiStatusColor = getBmiStatusColor(bmiStatus);
 
   return (
-    <div className="min-h-screen bg-blue-50">
-      <Header/>
+    <div className="min-h-screen ">
+      
       <Sidebar/>
       
       <div className="ml-16 sm:ml-20 md:ml-24 lg:ml-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Sidebar */}
+            {/* Left Sidebar - Make background transparent */}
             <div className="lg:col-span-4">
-              <div className="bg-white rounded-2xl shadow-md p-6">
+              <div className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl shadow-md p-6">
                 {/* Profile Section */}
                 <div className="flex flex-col items-center mb-8">
                   <div className="relative mb-4">
@@ -607,11 +498,11 @@ const HealthRecord = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons - Make background transparent */}
               <div className="space-y-3 mt-4">
                 <button 
                   onClick={navigateToPersonalInfo}
-                  className="w-full bg-white rounded-xl shadow-sm py-3.5 px-4 flex items-center justify-center space-x-2 hover:bg-gray-50 border border-gray-100 transition duration-200"
+                  className="w-full bg-white bg-opacity-80 backdrop-blur-sm rounded-xl shadow-sm py-3.5 px-4 flex items-center justify-center space-x-2 hover:bg-opacity-90 border border-gray-100 transition duration-200"
                 >
                   <FaEdit className="w-5 h-5 text-gray-700" />
                   <span className="text-sm font-semibold text-gray-700">Edit your profile</span>
@@ -619,7 +510,7 @@ const HealthRecord = () => {
 
                 <button 
                   onClick={navigateToHealthInfo}
-                  className="w-full bg-white rounded-xl shadow-sm py-3.5 px-4 flex items-center justify-center space-x-2 hover:bg-gray-50 border border-gray-100 transition duration-200"
+                  className="w-full bg-white bg-opacity-80 backdrop-blur-sm rounded-xl shadow-sm py-3.5 px-4 flex items-center justify-center space-x-2 hover:bg-opacity-90 border border-gray-100 transition duration-200"
                 >
                   <FaPlus className="w-5 h-5 text-gray-700" />
                   <span className="text-sm font-semibold text-gray-700">Add more Health Data</span>
@@ -627,16 +518,16 @@ const HealthRecord = () => {
               </div>
             </div>
 
-            {/* Right Content */}
+            {/* Right Content - Make background transparent */}
             <div className="lg:col-span-8">
-              <div className="bg-white rounded-2xl shadow-md p-6">
+              <div className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl shadow-md p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900">Health Information</h2>
                   <HealthInfoIndicator />
                 </div>
                 
                 {healthError ? (
-                  <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                  <div className="bg-red-50 bg-opacity-80 backdrop-blur-sm p-4 rounded-lg border border-red-200">
                     <div className="flex">
                       <div className="flex-shrink-0">
                         <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -657,7 +548,7 @@ const HealthRecord = () => {
                     <div className="flex-1">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Height */}
-                        <div className="bg-white rounded-xl border border-gray-200 p-4">
+                        <div className="bg-white bg-opacity-60 backdrop-blur-sm rounded-xl border border-gray-200 p-4">
                           <div className="flex items-center justify-between mb-3">
                             <p className="text-sm text-gray-600">Height</p>
                             <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -668,7 +559,7 @@ const HealthRecord = () => {
                         </div>
 
                         {/* Weight */}
-                        <div className="bg-white rounded-xl border border-gray-200 p-4">
+                        <div className="bg-white bg-opacity-60 backdrop-blur-sm rounded-xl border border-gray-200 p-4">
                           <div className="flex items-center justify-between mb-3">
                             <p className="text-sm text-gray-600">Weight</p>
                             <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -698,14 +589,6 @@ const HealthRecord = () => {
                             <div className="h-1 w-1/4 bg-red-300 rounded"></div>
                           </div>
                         </div>
-
-                        {/* Blood Group
-                        <div className="bg-white rounded-xl border border-gray-200 p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <p className="text-sm text-gray-600">Blood Group</p>
-                          </div>
-                          <p className="text-2xl font-bold text-gray-900">{healthData?.bloodGroup}</p>
-                        </div> */}
 
                         {/* Blood Group */}
                         <div className="bg-white rounded-xl border border-gray-200 p-4">
