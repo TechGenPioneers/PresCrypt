@@ -144,11 +144,8 @@ const AppointmentList = ({ patientId }) => {
     }
     } catch (err) {
       console.error("Failed to cancel appointment", err);
-      <AlertDialogBox
-          open={alertOpen}
-          onClose={() => setAlertOpen(false)}
-          message={alertMessage}
-      />
+      setAlertMessage("Failed to cancel appointment. Please try again.");
+      setAlertOpen(true);
       const res = await getAppointmentsByPatient(patientId);
       setAppointments(res);
     }
@@ -226,7 +223,7 @@ const AppointmentList = ({ patientId }) => {
               )}
               {appt.status.toLowerCase() === "completed" && (
                 <button
-                  onClick={() => alert(`Viewing health records for appointment ${appt.appointmentId}`)}
+                  onClick={() => handleViewHealthRecords(appt)}
                   className="bg-blue-500 hover:bg-blue-300 rounded-lg text-white px-3 py-0.5 text-sm shadow"
                 >
                   View Health Records
@@ -246,9 +243,6 @@ const AppointmentList = ({ patientId }) => {
               )}
             </div>
 
-
-
-
             </div>
           ))
         ) : (
@@ -256,6 +250,7 @@ const AppointmentList = ({ patientId }) => {
         )}
       </div>
 
+      {/* Cancel Appointment Dialog */}
       {selectedAppointment && (
         <CancelAppointmentDialog
           open={openDialog}
@@ -267,6 +262,34 @@ const AppointmentList = ({ patientId }) => {
           hospitalName={selectedAppointment.hospitalName}
         />
       )}
+
+      {/* View Health Records Dialog */}
+      {selectedAppointment && (
+        <ViewHealthRecordsDialog
+          open={openHealthRecordsDialog}
+          onClose={() => setOpenHealthRecordsDialog(false)}
+          appointment={selectedAppointment}
+        />
+      )}
+
+      {/* Response Dialog */}
+      <ResponseDialogBox
+        open={responseDialogOpen}
+        onClose={() => setResponseDialogOpen(false)}
+        message={responseMessage}
+        paymentMethod={paymentMethod}
+        appointmentDate={appointmentDate}
+        appointmentTime={appointmentTime}
+        paymentAmount={paymentAmount}
+        payHereObjectId={payHereObjectId}
+      />
+
+      {/* Alert Dialog */}
+      <AlertDialogBox
+        open={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        message={alertMessage}
+      />
     </div>
   );
 };
