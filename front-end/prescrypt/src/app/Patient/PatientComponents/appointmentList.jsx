@@ -145,7 +145,9 @@ const AppointmentList = ({ patientId }) => {
       console.error("Failed to cancel appointment", err);
       setAlertMessage("Failed to cancel appointment. Please try again.");
       setAlertOpen(true);
+
       // Refresh appointments on error
+
       const res = await getAppointmentsByPatient(patientId);
       setAppointments(res);
     }
@@ -211,39 +213,39 @@ const AppointmentList = ({ patientId }) => {
                 <div className="flex-1 text-gray-600 text-sm">{appt.time}</div>
               </div>
 
-              <div className="flex gap-2 mt-2 md:mt-0 min-h-[36px]">
-                {appt.status.toLowerCase() === "pending" && (
-                  <button
-                    onClick={() => confirmCancelAppointment(appt)}
-                    className="bg-red-500 hover:bg-red-300 rounded-lg text-white px-3 py-1 text-sm shadow"
-                  >
-                    Cancel Appointment
-                  </button>
-                )}
 
-                {appt.status.toLowerCase() === "completed" && (
-                  <button
-                    onClick={() =>
-                      alert(`Viewing health records for appointment ${appt.appointmentId}`)
-                    }
-                    className="bg-blue-500 hover:bg-blue-300 rounded-lg text-white px-3 py-1 text-sm shadow"
-                  >
-                    View Health Records
-                  </button>
-                )}
+            <div className="flex gap-2 mt-2 md:mt-0">
+              {appt.status.toLowerCase() === "pending" && (
+                <button
+                  onClick={() => confirmCancelAppointment(appt)}
+                  className="bg-red-500 hover:bg-red-300 rounded-lg text-white px-3 py-1 text-sm shadow"
+                >
+                  Cancel Appointment
+                </button>
+              )}
+              {appt.status.toLowerCase() === "completed" && (
+                <button
+                  onClick={() => handleViewHealthRecords(appt)}
+                  className="bg-blue-500 hover:bg-blue-300 rounded-lg text-white px-3 py-0.5 text-sm shadow"
+                >
+                  View Health Records
+                </button>
+              )}
 
-                {appt.status.toLowerCase() === "cancelled" && (
-                  <div className="h-[32px] w-[140px] invisible">
-                    <button className="w-full h-full">Placeholder</button>
-                  </div>
-                )}
+              {appt.status.toLowerCase() === "cancelled" && (
+                <div className="h-[32px] w-[140px] invisible">
+                  <button className="w-full h-full">Placeholder</button>
+                </div>
+              )}
 
-                {appt.status.toLowerCase() === "rescheduled" && (
-                  <div className="h-[32px] w-[140px] invisible">
-                    <button className="w-full h-full">Placeholder</button>
-                  </div>
-                )}
-              </div>
+              {appt.status.toLowerCase() === "rescheduled" && (
+                <div className="h-[32px] w-[140px] invisible">
+                  <button className="w-full h-full">Placeholder</button>
+                </div>
+              )}
+            </div>
+
+
             </div>
           ))
         ) : (
@@ -251,6 +253,7 @@ const AppointmentList = ({ patientId }) => {
         )}
       </div>
 
+      {/* Cancel Appointment Dialog */}
       {selectedAppointment && (
         <CancelAppointmentDialog
           open={openDialog}
@@ -263,18 +266,28 @@ const AppointmentList = ({ patientId }) => {
         />
       )}
 
-      {responseDialogOpen && (
-        <ResponseDialogBox
-          open={responseDialogOpen}
-          onClose={() => setResponseDialogOpen(false)}
-          message={responseMessage}
-          paymentMethod={paymentMethod}
-          appointmentDate={appointmentDate}
-          appointmentTime={appointmentTime}
-          payHereObjectId={payHereObjectId}
-          paymentAmount={paymentAmount}
+      {/* View Health Records Dialog */}
+      {selectedAppointment && (
+        <ViewHealthRecordsDialog
+          open={openHealthRecordsDialog}
+          onClose={() => setOpenHealthRecordsDialog(false)}
+          appointment={selectedAppointment}
         />
       )}
+
+      {/* Response Dialog */}
+      <ResponseDialogBox
+        open={responseDialogOpen}
+        onClose={() => setResponseDialogOpen(false)}
+        message={responseMessage}
+        paymentMethod={paymentMethod}
+        appointmentDate={appointmentDate}
+        appointmentTime={appointmentTime}
+        paymentAmount={paymentAmount}
+        payHereObjectId={payHereObjectId}
+      />
+
+      {/* Alert Dialog */}
 
       <AlertDialogBox
         open={alertOpen}
