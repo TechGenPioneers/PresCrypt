@@ -21,6 +21,7 @@ import {
   getNotifications,
   markAsRead,
   respondToRequest,
+  markAsResponded
 } from "../services/PatientHeaderService";
 
 export default function NotificationIcon({ patientId }) {
@@ -31,7 +32,7 @@ export default function NotificationIcon({ patientId }) {
   const [responded, setResponded] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [responseMessage, setResponseMessage] = useState("");
-  const [respondedNotifications, setRespondedNotifications] = useState(new Set());
+
   const [snackOpen, setSnackOpen] = useState(false);
   const open = Boolean(anchorEl);
 
@@ -73,6 +74,7 @@ export default function NotificationIcon({ patientId }) {
               isRead: false,
               type: msg.type,
               doctorId: msg.doctorId || null,
+              isResponded: false,
             },
             ...prev,
           ]);
@@ -129,12 +131,14 @@ export default function NotificationIcon({ patientId }) {
 
       setNotifications((prev) =>
         prev.map((n) =>
-          n.id === selectedNotification.id ? { ...n, isRead: true } : n
+          n.id === selectedNotification.id ? { ...n, isRead: true, isResponded: true } : n
         )
       );
 
+      // Mark as responded in the backend
+      await markAsResponded(selectedNotification.id);
+
       setResponded(true);
-      setRespondedNotifications(prev => new Set([...prev, selectedNotification.id]));
       setResponseMessage(
         accepted
           ? "✅ Your response has been sent to the doctor."
@@ -323,10 +327,10 @@ export default function NotificationIcon({ patientId }) {
                     variant="contained"
                     size="small"
                     onClick={() => confirmAccept(n)}
-                    disabled={respondedNotifications.has(n.id)}
+                    disabled={n.isResponded}
                     sx={{
-                      backgroundColor: respondedNotifications.has(n.id) ? '#dcfce7' : '#15803d',
-                      color: respondedNotifications.has(n.id) ? '#166534' : 'white',
+                      backgroundColor: n.isResponded ? '#dcfce7' : '#15803d',
+                      color: n.isResponded ? '#166534' : 'white',
                       borderRadius: '6px',
                       px: 3,
                       py: 1,
@@ -334,12 +338,12 @@ export default function NotificationIcon({ patientId }) {
                       fontWeight: '500',
                       textTransform: 'none',
                       border: '1px solid #d1d5db',
-                      boxShadow: respondedNotifications.has(n.id) ? 'none' : '0px 1px 2px rgba(0, 0, 0, 0.05)',
+                      boxShadow: n.isResponded ? 'none' : '0px 1px 2px rgba(0, 0, 0, 0.05)',
                       minWidth: '130px',
-                      cursor: respondedNotifications.has(n.id) ? 'not-allowed' : 'pointer',
+                      cursor: n.isResponded ? 'not-allowed' : 'pointer',
                       '&:hover': {
-                        backgroundColor: respondedNotifications.has(n.id) ? '#dcfce7' : '#16a34a',
-                        boxShadow: respondedNotifications.has(n.id) ? 'none' : '0px 1px 3px rgba(0, 0, 0, 0.1)'
+                        backgroundColor: n.isResponded ? '#dcfce7' : '#16a34a',
+                        boxShadow: n.isResponded ? 'none' : '0px 1px 3px rgba(0, 0, 0, 0.1)'
                       },
                       '&:disabled': {
                         backgroundColor: '#dcfce7',
@@ -348,7 +352,7 @@ export default function NotificationIcon({ patientId }) {
                       }
                     }}
                   >
-                    {respondedNotifications.has(n.id) ? 'Responded' : 'View Request'}
+                    {n.isResponded ? 'Responded' : 'View Request'}
                   </Button>
                 )}
 

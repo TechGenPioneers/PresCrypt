@@ -16,6 +16,16 @@ export const markAsRead = async (id) => {
   });
 };
 
+//make a notificaiton as reponded
+export const markAsResponded = async (id) => {
+  return await axios.post(`${BASE_URL}/PatientNotification/mark-as-responded`, id, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};
+
+
 export const respondToRequest = async ({ doctorId, accepted ,patientId}) => {
   try {
 
