@@ -5,6 +5,7 @@ import AppointmentListStat from "./appointmentListStat";
 import CancelAppointmentDialog from "./cancelAppointmentConfirmation";
 import ResponseDialogBox from "./responseDialogBox";
 import AlertDialogBox from "./alertDialogBox";
+import ViewHealthRecordsDialog from "./viewHealthRecordsDialog";
 import {
   getAppointmentsByPatient,
   deleteAppointment,
@@ -24,6 +25,7 @@ const AppointmentList = ({ patientId }) => {
   const [patientDetails, setPatientDetails] = useState({});
   const [profileImage, setProfileImage] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+  const [openHealthRecordsDialog, setOpenHealthRecordsDialog] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [responseDialogOpen, setResponseDialogOpen] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
@@ -88,6 +90,11 @@ const AppointmentList = ({ patientId }) => {
   const confirmCancelAppointment = (appointment) => {
     setSelectedAppointment(appointment);
     setOpenDialog(true);
+  };
+
+  const handleViewHealthRecords = (appointment) => {
+    setSelectedAppointment(appointment);
+    setOpenHealthRecordsDialog(true);
   };
 
   const handleCancelConfirmed = async () => {
@@ -208,7 +215,7 @@ const AppointmentList = ({ patientId }) => {
                 <div className="flex-1 text-gray-600 text-sm">{appt.time}</div>
               </div>
 
-            <div className="flex gap-2 mt-2 md:mt-0 min-h-[36px]"> {/* Ensures minimum height */}
+            <div className="flex gap-2 mt-2 md:mt-0">
               {appt.status.toLowerCase() === "pending" && (
                 <button
                   onClick={() => confirmCancelAppointment(appt)}
@@ -217,13 +224,10 @@ const AppointmentList = ({ patientId }) => {
                   Cancel Appointment
                 </button>
               )}
-
               {appt.status.toLowerCase() === "completed" && (
                 <button
-                  onClick={() =>
-                    alert(`Viewing health records for appointment ${appt.appointmentId}`)
-                  }
-                  className="bg-blue-500 hover:bg-blue-300 rounded-lg text-white px-3 py-1 text-sm shadow"
+                  onClick={() => alert(`Viewing health records for appointment ${appt.appointmentId}`)}
+                  className="bg-blue-500 hover:bg-blue-300 rounded-lg text-white px-3 py-0.5 text-sm shadow"
                 >
                   View Health Records
                 </button>
@@ -263,20 +267,6 @@ const AppointmentList = ({ patientId }) => {
           hospitalName={selectedAppointment.hospitalName}
         />
       )}
-
-      {responseDialogOpen && (
-        <ResponseDialogBox
-          open={responseDialogOpen}
-          onClose={() => setResponseDialogOpen(false)}
-          message={responseMessage}
-          paymentMethod={paymentMethod}
-          appointmentDate={appointmentDate}
-          appointmentTime={appointmentTime}
-          payHereObjectId={payHereObjectId}
-          paymentAmount={paymentAmount}
-        />
-      )}
-
     </div>
   );
 };

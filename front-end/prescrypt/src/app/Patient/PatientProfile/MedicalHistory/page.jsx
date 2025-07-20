@@ -31,11 +31,6 @@ const HealthRecord = () => {
     return match ? match[1] : null;
   };
 
-  // Helper function to find latest observation by type
-  const findLatestObservation = (results, type) => {
-    return results.find(obs => obs.display && obs.display.includes(type));
-  };
-
   // Helper function to parse allergies
   const parseAllergies = (display) => {
     if (!display) return [];
@@ -161,20 +156,15 @@ const HealthRecord = () => {
 
     setUploadingFile(true);
     try {
-      // Create a new attachment object
       const newAttachment = {
         id: Date.now(),
         name: file.name,
         size: file.size,
         type: file.type,
         uploadDate: new Date().toISOString(),
-        url: URL.createObjectURL(file) // In a real app, this would be the server URL
+        url: URL.createObjectURL(file)
       };
-
-      // Add to attachments list
       setAttachments(prev => [...prev, newAttachment]);
-      
-      // Reset file input
       event.target.value = '';
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -186,6 +176,11 @@ const HealthRecord = () => {
 
   // Handle file deletion
   const handleDeleteAttachment = (attachmentId) => {
+    // Find the attachment to revoke its URL before removing from state
+    const attachmentToRemove = attachments.find(att => att.id === attachmentId);
+    if (attachmentToRemove) {
+      URL.revokeObjectURL(attachmentToRemove.url);
+    }
     setAttachments(prev => prev.filter(attachment => attachment.id !== attachmentId));
   };
 
@@ -208,45 +203,93 @@ const HealthRecord = () => {
   };
 
   useEffect(() => {
-    const fetchHealthData = async () => {
+    const fetchPatientData = async () => {
       try {
-        setLoading(true);
-        
-        // Get patientId from localStorage or other state management
-        const patientId = "P021";
+        const patientId = localStorage.getItem('patientId') || "P021";
         
         if (!patientId) {
           setError("Patient ID not found. Please log in again.");
           setLoading(false);
           return;
         }
-
-        // Fetch health data from the API
-        const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
-        const results = healthResponse.data.results || [];
-
-        // Categorize and set health data
-        const categorizedData = categorizeObservations(results);
-        
-        setHealthData({
-          vitals: categorizedData.vitals,
-          measurements: categorizedData.measurements,
-          labResults: categorizedData.labResults,
-          personalInfo: {
-            bloodType: categorizedData.bloodType,
-            allergies: categorizedData.allergies.length > 0 ? categorizedData.allergies : ['No allergies recorded']
+  
+        // Fetch health data (Vitals, Measurements, Labs)
+        try {
+          const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
+          let results = [];
+          if (healthResponse.data && healthResponse.data.data) {
+            try {
+              const parsedData = JSON.parse(healthResponse.data.data);
+              results = parsedData.results || [];
+            } catch (parseError) {
+              console.error('Error parsing health data JSON:', parseError);
+            }
           }
-        });
+          const categorizedData = categorizeObservations(results);
+          setHealthData({
+            vitals: categorizedData.vitals,
+            measurements: categorizedData.measurements,
+            labResults: categorizedData.labResults,
+            personalInfo: {
+              bloodType: categorizedData.bloodType,
+              allergies: categorizedData.allergies.length > 0 ? categorizedData.allergies : ["No allergies recorded"]
+            }
+          });
+        } catch (healthErr) {
+          console.error("Error fetching health data:", healthErr);
+          setError("Couldn't connect to the server for health data.");
+        }
+        
+        // Fetch attachments
+        try {
+          const attachmentResponse = await axios.get(`https://localhost:7021/api/PatientAttachment/${patientId}`);
+          if (attachmentResponse.data && Array.isArray(attachmentResponse.data.observations)) {
+            const formattedAttachments = attachmentResponse.data.observations.map((att, index) => {
+              if (!att.attachmentValue) return null;
+              
+              const byteCharacters = atob(att.attachmentValue);
+              const byteNumbers = new Array(byteCharacters.length);
+              for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+              }
+              const byteArray = new Uint8Array(byteNumbers);
+              
+              const fileType = 'application/pdf'; // Assuming PDF
+              const blob = new Blob([byteArray], { type: fileType });
+              const objectUrl = URL.createObjectURL(blob);
 
+              return {
+                id: att.observationUuid || index,
+                name: `Attachment-${att.observationUuid.slice(0, 8)}.pdf`,
+                size: blob.size,
+                type: fileType,
+                uploadDate: att.obsDatetime || new Date().toISOString(),
+                url: objectUrl,
+              };
+            }).filter(Boolean);
+            
+            setAttachments(formattedAttachments);
+          } else {
+            setAttachments([]);
+          }
+        } catch (attachErr) {
+          console.error("Failed to fetch attachments:", attachErr);
+          setError(prevError => (prevError ? prevError + "\n" : "") + "Failed to load attachments.");
+        }
+        
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching health data:", err);
-        setError("Failed to load health data. Please try again later.");
+        console.error("Error fetching patient data:", err);
+        setError("Failed to load patient data. Please try again later.");
         setLoading(false);
       }
     };
+  
+    fetchPatientData();
 
-    fetchHealthData();
+    return () => {
+      attachments.forEach(attachment => URL.revokeObjectURL(attachment.url));
+    };
   }, []);
 
   const getStatusColor = (status) => {
@@ -282,7 +325,6 @@ const HealthRecord = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50">
-        <Header />
         <Sidebar />
         <div className="ml-16 sm:ml-20 md:ml-24 lg:ml-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -298,7 +340,6 @@ const HealthRecord = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50">
-        <Header />
         <Sidebar />
         <div className="ml-16 sm:ml-20 md:ml-24 lg:ml-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -312,7 +353,7 @@ const HealthRecord = () => {
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-red-800">Error</h3>
                   <div className="mt-2 text-sm text-red-700">
-                    <p>{error}</p>
+                    <p className="whitespace-pre-line">{error}</p>
                   </div>
                 </div>
               </div>
@@ -324,10 +365,8 @@ const HealthRecord = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50">
-      <Header />
+    <div className="min-h-screen ">
       <Sidebar />
-      
       <div className="ml-16 sm:ml-20 md:ml-24 lg:ml-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header Section */}
@@ -574,12 +613,14 @@ const HealthRecord = () => {
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => window.open(attachment.url, '_blank')}
+                          <a
+                            href={attachment.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="px-3 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
                           >
                             View
-                          </button>
+                          </a>
                           <button
                             onClick={() => handleDeleteAttachment(attachment.id)}
                             className="px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"

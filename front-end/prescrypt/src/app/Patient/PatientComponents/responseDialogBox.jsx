@@ -36,131 +36,173 @@ const ResponseDialogBox = ({
     return diffMs / (1000 * 60 * 60); // ms to hours
   }, [appointmentDateTime]);
 
-
   const refundInfo = useMemo(() => {
-  if (paymentMethod === "Card") {
-    if (!paymentAmount || hoursUntilAppointment === null) return null;
+    if (paymentMethod === "Card") {
+      if (!paymentAmount || hoursUntilAppointment === null) return null;
 
-    const isWithin48Hours = hoursUntilAppointment <= 48;
-    const refundPercent = isWithin48Hours ? 0.8 : 1.0;
-    const refundAmount = Math.round(paymentAmount * refundPercent * 100) / 100;
+      const isWithin48Hours = hoursUntilAppointment <= 48;
+      const refundPercent = isWithin48Hours ? 0.8 : 1.0;
+      const refundAmount = Math.round(paymentAmount * refundPercent * 100) / 100;
 
-    const refundMessage = isWithin48Hours
-      ? `Your appointment scheduled on ${appointmentDate} at ${appointmentTime} has been cancelled and requested from PayHere with the payment ID: ${payHereObjectId}. You will receive 80% refund due to cancellation within 48 hours. Refunded amount: Rs. ${refundAmount.toFixed(2)}.`
-      : `Your appointment scheduled on ${appointmentDate} at ${appointmentTime} has been cancelled and requested from PayHere with the Payment ID: ${payHereObjectId}. You will receive a full refund. Refunded amount: Rs. ${refundAmount.toFixed(2)}.`;
+      const refundMessage = isWithin48Hours
+        ? `Your appointment scheduled on ${appointmentDate} at ${appointmentTime} has been cancelled and requested from PayHere with the payment ID: ${payHereObjectId}. You will receive 80% refund due to cancellation within 48 hours. Refunded amount: Rs. ${refundAmount.toFixed(2)}.`
+        : `Your appointment scheduled on ${appointmentDate} at ${appointmentTime} has been cancelled and requested from PayHere with the Payment ID: ${payHereObjectId}. You will receive a full refund. Refunded amount: Rs. ${refundAmount.toFixed(2)}.`;
 
-    return {
-      refundAmount,
-      refundMessage,
-      refundPercent: refundPercent * 100,
-    };
-  }
-
-  if (paymentMethod === "Location") {
-    const warningMessage = `Your appointment on ${appointmentDate} at ${appointmentTime} has been successfully cancelled. Please note: Cancelling appointments on short notice may lead to permanent account inactivation.`;
-    return {
-      refundAmount: null,
-      refundMessage: warningMessage,
-      refundPercent: null,
-    };
-  }
-
-  return null;
-}, [paymentMethod, paymentAmount, hoursUntilAppointment, appointmentDate, appointmentTime, payHereObjectId]);
-
-
-  
-  useEffect(() => {
-  const sendRefundRequest = async () => {
-    if (
-      open &&
-      paymentMethod === "Card" &&
-      payHereObjectId &&
-      refundInfo?.refundAmount != null
-    ) {
-      try {
-        await axios.post("http://localhost:3000/api/payhere-refund", {
-          payment_id: payHereObjectId,
-          reason: "Customer changed their mind",
-          refund_amount: refundInfo.refundAmount,
-        });
-        console.log("Refund request sent successfully");
-      } catch (error) {
-        console.error("Failed to send refund request:", error);
-      }
+      return {
+        refundAmount,
+        refundMessage,
+        refundPercent: refundPercent * 100,
+        isWithin48Hours,
+      };
     }
-  };
 
-  sendRefundRequest();
-}, [open, paymentMethod, payHereObjectId, refundInfo]);
+    if (paymentMethod === "Location") {
+      const warningMessage = `Your appointment on ${appointmentDate} at ${appointmentTime} has been successfully cancelled. Please note: Cancelling appointments on short notice may lead to permanent account inactivation.`;
+      return {
+        refundAmount: null,
+        refundMessage: warningMessage,
+        refundPercent: null,
+        isWithin48Hours: false,
+      };
+    }
 
+    return null;
+  }, [paymentMethod, paymentAmount, hoursUntilAppointment, appointmentDate, appointmentTime, payHereObjectId]);
 
+  useEffect(() => {
+    const sendRefundRequest = async () => {
+      if (
+        open &&
+        paymentMethod === "Card" &&
+        payHereObjectId &&
+        refundInfo?.refundAmount != null
+      ) {
+        try {
+          await axios.post("http://localhost:3000/api/payhere-refund", {
+            payment_id: payHereObjectId,
+            reason: "Customer changed their mind",
+            refund_amount: refundInfo.refundAmount,
+          });
+          console.log("Refund request sent successfully");
+        } catch (error) {
+          console.error("Failed to send refund request:", error);
+        }
+      }
+    };
+
+    sendRefundRequest();
+  }, [open, paymentMethod, payHereObjectId, refundInfo]);
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
       maxWidth="sm"
-      fullWidth
       sx={{
         "& .MuiDialog-paper": {
-          borderRadius: "40px",
-          padding: "40px 20px",
+          borderRadius: "20px",
+          padding: "24px 20px",
           border: "2px solid #4CAF50",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#fffdfd",
           boxShadow: "0px 6px 30px rgba(0, 0, 0, 0.15)",
+          minWidth: "400px",
+          maxWidth: "500px",
         },
       }}
     >
       <IconButton
         onClick={onClose}
-        sx={{ position: "absolute", top: 16, right: 16 }}
+        sx={{
+          position: "absolute",
+          top: 12,
+          right: 12,
+          color: "#4CAF50",
+          "&:hover": { backgroundColor: "rgba(76, 175, 80, 0.1)" }
+        }}
       >
-        <CloseIcon fontSize="large" />
+        <CloseIcon />
       </IconButton>
 
-      <DialogContent className="flex flex-col items-center text-center">
-        <CheckCircleOutlineIcon sx={{ fontSize: 80, color: "#4CAF50" }} />
+      <DialogContent className="flex flex-col items-center text-center" sx={{ pt: 2 }}>
+        <CheckCircleOutlineIcon sx={{ fontSize: 60, color: "#4CAF50", mb: 2 }} />
         <Typography
           variant="h6"
-          sx={{ mt: 2, fontWeight: "bold", color: "#2e7d32" }}
+          sx={{ fontWeight: "700", color: "#2E7D32", mb: 3 }}
         >
           {message}
         </Typography>
 
-        {paymentMethod && (
-          <Typography variant="body1" sx={{ mt: 1, color: "#555" }}>
-            Payment Method: <strong>{paymentMethod}</strong>
-          </Typography>
-        )}
+        <div className="text-left w-full space-y-3">
+          {/* Payment Method Info */}
+          {paymentMethod && (
+            <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg">
+              <Typography
+                variant="body2"
+                sx={{ color: "#2E7D32", fontWeight: "500", fontSize: "0.9rem" }}
+              >
+                Payment Method: <strong>{paymentMethod}</strong>
+              </Typography>
+            </div>
+          )}
 
-        {appointmentDate && appointmentTime && (
-          <Typography variant="body2" sx={{ mt: 0.5, color: "#777" }}>
-            Appointment: <strong>{appointmentDate} at {appointmentTime}</strong>
-          </Typography>
-        )}
+          {/* Appointment Date & Time Info */}
+          {appointmentDate && appointmentTime && (
+            <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg">
+              <Typography
+                variant="body2"
+                sx={{ color: "#2E7D32", fontWeight: "500", fontSize: "0.9rem" }}
+              >
+                Appointment: <strong>{appointmentDate} at {appointmentTime}</strong>
+              </Typography>
+            </div>
+          )}
 
-        {refundInfo && (
-          <Typography variant="body2" sx={{ mt: 2, color: "#d84315", fontWeight: 500 }}>
-            {refundInfo.refundMessage}
-          </Typography>
-        )}
+          {/* Refund Information */}
+          {refundInfo && (
+            <div className={`border-l-4 p-3 rounded-r-lg ${
+              paymentMethod === "Location" 
+                ? "bg-red-50 border-red-400" 
+                : refundInfo.isWithin48Hours 
+                  ? "bg-orange-50 border-orange-400"
+                  : "bg-green-50 border-green-400"
+            }`}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: paymentMethod === "Location" 
+                    ? "#B71C1C" 
+                    : refundInfo.isWithin48Hours 
+                      ? "#E65100"
+                      : "#2E7D32",
+                  fontWeight: paymentMethod === "Location" ? "600" : "500",
+                  fontSize: "0.9rem"
+                }}
+              >
+                {refundInfo.refundMessage}
+              </Typography>
+            </div>
+          )}
+        </div>
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: "center", mt: 2 }}>
+      <DialogActions sx={{ justifyContent: "center", pt: 2 }}>
         <Button
           onClick={onClose}
           variant="contained"
           sx={{
             backgroundColor: "#4CAF50",
             color: "#fff",
-            "&:hover": { backgroundColor: "#43a047" },
-            borderRadius: "8px",
-            padding: "8px 20px",
-            fontWeight: 600,
+            "&:hover": { backgroundColor: "#388E3C" },
+            borderRadius: "20px",
+            px: 4,
+            py: 1,
+            fontWeight: "600",
+            fontSize: "0.9rem",
+            textTransform: "none",
+            boxShadow: "0px 3px 8px rgba(76, 175, 80, 0.3)",
           }}
         >
-          OK
+          Close
         </Button>
       </DialogActions>
     </Dialog>
