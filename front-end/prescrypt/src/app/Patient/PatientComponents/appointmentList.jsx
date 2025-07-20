@@ -5,6 +5,7 @@ import AppointmentListStat from "./appointmentListStat";
 import CancelAppointmentDialog from "./cancelAppointmentConfirmation";
 import ResponseDialogBox from "./responseDialogBox";
 import AlertDialogBox from "./alertDialogBox";
+import ViewHealthRecordsDialog from "./viewHealthRecordsDialog";
 import {
   getAppointmentsByPatient,
   deleteAppointment,
@@ -24,6 +25,7 @@ const AppointmentList = ({ patientId }) => {
   const [patientDetails, setPatientDetails] = useState({});
   const [profileImage, setProfileImage] = useState(null); // Changed from "" to null
   const [openDialog, setOpenDialog] = useState(false);
+  const [openHealthRecordsDialog, setOpenHealthRecordsDialog] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [responseDialogOpen, setResponseDialogOpen] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
@@ -87,6 +89,11 @@ const AppointmentList = ({ patientId }) => {
   const confirmCancelAppointment = (appointment) => {
     setSelectedAppointment(appointment);
     setOpenDialog(true);
+  };
+
+  const handleViewHealthRecords = (appointment) => {
+    setSelectedAppointment(appointment);
+    setOpenHealthRecordsDialog(true);
   };
 
   const handleCancelConfirmed = async () => {
