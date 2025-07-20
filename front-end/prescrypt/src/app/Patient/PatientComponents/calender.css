@@ -1,0 +1,11 @@
+.pending-appointment {
+  background-color: #ef4444 !important;
+  color: white !important;
+  border-radius: 100px !important;
+}
+
+.completed-appointment {
+  background-color: #22c55e !important;
+  color: white !important;
+  border-radius: 100px !important;
+}
