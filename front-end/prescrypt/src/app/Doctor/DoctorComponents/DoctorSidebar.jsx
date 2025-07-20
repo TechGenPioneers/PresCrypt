@@ -5,12 +5,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import axios from "axios";
 import DoctorDashboardService from "../services/DoctorDashboardService";
+import DoctorProfileImageService from "../services/DoctorProfileImageService";
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -25,8 +26,8 @@ export default function Sidebar() {
       if (profile.name) {
         setUserName(profile.name);
       }
-      if (profile.image) {
-        setProfileImage(profile.image);
+      if (profile?.doctorImage) {
+        setProfileImage(profile.doctorImage);
       }
     }
     fetchProfile();
@@ -60,7 +61,8 @@ export default function Sidebar() {
         setUploadError("Please select an image file");
         return;
       }
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
         setUploadError("File size should be less than 5MB");
         return;
       }
@@ -71,38 +73,23 @@ export default function Sidebar() {
 
   const handleUpload = async () => {
     if (!selectedFile) return;
-    
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("doctorId", doctorId);
 
     try {
-      setUploadProgress(0);
-      const response = await axios.post(
-        "https://localhost:7021/api/Doctor/upload-profile-image",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setUploadProgress(percentCompleted);
-          },
-        }
+      setIsUploading(true);
+
+      const imageBase64 = await DoctorProfileImageService.uploadImage(
+        doctorId,
+        selectedFile
       );
 
-      if (response.data.success) {
-        setProfileImage(response.data.imageUrl);
-        setShowImageModal(false);
-        setSelectedFile(null);
-        setUploadProgress(0);
-      }
+      setProfileImage(imageBase64);
+      setShowImageModal(false);
+      setSelectedFile(null);
     } catch (error) {
       console.error("Error uploading image:", error);
       setUploadError("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -122,33 +109,34 @@ export default function Sidebar() {
 
       {/* Profile */}
       <div className="flex justify-center p-2">
-        <button 
+        <button
           onClick={() => setShowImageModal(true)}
           className="relative group"
         >
           {profileImage ? (
             <Image
-              src={profileImage}
+              src={`data:image/jpeg;base64,${profileImage}`}
               alt="profile"
-              width={40}
-              height={40}
+              width={50}
+              height={50}
+              unoptimized
               className="rounded-full cursor-pointer hover:opacity-80 transition-opacity"
             />
           ) : (
-            <Image 
-              src="/profile.png" 
-              alt="profile" 
-              width={40} 
-              height={40} 
+            <Image
+              src="/profile.png"
+              alt="profile"
+              width={50}
+              height={50}
               className="cursor-pointer hover:opacity-80 transition-opacity"
             />
           )}
-          <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 rounded-full text-white text-xs">
+          <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 rounded-full text-white text-xs cursor-pointer">
             Edit
           </span>
         </button>
         {isExpanded && (
-          <div className="flex justify-center ml-4 whitespace-nowrap mt-2">
+          <div className="flex justify-center ml-4 whitespace-nowrap mt-3">
             <p className="font-bold text-[#033A3D] text-[17px]">
               {userName || "Loading..."}
             </p>
@@ -160,38 +148,51 @@ export default function Sidebar() {
       {showImageModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-[#033A3D]">Upload Profile Image</h3>
-              <button 
-                onClick={() => {
-                  setShowImageModal(false);
-                  setSelectedFile(null);
-                  setUploadError(null);
-                  setUploadProgress(0);
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                &times;
-              </button>
-            </div>
-            
+            <h2 className="text-lg font-semibold mb-4 text-[#033A3D]">
+              Update Profile Picture
+            </h2>
+
+            {/* File selection */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select an image
               </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="block w-full text-sm text-gray-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-md file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-[#033A3D] file:text-white
-                  hover:file:bg-[#033A3D]/90"
-              />
+              <div className="flex items-center justify-center w-full">
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg
+                      className="w-8 h-8 mb-4 text-gray-500"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 20 16"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                      />
+                    </svg>
+                    <p className="mb-2 text-sm text-gray-500">
+                      <span className="font-semibold">Click to upload</span>{" "}
+                      or drag and drop
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG (MAX. 5MB)
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
-            
+
             {selectedFile && (
               <div className="mb-4">
                 <div className="flex items-center justify-center mb-2">
@@ -202,49 +203,55 @@ export default function Sidebar() {
                   />
                 </div>
                 <p className="text-sm text-center text-gray-600">
-                  {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                  {selectedFile.name} (
+                  {(selectedFile.size / 1024).toFixed(2)} KB)
                 </p>
               </div>
             )}
-            
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-                <div
-                  className="bg-[#033A3D] h-2.5 rounded-full"
-                  style={{ width: `${uploadProgress}%` }}
-                ></div>
-                <p className="text-xs text-center mt-1">
-                  Uploading: {uploadProgress}%
-                </p>
-              </div>
-            )}
-            
+
+            {/* Error message */}
             {uploadError && (
-              <div className="mb-4 text-red-500 text-sm">{uploadError}</div>
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md flex items-center">
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {uploadError}
+              </div>
             )}
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => {
                   setShowImageModal(false);
                   setSelectedFile(null);
                   setUploadError(null);
-                  setUploadProgress(0);
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                disabled={isUploading}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpload}
-                disabled={!selectedFile || uploadProgress > 0}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
-                  !selectedFile || uploadProgress > 0
+                disabled={!selectedFile || isUploading}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${
+                  !selectedFile || isUploading
                     ? "bg-[#033A3D]/50 cursor-not-allowed"
                     : "bg-[#033A3D] hover:bg-[#033A3D]/90"
                 }`}
               >
-                {uploadProgress > 0 ? "Uploading..." : "Upload"}
+                {isUploading ? "Uploading..." : "Upload"}
               </button>
             </div>
           </div>
@@ -291,8 +298,8 @@ export default function Sidebar() {
                 href={item.path}
                 className={`flex items-center p-2 border-1 rounded-full transition-all duration-300 ${
                   pathname === item.path
-                    ? "border-[#033A3D] bg-[#033A3D]/20 text-[#033A3D] font-bold shadow-md"
-                    : "border-transparent hover:border-[#033A3D] hover:bg-[#033a3d32] text-black"
+                    ? "border-[#033A3D] bg-[#9debc78d] text-[#033A3D] font-bold shadow-md"
+                    : "border-transparent hover:border-[#033A3D] hover:bg-[#9debc74b] text-black"
                 }`}
                 style={{
                   width: isExpanded ? "90%" : "50px",
@@ -303,11 +310,16 @@ export default function Sidebar() {
                 }}
               >
                 <img src={item.img} alt={item.label} className="w-5 h-5" />
-                {isExpanded && (
-                  <span className="text-[15px] whitespace-nowrap ml-2">
-                    {item.label}
-                  </span>
-                )}
+                <span 
+                  className={`text-[15px] whitespace-nowrap ml-2 transition-opacity duration-300 ${
+                    isExpanded ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{ 
+                    display: isExpanded ? 'inline' : 'none'
+                  }}
+                >
+                  {item.label}
+                </span>
               </Link>
             </li>
           ))}
@@ -324,7 +336,7 @@ export default function Sidebar() {
         <li className="mb-4 w-full flex justify-center">
           <a
             href="/Auth/login"
-            className="flex items-center p-2 hover:border-1 rounded-full transition-all duration-300 hover:border-[#033A3D] hover:bg-[#033a3d32]"
+            className="flex items-center p-2 hover:border-1 rounded-full transition-all duration-300 hover:border-red-800 hover:bg-red-200"
             onClick={handleLogout}
             style={{
               width: isExpanded ? "90%" : "50px",
@@ -335,11 +347,16 @@ export default function Sidebar() {
             }}
           >
             <img src="/image28.png" alt="Logout" className="w-5 h-5" />
-            {isExpanded && (
-              <span className="text-[#033A3D] text-[15px] whitespace-nowrap ml-2 font-bold">
-                Logout
-              </span>
-            )}
+            <span 
+              className={`text-red-600 text-[15px] whitespace-nowrap ml-2 font-bold transition-opacity duration-300 ${
+                isExpanded ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{ 
+                display: isExpanded ? 'inline' : 'none'
+              }}
+            >
+              Logout
+            </span>
           </a>
         </li>
       </div>
