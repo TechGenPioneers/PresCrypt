@@ -69,12 +69,15 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
   }, [selectedMethod]);
 
   const handleConfirmBooking = async () => {
+    if (loading) return; // Prevent multiple clicks
+    
     if (selectedMethod === "location") {
       if (!checkbox1Checked || !checkbox2Checked) {
         setAlertMessage("Please mark both checkboxes to confirm your booking.");
         setAlertOpen(true);
         return;
       }
+      setLoading(true);
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       setGeneratedOtp(otp);
 
@@ -89,6 +92,8 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
         console.error("Failed to send OTP:", error);
         setAlertMessage("Failed to send OTP. Please try again.");
         setAlertOpen(true);
+      } finally {
+        setLoading(false);
       }
     } else if (selectedMethod === "online") {
       handleOnlinePayment();
@@ -188,6 +193,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
 
       window.payhere.onDismissed = function () {
         console.log("Payment dismissed");
+        setLoading(false);
       };
 
       window.payhere.onError = async function (error) {
@@ -208,6 +214,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
           console.error("Failed to send failure notifications", notifyError);
         }
         alert("Payment failed. Please try again or choose pay at location.");
+        setLoading(false);
       };
 
       const payment = {
@@ -237,7 +244,6 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
     } catch (err) {
       console.error("Payment init error:", err);
       alert("Failed to initiate payment.");
-    } finally {
       setLoading(false);
     }
   };
@@ -320,7 +326,11 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
         )}
 
         <button
-          className="w-full bg-green-700 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`w-full font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 disabled:cursor-not-allowed ${
+            loading 
+              ? 'bg-green-400 text-white opacity-50' 
+              : 'bg-green-700 hover:bg-green-600 text-white'
+          }`}
           onClick={handleConfirmBooking}
           disabled={loading}
         >
