@@ -11,6 +11,7 @@ import SuccessMessage from "../components/SuccessMessage";
 import UploadModal from "../components/UploadModal";
 import { Button } from "@mui/material";
 import Link from "next/link";
+import HealthcareAnimatedBackground from "../../Components/MainPage/AnimatedWaveBackground";
 
 export default function DoctorRegistration() {
   const router = useRouter();
@@ -182,114 +183,118 @@ export default function DoctorRegistration() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-      {registrationSuccess ? (
-        <SuccessMessage
-          registrationSuccess={registrationSuccess}
-          handleSuccessClose={handleSuccessClose}
-        />
-      ) : (
-        <div className="flex flex-row bg-white rounded-xl shadow-lg overflow-hidden max-w-4xl w-full">
-          <div className="flex-1 p-6 flex flex-col">
-            <LogoSection />
-            <StepIndicator currentStep={currentStep} />
-            <RoleDropdown formData={formData} setFormData={setFormData} />
-            {currentStep === 1 ? (
-              <PersonalInfoForm
-                formData={formData}
-                setFormData={setFormData}
-                errors={errors}
-                setErrors={setErrors}
-                uploadedFile={uploadedFile}
-                setUploadedFile={setUploadedFile}
-                setShowUploadModal={setShowUploadModal}
-                otherSpecialization={otherSpecialization}
-                setOtherSpecialization={setOtherSpecialization}
-              />
-            ) : (
-              <div className="flex flex-col md:flex-row gap-8 mb-6">
-                <HospitalScheduleForm
-                  formData={formData}
-                  setFormData={setFormData}
-                  currentSchedule={currentSchedule}
-                  setCurrentSchedule={setCurrentSchedule}
-                  errors={errors}
-                  setErrors={setErrors}
-                />
-                <PasswordForm
-                  formData={formData}
-                  setFormData={setFormData}
-                  errors={errors}
-                  setErrors={setErrors}
-                />
-              </div>
-            )}
-            {errors.general && <p className="text-red-500 text-xs mb-4">{errors.general}</p>}
-            <p className="text-center text-gray-600 mb-4">
-              Already registered?{" "}
-              <Link href="/Auth/login" className="text-green-500 hover:underline">
-                Log in here
-              </Link>
-            </p>
-            <div className="flex flex-col md:flex-row gap-4 mt-4">
-              {currentStep === 2 && (
-                <Button
-                  variant="outlined"
-                  sx={{
-                    color: "#14b8a6",
-                    borderColor: "#14b8a6",
-                    "&:hover": {
-                      borderColor: "#0d9488",
-                      backgroundColor: "#f0fdfa",
-                    },
-                  }}
-                  onClick={handlePrevStep}
-                  fullWidth
-                >
-                  Back
-                </Button>
-              )}
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Fixed Animated Background */}
+      <HealthcareAnimatedBackground />
+      <div className="flex justify-center items-center min-h-screen p-4 relative z-10">
+        {registrationSuccess ? (
+          <SuccessMessage
+            registrationSuccess={registrationSuccess}
+            handleSuccessClose={handleSuccessClose}
+          />
+        ) : (
+          <div className="bg-white/80 rounded-xl overflow-hidden max-w-7xl w-full">
+            <div className="flex-1 p-6 flex flex-col">
+              <LogoSection />
+              <StepIndicator currentStep={currentStep} />
+              <RoleDropdown formData={formData} setFormData={setFormData} />
               {currentStep === 1 ? (
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#14b8a6",
-                    color: "#fff",
-                    "&:hover": {
-                      backgroundColor: "#0d9488",
-                    },
-                  }}
-                  onClick={handleNextStep}
-                  fullWidth
-                >
-                  Next
-                </Button>
+                <PersonalInfoForm
+                  formData={formData}
+                  setFormData={setFormData}
+                  errors={errors}
+                  setErrors={setErrors}
+                  uploadedFile={uploadedFile}
+                  setUploadedFile={setUploadedFile}
+                  setShowUploadModal={setShowUploadModal}
+                  otherSpecialization={otherSpecialization}
+                  setOtherSpecialization={setOtherSpecialization}
+                />
               ) : (
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#14b8a6",
-                    color: "#fff",
-                    "&:hover": {
-                      backgroundColor: "#0d9488",
-                    },
-                  }}
-                  onClick={handleRegister}
-                  disabled={loading}
-                  fullWidth
-                >
-                  {loading ? "Processing..." : "Request Verification"}
-                </Button>
+                <div className="flex flex-col md:flex-row gap-8 mb-6">
+                  <HospitalScheduleForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    currentSchedule={currentSchedule}
+                    setCurrentSchedule={setCurrentSchedule}
+                    errors={errors}
+                    setErrors={setErrors}
+                  />
+                  <PasswordForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    errors={errors}
+                    setErrors={setErrors}
+                  />
+                </div>
               )}
+              {errors.general && <p className="text-red-500 text-xs mb-4">{errors.general}</p>}
+              <p className="text-center text-gray-600 mb-4">
+                Already registered?{" "}
+                <Link href="/Auth/login" className="text-green-500 hover:underline">
+                  Log in here
+                </Link>
+              </p>
+              <div className="flex flex-col md:flex-row gap-4 mt-4">
+                {currentStep === 2 && (
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      color: "#14b8a6",
+                      borderColor: "#14b8a6",
+                      "&:hover": {
+                        borderColor: "#0d9488",
+                        backgroundColor: "#f0fdfa",
+                      },
+                    }}
+                    onClick={handlePrevStep}
+                    fullWidth
+                  >
+                    Back
+                  </Button>
+                )}
+                {currentStep === 1 ? (
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#14b8a6",
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#0d9488",
+                      },
+                    }}
+                    onClick={handleNextStep}
+                    fullWidth
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#14b8a6",
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#0d9488",
+                      },
+                    }}
+                    onClick={handleRegister}
+                    disabled={loading}
+                    fullWidth
+                  >
+                    {loading ? "Processing..." : "Request Verification"}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-      <UploadModal
-        showUploadModal={showUploadModal}
-        setShowUploadModal={setShowUploadModal}
-        handleFileUpload={handleFileUpload}
-      />
+        )}
+        <UploadModal
+          showUploadModal={showUploadModal}
+          setShowUploadModal={setShowUploadModal}
+          handleFileUpload={handleFileUpload}
+        />
+      </div>
     </div>
   );
 }
