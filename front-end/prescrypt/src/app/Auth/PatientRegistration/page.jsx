@@ -13,7 +13,6 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
-
 export default function PatientRegistration() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -322,7 +321,8 @@ export default function PatientRegistration() {
           </p>
         </div>
       </Backdrop>
-
+      
+      {/* Registration Form */}
       <RegistrationLayout
         title="JOIN US FOR A HEALTHIER TOMORROW!"
         subtitle="Create your account"
