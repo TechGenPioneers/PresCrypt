@@ -16,6 +16,7 @@ import * as signalR from "@microsoft/signalr";
 import VideoCallRoom from "../VideoCall/VideoCallRoom";
 import { useVideoCall } from "../VideoCallProvider";
 import IncomingCallModal from "../VideoCall/IncomingCallModal";
+import { useRouter } from "next/navigation";
 
 const formatMessageTime = (date) =>
   new Date(date).toLocaleTimeString([], {
@@ -58,6 +59,7 @@ const ChatWindow = ({
   doctorName,
   patientName,
 }) => {
+  const router = useRouter();
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [menuOpenId, setMenuOpenId] = useState(null);
@@ -66,7 +68,7 @@ const ChatWindow = ({
   const messageContainerRef = useRef(null);
   const currentUserName = userRole === "Doctor" ? doctorName : patientName;
   const otherUserName = userRole === "Doctor" ? patientName : doctorName;
-  const[isDelete,setIsDelete]=useState(false)
+  const [isDelete, setIsDelete] = useState(false);
   const {
     incomingCall,
     callerInfo,
@@ -151,6 +153,7 @@ const ChatWindow = ({
   }, [connection]);
 
   const fetchMessages = useCallback(async () => {
+    console.log(selectedUser);
     setIsLoading(true);
     try {
       const data = await GetAllMessages(userId, selectedUser.receiverId);
@@ -254,15 +257,15 @@ const ChatWindow = ({
   }, []);
 
   const handleDeleteMessage = async (messageId) => {
-    setIsDelete(true)
+    setIsDelete(true);
     try {
       await DeleteMessage(messageId);
       setMenuOpenId(null);
       fetchUsers();
     } catch (err) {
       console.error("Failed to delete message", err);
-    } 
-    setIsDelete(false) 
+    }
+    setIsDelete(false);
   };
 
   const shouldShowIncomingModal =
@@ -273,7 +276,45 @@ const ChatWindow = ({
       <div className="flex flex-col flex-1 overflow-auto">
         <ChatHeaderSkeleton />
         <MessageSkeleton />
-        <MessageInput />
+        {userRole === "Patient" ? (
+          selectedUser?.appointmentStatus === "Pending" ||
+          selectedUser?.appointmentStatus === "Rescheduled" ? (
+            <MessageInput />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 px-4 bg-gray-50 rounded-xl shadow-inner border border-dashed border-gray-300">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-12 w-12 text-emerald-500 mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M18.364 5.636a9 9 0 11-12.728 0M12 7v5l3 3"
+                />
+              </svg>
+              <p className="text-gray-700 text-lg font-semibold mb-2">
+                Messaging Unavailable
+              </p>
+              <p className="text-gray-500 text-sm text-center max-w-md">
+                Your appointment with this doctor is{" "}
+                <span className="text-yellow-600">Completed</span> or{" "}
+                <span className="text-yellow-600">Cancelled</span>.
+              </p>
+              <button
+                onClick={() => router.push("/Patient/PatientAppointments")}
+                className="mt-6 bg-[#A9C9CD] text-[#09424D]  px-6 py-2 rounded-lg transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                Re-Book Appointment
+              </button>
+            </div>
+          )
+        ) : (
+          <MessageInput />
+        )}
       </div>
     );
   }
@@ -285,6 +326,7 @@ const ChatWindow = ({
         setSelectedUser={setSelectedUser}
         onStartCall={userRole === "Doctor" ? handleStartCall : undefined}
         userRole={userRole}
+        userId={userId}
         isCallActive={!!activeCall}
       />
 
@@ -432,13 +474,57 @@ const ChatWindow = ({
             })()}
           </div>
 
-          <MessageInput
-            selectedUser={selectedUser}
-            userId={userId}
-            fetchUsers={fetchUsers}
-            connection={connection}
-            setMessages={setMessages}
-          />
+          {userRole === "Patient" ? (
+            selectedUser?.appointmentStatus === "Pending" ||
+            selectedUser?.appointmentStatus === "Rescheduled" ? (
+              <MessageInput
+                selectedUser={selectedUser}
+                userId={userId}
+                fetchUsers={fetchUsers}
+                connection={connection}
+                setMessages={setMessages}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-10 px-4 bg-gray-50 rounded-xl shadow-inner border border-dashed border-gray-300">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-12 w-12 text-emerald-500 mb-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M18.364 5.636a9 9 0 11-12.728 0M12 7v5l3 3"
+                  />
+                </svg>
+                <p className="text-gray-700 text-lg font-semibold mb-2">
+                  Messaging Unavailable
+                </p>
+                <p className="text-gray-500 text-sm text-center max-w-md">
+                  Your appointment with this doctor is{" "}
+                  <span className="text-yellow-600">Completed</span> or{" "}
+                  <span className="text-yellow-600">Cancelled</span>.
+                </p>
+                <button
+                  onClick={() => router.push("/Patient/PatientAppointments")}
+                  className="mt-6 bg-[#A9C9CD] text-[#09424D]  px-6 py-2 rounded-lg transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  Re-Book Appointment
+                </button>
+              </div>
+            )
+          ) : (
+            <MessageInput
+              selectedUser={selectedUser}
+              userId={userId}
+              fetchUsers={fetchUsers}
+              connection={connection}
+              setMessages={setMessages}
+            />
+          )}
         </>
       )}
     </div>

@@ -15,6 +15,21 @@ const GetUsers = async (userId) => {
     throw error;
   }
 };
+
+const GetUserDetails = async (userId,receiverId) => {
+  console.log("Ids",userId,receiverId)
+  try {
+    const response = await axios.get(
+      `${baseUrl}/GetUserDetails?userId=${userId}&receiverId=${receiverId}`
+    );
+    console.log("re",response)
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch users", error);
+    throw error;
+  }
+};
+
 const GetAllMessages = async (senderId, receiverId) => {
   try {
     const response = await axios.get(
@@ -150,4 +165,5 @@ export {
   GetUserNames,
   GetVideoCallRoom,
   EstablishVideoSignalRConnection,
+  GetUserDetails
 };
