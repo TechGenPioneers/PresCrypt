@@ -85,10 +85,10 @@ const HealthRecord = () => {
 
   // Helper function to find the most recent value from observations
   const findLatestObservation = (results, displayStartsWith) => {
-    const matchingObs = results.filter(obs => 
+    const matchingObs = results.filter(obs =>
       obs.display && obs.display.startsWith(displayStartsWith)
     );
-    return matchingObs.length > 0 ? matchingObs[matchingObs.length - 1] : null;
+    return matchingObs.length > 0 ? matchingObs[0] : null;
   };
 
   // OpenMRS Health Information Header Indicator Component
@@ -154,6 +154,7 @@ const HealthRecord = () => {
         // Fetch health data from the API
         try {
           const healthResponse = await axios.get(`https://localhost:7021/api/PatientObservations/${patientId}`);
+          
           
           console.log('Health API Response:', healthResponse.data);
           
