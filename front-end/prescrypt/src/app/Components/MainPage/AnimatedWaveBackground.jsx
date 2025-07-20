@@ -1,279 +1,99 @@
-// import React from 'react';
-
-// const HealthcareAnimatedBackground = () => {
-//   // Generate network points for lines
-//   const networkPoints = Array.from({ length: 15 }, (_, i) => ({
-//     id: i,
-//     x: Math.random() * 100,
-//     y: Math.random() * 100,
-//     radius: Math.random() * 1.5 + 0.5, // Smaller radius
-//     duration: Math.random() * 10 + 5,
-//   }));
-
-//   // Generate healthcare-themed particles
-//   const healthcareParticles = Array.from({ length: 8 }, (_, i) => ({
-//     id: i,
-//     x: Math.random() * 100,
-//     y: Math.random() * 100,
-//     duration: Math.random() * 30 + 20,
-//     delay: Math.random() * 15,
-//     type: i % 4, // Different healthcare icons
-//   }));
-
-//   // Generate dropping hearts
-//   const droppingHearts = Array.from({ length: 10 }, (_, i) => ({
-//     id: i,
-//     x: Math.random() * 100,
-//     duration: Math.random() * 10 + 5,
-//     delay: Math.random() * 5,
-//   }));
-
-//   const HealthcareIcon = ({ type, className }) => {
-//     switch (type) {
-//       case 0: // Stethoscope
-//         return (
-//           <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-//             <path d="M12 2A10 10 0 0 0 2 12A10 10 0 0 0 12 22A10 10 0 0 0 22 12A10 10 0 0 0 12 2M12 4A8 8 0 0 1 20 12A8 8 0 0 1 12 20A8 8 0 0 1 4 12A8 8 0 0 1 12 4M11 6V12L16.2 16.2L17.6 14.8L13 10.2V6H11Z"/>
-//           </svg>
-//         );
-//       case 1: // Cross
-//         return (
-//           <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-//             <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"/>
-//           </svg>
-//         );
-//       case 2: // Heart
-//         return (
-//           <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-//             <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z"/>
-//           </svg>
-//         );
-//       case 3: // Pill
-//         return (
-//           <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-//             <path d="M17 8H7C5.9 8 5 8.9 5 10V14C5 15.1 5.9 16 7 16H17C18.1 16 19 15.1 19 14V10C19 8.9 18.1 8 17 8M17 14H7V10H17V14Z"/>
-//           </svg>
-//         );
-//       default:
-//         return null;
-//     }
-//   };
-
-//   const HeartbeatLine = () => (
-//     <svg className="absolute w-16 h-16 text-teal-500 opacity-30 animate-heartbeat" style={{ top: '10%', left: '20%', animationDelay: '0s' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-//       <path d="M3 12L6 9L9 12L12 9L15 12L18 9L21 12" />
-//     </svg>
-//   );
-
-//   const AnimatedStethoscope = () => (
-//     <svg className="absolute w-12 h-12 text-teal-500 opacity-30 animate-rotate" style={{ top: '30%', right: '10%', animationDelay: '2s' }} viewBox="0 0 24 24" fill="currentColor">
-//       <path d="M12 2A10 10 0 0 0 2 12A10 10 0 0 0 12 22A10 10 0 0 0 22 12A10 10 0 0 0 12 2M12 4A8 8 0 0 1 20 12A8 8 0 0 1 12 20A8 8 0 0 1 4 12A8 8 0 0 1 12 4M11 6V12L16.2 16.2L17.6 14.8L13 10.2V6H11Z"/>
-//     </svg>
-//   );
-
-//   const MedicalCross = () => (
-//     <svg className="absolute w-10 h-10 text-teal-500 opacity-30 animate-pulse" style={{ top: '50%', left: '70%', animationDelay: '1s' }} viewBox="0 0 24 24" fill="currentColor">
-//       <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"/>
-//     </svg>
-//   );
-
-//   return (
-//     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-//       {/* Gradient Background (White to Teal) */}
-//       <div className="absolute inset-0 bg-gradient-to-br from-white via-teal-50 to-teal-200 opacity-80"></div>
-
-//       {/* Network Lines and Dots */}
-//       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-//         {networkPoints.map((point) => (
-//           <React.Fragment key={point.id}>
-//             <circle
-//               cx={point.x}
-//               cy={point.y}
-//               r={point.radius}
-//               fill="rgba(20, 184, 166, 0.6)" // Teal color
-//               className="animate-pulse"
-//               style={{ animationDuration: `${point.duration}s` }}
-//             />
-//             {networkPoints
-//               .filter((otherPoint) => Math.hypot(point.x - otherPoint.x, point.y - otherPoint.y) < 20)
-//               .map((otherPoint) => (
-//                 <line
-//                   key={`${point.id}-${otherPoint.id}`}
-//                   x1={point.x}
-//                   y1={point.y}
-//                   x2={otherPoint.x}
-//                   y2={otherPoint.y}
-//                   stroke="rgba(20, 184, 166, 0.2)" // Teal color
-//                   strokeWidth="0.5"
-//                   className="animate-line"
-//                 />
-//               ))}
-//           </React.Fragment>
-//         ))}
-//       </svg>
-
-//       {/* Healthcare-themed Particles */}
-//       <div className="absolute inset-0">
-//         {healthcareParticles.map((particle) => (
-//           <div
-//             key={particle.id}
-//             className="absolute opacity-30"
-//             style={{
-//               left: `${particle.x}%`,
-//               top: `${particle.y}%`,
-//               animation: `healthcareFloat ${particle.duration}s ease-in-out infinite`,
-//               animationDelay: `${particle.delay}s`,
-//             }}
-//           >
-//             <HealthcareIcon
-//               type={particle.type}
-//               className="w-6 h-6 md:w-8 md:h-8 text-teal-500"
-//             />
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Dropping Hearts */}
-//       <div className="absolute inset-0">
-//         {droppingHearts.map((heart) => (
-//           <div
-//             key={heart.id}
-//             className="absolute opacity-20"
-//             style={{
-//               left: `${heart.x}%`,
-//               top: '-5%', // Start above the viewport
-//               animation: `dropHeart ${heart.duration}s linear infinite`,
-//               animationDelay: `${heart.delay}s`,
-//             }}
-//           >
-//             <svg className="w-4 h-4 text-teal-500" viewBox="0 0 24 24" fill="currentColor">
-//               <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z"/>
-//             </svg>
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Animated Health Vectors */}
-//       <HeartbeatLine />
-//       <AnimatedStethoscope />
-//       <MedicalCross />
-
-//       {/* Pulsing Circles (Smaller) */}
-//       <div className="absolute top-1/4 left-1/4 w-16 h-16 bg-teal-200 rounded-full opacity-15 animate-ping" style={{ animationDuration: '4s' }}></div>
-//       <div className="absolute top-3/4 right-1/4 w-12 h-12 bg-teal-300 rounded-full opacity-15 animate-ping" style={{ animationDuration: '6s', animationDelay: '2s' }}></div>
-//       <div className="absolute top-1/2 right-1/3 w-10 h-10 bg-teal-600 rounded-full opacity-15 animate-ping" style={{ animationDuration: '5s', animationDelay: '1s' }}></div>
-
-//       {/* CSS Keyframes */}
-//       <style jsx>{`
-//         @keyframes pulse {
-//           0%, 100% { transfor500m: scale(1); }
-//           50% { transform: scale(1.2); }
-//         }
-
-//         @keyframes line {
-//           0%, 100% { stroke-opacity: 0.2; }
-//           50% { stroke-opacity: 0.4; }
-//         }
-
-//         @keyframes healthcareFloat {
-//           0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
-//           25% { transform: translateY(-30px) translateX(20px) rotate(5deg); }
-//           50% { transform: translateY(-10px) translateX(-10px) rotate(-3deg); }
-//           75% { transform: translateY(-25px) translateX(-20px) rotate(2deg); }
-//         }
-
-//         @keyframes dropHeart {
-//           0% { transform: translateY(-19%) rotate(0deg); }
-//           100% { transform: translateY(110%) rotate(360deg); }
-//         }
-
-//         @keyframes heartbeat {
-//           0%, 100% { transform: scale(1); }
-//           50% { transform: scale(1.1); }
-//         }
-
-//         @keyframes rotate {
-//           0% { transform: rotate(0deg); }
-//           100% { transform: rotate(360deg); }
-//         }
-
-//         .animate-pulse {
-//           animation: pulse 4s infinite;
-//         }
-
-//         .animate-line {
-//           animation: line 4s infinite;
-//         }
-
-//         .animate-heartbeat {
-//           animation: heartbeat 2s infinite;
-//         }
-
-//         .animate-rotate {
-//           animation: rotate 10s linear infinite;
-//         }
-//       `}</style>
-//     </div>
-//   );
-// };
-
-// export default HealthcareAnimatedBackground;
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const HealthcareAnimatedBackground = () => {
-  // Generate network points for circles and lines
-  const networkPoints = Array.from({ length: 20 }, (_, i) => ({
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Seeded random function for consistent results
+  const seededRandom = (seed) => {
+    let x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
+  };
+
+  // Generate network points with seeded random for consistency
+  const networkPoints = Array.from({ length: 25 }, (_, i) => ({
     id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    radius: Math.random() * 2 + 0.5, // Varied small radius
-    size: Math.random() * 5 + 2, // Varied circle size
-    duration: Math.random() * 8 + 4, // Varied animation duration
-    opacity: Math.random() * 0.4 + 0.2, // Varied opacity
+    x: seededRandom(i * 10 + 1) * 100,
+    y: seededRandom(i * 10 + 2) * 100,
+    radius: seededRandom(i * 10 + 3) * 1.5 + 0.8,
+    duration: seededRandom(i * 10 + 4) * 8 + 6,
+    opacity: seededRandom(i * 10 + 5) * 0.6 + 0.3,
+    delay: seededRandom(i * 10 + 6) * 3,
   }));
 
-  // Generate healthcare-themed particles
-  const healthcareParticles = Array.from({ length: 8 }, (_, i) => ({
+  // Generate floating healthcare icons with seeded random
+  const healthcareIcons = Array.from({ length: 12 }, (_, i) => ({
     id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    duration: Math.random() * 25 + 15,
-    delay: Math.random() * 10,
-    type: i % 4, // Different healthcare icons
+    x: seededRandom(i * 20 + 7) * 100,
+    y: seededRandom(i * 20 + 8) * 100,
+    duration: seededRandom(i * 20 + 9) * 20 + 15,
+    delay: seededRandom(i * 20 + 10) * 8,
+    type: i % 6,
+    size: seededRandom(i * 20 + 11) * 0.5 + 0.3,
   }));
 
-  // Generate dropping hearts
-  const droppingHearts = Array.from({ length: 12 }, (_, i) => ({ // Increased number for more effect
+  // Generate DNA helix particles with seeded random
+  const dnaParticles = Array.from({ length: 8 }, (_, i) => ({
     id: i,
-    x: Math.random() * 100,
-    duration: Math.random() * 12 + 6,
-    delay: Math.random() * 3,
+    x: seededRandom(i * 30 + 12) * 100,
+    y: seededRandom(i * 30 + 13) * 100,
+    duration: seededRandom(i * 30 + 14) * 15 + 10,
+    delay: seededRandom(i * 30 + 15) * 5,
   }));
 
-  const HealthcareIcon = ({ type, className }) => {
+  // Generate subtle pulse circles with seeded random
+  const pulseCircles = Array.from({ length: 6 }, (_, i) => ({
+    id: i,
+    x: seededRandom(i * 40 + 16) * 100,
+    y: seededRandom(i * 40 + 17) * 100,
+    size: seededRandom(i * 40 + 18) * 60 + 40,
+    duration: seededRandom(i * 40 + 19) * 8 + 5,
+    delay: seededRandom(i * 40 + 20) * 4,
+  }));
+
+  const HealthcareIcon = ({ type, className, opacity = 0.3 }) => {
+    const iconStyle = { opacity };
+    
     switch (type) {
       case 0: // Stethoscope
         return (
-          <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2A10 10 0 0 0 2 12A10 10 0 0 0 12 22A10 10 0 0 0 22 12A10 10 0 0 0 12 2M12 4A8 8 0 0 1 20 12A8 8 0 0 1 12 20A8 8 0 0 1 4 12A8 8 0 0 1 12 4M11 6V12L16.2 16.2L17.6 14.8L13 10.2V6H11Z"/>
+          <svg className={className} style={iconStyle} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.43 12.98c.04-.32.07-.64.07-.98 0-.34-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98 0 .33.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
           </svg>
         );
-      case 1: // Cross
+      case 1: // Medical Cross
         return (
-          <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"/>
+          <svg className={className} style={iconStyle} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.5 12c0 .28-.11.53-.29.71l-4.5 4.5c-.18.18-.43.29-.71.29s-.53-.11-.71-.29l-4.5-4.5c-.18-.18-.29-.43-.29-.71s.11-.53.29-.71l4.5-4.5c.18-.18.43-.29.71-.29s.53.11.71.29l4.5 4.5c.18.18.29.43.29.71z"/>
+            <path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"/>
           </svg>
         );
       case 2: // Heart
         return (
-          <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z"/>
+          <svg className={className} style={iconStyle} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
         );
-      case 3: // Pill
+      case 3: // Pills
         return (
-          <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17 8H7C5.9 8 5 8.9 5 10V14C5 15.1 5.9 16 7 16H17C18.1 16 19 15.1 19 14V10C19 8.9 18.1 8 17 8M17 14H7V10H17V14Z"/>
+          <svg className={className} style={iconStyle} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4.22 11.29l6.36-6.36c.79-.79 2.07-.79 2.86 0l6.36 6.36c.79.79.79 2.07 0 2.86l-6.36 6.36c-.79.79-2.07.79-2.86 0l-6.36-6.36c-.79-.79-.79-2.07 0-2.86z"/>
+            <path d="M15 9l-6 6"/>
+          </svg>
+        );
+      case 4: // Microscope
+        return (
+          <svg className={className} style={iconStyle} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9.5 12c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zM20 19.5c0 .28-.22.5-.5.5H4.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h15c.28 0 .5.22.5.5zm-8-16c0-.28-.22-.5-.5-.5s-.5.22-.5.5V5h-1c-.28 0-.5.22-.5.5S9.72 6 10 6h1v1.5c0 .28.22.5.5.5s.5-.22.5-.5V6h1c.28 0 .5-.22.5-.5S12.28 5 12 5h-1V3.5z"/>
+          </svg>
+        );
+      case 5: // Medical Chart
+        return (
+          <svg className={className} style={iconStyle} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 10h2v7H7v-7zm4-3h2v10h-2V7zm4 6h2v4h-2v-4z"/>
           </svg>
         );
       default:
@@ -281,159 +101,342 @@ const HealthcareAnimatedBackground = () => {
     }
   };
 
+  const DNAHelix = ({ className, style }) => (
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M3 7c0 0 4-3 9 0s9 0 9 0"/>
+      <path d="M3 12c0 0 4 3 9 0s9 0 9 0"/>
+      <path d="M3 17c0 0 4-3 9 0s9 0 9 0"/>
+      <circle cx="6" cy="7" r="1"/>
+      <circle cx="18" cy="7" r="1"/>
+      <circle cx="12" cy="12" r="1"/>
+      <circle cx="6" cy="17" r="1"/>
+      <circle cx="18" cy="17" r="1"/>
+    </svg>
+  );
+
   const HeartbeatLine = () => (
-    <svg className="absolute w-20 h-20 text-teal-500 opacity-30 animate-heartbeat" style={{ top: '15%', left: '25%', animationDelay: '0s' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M3 12L6 9L9 12L12 9L15 12L18 9L21 12" />
+    <svg 
+      className="absolute w-24 h-24 text-teal-100 opacity-10 animate-heartbeat" 
+      style={{ top: '10%', left: '5%', animationDelay: '0s' }} 
+      viewBox="0 0 100 20" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="1"
+    >
+      <path d="M0 10 L20 10 L25 5 L30 15 L35 0 L40 20 L45 10 L80 10 L100 10" />
     </svg>
   );
 
-  const AnimatedStethoscope = () => (
-    <svg className="absolute w-16 h-16 text-teal-500 opacity-30 animate-rotate" style={{ top: '35%', right: '15%', animationDelay: '2s' }} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2A10 10 0 0 0 2 12A10 10 0 0 0 12 22A10 10 0 0 0 22 12A10 10 0 0 0 12 2M12 4A8 8 0 0 1 20 12A8 8 0 0 1 12 20A8 8 0 0 1 4 12A8 8 0 0 1 12 4M11 6V12L16.2 16.2L17.6 14.8L13 10.2V6H11Z"/>
-    </svg>
-  );
-
-  const MedicalCross = () => (
-    <svg className="absolute w-12 h-12 text-teal-500 opacity-30 animate-pulse" style={{ top: '60%', left: '75%', animationDelay: '1s' }} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"/>
-    </svg>
-  );
+  // Don't render animated content during SSR
+  if (!isClient) {
+    return (
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Enhanced Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-teal-50/80 to-teal-100/90"></div>
+        
+        {/* Radial gradients for depth */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-teal-200/30 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-gradient-radial from-teal-300/20 to-transparent rounded-full blur-3xl"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {/* Gradient Background (White to Teal) */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-teal-50 to-teal-300 opacity-90"></div>
+      {/* Enhanced Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-teal-50/80 to-teal-100/90"></div>
+      
+      {/* Radial gradients for depth */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-teal-200/30 to-transparent rounded-full blur-3xl"></div>
+      <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-gradient-radial from-teal-300/20 to-transparent rounded-full blur-3xl"></div>
 
-      {/* Enhanced Network Circles and Lines */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-        {networkPoints.map((point) => (
-          <React.Fragment key={point.id}>
-            <circle
-              cx={point.x}
-              cy={point.y}
-              r={point.radius}
-              fill={`rgba(20, 184, 166, ${point.opacity})`} // Teal with varied opacity
-              className="animate-pulse"
-              style={{ animationDuration: `${point.duration}s`, transformOrigin: `${point.x}% ${point.y}%` }}
-            />
-            {networkPoints
-              .filter((otherPoint) => Math.hypot(point.x - otherPoint.x, point.y - otherPoint.y) < 25) // Increased distance for more connections
-              .map((otherPoint) => (
-                <line
-                  key={`${point.id}-${otherPoint.id}`}
-                  x1={point.x}
-                  y1={point.y}
-                  x2={otherPoint.x}
-                  y2={otherPoint.y}
-                  stroke={`rgba(20, 184, 166, ${point.opacity * 0.5})`} // Lighter teal lines
-                  strokeWidth={0.3}
-                  className="animate-line"
-                  style={{ animationDuration: `${point.duration}s` }}
-                />
-              ))}
-          </React.Fragment>
-        ))}
-      </svg>
+      {/* Entire Animation Container with Blur Effect */}
+      <div className="absolute inset-0 blur-sm">
+        {/* Advanced Network Lines and Nodes */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+          {/* Connection Lines */}
+          {networkPoints.map((point) => (
+            <React.Fragment key={point.id}>
+              {networkPoints
+                .filter((otherPoint) => {
+                  const distance = Math.hypot(point.x - otherPoint.x, point.y - otherPoint.y);
+                  return distance < 20 && distance > 0;
+                })
+                .map((otherPoint) => (
+                  <line
+                    key={`${point.id}-${otherPoint.id}`}
+                    x1={point.x}
+                    y1={point.y}
+                    x2={otherPoint.x}
+                    y2={otherPoint.y}
+                    stroke={`rgba(20, 184, 166, ${point.opacity * 0.3})`}
+                    strokeWidth="0.4"
+                    className="animate-networkLine"
+                    style={{ 
+                      animationDuration: `${point.duration}s`,
+                      animationDelay: `${point.delay}s`
+                    }}
+                  />
+                ))}
+              
+              {/* Network Nodes */}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={point.radius}
+                fill={`rgba(20, 184, 166, ${point.opacity})`}
+                className="animate-networkPulse"
+                style={{ 
+                  animationDuration: `${point.duration}s`,
+                  animationDelay: `${point.delay}s`
+                }}
+              />
+              
+              {/* Node Glow Effect */}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={point.radius * 2}
+                fill={`rgba(20, 184, 166, ${point.opacity * 0.2})`}
+                className="animate-networkGlow"
+                style={{ 
+                  animationDuration: `${point.duration * 1.5}s`,
+                  animationDelay: `${point.delay}s`
+                }}
+              />
+            </React.Fragment>
+          ))}
+        </svg>
 
-      {/* Healthcare-themed Particles */}
-      <div className="absolute inset-0">
-        {healthcareParticles.map((particle) => (
-          <div
-            key={particle.id}
-            className="absolute opacity-40"
-            style={{
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              animation: `healthcareFloat ${particle.duration}s ease-in-out infinite`,
-              animationDelay: `${particle.delay}s`,
-            }}
-          >
-            <HealthcareIcon
-              type={particle.type}
-              className="w-5 h-5 md:w-7 md:h-7 text-teal-500"
+        {/* Floating Healthcare Icons */}
+        <div className="absolute inset-0">
+          {healthcareIcons.map((icon) => (
+            <div
+              key={icon.id}
+              className="absolute"
+              style={{
+                left: `${icon.x}%`,
+                top: `${icon.y}%`,
+                animation: `healthcareFloat ${icon.duration}s ease-in-out infinite`,
+                animationDelay: `${icon.delay}s`,
+                transform: `scale(${icon.size})`,
+              }}
+            >
+              <HealthcareIcon
+                type={icon.type}
+                className="w-6 h-6 md:w-8 md:h-8 text-teal-500"
+                opacity={0.25}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* DNA Helix Elements */}
+        <div className="absolute inset-0">
+          {dnaParticles.map((dna) => (
+            <div
+              key={dna.id}
+              className="absolute"
+              style={{
+                left: `${dna.x}%`,
+                top: `${dna.y}%`,
+                animation: `dnaRotate ${dna.duration}s linear infinite`,
+                animationDelay: `${dna.delay}s`,
+              }}
+            >
+              <DNAHelix
+                className="w-8 h-8 text-teal-600"
+                style={{ opacity: 0.15 }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Pulse Circles */}
+        <div className="absolute inset-0">
+          {pulseCircles.map((circle) => (
+            <div
+              key={circle.id}
+              className="absolute rounded-full bg-gradient-radial from-teal-100/10 to-transparent animate-subtlePulse"
+              style={{
+                left: `${circle.x}%`,
+                top: `${circle.y}%`,
+                width: `${circle.size}px`,
+                height: `${circle.size}px`,
+                transform: 'translate(-50%, -50%)',
+                animationDuration: `${circle.duration}s`,
+                animationDelay: `${circle.delay}s`,
+              }}
             />
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Animated Medical Elements */}
+        <HeartbeatLine />
+        
+        {/* Floating Medical Symbols */}
+        <div className="absolute top-1/3 right-1/5 w-12 h-12 text-teal-500 opacity-15 animate-slowSpin">
+          <HealthcareIcon type={0} className="w-full h-full" opacity={0.15} />
+        </div>
+        
+        <div className="absolute bottom-1/4 left-1/6 w-10 h-10 text-teal-600 opacity-20 animate-gentleBob">
+          <HealthcareIcon type={2} className="w-full h-full" opacity={0.2} />
+        </div>
+
+        {/* Geometric Patterns */}
+        <svg className="absolute top-1/2 left-1/2 w-32 h-32 text-teal-400 opacity-10 animate-slowRotate" style={{ transform: 'translate(-50%, -50%)' }} viewBox="0 0 100 100">
+          <polygon points="50,15 90,85 10,85" fill="none" stroke="currentColor" strokeWidth="1"/>
+          <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="1"/>
+        </svg>
       </div>
 
-      {/* Dropping Hearts */}
-      <div className="absolute inset-0">
-        {droppingHearts.map((heart) => (
-          <div
-            key={heart.id}
-            className="absolute opacity-25"
-            style={{
-              left: `${heart.x}%`,
-              top: '-5%',
-              animation: `dropHeart ${heart.duration}s linear infinite`,
-              animationDelay: `${heart.delay}s`,
-            }}
-          >
-            <svg className="w-3 h-3 text-teal-500" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5C22 12.27 18.6 15.36 13.45 20.03L12 21.35Z"/>
-            </svg>
-          </div>
-        ))}
-      </div>
-
-      {/* Animated Health Vectors */}
-      <HeartbeatLine />
-      <AnimatedStethoscope />
-      <MedicalCross />
-
-      {/* Pulsing Circles (Enhanced with varied sizes and positions) */}
-      <div className="absolute top-20% left-10% w-12 h-12 bg-teal-200 rounded-full opacity-15 animate-ping" style={{ animationDuration: '3s' }}></div>
-      <div className="absolute top-70% right-20% w-10 h-10 bg-teal-300 rounded-full opacity-15 animate-ping" style={{ animationDuration: '5s', animationDelay: '1s' }}></div>
-      <div className="absolute top-40% left-70% w-8 h-8 bg-teal-600 rounded-full opacity-15 animate-ping" style={{ animationDuration: '4s', animationDelay: '0.5s' }}></div>
-
-      {/* CSS Keyframes */}
+      {/* CSS Animations */}
       <style jsx>{`
-        @keyframes pulse {
-          0%, 100% { transform: scale(1) rotate(0deg); }
-          50% { transform: scale(1.3) rotate(10deg); }
+        @keyframes networkPulse {
+          0%, 100% { 
+            transform: scale(1); 
+            opacity: 0.6; 
+          }
+          50% { 
+            transform: scale(1.4); 
+            opacity: 0.9; 
+          }
         }
 
-        @keyframes line {
-          0%, 100% { stroke-opacity: 0.2; }
-          50% { stroke-opacity: 0.6; }
+        @keyframes networkGlow {
+          0%, 100% { 
+            transform: scale(1); 
+            opacity: 0.1; 
+          }
+          50% { 
+            transform: scale(1.8); 
+            opacity: 0.3; 
+          }
+        }
+
+        @keyframes networkLine {
+          0%, 100% { 
+            stroke-opacity: 0.2; 
+          }
+          50% { 
+            stroke-opacity: 0.6; 
+          }
         }
 
         @keyframes healthcareFloat {
-          0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
-          25% { transform: translateY(-20px) translateX(15px) rotate(5deg); }
-          50% { transform: translateY(-10px) translateX(-10px) rotate(-3deg); }
-          75% { transform: translateY(-15px) translateX(-15px) rotate(2deg); }
+          0%, 100% { 
+            transform: translateY(0px) translateX(0px) rotate(0deg); 
+          }
+          25% { 
+            transform: translateY(-25px) translateX(20px) rotate(5deg); 
+          }
+          50% { 
+            transform: translateY(-10px) translateX(-15px) rotate(-3deg); 
+          }
+          75% { 
+            transform: translateY(-20px) translateX(-25px) rotate(2deg); 
+          }
         }
 
-        @keyframes dropHeart {
-          0% { transform: translateY(-10%) rotate(0deg); }
-          100% { transform: translateY(110%) rotate(360deg); }
+        @keyframes dnaRotate {
+          0% { 
+            transform: rotate(0deg) scale(1); 
+          }
+          50% { 
+            transform: rotate(180deg) scale(1.1); 
+          }
+          100% { 
+            transform: rotate(360deg) scale(1); 
+          }
+        }
+
+        @keyframes subtlePulse {
+          0%, 100% { 
+            transform: translate(-50%, -50%) scale(1); 
+            opacity: 0.1; 
+          }
+          50% { 
+            transform: translate(-50%, -50%) scale(1.2); 
+            opacity: 0.3; 
+          }
         }
 
         @keyframes heartbeat {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.1); }
+          0%, 100% { 
+            transform: scale(1); 
+          }
+          25% { 
+            transform: scale(1.1); 
+          }
+          50% { 
+            transform: scale(1.05); 
+          }
+          75% { 
+            transform: scale(1.15); 
+          }
         }
 
-        @keyframes rotate {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        @keyframes slowSpin {
+          0% { 
+            transform: rotate(0deg); 
+          }
+          100% { 
+            transform: rotate(360deg); 
+          }
         }
 
-        .animate-pulse {
-          animation: pulse 4s infinite;
+        @keyframes gentleBob {
+          0%, 100% { 
+            transform: translateY(0px); 
+          }
+          50% { 
+            transform: translateY(-10px); 
+          }
         }
 
-        .animate-line {
-          animation: line 5s infinite;
+        @keyframes slowRotate {
+          0% { 
+            transform: translate(-50%, -50%) rotate(0deg); 
+          }
+          100% { 
+            transform: translate(-50%, -50%) rotate(360deg); 
+          }
+        }
+
+        .animate-networkPulse {
+          animation: networkPulse 6s ease-in-out infinite;
+        }
+
+        .animate-networkGlow {
+          animation: networkGlow 8s ease-in-out infinite;
+        }
+
+        .animate-networkLine {
+          animation: networkLine 4s ease-in-out infinite;
+        }
+
+        .animate-subtlePulse {
+          animation: subtlePulse 8s ease-in-out infinite;
         }
 
         .animate-heartbeat {
-          animation: heartbeat 2s infinite;
+          animation: heartbeat 20s ease-in-out infinite;
         }
 
-        .animate-rotate {
-          animation: rotate 12s linear infinite;
+        .animate-slowSpin {
+          animation: slowSpin 20s linear infinite;
+        }
+
+        .animate-gentleBob {
+          animation: gentleBob 3s ease-in-out infinite;
+        }
+
+        .animate-slowRotate {
+          animation: slowRotate 25s linear infinite;
+        }
+
+        .bg-gradient-radial {
+          background: radial-gradient(circle, var(--tw-gradient-stops));
         }
       `}</style>
     </div>
