@@ -69,13 +69,13 @@ const RequestReportDialog = ({ open, handleClose, patientId }) => {
         sx={{
           "& .MuiDialog-paper": {
             borderRadius: "20px",
-            border: "2px solid rgb(21 128 61)", // green-700
-            boxShadow: "0 0 20px rgba(21, 128, 61, 0.2)",
+            border: "2px solid rgb(0, 137, 123)", 
+            boxShadow: "0 0 20px rgba(0, 137, 123, 0.2)", 
           },
         }}
       >
         <div className="bg-white rounded-3xl p-2">
-          <DialogTitle className="font-semibold text-lg text-green-700 relative">
+          <DialogTitle className="font-semibold text-lg text-teal-700 relative">
             Request Appointment Report
             <IconButton
               onClick={handleClose}
@@ -120,9 +120,9 @@ const RequestReportDialog = ({ open, handleClose, patientId }) => {
               onClick={handleDownloadReport}
               disabled={loading || !startDate || !endDate}
               sx={{
-                backgroundColor: 'rgb(21 128 61)', // green-700
+                backgroundColor: 'rgb(0, 137, 123)', 
                 '&:hover': {
-                  backgroundColor: 'rgb(22 163 74)', // green-600
+                  backgroundColor: 'rgb(0, 121, 107)', 
                 },
                 color: 'white',
                 padding: '8px 16px',

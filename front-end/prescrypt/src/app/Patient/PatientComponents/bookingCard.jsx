@@ -41,10 +41,10 @@ const BookingCard = ({
             <img
               src={imageUrl}
               alt={`${firstName} ${lastName}`}
-              className="w-20 h-20 rounded-full object-cover border-4 border-green-100"
+              className="w-20 h-20 rounded-full object-cover border-4 border-teal-100"
               loading="lazy"
             />
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-teal-500 rounded-full border-2 border-white flex items-center justify-center">
               <span className="text-white text-xs font-bold">✓</span>
             </div>
           </div>
@@ -73,7 +73,7 @@ const BookingCard = ({
             {/* Appointment Day */}
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <span className="text-sm font-medium text-gray-600">Appointment Day</span>
@@ -84,7 +84,7 @@ const BookingCard = ({
             {/* Appointment Time */}
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="text-sm font-medium text-gray-600">Time</span>
@@ -97,7 +97,7 @@ const BookingCard = ({
 
           {/* Book Appointment Button */}
           <button
-            className="w-full px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center relative min-w-[160px] font-semibold text-lg transition-all duration-300 gap-2"
+            className="w-full px-6 py-3 border border-gray-300 rounded-md text-white bg-teal-600 hover:bg-teal-700 shadow-sm flex justify-center items-center relative min-w-[160px] font-semibold text-lg transition-all duration-300 gap-2"
             onClick={() => {
               saveAppointmentToLocalStorage();
               setOpenDialog(true);

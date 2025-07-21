@@ -1,4 +1,4 @@
-// Components/team/TeamCard.jsx
+
 "use client";
 
 import React from "react";
@@ -46,7 +46,7 @@ const teamMembers = [
 const TeamCard = () => {
   return (
     <div className="p-6">
-      <h2 className="text-3xl font-bold text-center mb-8 text-green-700">
+      <h2 className="text-3xl font-bold text-center mb-8 text-teal-700">
         Meet Our Team Behind PresCrypt
       </h2>
 
@@ -58,7 +58,7 @@ const TeamCard = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.2 }}
-            className="bg-white border-2 border-green-600 text-green-700 shadow-lg rounded-2xl p-4 w-80 hover:scale-105 transition-transform duration-300 ease-in-out"
+            className="bg-white border-2 border-teal-600 text-teal-700 shadow-lg rounded-2xl p-4 w-80 hover:scale-105 transition-transform duration-300 ease-in-out"
           >
             <Image
               src={member.photo}
@@ -85,7 +85,7 @@ const TeamCard = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: (index + 3) * 0.2 }}
-            className="bg-white border-2 border-green-600 text-green-700 shadow-lg rounded-2xl p-4 w-80 hover:scale-105 transition-transform duration-300 ease-in-out"
+            className="bg-white border-2 border-teal-600 text-teal-700 shadow-lg rounded-2xl p-4 w-80 hover:scale-105 transition-transform duration-300 ease-in-out"
           >
             <Image
               src={member.photo}

@@ -187,13 +187,14 @@ export default function NotificationIcon({ patientId }) {
           color="error"
           sx={{
             '& .MuiBadge-badge': {
-              backgroundColor: '#15803d',
+              backgroundColor: '#00897B', 
               color: 'white',
               fontWeight: 'bold',
               fontSize: '0.75rem',
               minWidth: '20px',
               height: '20px',
-              boxShadow: '0 2px 6px rgba(21, 128, 61, 0.3)'
+              boxShadow: '0 2px 6px rgba(0, 137, 123, 0.3)' 
+
             }
           }}
         >
@@ -221,7 +222,7 @@ export default function NotificationIcon({ patientId }) {
       >
         <Box 
           sx={{ 
-            backgroundColor: '#15803d',
+            backgroundColor: '#00897B', 
             color: 'white',
             px: 3,
             py: 2,
@@ -264,8 +265,8 @@ export default function NotificationIcon({ patientId }) {
               <Box
                 key={n.id}
                 sx={{
-                  backgroundColor: n.isRead ? '#ffffff' : '#f0fdf4',
-                  borderLeft: n.isRead ? '4px solid transparent' : '4px solid #15803d',
+                  backgroundColor: n.isRead ? '#ffffff' : '#e6fffa', // teal-50
+                  borderLeft: n.isRead ? '4px solid transparent' : '4px solid #00897B', // teal-600
                   p: 2.5,
                   borderBottom: index < notifications.length - 1 ? '1px solid #F0F0F0' : 'none',
                   position: 'relative',
@@ -275,7 +276,7 @@ export default function NotificationIcon({ patientId }) {
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   '&:hover': {
-                    backgroundColor: n.isRead ? '#f9fafb' : '#ecfdf5'
+                    backgroundColor: n.isRead ? '#f9fafb' : '#b2dfdb' // teal-100 on hover when unread
                   }
                 }}
               >
@@ -329,8 +330,8 @@ export default function NotificationIcon({ patientId }) {
                     onClick={() => confirmAccept(n)}
                     disabled={n.isResponded}
                     sx={{
-                      backgroundColor: n.isResponded ? '#dcfce7' : '#15803d',
-                      color: n.isResponded ? '#166534' : 'white',
+                      backgroundColor: n.isResponded ? '#dcfce7' : '#00897B', 
+                      color: n.isResponded ? '#166534' : 'white',           
                       borderRadius: '6px',
                       px: 3,
                       py: 1,
@@ -342,7 +343,7 @@ export default function NotificationIcon({ patientId }) {
                       minWidth: '130px',
                       cursor: n.isResponded ? 'not-allowed' : 'pointer',
                       '&:hover': {
-                        backgroundColor: n.isResponded ? '#dcfce7' : '#16a34a',
+                        backgroundColor: n.isResponded ? '#dcfce7' : '#00796B', 
                         boxShadow: n.isResponded ? 'none' : '0px 1px 3px rgba(0, 0, 0, 0.1)'
                       },
                       '&:disabled': {
@@ -350,6 +351,7 @@ export default function NotificationIcon({ patientId }) {
                         color: '#166534',
                         cursor: 'not-allowed'
                       }
+
                     }}
                   >
                     {n.isResponded ? 'Responded' : 'View Request'}
@@ -438,7 +440,7 @@ export default function NotificationIcon({ patientId }) {
             }}
           />
           
-          <Box className="bg-green-50 border-l-4 border-green-700 p-3 rounded-r-lg mb-3">
+          <Box className="bg-teal-50 border-l-4 border-teal-700 p-3 rounded-r-lg mb-3">
             <Typography
               variant="body1"
               sx={{ 
