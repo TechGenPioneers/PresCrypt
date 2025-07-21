@@ -12,7 +12,7 @@ export default function page() {
   const Title = "Patients";
   const doctorId =
     typeof window !== "undefined" ? localStorage.getItem("doctorId") : null;
-  const [allPatients, setAllPatients] = useState({ past: [], future: [] });
+  const [allPatients, setAllPatients] = useState({ past: [], new: [] });
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [noPatients, setNoPatients] = useState(false);
@@ -28,19 +28,19 @@ export default function page() {
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      const [pastPatients, futurePatients] = await Promise.all([
+      const [pastPatients, newPatients] = await Promise.all([
         DoctorPatientsService.getPatientsByType(doctorId, "past"),
-        DoctorPatientsService.getPatientsByType(doctorId, "future"),
+        DoctorPatientsService.getPatientsByType(doctorId, "new"),
       ]);
 
       const allFetchedPatients = {
         past: pastPatients || [],
-        future: futurePatients || [],
+        new: newPatients || [],
       };
       setAllPatients(allFetchedPatients);
 
       // Get unique hospitals
-      const hospitals = [...pastPatients, ...futurePatients]
+      const hospitals = [...pastPatients, ...newPatients]
         .map((p) => p.hospitalName)
         .filter((v, i, a) => v && a.indexOf(v) === i);
 
@@ -61,7 +61,7 @@ export default function page() {
   // filtered patients
   useEffect(() => {
     let patientsToFilter =
-      patientType === "past" ? allPatients.past : allPatients.future;
+      patientType === "past" ? allPatients.past : allPatients.new;
 
     if (searchTerm) {
       patientsToFilter = patientsToFilter.filter(
@@ -143,8 +143,8 @@ export default function page() {
               <input
                 type="radio"
                 name="patientType"
-                value="future"
-                checked={patientType === "future"}
+                value="new"
+                checked={patientType === "new"}
                 onChange={(e) => setPatientType(e.target.value)}
                 className="w-4 h-4 text-[#094A4D] focus:ring-[#094A4D]"
               />
@@ -153,6 +153,7 @@ export default function page() {
           </div>
 
           {/* Hospital Filter */}
+          
           <div className="flex items-center space-x-2">
             <MapPin className="w-4 h-4 text-[#094A4D]" />
             <select
