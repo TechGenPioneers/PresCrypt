@@ -1,7 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const Footer = () => {
+  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   return (
     <>
       {/* Footer */}

@@ -6,8 +6,10 @@ import MessageInput from "./messageInput";
 import ChatButton from "./chatButton";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function Chatbot() {
+  useAuthGuard(["Patient"]); // Ensure the user is authenticated as a Patient
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);

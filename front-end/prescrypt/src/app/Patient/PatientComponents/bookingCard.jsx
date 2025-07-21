@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import AppointmentCard from "./appointmentCard";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const BookingCard = ({
   doctorId,
@@ -13,6 +14,7 @@ const BookingCard = ({
   hospitalId,
   hospitalCharge,
 }) => {
+  useAuthGuard(["Patient"]); // Ensure only authenticated patients can access this component
   const [openDialog, setOpenDialog] = useState(false);
 
   const saveAppointmentToLocalStorage = () => {

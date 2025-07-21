@@ -15,8 +15,10 @@ import {
   XCircle,
 } from "lucide-react";
 import { UserX, ArrowLeft, Search, Stethoscope } from "lucide-react";
+import { useAuthGuard } from "@/utils/useAuthGuard";
 
 export default function DoctorDetails({ doctorID }) {
+  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   const [doctor, setDoctor] = useState(null);
   const [dateTime, setDateTime] = useState(null);
   const [showNotFound, setShowNotFound] = useState(false);

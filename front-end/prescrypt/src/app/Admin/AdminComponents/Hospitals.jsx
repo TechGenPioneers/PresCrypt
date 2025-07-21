@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
+import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as an Admin
 import {
   AddNewHospital,
   DeleteHospital,
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 
 const Hospitals = () => {
+  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [dateTime, setDateTime] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [hospitals, setHospitals] = useState([]);

@@ -9,6 +9,7 @@ import {
   SendMail,
 } from "../service/AdminDoctorRequestService";
 import { Spinner } from "@material-tailwind/react";
+import { useAuthGuard } from "@/utils/useAuthGuard"; // Ensure the user is authenticated as an Admin
 import {
   User,
   DollarSign,
@@ -32,6 +33,7 @@ import {
 } from "lucide-react";
 
 const DoctorRequestDetails = ({ requestId }) => {
+  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const router = useRouter();
   const [request, setRequest] = useState(null);
   const [dateTime, setDateTime] = useState(null);

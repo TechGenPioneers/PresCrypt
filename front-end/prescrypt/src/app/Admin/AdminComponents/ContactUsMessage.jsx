@@ -15,8 +15,10 @@ import {
   MarkAsRead,
   SendReply,
 } from "../service/AdminContactUsService";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const MessageTable = () => {
+  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(null);
