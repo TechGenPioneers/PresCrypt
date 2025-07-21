@@ -1,11 +1,9 @@
 import axios from "axios";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 const AdminDashboardURL = "https://localhost:7021/api/AdminDashboard";
 
 //get all Dashboard data
 const GetAllDashboardData = async () => {
-  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   try {
     const response = await axios.get(
       `${AdminDashboardURL}/GetAllData?userName=${localStorage.getItem(

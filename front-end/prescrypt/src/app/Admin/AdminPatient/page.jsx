@@ -2,12 +2,13 @@
 import React from 'react';
 import AdminNavBar from '../AdminComponents/AdminNavBar';
 import Patients from '../AdminComponents/Patients';
-import Footer from '@/app/Components/footer/Footer';
 import useAuthGuard from "@/utils/useAuthGuard"; 
+import Footer from '../AdminComponents/Footer';
+
 const AdminPatientsPage = () => {
-    useAuthGuard("Admin"); 
+    useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
     return (
-        <div>
+        <div className='bg-[#f3faf7]'>
       <div className="flex">
         <div className="w-27">
           <AdminNavBar />

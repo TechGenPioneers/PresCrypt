@@ -2,10 +2,8 @@
 import { useState, useEffect } from "react";
 import { AddNewDoctor, GetHospitals } from "../service/AdminDoctorService";
 import { Spinner } from "@material-tailwind/react";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function DoctorRegistrationForm() {
-  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [schedule, setSchedule] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newDoctor, setNewDoctor] = useState({
@@ -238,7 +236,7 @@ export default function DoctorRegistrationForm() {
 
 
   return (
-    <div className="p-6 ml-15 bg-white rounded-lg shadow-md">
+    <div className="p-6 ml-15 rounded-lg shadow-md">
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">Doctor Registration</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>

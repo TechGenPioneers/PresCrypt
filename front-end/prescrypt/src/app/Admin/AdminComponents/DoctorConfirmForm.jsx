@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { AddNewDoctor, GetHospitals } from "../service/AdminDoctorService";
 import { GetRequestById } from "../service/AdminDoctorRequestService";
 import { Spinner } from "@material-tailwind/react";
-import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as an Admin
 import {
   Calendar,
   Clock,
@@ -22,7 +21,6 @@ import {
 } from "lucide-react";
 
 export default function DoctorConfirmForm({ requestId }) {
-  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [schedule, setSchedule] = useState([]);
   const [request, setRequest] = useState(null);
   const [isLoading, setIsLoading] = useState(false);

@@ -8,9 +8,7 @@ import {
   MarkAsRead,
 } from "../service/AdminDashboardService";
 import { useMemo } from "react";
-import useAuthGuard from "@/utils/useAuthGuard";
 const AdminNotification = () => {
-  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   const [connection, setConnection] = useState(null);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [notifications, setNotifications] = useState([]);

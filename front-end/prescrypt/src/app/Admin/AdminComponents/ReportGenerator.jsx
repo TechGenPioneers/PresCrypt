@@ -282,7 +282,7 @@ export default function ReportGenerator() {
       : reportTypeOptions; // Show all other options when none of the above conditions are true
 
   return (
-     <div className="min-h-screen bg-[#f3faf7] p-6">
+     <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
