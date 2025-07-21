@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import { AddNewDoctor, GetHospitals } from "../service/AdminDoctorService";
 import { Spinner } from "@material-tailwind/react";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function DoctorRegistrationForm() {
+  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [schedule, setSchedule] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newDoctor, setNewDoctor] = useState({

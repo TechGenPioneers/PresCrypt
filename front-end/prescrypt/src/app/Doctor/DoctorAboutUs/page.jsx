@@ -1,8 +1,10 @@
 "use client";
 import TeamCard from "./TeamCard";
 import React from "react";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function TeamPage() {
+  useAuthGuard("Doctor");
   return (
     <div className="relative min-h-screen flex flex-col">
       {/* Background Image with Opacity */}

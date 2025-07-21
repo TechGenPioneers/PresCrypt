@@ -3,8 +3,10 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { GetDoctors } from "../service/AdminDoctorService";
 import { Search } from "lucide-react";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const Doctors = () => {
+  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [dateTime, setDateTime] = useState(new Date()); // Initialize dateTime
   const [searchQuery, setSearchQuery] = useState("");
   const [doctorData, setDoctorData] = useState([]); // Initialize as an array

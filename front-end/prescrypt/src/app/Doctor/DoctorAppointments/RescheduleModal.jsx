@@ -4,8 +4,10 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { X } from "lucide-react";
 import AppointmentsRescheduleService from "../services/AppointmentsRescheduleService";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function RescheduleModal({ isOpen, onClose, doctorId }) {
+  useAuthGuard("Doctor");
   // Initialize date to today's date, setting hours, minutes, seconds, and milliseconds to 0
   const [date, setDate] = useState(() => {
     const today = new Date();

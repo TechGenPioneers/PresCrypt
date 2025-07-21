@@ -15,8 +15,10 @@ import {
   MarkAsRead,
   SendReply,
 } from "../service/AdminContactUsService";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const MessageTable = () => {
+  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(null);
@@ -118,6 +120,29 @@ const MessageTable = () => {
         : "bg-white text-slate-600 hover:bg-slate-50 border border-[#A9C9CD]"
     }`;
   };
+
+  const [showModel,setShowModel]=useState(true);
+
+  useEffect(() => {
+    // Minimum 5 second delay
+    const timer = setTimeout(() => {
+      setShowModel(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // set date and time
+  if (showModel || !messages ) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
+          <p className="text-slate-600 text-lg font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">

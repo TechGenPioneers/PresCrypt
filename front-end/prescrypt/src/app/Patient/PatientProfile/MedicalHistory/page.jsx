@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import Header from '@/app/Components/header/Header';
+
 import Sidebar from '@/app/Patient/PatientComponents/navBar';
 
 const HealthRecord = () => {

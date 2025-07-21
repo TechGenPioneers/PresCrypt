@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Image from 'next/image';
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const HelpUsPage = () => {
+  useAuthGuard("Doctor");
   const [price, setPrice] = useState(0);
   const [currentSentence, setCurrentSentence] = useState(0);
   const [payhereReady, setPayhereReady] = useState(false);

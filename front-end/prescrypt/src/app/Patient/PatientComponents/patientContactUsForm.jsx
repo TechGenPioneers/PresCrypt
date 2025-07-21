@@ -75,7 +75,7 @@ const TermsDialog = ({ open, onClose }) => {
         }}
       >
         <Typography variant="body1" paragraph sx={{ color: "#2E7D32", fontWeight: "500" }}>
-          Welcome to our platform! By using our services, you agree to the following terms and conditions:
+          Welcome to our platform! By submitting this form, you agree to the following terms and conditions:
         </Typography>
         <Typography variant="body2" paragraph sx={{ color: "#555", lineHeight: 1.6 }}>
           1. Your personal information will be kept confidential and used only for service purposes.
@@ -90,7 +90,7 @@ const TermsDialog = ({ open, onClose }) => {
           4. You agree not to misuse our services or attempt unauthorized access.
         </Typography>
         <Typography variant="body2" paragraph sx={{ color: "#555", lineHeight: 1.6 }}>
-          5. For detailed guidelines, please visit our official documentation or contact support.
+          5. Please describe your full problem descriptively.
         </Typography>
         <Typography variant="body2" paragraph sx={{ color: "#2E7D32", fontWeight: "500" }}>
           Thank you for understanding and cooperating.
@@ -191,10 +191,7 @@ const ContactUsForm = () => {
       <div className="flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="bg-white/70 backdrop-blur-md p-6 md:p-8 rounded-3xl shadow-xl w-full max-w-2xl mx-auto space-y-5 border border-green-300/30"
-          style={{
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(76, 175, 80, 0.1)"
-          }}
+          className="bg-white p-6 md:p-8 rounded-3xl shadow-xl w-full max-w-2xl mx-auto space-y-5 border border-green-300/30"
         >
           <div className="text-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold text-green-700 mb-2">Contact Us</h2>
@@ -249,6 +246,8 @@ const ContactUsForm = () => {
             <option value="prescription">Prescription</option>
             <option value="technical">Technical Support</option>
             <option value="complaint">Complaint</option>
+            <option value="feedback">Feedback</option>
+            <option value="other">Other</option>
           </select>
 
           <textarea

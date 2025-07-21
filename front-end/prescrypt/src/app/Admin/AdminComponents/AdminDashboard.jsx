@@ -26,9 +26,11 @@ import {
 import AdminNotification from "./AdminNotification";
 import { GetAllDashboardData } from "../service/AdminDashboardService";
 import Dashboard from "@/app/Doctor/DoctorDashboard/page";
+import useAuthGuard from "@/utils/useAuthGuard";
 //import SystemAnalyze from "./SystemAnalyse";
 
 const AdminDashboard = ({ setAdminName }) => {
+  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [dateTime, setDateTime] = useState(null);
   const [dashboardData, setDashboardData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,8 +88,29 @@ const AdminDashboard = ({ setAdminName }) => {
     dashboardData?.appointmentsOverTime
   );
 
-  if (!dateTime) return null; // Prevent SSR mismatch
 
+   const [showModel,setShowModel]=useState(true);
+  
+    useEffect(() => {
+      // Minimum 5 second delay
+      const timer = setTimeout(() => {
+        setShowModel(false);
+      }, 500);
+  
+      return () => clearTimeout(timer);
+    }, []);
+  
+    // set date and time
+    if (!dateTime || !dashboardData ) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
+            <p className="text-slate-600 text-lg font-medium">Loading...</p>
+          </div>
+        </div>
+      );
+    }
   const getCurrentDate = () => {
     const today = new Date();
     return today.toLocaleDateString("en-US", {
@@ -270,12 +293,6 @@ const AdminDashboard = ({ setAdminName }) => {
               More Actions
             </h4>
             <div className="space-y-3">
-              <button
-                className="w-full text-left p-3 rounded-lg bg-[#E9FAF2] hover:bg-[#CEE4E6] transition-colors text-[#09424D]"
-                onClick={() => setIsModalOpen(true)}
-              >
-                System Analyses
-              </button>
               <Link href={"/Admin/HospitalsPage"}>
                 <button className="w-full text-left p-3 rounded-lg bg-[#E9FAF2] hover:bg-[#CEE4E6] transition-colors text-[#09424D]">
                   Hospitals
@@ -294,6 +311,8 @@ const AdminDashboard = ({ setAdminName }) => {
       {isModalOpen ? (
         <SystemAnalyze closeModal={() => setIsModalOpen(false)} />
       ) : null}
+
+      
     </>
   );
 };

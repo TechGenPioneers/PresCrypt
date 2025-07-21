@@ -1,5 +1,6 @@
 import { useState } from "react";
 import RequestReportDialog from "./RequestReportDialog";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const AppointmentListStat = ({
   patientName,
@@ -14,6 +15,7 @@ const AppointmentListStat = ({
   email,
   onFilterSelect, 
 }) => {
+  useAuthGuard(["Patient"]);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
   const handleOpenReport = () => setReportDialogOpen(true);

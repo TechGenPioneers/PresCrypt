@@ -6,13 +6,16 @@ import { usePathname, useRouter } from "next/navigation";
 import axios from "axios";
 import DoctorDashboardService from "../services/DoctorDashboardService";
 import DoctorProfileImageService from "../services/DoctorProfileImageService";
-
+import LogoutConfirmationDialog from "./LogoutConfirmationDialog"; // Import the component
+import useAuthGuard from "@/utils/useAuthGuard";
 export default function Sidebar() {
+  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const [isExpanded, setIsExpanded] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false); // Add state for dialog
   const pathname = usePathname();
   const router = useRouter();
   const doctorId =
@@ -33,11 +36,18 @@ export default function Sidebar() {
     fetchProfile();
   }, [doctorId]);
 
-  const handleLogout = async (e) => {
+  const handleLogoutClick = (e) => {
     e.preventDefault();
-    const ok = window.confirm("Are you sure you want to log out?");
-    if (!ok) return;
+    setLogoutDialogOpen(true);
+  };
 
+  const handleLogoutCancel = () => {
+    setLogoutDialogOpen(false);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setLogoutDialogOpen(false);
+    
     try {
       await axios.post("https://localhost:7021/api/User/logout", null, {
         withCredentials: true,
@@ -97,18 +107,18 @@ export default function Sidebar() {
   const expandedWidth = 256; // 16rem in pixels
 
   return (
-    <div
-      className="h-full bg-white shadow-2xl font-medium font-sans flex flex-col fixed left-0 top-0 z-50 transition-all duration-500 ease-in-out overflow-hidden"
-      style={{
-        width: isExpanded ? `${expandedWidth}px` : `${collapsedWidth}px`,
-      }}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
-    >
-      {/* Logo */}
-      <div className="flex justify-center items-center mt-4 mb-8 flex-shrink-0">
-        <Image src="/logo.png" alt="logo" width={100} height={100} />
-      </div>
+      <div
+        className={`h-full bg-white shadow-2xl font-medium font-sans transition-all duration-300 ease-in-out flex flex-col fixed left-0 top-0 z-50`}
+        style={{
+          width: isExpanded ? "16rem" : "8rem",
+        }}
+        onMouseEnter={() => setIsExpanded(true)}
+        onMouseLeave={() => setIsExpanded(false)}
+      >
+        {/* Logo */}
+        <div className="flex justify-center items-center mt-4 mb-8">
+          <Image src="/logo.png" alt="logo" width={100} height={100} />
+        </div>
 
       {/* Profile */}
       <div className="flex items-center ml-3 py-2 flex-shrink-0 transition-all duration-500 ease-in-out" style={{ justifyContent: isExpanded ? 'flex-start' : 'center', paddingLeft: isExpanded ? '16px' : '0px' }}>
@@ -333,6 +343,7 @@ export default function Sidebar() {
         </ul>
       </nav>
 
+
       {/* Logout Button */}
       <div className="w-full px-2 pb-4 flex-shrink-0">
         <div className="w-full flex justify-center">
@@ -360,8 +371,18 @@ export default function Sidebar() {
               Logout
             </span>
           </a>
+
         </div>
       </div>
-    </div>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmationDialog
+        open={logoutDialogOpen}
+        onClose={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+        title="Doctor Logout"
+        message="Are you sure you want to log out of your doctor account? You'll need to sign in again to access your dashboard."
+      />
+    </>
   );
 }

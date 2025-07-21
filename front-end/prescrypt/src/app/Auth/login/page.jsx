@@ -126,7 +126,7 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center overflow-hidden min-h-screen bg-white relative ">
       <HealthcareAnimatedBackground />
       {sessionExpired && (
-        <div className="w-full max-w-md mb-4 px-4 py-3 bg-red-400 border border-red-700 rounded-md text-white text-center">
+        <div className="w-full max-w-md mb-4 px-4 py-3 bg-red-400 border border-red-700 rounded-md text-white text-center z-5">
           Your session has timed out. Please log in again.
         </div>
       )}

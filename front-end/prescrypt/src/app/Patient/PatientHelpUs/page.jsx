@@ -6,8 +6,10 @@ import Footer from "../../Components/footer/Footer";
 import NavBar from "../PatientComponents/navBar";
 import Chatbot from "../ChatbotComponents/chatbot";
 import Image from 'next/image';
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const HelpUsPage = () => {
+  useAuthGuard(["Patient"]); // Ensure only authenticated patients can access this component
   const [price, setPrice] = useState(0);
   const [currentSentence, setCurrentSentence] = useState(0);
   const [payhereReady, setPayhereReady] = useState(false);
@@ -116,7 +118,7 @@ const HelpUsPage = () => {
   };
 
   return (
-  <div className="min-h-screen flex flex-col bg-gray-50">
+  <div className="min-h-screen flex flex-col">
     <div className="flex flex-grow">
      
 
@@ -144,13 +146,13 @@ const HelpUsPage = () => {
             <div className="flex-1 border border-green-300 rounded-lg p-6 bg-green-50 shadow-sm">
                 <h3 className="text-xl font-semibold text-green-700 mb-4">Our Mission</h3>
                 <p className="text-gray-800 text-base leading-relaxed font-serif">
-                Our mission is to simplify prescription management for patients and give doctors quick, easy access to health data. We improve appointment booking process faster and smarter. Using AI we simplified the navigation and simple user queires more helpful for patients. While now focusing on connecting doctors and patients, we plan to expand the platform to hospitals and pharmacies. This will create a complete, seamless healthcare network. Ultimately, we aim to build a more efficient and connected healthcare system that benefits everyone involved.
+                Our mission is to simplify healthcare by making prescriptions, appointments, and doctor-patient connections faster, smarter, and more accessible while intergrating AI options and ensuring the highest standards of security and privacy.
                 </p>
             </div>
             {/* Image */}
             <div className="w-full lg:w-1/2 relative rounded shadow overflow-hidden h-64">
                 <Image
-                src="/OurMission.jpg"
+                src="/OurMission.png"
                 alt="Our Mission"
                 fill
                 className="object-contain rounded"
@@ -163,7 +165,7 @@ const HelpUsPage = () => {
             {/* Image */}
             <div className="w-full lg:w-1/2 relative rounded shadow overflow-hidden h-64">
                 <Image
-                src="/OurStory.jpg"
+                src="/OurStory.png"
                 alt="Our Story"
                 fill
                 className="object-cover rounded"

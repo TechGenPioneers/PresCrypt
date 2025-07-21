@@ -1,6 +1,7 @@
 import axiosInstance from "../utils/axiosInstance"; 
-
+import useAuthGuard from "@/utils/useAuthGuard";
 export const getDoctorIdFromServer = async () => {
+  useAuthGuard(["Doctor"]);
   const username = localStorage.getItem("username");
 
   if (!username) return null;

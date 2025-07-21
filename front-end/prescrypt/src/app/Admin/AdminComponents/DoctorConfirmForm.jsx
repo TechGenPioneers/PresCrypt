@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AddNewDoctor, GetHospitals } from "../service/AdminDoctorService";
 import { GetRequestById } from "../service/AdminDoctorRequestService";
 import { Spinner } from "@material-tailwind/react";
+import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as an Admin
 import {
   Calendar,
   Clock,
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 
 export default function DoctorConfirmForm({ requestId }) {
+  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [schedule, setSchedule] = useState([]);
   const [request, setRequest] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -317,18 +319,19 @@ export default function DoctorConfirmForm({ requestId }) {
     }
   }, [request]); //  This effect only runs when request changes
 
+   const [showLoading, setShowLoading] = useState(true);
+
+  useEffect(() => {
+    // Minimum 5 second delay
+    const timer = setTimeout(() => {
+      setShowLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // set date and time
-  if (!dateTime) {
-    return (
-      <div className="flex items-center justify-center h-[400px]">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
-          <p className="text-slate-600 text-lg font-medium">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-  if (!newDoctor) {
+  if (showLoading || !dateTime || !newDoctor ) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
@@ -338,6 +341,7 @@ export default function DoctorConfirmForm({ requestId }) {
       </div>
     );
   }
+
   // Date Formatting
   const formattedDate = dateTime.toLocaleDateString("en-GB", {
     weekday: "long",
@@ -345,35 +349,6 @@ export default function DoctorConfirmForm({ requestId }) {
     month: "long",
     year: "numeric",
   });
-
-  const InputField = ({
-    label,
-    name,
-    type = "text",
-    placeholder,
-    value,
-    onChange,
-    required = true,
-    icon: Icon,
-  }) => (
-    <div className="space-y-2">
-      <label className="flex items-center gap-2 font-semibold text-gray-700">
-        {Icon && <Icon size={16} className="text-[#006369]" />}
-        {label}
-      </label>
-      <input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="w-full p-3 bg-white border border-gray-200 rounded-xl
-          focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent
-          transition-all duration-200 hover:border-gray-300"
-        required={required}
-      />
-    </div>
-  );
 
   return (
     <div className="min-h-screen p-4">

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import useAuthGuard from "@/utils/useAuthGuard";
 import {
   CloudUpload,
   Loader2,
@@ -11,6 +12,7 @@ import {
 import DoctorPatientsService from "../services/DoctorAppointmentsService"
 
 export default function PatientViewModal({ isOpen, onClose, patient }) {
+  useAuthGuard("Doctor");
   const [prescriptionFile, setPrescriptionFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
