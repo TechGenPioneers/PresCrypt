@@ -31,6 +31,12 @@ const AppointmentService = {
     });
     return response.data;
   },
+
+  async markTodayAppointmentComplete(patientId) {
+    const endpoint = `${BASE_URL}/complete-today/${patientId}`;
+    const response = await axiosInstance.put(endpoint);
+    return response.data;
+  },
 };
 
 export default AppointmentService;

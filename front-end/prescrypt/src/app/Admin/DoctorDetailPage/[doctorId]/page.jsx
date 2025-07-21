@@ -5,8 +5,8 @@ import DoctorDetails from "../../AdminComponents/DoctorDetails";
 import { useParams } from "next/navigation"; 
 import useAuthGuard from "@/utils/useAuthGuard";
 import Footer from "../../AdminComponents/Footer";
+
 const DoctorDetailPage = () => {
-  useAuthGuard("Admin"); 
   const { doctorId } = useParams(); // Access the dynamic parameter
 
   // Check if doctorId is available

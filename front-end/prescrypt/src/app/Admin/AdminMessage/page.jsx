@@ -4,6 +4,7 @@ import MessageTable from '../AdminComponents/ContactUsMessage';
 import Footer from '../AdminComponents/Footer';
 
 const AdminMessage = () => {
+   // Ensure the user is authenticated as an Admin
     return (
         <div className='bg-[#f3faf7]'>
       <div className="flex">

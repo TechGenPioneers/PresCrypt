@@ -7,6 +7,7 @@ import ChatButton from "./chatButton";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
+
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);

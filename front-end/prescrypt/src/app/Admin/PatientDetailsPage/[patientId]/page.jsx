@@ -5,8 +5,8 @@ import AdminNavBar from '../../AdminComponents/AdminNavBar';
 import PatientDetails from '../../AdminComponents/PatientDetails';
 import useAuthGuard from '@/utils/useAuthGuard';
 import Footer from '../../AdminComponents/Footer';
+
 const PatientDetailsPage = () => {
-  useAuthGuard("Admin"); 
   const { patientId } = useParams(); 
   console.log("patientId:", patientId);
 

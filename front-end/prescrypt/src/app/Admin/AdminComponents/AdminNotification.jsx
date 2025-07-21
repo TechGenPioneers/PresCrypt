@@ -8,7 +8,6 @@ import {
   MarkAsRead,
 } from "../service/AdminDashboardService";
 import { useMemo } from "react";
-
 const AdminNotification = () => {
   const [connection, setConnection] = useState(null);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);

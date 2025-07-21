@@ -3,7 +3,6 @@ import AdminNavBar from '../AdminComponents/AdminNavBar';
 import Hospitals from '../AdminComponents/Hospitals';
 import Footer from '../AdminComponents/Footer';
 
-
 const HospitalsPage = () => {
     return (
         <div className='bg-[#f3faf7]'>

@@ -4,8 +4,9 @@ import AdminNavBar from '../AdminComponents/AdminNavBar';
 import DoctorRequest from '../AdminComponents/DoctorRequest';
 import useAuthGuard from "@/utils/useAuthGuard"; 
 import Footer from '../AdminComponents/Footer';
+
+
 const DoctorRequestPage = () => {
-    useAuthGuard("Admin");  
     return (
         <div className='bg-[#f3faf7]'>
       <div className="flex">

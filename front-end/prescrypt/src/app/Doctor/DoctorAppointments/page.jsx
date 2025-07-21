@@ -20,14 +20,14 @@ import {
 } from "lucide-react";
 
 export default function AppointmentsPage() {
-  useAuthGuard(["Doctor"]);
+  useAuthGuard("Doctor");
   const Title = "Appointments";
   const doctorId =
     typeof window !== "undefined" ? localStorage.getItem("doctorId") : null;
   const [appointments, setAppointments] = useState([]);
   const [availability, setAvailability] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState();
+  const [selectedStatus, setSelectedStatus] = useState("Pending");
   const [selectedHospital, setSelectedHospital] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
@@ -327,7 +327,7 @@ export default function AppointmentsPage() {
 
         {/* Hospital Filter Section */}
         <div
-          className="relative my-10 ml-5 p-3 pl-6 bg-[#E9FAF2] text-[#094A4D] w-56 shadow-lg rounded-[20px] border border-[#094A4D]/10"
+          className="relative my-10 ml-5 p-3 pl-6 bg-[#E9FAF2] text-[#094A4D] w-50 shadow-lg rounded-[20px] border border-[#094A4D]/10"
           ref={hospitalRef}
         >
           <label className="font-semibold text-sm uppercase tracking-wide mb-2 flex items-center gap-2">
@@ -369,9 +369,9 @@ export default function AppointmentsPage() {
         </div>
 
         {/* Reschedule Button */}
-        <div className="ml-auto mr-12 flex items-center">
+        <div className="ml-auto mr-17 flex items-center">
           <button
-            className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-[15px] shadow-lg hover:bg-[#094A4D]/90 hover:shadow-xl cursor-pointer transition-all duration-200 font-medium flex items-center space-x-2"
+            className="bg-teal-700 hover:bg-teal-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-[15px] shadow-lg hover:shadow-xl cursor-pointer transition-all duration-200 font-medium flex items-center space-x-2"
             onClick={() => setIsRescheduleModalOpen(true)}
           >
             <RefreshCw size={16} className="text-white" />
@@ -387,7 +387,7 @@ export default function AppointmentsPage() {
           <p className="text-[#094A4D] font-medium">Loading appointments...</p>
         </div>
       ) : (
-        <div className="pl-12 pb-8 pr-12">
+        <div className="pl-12 pb-10 pr-12">
           <div className="overflow-hidden rounded-lg shadow-md bg-white">
             <table className="w-full table-auto sm:table-fixed min-w-full">
               <thead className="text-[#094A4D] sticky top-0 bg-gradient-to-r from-[#0064694e] to-[#094A4D]/20 z-10">
@@ -522,7 +522,8 @@ export default function AppointmentsPage() {
           </div>
         </div>
       )}
-
+       <DateTimeDisplay />
+   
       {/* Modal */}
       <PatientViewModal
         isOpen={isPatientModalOpen}
@@ -534,7 +535,7 @@ export default function AppointmentsPage() {
         onClose={() => setIsRescheduleModalOpen(false)}
         doctorId={doctorId}
       />
-      <DateTimeDisplay />
+      
     </div>
   );
 }

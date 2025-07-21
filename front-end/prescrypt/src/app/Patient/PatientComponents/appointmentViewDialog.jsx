@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { getAppointmentsByPatientIdAndDate } from "../services/AppointmentsFindingService";
-
 const statusColor = {
   completed: "success",
   cancelled: "error",

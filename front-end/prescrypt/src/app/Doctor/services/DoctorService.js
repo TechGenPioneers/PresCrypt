@@ -1,5 +1,4 @@
 import axiosInstance from "../utils/axiosInstance"; 
-
 export const getDoctorIdFromServer = async () => {
   const username = localStorage.getItem("username");
 

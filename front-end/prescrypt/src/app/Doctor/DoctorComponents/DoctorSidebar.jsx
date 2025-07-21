@@ -7,7 +7,6 @@ import axios from "axios";
 import DoctorDashboardService from "../services/DoctorDashboardService";
 import DoctorProfileImageService from "../services/DoctorProfileImageService";
 import LogoutConfirmationDialog from "./LogoutConfirmationDialog"; // Import the component
-
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -102,9 +101,10 @@ export default function Sidebar() {
     }
   };
 
+  const collapsedWidth = 128; // 8rem in pixels
+  const expandedWidth = 256; // 16rem in pixels
+
   return (
-    <>
-    
       <div
         className={`h-full bg-white shadow-2xl font-medium font-sans transition-all duration-300 ease-in-out flex flex-col fixed left-0 top-0 z-50`}
         style={{
@@ -119,10 +119,10 @@ export default function Sidebar() {
         </div>
 
       {/* Profile */}
-      <div className="flex justify-center p-2">
+      <div className="flex items-center ml-3 py-2 flex-shrink-0 transition-all duration-500 ease-in-out" style={{ justifyContent: isExpanded ? 'flex-start' : 'center', paddingLeft: isExpanded ? '16px' : '0px' }}>
         <button
           onClick={() => setShowImageModal(true)}
-          className="relative group"
+          className="relative group flex-shrink-0"
         >
           {profileImage ? (
             <Image
@@ -146,13 +146,17 @@ export default function Sidebar() {
             Edit
           </span>
         </button>
-        {isExpanded && (
-          <div className="flex justify-center ml-4 whitespace-nowrap mt-3">
-            <p className="font-bold text-[#033A3D] text-[17px]">
-              {userName || "Loading..."}
-            </p>
-          </div>
-        )}
+        <div 
+          className="ml-4 whitespace-nowrap transition-all duration-500 ease-in-out overflow-hidden"
+          style={{
+            width: isExpanded ? '140px' : '0px',
+            opacity: isExpanded ? 1 : 0,
+          }}
+        >
+          <p className="font-bold text-[#033A3D] text-[17px]">
+            {userName || "Loading..."}
+          </p>
+        </div>
       </div>
 
       {/* Image Upload Modal */}
@@ -270,7 +274,7 @@ export default function Sidebar() {
       )}
 
       {/* Navigation Links */}
-      <nav className="flex flex-col items-center p-2 text-black text-xl font-bold mt-4 flex-grow">
+      <nav className="flex flex-col items-center px-2 text-black text-xl font-bold mt-4 flex-grow overflow-hidden">
         <ul className="flex flex-col items-center w-full">
           {[
             {
@@ -307,26 +311,26 @@ export default function Sidebar() {
             <li key={index} className="mb-4 w-full flex justify-center">
               <Link
                 href={item.path}
-                className={`flex items-center p-2 border-1 rounded-full transition-all duration-300 ${
+                className={`flex items-center transition-all duration-500 ease-in-out overflow-hidden ${
                   pathname === item.path
-                    ? "border-[#033A3D] bg-[#9debc78d] text-[#033A3D] font-bold shadow-md"
-                    : "border-transparent hover:border-[#033A3D] hover:bg-[#9debc74b] text-black"
+                    ? "border border-[#033A3D] bg-[#9debc78d] text-[#033A3D] font-bold shadow-md"
+                    : "border border-transparent hover:border-[#033A3D] hover:bg-[#9debc74b] text-black"
                 }`}
                 style={{
                   width: isExpanded ? "90%" : "50px",
                   height: "50px",
+                  borderRadius: isExpanded ? "20px" : "50px",
+                  paddingLeft: isExpanded ? "20px" : "0",
                   justifyContent: isExpanded ? "flex-start" : "center",
-                  paddingLeft: isExpanded ? "20px" : "8px",
-                  borderRadius: isExpanded ? "20px" : "100%",
                 }}
               >
-                <img src={item.img} alt={item.label} className="w-5 h-5" />
+                <img src={item.img} alt={item.label} className="w-5 h-auto ml-1 flex-shrink-0" />
                 <span 
-                  className={`text-[15px] whitespace-nowrap ml-2 transition-opacity duration-300 ${
-                    isExpanded ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  style={{ 
-                    display: isExpanded ? 'inline' : 'none'
+                  className="text-[15px] whitespace-nowrap ml-2 transition-all duration-500 ease-in-out overflow-hidden"
+                  style={{
+                    width: isExpanded ? 'auto' : '0px',
+                    opacity: isExpanded ? 1 : 0,
+                    transform: isExpanded ? 'translateX(0)' : 'translateX(-10px)',
                   }}
                 >
                   {item.label}
@@ -337,33 +341,35 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-        {/* Logout Button */}
-        <div
-          className="w-full p-2 mt-5"
-          style={{
-            width: isExpanded ? "16rem" : "8rem",
-          }}
-        >
-          <li className="mb-4 w-full flex justify-center">
-            <button
-              onClick={handleLogoutClick}
-              className="flex items-center p-2 hover:border-1 rounded-full transition-all duration-300 hover:border-[#033A3D] hover:bg-[#033a3d32]"
+
+      {/* Logout Button */}
+      <div className="w-full px-2 pb-4 flex-shrink-0">
+        <div className="w-full flex justify-center">
+          <a
+            href="/Auth/login"
+            className="flex items-center hover:border hover:border-red-800 hover:bg-red-200 transition-all duration-500 ease-in-out overflow-hidden"
+            onClick={handleLogoutClick}
+            style={{
+              width: isExpanded ? "90%" : "50px",
+              height: "50px",
+              borderRadius: isExpanded ? "20px" : "50px",
+              paddingLeft: isExpanded ? "20px" : "0",
+              justifyContent: isExpanded ? "flex-start" : "center",
+            }}
+          >
+            <img src="/image28.png" alt="Logout" className="w-5 h-5 flex-shrink-0" />
+            <span 
+              className="text-red-600 text-[15px] whitespace-nowrap ml-2 font-bold transition-all duration-500 ease-in-out overflow-hidden"
               style={{
-                width: isExpanded ? "90%" : "50px",
-                height: "50px",
-                justifyContent: isExpanded ? "flex-start" : "center",
-                paddingLeft: isExpanded ? "20px" : "8px",
-                borderRadius: isExpanded ? "20px" : "100%",
+                width: isExpanded ? 'auto' : '0px',
+                opacity: isExpanded ? 1 : 0,
+                transform: isExpanded ? 'translateX(0)' : 'translateX(-10px)',
               }}
             >
-              <img src="/image28.png" alt="Logout" className="w-5 h-5" />
-              {isExpanded && (
-                <span className="text-[#033A3D] text-[15px] whitespace-nowrap ml-2 font-bold">
-                  Logout
-                </span>
-              )}
-            </button>
-          </li>
+              Logout
+            </span>
+          </a>
+
         </div>
       </div>
 
@@ -375,6 +381,6 @@ export default function Sidebar() {
         title="Doctor Logout"
         message="Are you sure you want to log out of your doctor account? You'll need to sign in again to access your dashboard."
       />
-    </>
+    </div>
   );
 }
