@@ -4,9 +4,7 @@ import Footer from '@/app/Components/footer/Footer';
 import { useParams } from "next/navigation"; 
 import AdminNavBar from '../../AdminComponents/AdminNavBar';
 import PatientDetails from '../../AdminComponents/PatientDetails';
-import useAuthGuard from '@/utils/useAuthGuard';
 const PatientDetailsPage = () => {
-  useAuthGuard("Admin"); 
   const { patientId } = useParams(); 
   console.log("patientId:", patientId);
 

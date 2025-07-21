@@ -4,9 +4,9 @@ import Footer from '@/app/Components/footer/Footer';
 import DoctorRequestDetails from '../../AdminComponents/DoctorRequestDetails';
 import { useParams } from "next/navigation"; 
 import AdminNavBar from '../../AdminComponents/AdminNavBar';
-import useAuthGuard from '@/utils/useAuthGuard';
+import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as an Admin
 const DoctorRequestDetailPage = () => {
-  useAuthGuard("Admin"); 
+  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   const { requestId } = useParams(); 
   console.log("RequestID:", requestId);
 

@@ -4,9 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { GetPatients } from "../service/AdminPatientService";
 import { Search, Filter } from "lucide-react";
-import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as an Admin
 const Patients = () => {
-  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [dateTime, setDateTime] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [patients, setPatients] = useState([]);

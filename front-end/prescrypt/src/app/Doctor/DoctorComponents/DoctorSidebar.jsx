@@ -7,9 +7,7 @@ import axios from "axios";
 import DoctorDashboardService from "../services/DoctorDashboardService";
 import DoctorProfileImageService from "../services/DoctorProfileImageService";
 import LogoutConfirmationDialog from "./LogoutConfirmationDialog"; // Import the component
-import useAuthGuard from "@/utils/useAuthGuard";
 export default function Sidebar() {
-  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const [isExpanded, setIsExpanded] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);

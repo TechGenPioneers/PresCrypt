@@ -4,7 +4,7 @@ import Footer from '@/app/Components/footer/Footer';
 import MessageTable from '../AdminComponents/ContactUsMessage';
 import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as an Admin
 const AdminMessage = () => {
-    useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
+  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
     return (
         <div>
       <div className="flex">

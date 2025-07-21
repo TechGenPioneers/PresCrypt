@@ -8,7 +8,6 @@ import {
 } from "../service/AdminDoctorService";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@material-tailwind/react";
-import useAuthGuard from "@/utils/useAuthGuard";
 import {
   Calendar,
   ArrowLeft,
@@ -29,7 +28,6 @@ import {
 } from "lucide-react";
 
 export default function ManageDoctor({ doctorData }) {
-  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [schedule, setSchedule] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

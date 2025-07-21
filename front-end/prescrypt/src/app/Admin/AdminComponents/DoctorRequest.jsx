@@ -3,9 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { GetDoctorRequest } from "../service/AdminDoctorRequestService";
-import useAuthGuard from "@/utils/useAuthGuard";
 const DoctorRequest = () => {
-  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [dateTime, setDateTime] = useState(null);
   const [requests, setRequests] = useState([]);
   const [title, setTitle] = useState("Pending Requests");

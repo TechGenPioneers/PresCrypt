@@ -1,11 +1,9 @@
 import axios from 'axios'
-import useAuthGuard from "@/utils/useAuthGuard";
 
 const AddDoctorURL = "https://localhost:7021/api/AdminDoctor"
 
 //add new doctor
 const AddNewDoctor = async (doctors,schedule) => {
-  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
     const requestData = {
         doctor: doctors,       
         availability: schedule
