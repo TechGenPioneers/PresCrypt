@@ -16,10 +16,10 @@ import {
   CheckCircle,
 } from "lucide-react";
 import Select from "react-select";
-import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as a Doctor
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function Page() {
-  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
+  useAuthGuard("Doctor");
   const Title = "Reports";
   const doctorId =
     typeof window !== "undefined" ? localStorage.getItem("doctorId") : null;
