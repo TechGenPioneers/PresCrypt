@@ -88,4 +88,23 @@ const GetDoctorById = async (doctorId) => {
          throw error
        }
  }
-export{AddNewDoctor,GetDoctors,GetHospitals,GetDoctorById,UpdateDoctor,DeleteDoctor}
+
+ const PayAmount = async (doctorId, amount) => {
+  const paymentData = {
+    doctorId,     
+    payAmount: amount,
+  };
+
+  console.log("Payment Data:", paymentData);
+
+  try {
+    const response = await axios.patch(`${AddDoctorURL}/Pay`, paymentData);
+    console.log("Response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Payment request failed:", error);
+    throw error;
+  }
+};
+
+export{AddNewDoctor,GetDoctors,GetHospitals,GetDoctorById,UpdateDoctor,DeleteDoctor,PayAmount}
