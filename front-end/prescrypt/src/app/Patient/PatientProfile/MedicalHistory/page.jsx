@@ -383,7 +383,7 @@ const HealthRecord = () => {
                 onClick={() => setSelectedTab(tab)}
                 className={`px-6 py-3 rounded-md font-medium transition-all duration-200 ${
                   selectedTab === tab
-                    ? 'bg-gradient-to-r from-blue-500 to-teal-500 text-white shadow-md'
+                    ? 'bg-gradient-to-r from-teal-500 to-teal-500 text-white shadow-md'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
@@ -573,7 +573,7 @@ const HealthRecord = () => {
                     />
                     <label
                       htmlFor="fileUpload"
-                      className={`px-4 py-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-lg cursor-pointer hover:from-blue-600 hover:to-teal-600 transition-all duration-200 flex items-center space-x-2 ${
+                      className={`px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-500 text-white rounded-lg cursor-pointer hover:from-blue-600 hover:to-teal-600 transition-all duration-200 flex items-center space-x-2 ${
                         uploadingFile ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
@@ -617,7 +617,7 @@ const HealthRecord = () => {
                             href={attachment.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-3 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
+                            className="px-3 py-1 text-teal-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
                           >
                             View
                           </a>

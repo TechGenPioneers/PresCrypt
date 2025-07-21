@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation'; 
 import {
   Container,
   Paper,
@@ -32,6 +33,7 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import axios from 'axios';
 
 const EditProfilePage = ({ patientData, onBack, onSave }) => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     gender: '',
@@ -202,6 +204,10 @@ const EditProfilePage = ({ patientData, onBack, onSave }) => {
     }));
   };
 
+  const navigateToPersonalInfo = () => {
+    router.push('/Patient/PatientProfile');
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -339,11 +345,16 @@ const EditProfilePage = ({ patientData, onBack, onSave }) => {
     }
   };
 
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-    }
-  };
+  
+const handleBack = () => {
+  // First try to use the onBack prop if provided (for parent component handling)
+  if (onBack) {
+    onBack();
+  } else {
+    // If no onBack prop, navigate directly to patient profile
+    navigateToPersonalInfo();
+  }
+};
 
   // Helper function to check if field has error and is touched
   const hasError = (fieldName) => touched[fieldName] && errors[fieldName];
