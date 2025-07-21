@@ -178,26 +178,26 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
 
   return (
     <div className="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex justify-center items-center p-4 overflow-auto">
-      <div className="bg-gradient-to-br from-green-100/80 to-green-200/80 rounded-3xl shadow-xl border border-green-300/50 max-w-6xl w-full mx-4 overflow-hidden">
-        <div className="bg-white/70 backdrop-blur-sm m-3 rounded-2xl border border-green-400/30">
+      <div className="bg-teal-50 rounded-3xl shadow-xl border border-teal-400 max-w-6xl w-full mx-4 overflow-hidden">
+        <div className="bg-white/70 backdrop-blur-sm m-3 rounded-2xl border border-teal-300">
           <div className="max-w-6xl flex relative overflow-hidden max-h-[90vh]">
             <button
               onClick={onClose}
               disabled={isSubmitting}
-              className="absolute top-6 right-6 p-2.5 rounded-full hover:bg-green-200/70 transition-all duration-200 z-10 group"
+              className="absolute top-6 right-6 p-2.5 rounded-full hover:bg-teal-200/70 transition-all duration-200 z-10 group"
             >
-              <X className="w-5 h-5 text-green-800 group-hover:text-green-900" />
+              <X className="w-5 h-5 text-teal-500 " />
             </button>
 
-            <div className="w-1/2 border-r border-green-400/40 p-8">
+            <div className="w-1/2 border-r border-teal-400/40 p-8">
               <div className="mb-8">
                 <h2 className="text-2xl font-light mb-2 text-black tracking-wide">
                   Select a Date to Reschedule Appointments
                 </h2>
-                <div className="w-16 h-0.5 bg-gradient-to-r from-green-600 to-green-500"></div>
+                <div className="w-16 h-0.5 bg-teal-500"></div>
               </div>
 
-              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 mb-6 border border-green-300/50">
+              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 mb-6 border border-teal-200">
                 <DayPicker
                   mode="single"
                   selected={date}
@@ -226,14 +226,14 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
               </div>
 
               <div className="mb-6">
-                <label className="block mb-3 text-sm font-medium text-green-800 tracking-wide">
+                <label className="block mb-3 text-sm font-medium text-teal-800 tracking-wide">
                   FILTER BY HOSPITAL
                 </label>
                 <div className="relative">
                   <select
                     value={hospitalFilter}
                     onChange={(e) => setHospitalFilter(e.target.value)}
-                    className="w-full p-4 bg-white/70 backdrop-blur-sm border border-green-400/50 rounded-xl text-green-900 focus:ring-2 focus:ring-green-500/50 focus:border-transparent transition-all duration-200 appearance-none"
+                    className="w-full p-4 bg-white/70 backdrop-blur-sm border border-teal-400/50 rounded-xl text-teal-900 focus:ring-2 focus:ring-teal-500/50 focus:border-transparent transition-all duration-200 appearance-none"
                     disabled={
                       isSubmitting ||
                       !availableHospitals.length ||
@@ -249,7 +249,7 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
                     <svg
-                      className="w-4 h-4 text-green-700"
+                      className="w-4 h-4 text-teal-700"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -272,8 +272,8 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                 <h2 className="text-2xl font-light mb-2 text-black tracking-wide">
                   Appointments Overview
                 </h2>
-                <div className="w-16 h-0.5 bg-gradient-to-r from-green-600 to-green-500"></div>
-                <p className="text-green-700 text-sm mt-2">
+                <div className="w-16 h-0.5 bg-teal-500"></div>
+                <p className="text-teal-700 text-sm mt-2">
                   {date.toDateString()}
                 </p>
               </div>
@@ -285,12 +285,12 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
               )}
 
               {successMessage && (
-                <div className="mb-4 p-4 bg-green-100/80 backdrop-blur-sm border-l-4 border-green-500 rounded-xl">
-                  <p className="text-green-800 text-sm">{successMessage}</p>
+                <div className="mb-4 p-4 bg-teal-100/80 backdrop-blur-sm border-l-4 border-teal-500 rounded-xl">
+                  <p className="text-teal-800 text-sm">{successMessage}</p>
                 </div>
               )}
 
-              <div className="flex-grow overflow-y-auto mb-6 bg-white/50 backdrop-blur-sm p-5 rounded-xl border border-green-300/50 relative">
+              <div className="flex-grow overflow-y-auto mb-6 bg-white/50 backdrop-blur-sm p-5 rounded-xl border border-teal-200 relative">
                 {/* Loading Overlay */}
                 <div
                   className={`absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex items-center justify-center z-10 transition-all duration-300 ${
@@ -301,9 +301,9 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                 >
                   <div className="flex flex-col items-center">
                     <div className="relative mb-3">
-                      <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-teal-200 rounded-full flex items-center justify-center">
                         <svg
-                          className="w-5 h-5 text-green-700 animate-spin"
+                          className="w-5 h-5 text-teal-700 animate-spin"
                           fill="none"
                           viewBox="0 0 24 24"
                         >
@@ -323,7 +323,7 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                         </svg>
                       </div>
                     </div>
-                    <p className="text-green-800 text-sm font-medium">
+                    <p className="text-teal-800 text-sm font-medium">
                       Loading appointments...
                     </p>
                   </div>
@@ -331,7 +331,7 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
 
                 {filteredAppointments.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-32 text-center">
-                    <div className="w-12 h-12 bg-green-200/70 rounded-full flex items-center justify-center mb-3">
+                    <div className="w-12 h-12 bg-teal-200/70 rounded-full flex items-center justify-center mb-3">
                       <svg
                         className="w-6 h-6 text-black"
                         fill="none"
@@ -364,8 +364,8 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                         key={key}
                         className={`flex justify-between items-center p-4 mb-3 rounded-xl transition-all duration-200 ${
                           isSelected
-                            ? "bg-green-200/70 border-2 border-green-500/60 shadow-sm"
-                            : "bg-white/70 border border-green-300/40 hover:bg-green-100/50"
+                            ? "bg-teal-200/70 border-2 border-teal-300/60 shadow-sm"
+                            : "bg-white/70 border border-teal-300/40 hover:bg-teal-100/50"
                         } ${!canSelect ? "bg-gray-50/70 opacity-60" : ""}`}
                       >
                         <div className="space-y-1">
@@ -400,7 +400,7 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                             <span
                               className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                                 appt.status === "Completed"
-                                  ? "bg-green-200 text-green-800"
+                                  ? "bg-teal-100 text-teal-800"
                                   : appt.status === "Pending Confirmation"
                                   ? "bg-amber-100 text-amber-700"
                                   : appt.status === "Rescheduled"
@@ -413,8 +413,8 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                           </div>
                           {isSelected && (
                             <div className="flex items-center gap-2 mt-2">
-                              <div className="w-1.5 h-1.5 bg-green-600 rounded-full"></div>
-                              <span className="text-xs text-green-700 font-medium">
+                              <div className="w-1.5 h-1.5 bg-teal-600 rounded-full"></div>
+                              <span className="text-xs text-teal-700 font-medium">
                                 Marked for reschedule
                               </span>
                             </div>
@@ -423,10 +423,10 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                         <button
                           onClick={() => toggleSelection(key)}
                           disabled={isSubmitting || !canSelect}
-                          className={`px-4 py-2.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 ${
+                          className={`px-4 py-2.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer ${
                             isSelected
                               ? "bg-red-100/80 text-red-700 hover:bg-red-200/80 border border-red-200"
-                              : "bg-green-700 text-white hover:bg-green-800 shadow-sm"
+                              : "bg-teal-500 text-white hover:bg-teal-700 shadow-sm"
                           } ${
                             !canSelect ? "opacity-50 cursor-not-allowed" : ""
                           }`}
@@ -456,7 +456,7 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                     }
                     className={`px-6 py-3 rounded-xl text-sm font-medium tracking-wide transition-all duration-200 ${
                       Object.values(rescheduleStates).some((v) => v)
-                        ? "bg-green-700 hover:bg-green-800 text-white shadow-sm"
+                        ? "bg-teal-700 hover:bg-teal-800 text-white shadow-sm"
                         : "bg-gray-200 text-gray-400 cursor-not-allowed"
                     }`}
                   >
@@ -503,7 +503,7 @@ export default function RescheduleModal({ isOpen, onClose, doctorId }) {
                         <button
                           onClick={confirmReschedule}
                           disabled={isSubmitting}
-                          className="px-5 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl text-sm font-medium tracking-wide transition-all duration-200 shadow-sm disabled:opacity-50"
+                          className="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-sm font-medium tracking-wide transition-all duration-200 shadow-sm disabled:opacity-50"
                         >
                           {isSubmitting ? "PROCESSING..." : "CONFIRM"}
                         </button>

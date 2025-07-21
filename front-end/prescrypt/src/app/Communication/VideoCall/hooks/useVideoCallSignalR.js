@@ -60,13 +60,18 @@ export default function useVideoCallSignalR(userId, userRole) {
             );
           });
 
-          connection.on("CallRejected", ({ patientId }) => {
-            console.log(`Call rejected by ${patientId}`);
-
-            // Dispatch to globally notify UI
+          // In useVideoCallSignalR.js (use the more complete implementation)
+          // In the doctor-specific handlers
+          connection.on("CallRejected", (data) => {
+            console.log("Doctor received call rejection:", data);
             window.dispatchEvent(
               new CustomEvent("callRejected", {
-                detail: { rejectedBy: patientId },
+                detail: {
+                  rejectedBy: data.rejectedBy,
+                  message:
+                    data.message || `Call rejected by ${data.rejectedBy}`,
+                  timestamp: data.timestamp,
+                },
               })
             );
           });
