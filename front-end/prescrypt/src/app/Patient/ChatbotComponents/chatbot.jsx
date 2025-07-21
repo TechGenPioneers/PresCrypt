@@ -171,11 +171,11 @@ export default function Chatbot() {
   };
 
   const suggestedQuestions = [
-    "📅 Book an appointment",
-    "💊 Show my prescriptions", 
-    "👨‍⚕️ Is Dr. Sharma available?",
-    "🏥 Available doctors today",
-    "📋 Update health report",
+    "📅 What are the services provide by this system?",
+    "💊 How can you help me?", 
+    "👨‍⚕️ Show me Doctors",
+    "📞 How can I book an appointment?",
+    "📋 Where can I see my health records?",
   ];
 
   return (
