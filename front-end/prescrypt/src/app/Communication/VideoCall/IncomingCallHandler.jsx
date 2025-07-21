@@ -67,7 +67,7 @@ const useIncomingCallHandler = ({
       );
     };
 
-    videoCallConnection.on("CallReceived", handleCallReceived);
+    videoCallConnection.on("IncomingCall", handleCallReceived);
     videoCallConnection.on("CallRejected", handleCallRejected);
 
     return () => {
