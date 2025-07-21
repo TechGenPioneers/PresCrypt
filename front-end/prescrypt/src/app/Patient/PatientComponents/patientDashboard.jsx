@@ -9,11 +9,9 @@ import {
   getPatientDetails,
 } from "../services/PatientDataService";
 import LoadingSpinner from "./loadingSpinner";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 
 const PatientDashboard = () => {
-  useAuthGuard(["Patient"]);
   const [patient, setPatient] = useState(null);
   const [dateTime, setDateTime] = useState(null);
 

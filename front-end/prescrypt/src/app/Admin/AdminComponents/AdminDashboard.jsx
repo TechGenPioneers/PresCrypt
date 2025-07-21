@@ -26,11 +26,9 @@ import {
 import AdminNotification from "./AdminNotification";
 import { GetAllDashboardData } from "../service/AdminDashboardService";
 import Dashboard from "@/app/Doctor/DoctorDashboard/page";
-import useAuthGuard from "@/utils/useAuthGuard";
 //import SystemAnalyze from "./SystemAnalyse";
 
 const AdminDashboard = ({ setAdminName }) => {
-  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [dateTime, setDateTime] = useState(null);
   const [dashboardData, setDashboardData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

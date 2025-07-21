@@ -13,7 +13,6 @@ import {
   fetchDoctorDetails,
   fetchAppointmentCounts,
 } from "../services/AppointmentsFindingService";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 const AppointmentCard = ({
   doctorId,
@@ -29,7 +28,6 @@ const AppointmentCard = ({
   hospitalCharge,
   imageUrl,
 }) => {
-  useAuthGuard(["Patient"]);
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
