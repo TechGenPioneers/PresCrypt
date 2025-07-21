@@ -8,7 +8,7 @@ const GetUsers = async (userId) => {
     const response = await axios.get(
       `${baseUrl}/GetChatUsers?senderId=${userId}`
     );
-    console.log("re",response)
+    console.log("re", response);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch users", error);
@@ -16,13 +16,13 @@ const GetUsers = async (userId) => {
   }
 };
 
-const GetUserDetails = async (userId,receiverId) => {
-  console.log("Ids",userId,receiverId)
+const GetUserDetails = async (userId, receiverId) => {
+  console.log("Ids", userId, receiverId);
   try {
     const response = await axios.get(
       `${baseUrl}/GetUserDetails?userId=${userId}&receiverId=${receiverId}`
     );
-    console.log("re",response)
+    console.log("re", response);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch users", error);
@@ -35,10 +35,17 @@ const GetAllMessages = async (senderId, receiverId) => {
     const response = await axios.get(
       `${baseUrl}/GetAllMessages?senderId=${senderId}&receiverId=${receiverId}`
     );
-    return response.data;
+    return response.data || [];
   } catch (error) {
-    console.error("Failed to fetch users", error);
-    throw error;
+    if (error.response && error.response.status === 404) {
+      // Backend says "not found" – treat it as no messages
+      console.warn("No messages found for this conversation.");
+      return [];
+    } else {
+      // Unexpected error
+      console.error("Error fetching messages:", error);
+      return [];
+    }
   }
 };
 
@@ -109,7 +116,7 @@ const EstablishVideoSignalRConnection = (userId) => {
           return Math.min(retryContext.previousRetryCount * 2000, 10000);
         }
         return null; // Stop retrying after 60 seconds
-      }
+      },
     })
     .configureLogging(signalR.LogLevel.Warning)
     .build();
@@ -145,7 +152,6 @@ const GetVideoCallRoom = async (patientId) => {
   try {
     const response = await axios.get(
       `${baseUrlVideo}/create-room?patientId=${patientId}`
-      
     );
     return response.data;
   } catch (error) {
@@ -165,5 +171,5 @@ export {
   GetUserNames,
   GetVideoCallRoom,
   EstablishVideoSignalRConnection,
-  GetUserDetails
+  GetUserDetails,
 };

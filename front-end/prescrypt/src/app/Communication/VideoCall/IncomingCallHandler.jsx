@@ -1,15 +1,15 @@
-"use client";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import { useVideoCall } from "../VideoCallProvider";
 import * as signalR from "@microsoft/signalr";
+import useSoundManager from "./hooks/useSoundManager";
 
 const useIncomingCallHandler = ({
-  users, // Array of all available users/chats
+  users,
   userId,
   userRole,
   doctorName,
   patientName,
-  setSelectedUser, // Function to set the active chat
+  setSelectedUser,
   videoCallConnection,
 }) => {
   const {
@@ -23,11 +23,14 @@ const useIncomingCallHandler = ({
     startCall,
   } = useVideoCall();
 
+  const { playSound, stopSound } = useSoundManager(); // ✅ Fix applied here
+
   useEffect(() => {
     if (!videoCallConnection) return;
 
     const handleCallReceived = (data) => {
       console.log("📞 Incoming call received:", data);
+      playSound("ringtone", "/sounds/ringtone.mp3", true); // ✅ plays globally
 
       const callerUser = users.find(
         (user) => user.receiverId === data.doctorId
@@ -43,7 +46,6 @@ const useIncomingCallHandler = ({
         console.warn("⚠️ Caller not found in user list");
       }
 
-      // Set video call details
       setCallerInfo({
         callerId: data.doctorId,
         callerName: data.doctorName,
@@ -53,7 +55,9 @@ const useIncomingCallHandler = ({
       setIncomingCall(true);
       setCallStatus("incoming");
     };
+
     const handleCallRejected = (data) => {
+      stopSound("ringtone"); // ✅ stop ringtone when rejected
       console.log("Call was rejected by the other party:", data);
       resetCallState();
       window.dispatchEvent(
@@ -62,6 +66,7 @@ const useIncomingCallHandler = ({
         })
       );
     };
+
     videoCallConnection.on("CallReceived", handleCallReceived);
     videoCallConnection.on("CallRejected", handleCallRejected);
 
@@ -77,6 +82,8 @@ const useIncomingCallHandler = ({
     setCallStatus,
     users,
     setSelectedUser,
+    playSound,
+    stopSound,
   ]);
 
   const acceptCall = async (roomUrl, doctorId, patientId) => {
@@ -113,6 +120,7 @@ const useIncomingCallHandler = ({
       console.log("Accepting call with:", roomUrl, callerInfo.callerName);
 
       await acceptCall(roomUrl, doctorId, patientId);
+      stopSound("ringtone");
 
       const currentUser = userRole === "Doctor" ? doctorName : patientName;
       const otherUser = userRole === "Doctor" ? patientName : doctorName;
@@ -129,7 +137,7 @@ const useIncomingCallHandler = ({
   const handleRejectCall = async () => {
     try {
       if (!callerInfo || !videoCallConnection) return;
-
+      stopSound("ringtone");
       await videoCallConnection.invoke(
         "RejectCall",
         callerInfo.callerId,

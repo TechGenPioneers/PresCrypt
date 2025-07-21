@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const IncomingCallModal = ({
   callerName,
@@ -8,25 +8,9 @@ const IncomingCallModal = ({
   onAccept,
   onReject,
 }) => {
-  const audioRef = useRef(null);
   const [isRinging, setIsRinging] = useState(true);
   const [callTime, setCallTime] = useState(0);
-  const [rejectionNotification, setRejectionNotification] = useState(null);
-
-  // Handle ringtone
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.loop = true;
-      audioRef.current.play().catch((e) => console.warn("Autoplay failed:", e));
-    }
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-    };
-  }, []);
+  const [rejectionInfo, setRejectionInfo] = useState(null);
 
   // Call timer (starts when accepted)
   useEffect(() => {
@@ -41,18 +25,10 @@ const IncomingCallModal = ({
 
   const handleAccept = () => {
     setIsRinging(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
     onAccept();
   };
 
   const handleReject = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
     onReject();
   };
 
@@ -64,27 +40,25 @@ const IncomingCallModal = ({
       .toString()
       .padStart(2, "0")}`;
   };
-  // In IncomingCallModal component
+
+  // Replace the current useEffect with this:
   useEffect(() => {
     const handleCallRejected = (event) => {
-      console.log("Call rejected globally", event.detail);
-      setIsRinging(false);
-      setRejectionNotification({
-        message: `Call rejected by ${
-          event.detail.rejectedBy === userId ? "you" : "the other party"
-        }`,
-        visible: true,
+      console.log("Global call rejected event:", event.detail);
+      setRejectionInfo({
+        message: `Call was rejected by ${event.detail.rejectedBy}`,
+        timestamp: event.detail.timestamp,
       });
 
-      // Auto-dismiss after 3 seconds
-      const timeout = setTimeout(() => {
-        setRejectionNotification(null);
+      // Auto-close after 3 seconds
+      const timer = setTimeout(() => {
         onReject();
+        setRejectionInfo(null);
       }, 3000);
 
-      return () => clearTimeout(timeout);
+      return () => clearTimeout(timer);
     };
-    // Immediately close the modal by calling onReject
+
     window.addEventListener("callRejected", handleCallRejected);
     return () => {
       window.removeEventListener("callRejected", handleCallRejected);
@@ -93,11 +67,9 @@ const IncomingCallModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 backdrop-blur-sm">
-      {/* Ringing tone */}
-      <audio ref={audioRef} src="/sounds/ringtone.mp3" />
-      {rejectionNotification?.visible && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg animate-fade-in">
-          {rejectionNotification.message}
+      {rejectionInfo && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg animate-fade-in z-50">
+          {rejectionInfo.message}
         </div>
       )}
 
@@ -106,7 +78,6 @@ const IncomingCallModal = ({
           isRinging ? "animate-pulse" : ""
         }`}
       >
-        {/* Caller avatar */}
         <div className="relative mx-auto mb-6">
           <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden border-4 border-blue-200">
             <svg
@@ -134,11 +105,11 @@ const IncomingCallModal = ({
           )}
         </div>
 
-        {/* Caller info */}
         <h3 className="text-3xl font-bold text-gray-800 mb-1">
           {callerTitle}{" "}
           {callerName?.fullName || callerName?.firstName || "Unknown Caller"}
         </h3>
+
         <p className="text-gray-500 mb-6">
           {isRinging ? (
             <span className="flex items-center justify-center gap-2">
@@ -155,7 +126,6 @@ const IncomingCallModal = ({
           )}
         </p>
 
-        {/* Action buttons */}
         <div className="flex justify-center gap-6 mt-8">
           <button
             onClick={handleAccept}
