@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { GetDoctorById } from "../service/AdminDoctorService";
+import { GetDoctorById, PayAmount } from "../service/AdminDoctorService";
 import { useRouter } from "next/navigation";
 import {
   Clock,
@@ -13,6 +13,7 @@ import {
   Shield,
   CheckCircle,
   XCircle,
+  Wallet,
 } from "lucide-react";
 import { UserX, ArrowLeft, Search, Stethoscope } from "lucide-react";
 
@@ -20,7 +21,9 @@ export default function DoctorDetails({ doctorID }) {
   const [doctor, setDoctor] = useState(null);
   const [dateTime, setDateTime] = useState(null);
   const [showNotFound, setShowNotFound] = useState(false);
-
+  const [payAmount, setPayAmount] = useState(0);
+  const [isPaying, setIsPaying] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -37,15 +40,13 @@ export default function DoctorDetails({ doctorID }) {
 
     return () => clearTimeout(timeout); // cleanup on unmount
   }, [doctor]);
-
+  //fetch doctor by id
+  const fetchDoctor = async () => {
+    const getDoctor = await GetDoctorById(doctorID);
+    setDoctor(getDoctor);
+    console.log("Doctor:", getDoctor);
+  };
   useEffect(() => {
-    //fetch doctor by id
-    const fetchDoctor = async () => {
-      const getDoctor = await GetDoctorById(doctorID);
-      setDoctor(getDoctor);
-      console.log("Doctor:", getDoctor);
-    };
-
     fetchDoctor();
     const updateDateTime = () => setDateTime(new Date());
     updateDateTime(); // Set initial time
@@ -177,7 +178,21 @@ export default function DoctorDetails({ doctorID }) {
     localStorage.setItem("doctor", JSON.stringify(doctor));
     router.push("/Admin/ManageDoctorPage");
   };
-
+  const handlePayDoctor = async () => {
+    console.log("pay", payAmount);
+    setIsPaying(true);
+    setPaymentSuccess(false);
+    try {
+      // Simulate API call
+      await PayAmount(doctor.doctor.doctorId, payAmount);
+      fetchDoctor();
+      setPaymentSuccess(true);
+    } catch (err) {
+      console.error("Payment failed", err);
+    } finally {
+      setIsPaying(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-[#f3faf7] p-6">
       {doctor?.doctor ? (
@@ -249,15 +264,67 @@ export default function DoctorDetails({ doctorID }) {
 
                 {/* Key Info */}
                 <div className="space-y-3">
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-200">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-slate-600">
-                        Doctor Fee
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border border-teal-200 shadow-md max-w-md mx-auto">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-base font-semibold text-slate-700">
+                        Want to Pay
                       </span>
-                      <span className="text-2xl font-bold text-green-600">
-                        Rs.{doctor.doctor.charge}
+                      <span className="text-2xl font-bold text-teal-600">
+                        Rs. {doctor?.doctor?.totalAmtToPay ?? "0.00"}
                       </span>
                     </div>
+
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-slate-600 mb-1">
+                        Set Amount to Pay
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={payAmount}
+                        onChange={(e) => setPayAmount(Number(e.target.value))}
+                        className="w-full px-4 py-2 rounded-lg border border-green-300 focus:ring-2 focus:ring-emerald-400 focus:outline-none bg-white text-green-800 font-semibold shadow-sm"
+                        placeholder="Enter amount"
+                      />
+                    </div>
+
+                    <button
+                      onClick={handlePayDoctor}
+                      disabled={isPaying || !payAmount}
+                      className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-colors shadow-md 
+                        ${
+                          isPaying
+                            ? "bg-teal-300 cursor-not-allowed"
+                            : "bg-teal-500 hover:bg-teal-600"
+                        }`}
+                    >
+                      {isPaying ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <>
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M17 9V7a4 4 0 00-8 0v2m0 0H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-4zm-6 0h6"
+                            />
+                          </svg>
+                          Mark As Paid
+                        </>
+                      )}
+                    </button>
+
+                    {paymentSuccess && (
+                      <p className="mt-3 text-sm text-green-700 text-center font-medium">
+                        Payment successful!
+                      </p>
+                    )}
                   </div>
 
                   <InfoItem
@@ -282,6 +349,12 @@ export default function DoctorDetails({ doctorID }) {
                     icon={Mail}
                     label="Email"
                     value={doctor.doctor.email}
+                  />
+
+                  <InfoItem
+                    icon={Wallet}
+                    label="Doctor Fee"
+                    value={doctor.doctor.charge}
                   />
                 </div>
               </div>

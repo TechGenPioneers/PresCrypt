@@ -1,10 +1,11 @@
 import React from 'react';
 import AdminNavBar from '../AdminComponents/AdminNavBar';
 import ReportGenerator from '../AdminComponents/ReportGenerator';
-import Footer from '@/app/Components/footer/Footer';
+import Footer from '../AdminComponents/Footer';
+
 const AdminReportGeneratorPage = () => {
     return (
-        <div>
+        <div className='bg-[#f3faf7]'>
         <div className="flex">
           <div className="w-27">
             <AdminNavBar />

@@ -129,7 +129,7 @@ const AdminDashboard = ({ setAdminName }) => {
   };
   return (
     <>
-      <div className="flex min-h-screen bg-white border-t-[15px] border-l-[15px] border-r-[15px] border-b-0 border-[#E9FAF2]">
+      <div className="flex min-h-screen mb-10">
         {/* Main Content */}
         <main className="overflow-auto flex-grow p-6">
           {/* Header */}

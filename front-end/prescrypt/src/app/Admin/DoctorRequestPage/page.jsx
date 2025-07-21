@@ -2,11 +2,13 @@
 import React from 'react';
 import AdminNavBar from '../AdminComponents/AdminNavBar';
 import DoctorRequest from '../AdminComponents/DoctorRequest';
-import Footer from '@/app/Components/footer/Footer';
-import DoctorRequestDetails from '../AdminComponents/DoctorRequestDetails';
+import useAuthGuard from "@/utils/useAuthGuard"; 
+import Footer from '../AdminComponents/Footer';
+
+
 const DoctorRequestPage = () => {
     return (
-        <div>
+        <div className='bg-[#f3faf7]'>
       <div className="flex">
         <div className="w-27">
           <AdminNavBar />

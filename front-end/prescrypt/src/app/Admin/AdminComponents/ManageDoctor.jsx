@@ -1,13 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import {
   DeleteDoctor,
   GetHospitals,
   UpdateDoctor,
 } from "../service/AdminDoctorService";
 import { useRouter } from "next/navigation";
-import { Spinner } from "@material-tailwind/react";
 import {
   Calendar,
   ArrowLeft,
@@ -24,7 +22,7 @@ import {
   Trash2,
   Edit3,
   UserCheck,
-  UserX,
+  UserX,AlertTriangle, X
 } from "lucide-react";
 
 export default function ManageDoctor({ doctorData }) {
@@ -32,6 +30,7 @@ export default function ManageDoctor({ doctorData }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [doctorId, setDoctorId] = useState();
+  const [showPopup, setShowPopup] = useState(false);
   const [newDoctor, setNewDoctor] = useState({
     DoctorId: "",
     FirstName: "",
@@ -217,7 +216,7 @@ export default function ManageDoctor({ doctorData }) {
   };
 
   // Handle form delete
-  const handleDeleteDoctor = async (e) => {
+  const handleConfirmDelete = async (e) => {
     try {
       setIsLoading(true);
       const deleteDoctor = await DeleteDoctor(newDoctor.DoctorId);
@@ -231,7 +230,12 @@ export default function ManageDoctor({ doctorData }) {
       setIsLoading(false);
     }
   };
-
+  const handleDeleteDoctor = () => {
+    setShowPopup(true);
+  };
+  const handleCancel = () => {
+    setShowPopup(false);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission
     setIsLoading(true);
@@ -929,6 +933,61 @@ export default function ManageDoctor({ doctorData }) {
                   </button>
                 </div>
               </div>
+              {/* Warning Popup Overlay */}
+              {showPopup && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-red-500 to-red-600 p-6 text-white relative">
+                      <button
+                        onClick={handleCancel}
+                        className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+                      >
+                        <X size={20} />
+                      </button>
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 bg-white/20 rounded-full">
+                          <AlertTriangle size={24} />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold">
+                            Confirm Deletion
+                          </h3>
+                          <p className="text-red-100 text-sm">
+                            This action cannot be undone
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <p className="text-gray-700 text-base leading-relaxed mb-6">
+                        Are you sure you want to delete this doctor? This will
+                        permanently remove all associated records, appointments,
+                        and data from the system.
+                      </p>
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleCancel}
+                          className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleConfirmDelete}
+                          className="flex-1 bg-red-600 text-white py-3 px-4 rounded-xl hover:bg-red-700 transition-colors font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                        >
+                          <Trash2 size={16} />
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">

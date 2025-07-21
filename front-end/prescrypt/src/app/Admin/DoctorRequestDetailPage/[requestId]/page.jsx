@@ -1,10 +1,11 @@
 "use client";
 import React from 'react';
-import Footer from '@/app/Components/footer/Footer';
 import DoctorRequestDetails from '../../AdminComponents/DoctorRequestDetails';
 import { useParams } from "next/navigation"; 
 import AdminNavBar from '../../AdminComponents/AdminNavBar';
-import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as an Admin
+import useAuthGuard from '@/utils/useAuthGuard';
+import Footer from '../../AdminComponents/Footer';
+
 const DoctorRequestDetailPage = () => {
   useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   const { requestId } = useParams(); 
@@ -20,7 +21,7 @@ const DoctorRequestDetailPage = () => {
   }
 
     return (
-        <div>
+        <div className='bg-[#f3faf7]'>
       <div className="flex">
         <div className="w-27">
           <AdminNavBar />
