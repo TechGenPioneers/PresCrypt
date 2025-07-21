@@ -4,10 +4,7 @@ import PageHeaderDisplay from "../DoctorComponents/PageHeaderDisplay";
 import PatientViewModal from "./PatientViewModal";
 import DoctorPatientsService from "../services/DoctorPatientsService";
 import { Calendar, MapPin, Filter } from "lucide-react";
-import useAuthGuard from "@/utils/useAuthGuard";
-
 export default function page() {
-  useAuthGuard(["Doctor"]);
   const Title = "Patients";
   const doctorId =
     typeof window !== "undefined" ? localStorage.getItem("doctorId") : null;

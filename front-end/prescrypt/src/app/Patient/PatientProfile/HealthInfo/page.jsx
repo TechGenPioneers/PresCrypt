@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { FaArrowLeft, FaSave, FaHeartbeat, FaWeight, FaRulerVertical, FaVial, FaTint, FaCheckCircle, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import useAuthGuard from '@/utils/useAuthGuard'; // Ensure the user is authenticated as a Patient
 
 const AddHealthDataPage = ({ healthData, onSave }) => {
+  useAuthGuard("Patient"); // Ensure the user is authenticated as a Patient
   const router = useRouter();
   const [formData, setFormData] = useState({
     height: '',

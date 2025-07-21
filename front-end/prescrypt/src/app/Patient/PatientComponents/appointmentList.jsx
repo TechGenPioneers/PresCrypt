@@ -16,10 +16,8 @@ import {
   getPatientDetails,
   getProfileImage
 } from "../services/PatientDataService";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 const AppointmentList = ({ patientId }) => {
-  useAuthGuard(["Patient"]);
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [filter, setFilter] = useState("all");

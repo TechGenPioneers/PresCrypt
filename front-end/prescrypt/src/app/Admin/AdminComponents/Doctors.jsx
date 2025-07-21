@@ -3,10 +3,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { GetDoctors } from "../service/AdminDoctorService";
 import { Search } from "lucide-react";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 const Doctors = () => {
-  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [dateTime, setDateTime] = useState(new Date()); // Initialize dateTime
   const [searchQuery, setSearchQuery] = useState("");
   const [doctorData, setDoctorData] = useState([]); // Initialize as an array
@@ -65,7 +63,7 @@ const filteredDoctors = doctorData.filter((doctor) => {
 
 
   return (
-    <div className="p-6 border-[15px] border-b-0 border-[#E9FAF2] bg-white">
+    <div className="p-6 ">
       {/* Title */}
       <h1 className="text-3xl font-bold text-slate-800 mb-1">Doctors</h1>
       <p className="text-[#09424D] text-sm mb-4">{formattedDate}</p>

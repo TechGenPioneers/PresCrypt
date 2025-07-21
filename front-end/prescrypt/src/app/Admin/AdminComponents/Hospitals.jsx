@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
-import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as an Admin
 import {
   AddNewHospital,
   DeleteHospital,
@@ -20,7 +19,6 @@ import {
 } from "lucide-react";
 
 const Hospitals = () => {
-  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [dateTime, setDateTime] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [hospitals, setHospitals] = useState([]);
@@ -142,7 +140,7 @@ const Hospitals = () => {
   };
 
   return (
-    <div className="p-6 bg-white border-t-[15px] border-l-[15px] border-r-[15px] border-[#E9FAF2]">
+    <div className="p-6 ">
       <h1 className="text-3xl font-bold text-slate-800 mb-1">Hospitals</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
 

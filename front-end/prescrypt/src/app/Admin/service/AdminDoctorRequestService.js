@@ -1,12 +1,10 @@
 import axios from "axios";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 const DoctorRequestURL = "https://localhost:7021/api/AdminDoctorRequest";
 const ReasonMail = "https://localhost:7021/api/Email";
 
 //get all doctor requests
 const GetDoctorRequest = async () => {
-  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   try {
     const response = await axios.get(`${DoctorRequestURL}/getAllDoctorRequest`);
     return response.data;

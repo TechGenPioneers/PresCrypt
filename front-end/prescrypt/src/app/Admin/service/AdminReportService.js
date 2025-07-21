@@ -1,10 +1,8 @@
 import axios from "axios";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 const ReportUrl = "https://localhost:7021/api/AdminReport";
 
 const GetAllDetails = async () => {
-  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   //get the all doctors patients and specialty Details
   try {
     const response = await axios.get(`${ReportUrl}/GetAll`);

@@ -1,11 +1,9 @@
 import axios from 'axios'
-import useAuthGuard from "@/utils/useAuthGuard";
 
 const AddHospitalURL = "https://localhost:7021/api/AdminHospital"
 
 //add new Hospital
 const AddNewHospital = async (newHospital) => {
-  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
     try{
         const response = await axios.post(
             AddHospitalURL,

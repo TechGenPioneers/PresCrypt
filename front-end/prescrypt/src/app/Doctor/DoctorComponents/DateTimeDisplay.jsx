@@ -1,9 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function DateTimeDisplay() {
-  useAuthGuard("Doctor");
   const [shortDate, setShortDate] = useState("");
   const [time, setTime] = useState("");
 

@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 import PrescriptionsService from "../services/PrescriptionsService";
 import PageHeaderDisplay from "../DoctorComponents/PageHeaderDisplay";
 import MedicalHistoryModal from "./Modals/MedicalHistoryModal";
-import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as a Doctor
+import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function Page() {
-  useAuthGuard(["Doctor"]);
+  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const Title = "Prescriptions";
   const doctorId =
     typeof window !== "undefined" ? localStorage.getItem("doctorId") : null;

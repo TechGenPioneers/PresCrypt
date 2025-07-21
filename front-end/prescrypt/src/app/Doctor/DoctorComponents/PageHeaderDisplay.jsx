@@ -1,9 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 export default function DateTimeDisplay({ title }) {
-  useAuthGuard("Doctor"); // Ensure the user is authenticated as a Doctor
   const [formattedDate, setFormattedDate] = useState("");
 
   useEffect(() => {

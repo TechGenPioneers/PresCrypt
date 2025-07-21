@@ -7,11 +7,9 @@ import dayjs from "dayjs";
 import AppointmentViewDialog from "./AppointmentViewDialog";
 import { getAppointmentsByPatientId } from "../services/AppointmentsFindingService";
 import "./calender.css";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 // ✅ Custom Day Component
 const CustomDay = (props) => {
-  useAuthGuard(["Patient"]); // Ensure only authenticated patients can access this component
   const { day, outsideCurrentMonth, ...other } = props;
 
   const appointments = JSON.parse(localStorage.getItem("appointments")) || [];

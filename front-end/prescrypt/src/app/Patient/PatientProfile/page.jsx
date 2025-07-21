@@ -6,8 +6,10 @@ import { FaUser, FaEnvelope, FaBirthdayCake, FaPhone, FaMapMarkerAlt, FaEdit, Fa
 
 import Sidebar from '@/app/Patient/PatientComponents/navBar';
 import axios from 'axios';
+import useAuthGuard from '@/utils/useAuthGuard';
 
 const HealthRecord = () => {
+  useAuthGuard(["Patient"]); // Ensure the user is authenticated as a Patient
   const router = useRouter();
   const [patientData, setPatientData] = useState(null);
   const [healthData, setHealthData] = useState(null);
