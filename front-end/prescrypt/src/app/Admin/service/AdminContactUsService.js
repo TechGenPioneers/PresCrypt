@@ -1,8 +1,10 @@
 import axios from "axios";
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const AdminContactUsURL = "https://localhost:7021/api/AdminContactUs";
 
 const GetAllContactUsMessages = async () => {
+  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   try {
     const response = await axios.get(`${AdminContactUsURL}/GetAllMessages`);
     console.log("service", response.data);

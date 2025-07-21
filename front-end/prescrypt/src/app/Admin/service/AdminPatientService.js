@@ -1,8 +1,10 @@
 import axios from 'axios'
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const AddPatientURL = "https://localhost:7021/api/AdminPatient"
 
 const GetPatients = async () => {
+  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
     //get the Patients
        try{
          const response = await  axios.get(`${AddPatientURL}/GetAllPatients`)

@@ -6,8 +6,10 @@ import Footer from "../../Components/footer/Footer";
 import NavBar from "../PatientComponents/navBar";
 import Chatbot from "../ChatbotComponents/chatbot";
 import Image from 'next/image';
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const HelpUsPage = () => {
+  useAuthGuard(["Patient"]); // Ensure only authenticated patients can access this component
   const [price, setPrice] = useState(0);
   const [currentSentence, setCurrentSentence] = useState(0);
   const [payhereReady, setPayhereReady] = useState(false);

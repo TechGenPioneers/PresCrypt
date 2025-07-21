@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { getAppointmentsByPatientIdAndDate } from "../services/AppointmentsFindingService";
-
+import useAuthGuard from "@/utils/useAuthGuard";
 const statusColor = {
   completed: "success",
   cancelled: "error",
@@ -25,6 +25,7 @@ const statusColor = {
 };
 
 const AppointmentViewDialog = ({ open, onClose, date, patientId }) => {
+  useAuthGuard(["Patient"]);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
