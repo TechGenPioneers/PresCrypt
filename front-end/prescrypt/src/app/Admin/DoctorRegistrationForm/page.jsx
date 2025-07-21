@@ -1,13 +1,13 @@
 'use client';
 import React from 'react';
 import AdminNavBar from '../AdminComponents/AdminNavBar';
-import Footer from '@/app/Components/footer/Footer';
 import DoctorRegistrationForm from '../AdminComponents/DoctorsRegistrationForm';
 import useAuthGuard from "@/utils/useAuthGuard"; 
+import Footer from '../AdminComponents/Footer';
 const DoctorRegistrationFormPage = () => {
     useAuthGuard("Admin");
     return (
-        <div>
+        <div className='bg-[#f3faf7]'>
         <div className="flex">
           <div className="w-27">
             <AdminNavBar />

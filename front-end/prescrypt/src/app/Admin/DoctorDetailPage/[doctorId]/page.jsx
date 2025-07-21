@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import AdminNavBar from "../../AdminComponents/AdminNavBar";
-import Footer from "@/app/Components/footer/Footer";
 import DoctorDetails from "../../AdminComponents/DoctorDetails";
 import { useParams } from "next/navigation"; 
 import useAuthGuard from "@/utils/useAuthGuard";
+import Footer from "../../AdminComponents/Footer";
 const DoctorDetailPage = () => {
   useAuthGuard("Admin"); 
   const { doctorId } = useParams(); // Access the dynamic parameter
@@ -20,13 +20,13 @@ const DoctorDetailPage = () => {
   }
 
   return (
-    <div>
+    <div className="bg-[#f3faf7]">
       <div className="flex">
         <div className="w-27">
           <AdminNavBar />
         </div>
         <div className="w-full">
-          <DoctorDetails doctorID={doctorId} /> {/* Pass doctorId to DoctorDetails */}
+          <DoctorDetails doctorID={doctorId} /> 
         </div>
       </div>
       <div>

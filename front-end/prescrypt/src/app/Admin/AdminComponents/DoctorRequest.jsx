@@ -52,7 +52,7 @@ const DoctorRequest = () => {
   });
 
   return (
-    <div className="p-6 border-[15px] border-b-0 border-[#E9FAF2] bg-white">
+    <div className="p-6 ">
       {/* Title */}
       <h1 className="text-3xl font-bold text-slate-800 mb-1">
         Doctor's Requests

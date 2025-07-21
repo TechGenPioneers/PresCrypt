@@ -1,11 +1,11 @@
 import React from 'react';
 import AdminNavBar from '../AdminComponents/AdminNavBar';
-import Footer from '@/app/Components/footer/Footer';
 import MessageTable from '../AdminComponents/ContactUsMessage';
+import Footer from '../AdminComponents/Footer';
 
 const AdminMessage = () => {
     return (
-        <div>
+        <div className='bg-[#f3faf7]'>
       <div className="flex">
         <div className="w-27">
           <AdminNavBar />

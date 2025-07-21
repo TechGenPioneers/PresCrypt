@@ -84,13 +84,7 @@ const AdminNavBar = ({ adminName }) => {
 
         {/* User Avatar and Name */}
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center overflow-hidden relative">
-            <img
-              src="/profile.png"
-              alt="User"
-              className="w-full h-full object-cover"
-            />
-          </div>
+          
           {isExpanded && <div className="mt-2">{adminName}</div>}
         </div>
 

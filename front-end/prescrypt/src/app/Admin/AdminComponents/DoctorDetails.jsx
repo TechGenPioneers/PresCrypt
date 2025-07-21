@@ -16,7 +16,6 @@ import {
   Wallet,
 } from "lucide-react";
 import { UserX, ArrowLeft, Search, Stethoscope } from "lucide-react";
-import { fetchDoctorDetails } from "@/app/Patient/services/AppointmentsFindingService";
 
 export default function DoctorDetails({ doctorID }) {
   const [doctor, setDoctor] = useState(null);
