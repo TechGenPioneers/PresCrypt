@@ -350,7 +350,7 @@ export default function Sidebar() {
           <a
             href="/Auth/login"
             className="flex items-center hover:border hover:border-red-800 hover:bg-red-200 transition-all duration-500 ease-in-out overflow-hidden"
-            onClick={handleLogout}
+            onClick={handleLogoutClick}
             style={{
               width: isExpanded ? "90%" : "50px",
               height: "50px",
@@ -383,6 +383,6 @@ export default function Sidebar() {
         title="Doctor Logout"
         message="Are you sure you want to log out of your doctor account? You'll need to sign in again to access your dashboard."
       />
-    </>
+    </div>
   );
 }

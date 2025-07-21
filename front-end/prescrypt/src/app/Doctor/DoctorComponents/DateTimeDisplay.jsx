@@ -34,7 +34,7 @@ export default function DateTimeDisplay() {
 
   return (
     <div>
-      <div className="absolute text-[15px] bottom-4 right-6 text-[#09424D]">
+      <div className="absolute text-[15px] bottom-6 right-6 text-[#09424D]">
         <p>{shortDate}</p>
         <p>{time}</p>
       </div>
