@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export default function AppointmentsPage() {
-  useAuthGuard(["Doctor"]);
+  useAuthGuard("Doctor");
   const Title = "Appointments";
   const doctorId =
     typeof window !== "undefined" ? localStorage.getItem("doctorId") : null;

@@ -15,10 +15,8 @@ import {
   MarkAsRead,
   SendReply,
 } from "../service/AdminContactUsService";
-import useAuthGuard from "@/utils/useAuthGuard";
 
 const MessageTable = () => {
-  useAuthGuard("Admin"); // Ensure the user is authenticated as an Admin
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(null);
@@ -145,7 +143,7 @@ const MessageTable = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">

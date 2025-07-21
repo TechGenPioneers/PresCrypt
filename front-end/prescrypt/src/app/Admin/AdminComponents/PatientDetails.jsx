@@ -19,9 +19,7 @@ import {
 } from "lucide-react";
 import { X, UserX, ArrowLeft, Search, Users } from "lucide-react";
 import { set } from "date-fns";
-import useAuthGuard from "@/utils/useAuthGuard";
 const PatientDetails = ({ patientId }) => {
-  useAuthGuard(["Admin"]); // Ensure the user is authenticated as an Admin
   const [patientData, setPatientsData] = useState(null);
   const [dateTime, setDateTime] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
