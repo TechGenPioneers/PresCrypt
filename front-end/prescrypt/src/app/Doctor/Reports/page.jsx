@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import PageHeaderDisplay from "../DoctorComponents/PageHeaderDisplay"
+import PageHeaderDisplay from "../DoctorComponents/PageHeaderDisplay";
 import ReportsService from "../services/ReportsService";
 import { Input, Button } from "@material-tailwind/react";
 import { format } from "date-fns";
@@ -54,7 +54,10 @@ export default function Page() {
       if (toDateRef.current && !toDateRef.current.contains(event.target)) {
         setShowToDateCalendar(false);
       }
-      if (reportTypeRef.current && !reportTypeRef.current.contains(event.target)) {
+      if (
+        reportTypeRef.current &&
+        !reportTypeRef.current.contains(event.target)
+      ) {
         setShowReportTypeDropdown(false);
       }
     };
@@ -163,7 +166,7 @@ export default function Page() {
 
   return (
     <div className="p-1 mb-5">
-      <PageHeaderDisplay title={Title}/>
+      <PageHeaderDisplay title={Title} />
       <div className="flex flex-col items-center px-4">
         {/* Report Generation Form */}
         <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-[20px] w-full max-w-2xl shadow-2xl border border-teal-200">
@@ -218,21 +221,26 @@ export default function Page() {
                         onSelect={(date) => handleDateChange("fromDate", date)}
                         className="bg-white p-3"
                         classNames={{
-                          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                          months:
+                            "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                           month: "space-y-4",
-                          caption: "flex justify-center pt-1 relative items-center",
+                          caption:
+                            "flex justify-center pt-1 relative items-center",
                           caption_label: "text-sm font-medium text-teal-800",
                           nav: "space-x-1 flex items-center",
-                          nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-teal-600",
+                          nav_button:
+                            "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-teal-600",
                           nav_button_previous: "absolute left-1",
                           nav_button_next: "absolute right-1",
                           table: "w-full border-collapse space-y-1",
                           head_row: "flex",
-                          head_cell: "text-teal-600 rounded-md w-9 font-normal text-[0.8rem]",
+                          head_cell:
+                            "text-teal-600 rounded-md w-9 font-normal text-[0.8rem]",
                           row: "flex w-full mt-2",
                           cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-teal-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
                           day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-teal-100 rounded-md",
-                          day_selected: "bg-teal-500 text-white hover:bg-teal-500 hover:text-white focus:bg-teal-500 focus:text-white",
+                          day_selected:
+                            "bg-teal-500 text-white hover:bg-teal-500 hover:text-white focus:bg-teal-500 focus:text-white",
                           day_today: "bg-teal-100 text-teal-800",
                           day_outside: "text-gray-400 opacity-50",
                           day_disabled: "text-gray-400 opacity-50",
@@ -276,21 +284,26 @@ export default function Page() {
                         onSelect={(date) => handleDateChange("toDate", date)}
                         className="bg-white p-3"
                         classNames={{
-                          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                          months:
+                            "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                           month: "space-y-4",
-                          caption: "flex justify-center pt-1 relative items-center",
+                          caption:
+                            "flex justify-center pt-1 relative items-center",
                           caption_label: "text-sm font-medium text-teal-800",
                           nav: "space-x-1 flex items-center",
-                          nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-teal-600",
+                          nav_button:
+                            "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-teal-600",
                           nav_button_previous: "absolute left-1",
                           nav_button_next: "absolute right-1",
                           table: "w-full border-collapse space-y-1",
                           head_row: "flex",
-                          head_cell: "text-teal-600 rounded-md w-9 font-normal text-[0.8rem]",
+                          head_cell:
+                            "text-teal-600 rounded-md w-9 font-normal text-[0.8rem]",
                           row: "flex w-full mt-2",
                           cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-teal-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
                           day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-teal-100 rounded-md",
-                          day_selected: "bg-teal-500 text-white hover:bg-teal-500 hover:text-white focus:bg-teal-500 focus:text-white",
+                          day_selected:
+                            "bg-teal-500 text-white hover:bg-teal-500 hover:text-white focus:bg-teal-500 focus:text-white",
                           day_today: "bg-teal-100 text-teal-800",
                           day_outside: "text-gray-400 opacity-50",
                           day_disabled: "text-gray-400 opacity-50",
@@ -373,22 +386,31 @@ export default function Page() {
 
               <div className="relative" ref={reportTypeRef}>
                 <button
-                  onClick={() => setShowReportTypeDropdown(!showReportTypeDropdown)}
+                  onClick={() =>
+                    setShowReportTypeDropdown(!showReportTypeDropdown)
+                  }
                   className="w-full border-2 border-teal-200 rounded-[10px] px-4 py-3 text-teal-800 flex justify-between items-center hover:border-teal-400 transition-all duration-200 bg-white"
                 >
-                  <span className={formData.reportType ? "text-teal-800" : "text-gray-400"}>
+                  <span
+                    className={
+                      formData.reportType ? "text-teal-800" : "text-gray-400"
+                    }
+                  >
                     {formData.reportType || "Choose report type"}
                   </span>
                   <ChevronDown className="w-5 h-5 text-teal-500" />
                 </button>
-                
+
                 {showReportTypeDropdown && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-teal-200 rounded-[10px] shadow-lg">
                     {reportTypeOptions.map((option) => (
                       <button
                         key={option}
                         onClick={() => {
-                          setFormData((prev) => ({ ...prev, reportType: option }));
+                          setFormData((prev) => ({
+                            ...prev,
+                            reportType: option,
+                          }));
                           setErrors((prev) => ({ ...prev, reportType: "" }));
                           setShowReportTypeDropdown(false);
                         }}
@@ -400,7 +422,7 @@ export default function Page() {
                   </div>
                 )}
               </div>
-              
+
               {errors.reportType && (
                 <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
                   <span className="w-1 h-1 bg-red-500 rounded-full"></span>
@@ -484,6 +506,7 @@ export default function Page() {
           </div>
         </div>
       </div>
+      <div className="mb-8"></div>
     </div>
   );
 }

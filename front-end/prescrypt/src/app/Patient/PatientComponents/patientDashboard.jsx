@@ -7,11 +7,13 @@ import { Card, CardActionArea, CardContent, Typography } from "@mui/material";
 import {
   getPatientIdByEmail,
   getPatientDetails,
+  getAppointmentSummary
 } from "../services/PatientDataService";
 import LoadingSpinner from "./loadingSpinner";
 
 const PatientDashboard = () => {
   const [patient, setPatient] = useState(null);
+  const [appointmentSummary, setAppointmentSummary] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
@@ -49,8 +51,24 @@ const PatientDashboard = () => {
     }
   ];
 
+  // Function to format date to "Month Day" format
+  const formatAppointmentDate = (dateString) => {
+    if (!dateString) return null;
+    
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric"
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
-    const fetchPatient = async () => {
+    const fetchPatientData = async () => {
       try {
         const email = localStorage.getItem("username");
         if (!email) {
@@ -72,14 +90,20 @@ const PatientDashboard = () => {
           localStorage.setItem("status", response.status);
         }
 
-        const details = await getPatientDetails(patientId);
+        // Fetch patient details and appointment summary in parallel
+        const [details, appointmentData] = await Promise.all([
+          getPatientDetails(patientId),
+          getAppointmentSummary(patientId)
+        ]);
+
         setPatient(details);
+        setAppointmentSummary(appointmentData);
       } catch (error) {
         console.error("Failed to fetch patient data:", error);
       }
     };
 
-    fetchPatient();
+    fetchPatientData();
   }, []);
 
   useEffect(() => {
@@ -114,7 +138,7 @@ const PatientDashboard = () => {
     });
   };
 
-  if (!patient) {
+  if (!patient || !appointmentSummary) {
     return (
       <div className="flex flex-grow min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-teal-100 ml-24">
         <div className="flex-grow">
@@ -218,7 +242,7 @@ const PatientDashboard = () => {
                     </div>
                   </Link>
 
-                  {/* Upcoming Appointments */}
+                  {/* Next Appointment */}
                   <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-3xl shadow-lg border border-teal-200 h-full flex flex-col justify-center">
                     <div className="flex items-center justify-center mb-4">
                       <div className="w-16 h-16 bg-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -230,10 +254,21 @@ const PatientDashboard = () => {
                     <p className="text-lg font-semibold text-teal-700 text-center">
                       Next Appointment
                     </p>
-                    <p className="text-3xl font-bold mt-2 text-teal-600 text-center">
-                      2
-                    </p>
-                    <p className="text-sm text-teal-500 text-center">This week</p>
+                    {appointmentSummary.nearestPendingAppointmentDate ? (
+                      <>
+                        <p className="text-lg font-bold mt-2 text-teal-600 text-center">
+                          {formatAppointmentDate(appointmentSummary.nearestPendingAppointmentDate)}
+                        </p>
+                        <p className="text-sm text-teal-500 text-center">Upcoming</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-lg font-bold mt-2 text-teal-400 text-center">
+                          No upcoming
+                        </p>
+                        <p className="text-sm text-teal-400 text-center">appointments</p>
+                      </>
+                    )}
                   </div>
 
                   {/* Contact Us Card */}
@@ -343,12 +378,22 @@ const PatientDashboard = () => {
                     {/* Quick Health Stats */}
                     <div className="grid grid-cols-2 gap-4 mt-6">
                       <div className="bg-white/70 p-3 rounded-xl">
-                        <p className="text-sm font-medium text-teal-700">Total Visits</p>
-                        <p className="text-2xl font-bold text-teal-600">12</p>
+                        <p className="text-sm font-medium text-teal-700">Today Appointments</p>
+                        <p className="text-2xl font-bold text-teal-600">
+                          {appointmentSummary.todayAppointmentCount || 0}
+                        </p>
                       </div>
                       <div className="bg-white/70 p-3 rounded-xl">
                         <p className="text-sm font-medium text-teal-700">Last Visit</p>
-                        <p className="text-sm font-bold text-teal-600">2 days ago</p>
+                        {appointmentSummary.latestCompletedAppointmentDate ? (
+                          <p className="text-sm font-bold text-teal-600">
+                            {formatAppointmentDate(appointmentSummary.latestCompletedAppointmentDate)}
+                          </p>
+                        ) : (
+                          <p className="text-sm font-bold text-teal-400">
+                            No visits
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

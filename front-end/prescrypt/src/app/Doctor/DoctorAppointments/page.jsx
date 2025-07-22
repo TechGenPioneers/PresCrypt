@@ -49,6 +49,8 @@ export default function AppointmentsPage() {
     { value: "completed", label: "Completed" },
     { value: "pending", label: "Pending" },
     { value: "cancelled", label: "Cancelled" },
+    { value: "rescheduled", label: "Rescheduled" },
+    { value: "confirmation", label: "Pending Confirmation" },
   ];
 
   useEffect(() => {
@@ -211,7 +213,12 @@ export default function AppointmentsPage() {
 
   const isViewButtonDisabled = (status) => {
     const statusLower = status?.toLowerCase();
-    return statusLower === "completed" || statusLower === "cancelled";
+    return (
+      statusLower === "completed" ||
+      statusLower === "cancelled" ||
+      statusLower === "rescheduled" ||
+      statusLower === "pending confirmation"
+    );
   };
 
   return (

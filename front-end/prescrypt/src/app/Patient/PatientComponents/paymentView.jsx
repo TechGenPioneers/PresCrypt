@@ -58,7 +58,7 @@ const RefundPolicyDialog = ({ open, onClose }) => {
               variant="body2"
               sx={{ color: "#B71C1C", fontWeight: "600", fontSize: "0.9rem" }}
             >
-              • Cancelling 3 Pay At Location appointments in a month will result in permanent inactivation of the patient account reviewed by the admin team.
+              • Cancelling 2 Pay At Location appointments within two weeks will result in permanent inactivation of the patient account automatically by the system but still you can appeal the decision through the contact us page.
             </Typography>
           </div>
           
