@@ -86,3 +86,35 @@ export const addDoctorCharge = async (doctorId, doctorCharge) => {
     throw error;
   }
 };
+
+
+export const getAppointmentSummary = async (patientId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Appointments/summary/${patientId}`);
+    return response.data; 
+  } catch (error) {
+    console.error("Error fetching appointment summary:", error);
+    throw error;
+  }
+};
+
+
+export const updateCancelStatus = async (patientId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/Patient/update-cancel-status/${patientId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Failed to update cancel status");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Cancel status update failed:", error);
+    throw error;
+  }
+};
+
