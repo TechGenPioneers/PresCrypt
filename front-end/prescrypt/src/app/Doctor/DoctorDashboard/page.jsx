@@ -34,46 +34,7 @@ export default function Dashboard() {
   const notificationsContainerRef = useRef(null);
   const bellRef = useRef(null);
 
-  // Initialize client-side data and fetch immediately
-  useEffect(() => {
-    const loadData = async () => {
-      setIsClient(true);
-      const storedDoctorId = localStorage.getItem("doctorId");
-
-      if (storedDoctorId) {
-        setDoctorId(storedDoctorId);
-        try {
-          // Initial load
-          await Promise.all([
-            fetchProfileData(storedDoctorId),
-            fetchDashboardData(storedDoctorId),
-          ]);
-
-          // Hidden refresh after initial load
-          setIsRefreshing(true); // Indicate refresh is happening
-          await fetchDashboardData(storedDoctorId); // Second fetch for "hidden" refresh
-          setIsRefreshing(false); // End refresh
-          setInitialLoadComplete(true);
-
-          // Set up auto-refresh every 30 seconds
-          const refreshInterval = setInterval(() => {
-            fetchDashboardData(storedDoctorId);
-          }, 30000);
-
-          return () => clearInterval(refreshInterval);
-        } catch (error) {
-          console.error("Initial load or refresh error:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, []); // Empty dependency array means this runs once on mount
-
+  // Dynamic time formatting that updates based on current time
   const formatNotificationTime = useCallback((date) => {
     const now = new Date();
     const notificationDate = new Date(date);
@@ -110,6 +71,23 @@ export default function Dashboard() {
     }
   }, []);
 
+  // Update notification times every minute to keep them current
+  useEffect(() => {
+    const updateNotificationTimes = () => {
+      setDashboardData((prev) => ({
+        ...prev,
+        notifications: prev.notifications.map((notification) => ({
+          ...notification,
+          formattedTime: formatNotificationTime(notification.createdAt),
+        })),
+      }));
+    };
+
+    const timeUpdateInterval = setInterval(updateNotificationTimes, 60000); // Update every minute
+
+    return () => clearInterval(timeUpdateInterval);
+  }, [formatNotificationTime]);
+
   const fetchProfileData = useCallback(async (currentDoctorId) => {
     if (!currentDoctorId) return;
 
@@ -122,12 +100,8 @@ export default function Dashboard() {
   }, []);
 
   const fetchDashboardData = useCallback(
-    async (currentDoctorId) => {
+    async (currentDoctorId, isInitialLoad = false) => {
       if (!currentDoctorId) return;
-
-      // Only set isLoading to true if it's the *initial* load, not for subsequent auto-refreshes or hidden refreshes
-      // The initial useEffect handles its own isLoading state.
-      // For subsequent calls, we rely on isRefreshing for the button spinner.
 
       try {
         const [stats, notifications] = await Promise.all([
@@ -147,9 +121,13 @@ export default function Dashboard() {
               createdAt: new Date(n.createdAt),
               formattedTime: formatNotificationTime(new Date(n.createdAt)),
             })) || [],
-          isLoading: false, // Ensure isLoading is set to false after data is fetched
+          isLoading: false,
           error: null,
         }));
+
+        if (isInitialLoad) {
+          setInitialLoadComplete(true);
+        }
       } catch (error) {
         console.error("API Error:", error);
         setDashboardData((prev) => ({
@@ -161,6 +139,42 @@ export default function Dashboard() {
     },
     [formatNotificationTime]
   );
+
+  // Initialize client-side data and fetch immediately - Fixed initial loading
+  useEffect(() => {
+    const loadData = async () => {
+      setIsClient(true);
+      const storedDoctorId = localStorage.getItem("doctorId");
+
+      if (storedDoctorId) {
+        setDoctorId(storedDoctorId);
+        try {
+          // Initial load - fetch both profile and dashboard data
+          await Promise.all([
+            fetchProfileData(storedDoctorId),
+            fetchDashboardData(storedDoctorId, true), // Pass true for initial load
+          ]);
+
+          // Set up auto-refresh every 30 seconds after initial load is complete
+          const refreshInterval = setInterval(() => {
+            fetchDashboardData(storedDoctorId);
+          }, 30000);
+
+          return () => clearInterval(refreshInterval);
+        } catch (error) {
+          console.error("Initial load error:", error);
+          setInitialLoadComplete(true); // Set to true even if there's an error
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+        setInitialLoadComplete(true);
+      }
+    };
+
+    loadData();
+  }, []); // Empty dependency array means this runs once on mount
 
   const markAsRead = async (notificationId) => {
     try {
@@ -237,18 +251,16 @@ export default function Dashboard() {
     connection.on("ReceiveNotification", (notification) => {
       if (!notification) return;
 
+      const notificationDate = notification.createdAt ? new Date(notification.createdAt) : new Date();
+      
       const newNotification = {
         id: notification.id || Date.now().toString(),
         title: notification.title || "New Notification",
         message: notification.message,
         type: notification.type || "General",
         isRead: false,
-        createdAt: notification.createdAt
-          ? new Date(notification.createdAt)
-          : new Date(),
-        formattedTime: formatNotificationTime(
-          notification.createdAt ? new Date(notification.createdAt) : new Date()
-        ),
+        createdAt: notificationDate,
+        formattedTime: formatNotificationTime(notificationDate),
       };
 
       setDashboardData((prev) => ({
@@ -475,9 +487,6 @@ export default function Dashboard() {
                                           {notification.message}
                                         </p>
                                         <div className="flex justify-between items-center">
-                                          <span className="text-xs text-gray-400">
-                                            {notification.formattedTime}
-                                          </span>
                                           <div className="flex space-x-1">
                                             {!notification.isRead && (
                                               <button
