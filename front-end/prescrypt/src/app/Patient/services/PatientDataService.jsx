@@ -86,3 +86,14 @@ export const addDoctorCharge = async (doctorId, doctorCharge) => {
     throw error;
   }
 };
+
+
+export const getAppointmentSummary = async (patientId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Appointments/summary/${patientId}`);
+    return response.data; 
+  } catch (error) {
+    console.error("Error fetching appointment summary:", error);
+    throw error;
+  }
+};
