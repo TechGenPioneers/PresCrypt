@@ -10,13 +10,14 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { sendEmail, sendNotification } from "../services/PatientPaymentServices";
-import {generatePdf} from "../services/PatientDataService"; 
+import {generatePdf, addDoctorCharge} from "../services/PatientDataService"; 
 import { AppointmentContext } from "../Bookings/Payments/[id]/page"; 
 
 const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformCharge}) => {
   const {
     paymentId,
     patientId,
+    doctorId,
     doctorFirstName,
     doctorLastName,
     appointmentDate,
@@ -50,6 +51,8 @@ const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformC
             message: `Your appointment with Dr. ${doctorName} has been successfully scheduled on ${appointmentDate} at ${appointmentTime} at ${hospitalName}.`,
           };
           await sendNotification(notificationPayload);
+
+          await addDoctorCharge(doctorId, doctorCharge);
 
           const pdfPayload = {
             paymentId,
@@ -97,9 +100,10 @@ const PaymentConfirmation = ({ open, handleClose, totalCharge, email , platformC
         "& .MuiDialog-paper": {
           borderRadius: "40px",
           padding: "40px 20px",
-          border: "2px solid #4CAF50",
+          border: "2px solid #0d9488",
           backgroundColor: "#f6ffff",
           boxShadow: "0px 6px 30px rgba(0, 0, 0, 0.15)",
+
         },
       }}
     >

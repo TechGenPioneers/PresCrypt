@@ -140,7 +140,7 @@ const Hospitals = () => {
   };
 
   return (
-    <div className="p-6 bg-white border-t-[15px] border-l-[15px] border-r-[15px] border-[#E9FAF2]">
+    <div className="p-6 ">
       <h1 className="text-3xl font-bold text-slate-800 mb-1">Hospitals</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>
 

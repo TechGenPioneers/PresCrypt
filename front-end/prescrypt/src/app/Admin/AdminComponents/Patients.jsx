@@ -80,7 +80,7 @@ const Patients = () => {
     return matchesSearch && matchesStatus;
   });
   return (
-    <div className="p-6 bg-white border-t-[15px] border-l-[15px] border-r-[15px] border-[#E9FAF2]">
+    <div className="p-6 ">
       {/* Title */}
       <h1 className="text-3xl font-bold text-slate-800 mb-1">Patients</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>

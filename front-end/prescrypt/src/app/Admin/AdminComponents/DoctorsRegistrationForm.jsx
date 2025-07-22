@@ -236,7 +236,7 @@ export default function DoctorRegistrationForm() {
 
 
   return (
-    <div className="p-6 ml-15 bg-white rounded-lg shadow-md">
+    <div className="p-6 ml-15 rounded-lg shadow-md">
       {/* Title */}
       <h1 className="text-2xl font-bold mb-2">Doctor Registration</h1>
       <p className="text-[#09424D] text-sm">{formattedDate}</p>

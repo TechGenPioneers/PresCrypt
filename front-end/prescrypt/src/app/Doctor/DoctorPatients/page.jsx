@@ -1,18 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
-import PageHeaderDisplay from "../DoctorComponents/PageHeaderDisplay"
+import PageHeaderDisplay from "../DoctorComponents/PageHeaderDisplay";
 import PatientViewModal from "./PatientViewModal";
 import DoctorPatientsService from "../services/DoctorPatientsService";
 import { Calendar, MapPin, Filter } from "lucide-react";
-import useAuthGuard from "@/utils/useAuthGuard";
-
 export default function page() {
-  useAuthGuard(["Doctor"]);
   const Title = "Patients";
   const doctorId =
     typeof window !== "undefined" ? localStorage.getItem("doctorId") : null;
-  const [allPatients, setAllPatients] = useState({ past: [], future: [] });
+  const [allPatients, setAllPatients] = useState({ past: [], new: [] });
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [noPatients, setNoPatients] = useState(false);
@@ -28,19 +24,19 @@ export default function page() {
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      const [pastPatients, futurePatients] = await Promise.all([
+      const [pastPatients, newPatients] = await Promise.all([
         DoctorPatientsService.getPatientsByType(doctorId, "past"),
-        DoctorPatientsService.getPatientsByType(doctorId, "future"),
+        DoctorPatientsService.getPatientsByType(doctorId, "new"),
       ]);
 
       const allFetchedPatients = {
         past: pastPatients || [],
-        future: futurePatients || [],
+        new: newPatients || [],
       };
       setAllPatients(allFetchedPatients);
 
       // Get unique hospitals
-      const hospitals = [...pastPatients, ...futurePatients]
+      const hospitals = [...pastPatients, ...newPatients]
         .map((p) => p.hospitalName)
         .filter((v, i, a) => v && a.indexOf(v) === i);
 
@@ -61,7 +57,7 @@ export default function page() {
   // filtered patients
   useEffect(() => {
     let patientsToFilter =
-      patientType === "past" ? allPatients.past : allPatients.future;
+      patientType === "past" ? allPatients.past : allPatients.new;
 
     if (searchTerm) {
       patientsToFilter = patientsToFilter.filter(
@@ -100,10 +96,10 @@ export default function page() {
 
   return (
     <div className="p-1">
-      <PageHeaderDisplay title={Title}/>
+      <PageHeaderDisplay title={Title} />
 
       {/* Search input for Patient ID or Name */}
-      <div className="pl-12 pt-8 pb-5">
+      <div className="pl-12 pt-8 pb-6 pr-12">
         <input
           type="text"
           placeholder="🔍 Search by Patient ID or Name..."
@@ -134,17 +130,15 @@ export default function page() {
                 onChange={(e) => setPatientType(e.target.value)}
                 className="w-4 h-4 text-[#094A4D] focus:ring-[#094A4D]"
               />
-              <span className="text-sm text-[#094A4D]">
-                Visited Patients
-              </span>
+              <span className="text-sm text-[#094A4D]">Visited Patients</span>
             </label>
 
             <label className="flex items-center space-x-2 cursor-pointer">
               <input
                 type="radio"
                 name="patientType"
-                value="future"
-                checked={patientType === "future"}
+                value="new"
+                checked={patientType === "new"}
                 onChange={(e) => setPatientType(e.target.value)}
                 className="w-4 h-4 text-[#094A4D] focus:ring-[#094A4D]"
               />
@@ -153,6 +147,7 @@ export default function page() {
           </div>
 
           {/* Hospital Filter */}
+
           <div className="flex items-center space-x-2">
             <MapPin className="w-4 h-4 text-[#094A4D]" />
             <select
@@ -209,7 +204,7 @@ export default function page() {
                       <th className="px-14 py-4 text-left font-semibold text-sm uppercase tracking-wide">
                         Last Appointment Date
                       </th>
-                      
+
                       <th className="px-16 py-4 text-left font-semibold text-sm uppercase tracking-wide">
                         Action
                       </th>
@@ -232,22 +227,22 @@ export default function page() {
                           <td className="py-4">
                             <div className="flex items-center space-x-4">
                               <div className="relative">
-                               <div className="relative w-[50px] h-[50px] shrink-0">
-                              <img
-                                src={
-                                  patient.profileImage
-                                    ? `data:image/jpeg;base64,${patient.profileImage}`
-                                    : "/patient.png"
-                                }
-                                alt="Profile"
-                                className="w-full h-full rounded-full border-2 border-[#094A4D]/20 shadow-sm object-cover object-top bg-white"
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.src = "/patient.png";
-                                }}
-                              />
-                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#E9FAF2] rounded-full border-2 border-white"></div>
-                            </div>
+                                <div className="relative w-[50px] h-[50px] shrink-0">
+                                  <img
+                                    src={
+                                      patient.profileImage
+                                        ? `data:image/jpeg;base64,${patient.profileImage}`
+                                        : "/patient.png"
+                                    }
+                                    alt="Profile"
+                                    className="w-full h-full rounded-full border-2 border-[#094A4D]/20 shadow-sm object-cover object-top bg-white"
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = "/patient.png";
+                                    }}
+                                  />
+                                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#E9FAF2] rounded-full border-2 border-white"></div>
+                                </div>
                                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#E9FAF2] rounded-full border-2 border-white"></div>
                               </div>
                               <div className="flex flex-col">
@@ -257,9 +252,7 @@ export default function page() {
                                 <span className="text-sm text-[#094A4D]/60 flex items-center space-x-1">
                                   <span>{patient.gender}</span>
                                   <span>•</span>
-                                  <span>
-                                    {calculateAge(patient.dob)} yrs
-                                  </span>
+                                  <span>{calculateAge(patient.dob)} yrs</span>
                                 </span>
                               </div>
                             </div>
@@ -273,7 +266,7 @@ export default function page() {
                               </span>
                             </div>
                           </td>
-                          
+
                           <td className="px-18 py-4">
                             <button
                               className="bg-[#0064694e] text-[#094A4D] px-4 py-2 rounded-lg font-medium cursor-pointer hover:bg-[#094A4D]/90 hover:text-white transition-colors duration-200 shadow-sm hover:shadow-md"
@@ -298,7 +291,6 @@ export default function page() {
         onClose={() => setIsPatientModalOpen(false)}
         patient={selectedPatient}
       />
-      <DateTimeDisplay />
     </div>
   );
 }

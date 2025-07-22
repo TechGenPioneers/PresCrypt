@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { sendDoctorContactUs } from "../services/DoctorContactUsService";
+import { teal } from "@mui/material/colors";
 import {
   Dialog,
   DialogTitle,
@@ -13,60 +14,105 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-// Reusable terms dialog
+// Reusable terms dialog with updated design
 const TermsDialog = ({ open, onClose }) => (
   <Dialog
     open={open}
     onClose={onClose}
-    maxWidth="sm"
+    maxWidth="md"
     fullWidth
     sx={{
       "& .MuiDialog-paper": {
         borderRadius: "20px",
-        padding: "30px 20px",
+        padding: "20px",
         border: "2px solid #4CAF50",
-        backgroundColor: "#fffdfd",
-        boxShadow: "0px 6px 30px rgba(0, 0, 0, 0.15)",
+        backgroundColor: "rgba(255, 253, 253, 0.95)",
+        backdropFilter: "blur(10px)",
+        boxShadow: "0px 10px 40px rgba(0, 0, 0, 0.2)",
+        margin: "16px",
       },
     }}
   >
-    <IconButton onClick={onClose} sx={{ position: "absolute", top: 16, right: 16 }}>
-      <CloseIcon fontSize="large" />
+    <IconButton
+      onClick={onClose}
+      sx={{ 
+        position: "absolute", 
+        top: 12, 
+        right: 12,
+        color: teal[600], // teal-600
+        "&:hover": { backgroundColor: "rgba(13, 148, 136, 0.1)" } 
+      }}
+    >
+      <CloseIcon />
     </IconButton>
-    <DialogTitle sx={{ fontWeight: "bold", color: "#4CAF50", textAlign: "center" }}>
+
+    <DialogTitle sx={{ 
+      fontWeight: "700", 
+      color: "#0f766e", 
+      textAlign: "center",
+      fontSize: "1.5rem",
+      pb: 2
+    }}>
       Terms and Conditions
     </DialogTitle>
-    <DialogContent dividers>
-      <Typography variant="body1" paragraph>
+
+    <DialogContent 
+      dividers
+      sx={{
+        maxHeight: "400px",
+        overflowY: "auto",
+        "&::-webkit-scrollbar": {
+          width: "6px",
+        },
+        "&::-webkit-scrollbar-track": {
+          backgroundColor: "#f1f1f1",
+          borderRadius: "10px",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: "#4CAF50",
+          borderRadius: "10px",
+        },
+      }}
+    >
+      <Typography variant="body1" paragraph sx={{ color: "#0f766e", fontWeight: "500" }}>
         Welcome to our platform! By using our services, you agree to the following terms and conditions:
       </Typography>
-      <Typography variant="body2" paragraph>
+      <Typography variant="body2" paragraph sx={{ color: "#555", lineHeight: 1.6 }}>
         1. Your personal information will be kept confidential and used only for service purposes.
       </Typography>
-      <Typography variant="body2" paragraph>
+      <Typography variant="body2" paragraph sx={{ color: "#555", lineHeight: 1.6 }}>
         2. Submitting false or misleading information may lead to suspension of your account.
       </Typography>
-      <Typography variant="body2" paragraph>
+      <Typography variant="body2" paragraph sx={{ color: "#555", lineHeight: 1.6 }}>
         3. We reserve the right to update these terms at any time, with notice on our platform.
       </Typography>
-      <Typography variant="body2" paragraph>
+      <Typography variant="body2" paragraph sx={{ color: "#555", lineHeight: 1.6 }}>
         4. You agree not to misuse our services or attempt unauthorized access.
       </Typography>
-      <Typography variant="body2" paragraph>
+      <Typography variant="body2" paragraph sx={{ color: "#555", lineHeight: 1.6 }}>
         5. For detailed guidelines, please visit our official documentation or contact support.
       </Typography>
+      <Typography variant="body2" paragraph sx={{ color: "#0f766e", fontWeight: "500" }}>
+        Thank you for understanding and cooperating.
+      </Typography>
     </DialogContent>
-    <DialogActions sx={{ justifyContent: "center" }}>
+
+    <DialogActions sx={{ justifyContent: "center", pt: 2 }}>
       <Button
         onClick={onClose}
         variant="contained"
         sx={{
-          backgroundColor: "#4CAF50",
+          backgroundColor: "#0d9488", 
           color: "#fff",
-          "&:hover": { backgroundColor: "#388E3C" },
-          borderRadius: "8px",
-          padding: "8px 24px",
-          fontWeight: 600,
+          "&:hover": {
+            backgroundColor: "#0f766e", 
+          },
+          borderRadius: "25px",
+          padding: "10px 30px",
+          fontWeight: "600",
+          fontSize: "0.95rem",
+          textTransform: "none",
+          boxShadow: "0px 4px 15px rgba(13, 148, 136, 0.3)", 
         }}
       >
         I Understood and Accept
@@ -150,109 +196,113 @@ const ContactUsForm = () => {
 
   return (
     <>
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 md:p-10 rounded-2xl shadow-xl w-full max-w-3xl mx-auto space-y-6 border border-green-200"
-      >
-        <h2 className="text-3xl font-bold text-center text-green-700">Contact Us</h2>
-        <p className="text-center text-green-600">Your Personal Health Hub</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <input
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            placeholder="First Name"
-            className="border border-green-300 focus:ring-green-500 focus:border-green-500 p-3 rounded-md w-full"
-            required
-          />
-          <input
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            placeholder="Last Name"
-            className="border border-green-300 focus:ring-green-500 focus:border-green-500 p-3 rounded-md w-full"
-            required
-          />
-          <input
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email Address"
-            className="border border-green-300 focus:ring-green-500 focus:border-green-500 p-3 rounded-md w-full"
-            required
-          />
-          <input
-            name="phoneNumber"
-            type="tel"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            placeholder="Phone Number"
-            className="border border-green-300 focus:ring-green-500 focus:border-green-500 p-3 rounded-md w-full"
-          />
-        </div>
-
-        <select
-          name="topic"
-          value={formData.topic}
-          onChange={handleChange}
-          className="border border-green-300 focus:ring-green-500 focus:border-green-500 p-3 rounded-md w-full"
-          required
+      <div className="flex items-center justify-center p-4">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-6 md:p-8 rounded-3xl shadow-xl w-full max-w-2xl mx-auto space-y-5 border border-green-300/30"
         >
-          <option value="">Select Topic...</option>
-          <option value="appointment">Appointment</option>
-          <option value="prescription">Prescription</option>
-          <option value="technical">Technical Support</option>
-          <option value="complaint">Complaint</option>
-        </select>
+          <div className="text-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-teal-700 mb-2">Contact Us</h2>
+            <p className="text-teal-600/80 text-sm md:text-base">Your Personal Health Hub</p>
+          </div>
 
-        <textarea
-          name="message"
-          value={formData.message}
-          onChange={handleChange}
-          placeholder="Tell us more..."
-          rows={4}
-          className="border border-green-300 focus:ring-green-500 focus:border-green-500 p-3 rounded-md w-full"
-          required
-        />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              placeholder="First Name"
+              className="border border-green-300/30 focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 p-3 rounded-xl w-full bg-white/40 backdrop-blur-sm transition-all duration-200"
+              required
+            />
+            <input
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              placeholder="Last Name"
+              className="border border-green-300/30 focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 p-3 rounded-xl w-full bg-white/40 backdrop-blur-sm transition-all duration-200"
+              required
+            />
+            <input
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Email Address"
+              className="border border-green-300/30 focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 p-3 rounded-xl w-full bg-white/40 backdrop-blur-sm transition-all duration-200"
+              required
+            />
+            <input
+              name="phoneNumber"
+              type="tel"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              placeholder="Phone Number"
+              className="border border-green-300/30 focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 p-3 rounded-xl w-full bg-white/40 backdrop-blur-sm transition-all duration-200"
+            />
+          </div>
 
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="termsAccepted"
-            checked={formData.termsAccepted}
+          <select
+            name="topic"
+            value={formData.topic}
             onChange={handleChange}
-            className="accent-green-600"
+            className="border border-green-300/30 focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 p-3 rounded-xl w-full bg-white/40 backdrop-blur-sm transition-all duration-200"
+            required
+          >
+            <option value="">Select Topic...</option>
+            <option value="appointment">Appointment</option>
+            <option value="prescription">Prescription</option>
+            <option value="technical">Technical Support</option>
+            <option value="complaint">Complaint</option>
+          </select>
+
+          <textarea
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            placeholder="Tell us more..."
+            rows={4}
+            className="border border-green-300/30 focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 p-3 rounded-xl w-full bg-white/40 backdrop-blur-sm transition-all duration-200 resize-none"
             required
           />
-          <label className="text-sm text-green-700">
-            I accept the{" "}
-            <span
-              onClick={() => setIsTermsOpen(true)}
-              className="underline cursor-pointer text-green-800 hover:text-green-900"
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  setIsTermsOpen(true);
-                }
-              }}
-            >
-              terms and conditions
-            </span>
-          </label>
-        </div>
 
-        <div className="text-center">
-          <button
-            type="submit"
-            className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md transition duration-200"
-          >
-            Submit
-          </button>
-        </div>
-      </form>
+          <div className="flex items-start space-x-3 p-4 bg-white/30 rounded-xl border border-green-200/30">
+            <input
+              type="checkbox"
+              name="termsAccepted"
+              checked={formData.termsAccepted}
+              onChange={handleChange}
+              className="mt-1 w-4 h-4 accent-teal-600 rounded"
+              required
+            />
+            <label className="text-sm text-teal-700 leading-relaxed">
+              I accept the{" "}
+              <span
+                onClick={() => setIsTermsOpen(true)}
+                className="underline cursor-pointer text-teal-800 hover:text-teal-900 font-medium transition-colors duration-200"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    setIsTermsOpen(true);
+                  }
+                }}
+              >
+                terms and conditions
+              </span>
+            </label>
+          </div>
+
+          <div className="text-center pt-2">
+            <button
+              type="submit"
+              className="bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-green-800 text-white font-semibold px-8 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              Submit Message
+            </button>
+          </div>
+        </form>
+      </div>
 
       <TermsDialog open={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
     </>
