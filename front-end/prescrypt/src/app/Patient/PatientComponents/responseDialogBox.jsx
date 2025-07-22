@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { updateCancelStatus } from "../services/PatientDataService";
 import axios from "axios";
 
 const ResponseDialogBox = ({
@@ -22,7 +23,7 @@ const ResponseDialogBox = ({
   paymentAmount,
   payHereObjectId,
 }) => {
-  // Combine appointmentDate + appointmentTime into JS Date object
+  
   const appointmentDateTime = useMemo(() => {
     if (!appointmentDate || !appointmentTime) return null;
     return new Date(`${appointmentDate}T${appointmentTime}`);
@@ -69,6 +70,30 @@ const ResponseDialogBox = ({
     return null;
   }, [paymentMethod, paymentAmount, hoursUntilAppointment, appointmentDate, appointmentTime, payHereObjectId]);
 
+
+   useEffect(() => {
+    const handleCancelStatusUpdate = async () => {
+      if (open && paymentMethod === "Location") {
+        const storedPatientId = localStorage.getItem("patientId");
+
+        if (!storedPatientId) {
+          console.warn("No patientId found in localStorage");
+          return;
+        }
+
+        try {
+          await updateCancelStatus(storedPatientId);
+          console.log("Patient cancel status updated successfully.");
+        } catch (error) {
+          console.error("Error updating patient cancel status:", error);
+        }
+      }
+    };
+
+    handleCancelStatusUpdate();
+  }, [open, paymentMethod]);
+
+  
   useEffect(() => {
     const sendRefundRequest = async () => {
       if (
