@@ -16,7 +16,7 @@ const TimeAndDate = () => {
   const formattedTime = time.toLocaleTimeString();
 
   return (
-    <div className="text-sm text-green-700 font-bold text-center mb-1">
+    <div className="text-sm text-teal-700 font-bold text-center mb-1">
       <p>{formattedDate}</p>
       <p>{formattedTime}</p>
     </div>

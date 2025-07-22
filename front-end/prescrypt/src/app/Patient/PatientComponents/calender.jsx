@@ -8,7 +8,7 @@ import AppointmentViewDialog from "./AppointmentViewDialog";
 import { getAppointmentsByPatientId } from "../services/AppointmentsFindingService";
 import "./calender.css";
 
-// ✅ Custom Day Component
+
 const CustomDay = (props) => {
   const { day, outsideCurrentMonth, ...other } = props;
 
@@ -68,7 +68,7 @@ const CustomCalendar = () => {
   };
 
   return (
-    // 🔥 CRITICAL: Absolutely positioned or fixed container
+    
     <div 
       className="bg-white border border-gray-300 rounded-xl shadow-md"
       style={{

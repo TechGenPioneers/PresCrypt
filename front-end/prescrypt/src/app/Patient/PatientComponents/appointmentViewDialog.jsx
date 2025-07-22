@@ -75,9 +75,9 @@ const AppointmentViewDialog = ({ open, onClose, date, patientId }) => {
         sx={{
           fontWeight: "bold",
           textAlign: "center",
-          color: "#2e7d32",
+          color: "#00897B", 
           fontSize: "1.7rem",
-          paddingTop: "36px",
+          paddingTop: "36px"
         }}
       >
         Appointments on {date?.format("MMMM DD, YYYY")}
@@ -133,9 +133,11 @@ const AppointmentViewDialog = ({ open, onClose, date, patientId }) => {
           onClick={onClose}
           variant="contained"
           sx={{
-            backgroundColor: "#2e7d32",
+            backgroundColor: "#00897B",
             color: "#fff",
-            "&:hover": { backgroundColor: "#1b5e20" },
+            "&:hover": {
+              backgroundColor: "#00796B" 
+            },
             borderRadius: "8px",
             px: 4,
             py: 1.5,
