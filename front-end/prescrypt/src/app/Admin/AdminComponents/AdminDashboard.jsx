@@ -297,6 +297,13 @@ const AdminDashboard = ({ setAdminName }) => {
                 </button>
               </Link>
             </div>
+            <div className="space-y-3">
+              <Link href={"/Admin/AdminRegistrationPage"}>
+                <button className="w-full mt-3 text-left p-3 rounded-lg bg-[#E9FAF2] hover:bg-[#CEE4E6] transition-colors text-[#09424D]">
+                  Admin Registration
+                </button>
+              </Link>
+            </div>
           </div>
 
           <img

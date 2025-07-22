@@ -39,11 +39,10 @@ const GetAllMessages = async (senderId, receiverId) => {
   } catch (error) {
     if (error.response && error.response.status === 404) {
       // Backend says "not found" – treat it as no messages
-      console.warn("No messages found for this conversation.");
+      console.log("No messages found for this conversation.");
       return [];
     } else {
       // Unexpected error
-      console.error("Error fetching messages:", error);
       return [];
     }
   }
