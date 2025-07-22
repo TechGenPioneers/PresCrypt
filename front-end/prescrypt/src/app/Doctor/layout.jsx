@@ -13,11 +13,13 @@ export default function DoctorLayout({ children }) {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen ml-32">
+    <div className="flex flex-col min-h-screen">
       <div className="flex flex-1">
-        <Sidebar />
-        <div className="flex-grow p-2 bg-[#D4E9EA] min-h-screen">
-          <div className="bg-white h-full w-full">{children}</div>
+        <Sidebar /> {/* This is fixed positioned */}
+        <div className="flex-grow p-2 bg-[#D4E9EA] min-h-screen pl-[7rem]">
+          <div className="bg-white h-full w-full overflow-hidden">
+            {children}
+          </div>
         </div>
       </div>
       <Footer />
