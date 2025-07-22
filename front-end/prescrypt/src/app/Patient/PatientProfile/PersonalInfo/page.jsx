@@ -125,39 +125,27 @@ const EditProfilePage = ({ patientData, onBack, onSave }) => {
   };
 
   useEffect(() => {
-    // Set default data from the first image if no patientData is provided
-    const defaultData = {
-      name: 'Dewmin Deniyegedara',
-      gender: 'Male',
-      birthDate: '07/30/2002',
-      nic: '200221203128',
-      phone: '0783456756',
-      email: 'dewminkasmitha30@gmail.com',
-      address: '159e,Katubedda,Moratuwa',
-      profileImage: null
-    };
+    if (patientData) {
+      // Format birthDate from MM/DD/YYYY to YYYY-MM-DD for the date input
+      const birthParts = patientData.birthDate?.split('/');
+      const formattedBirthDate = birthParts?.length === 3 
+        ? `${birthParts[2]}-${birthParts[0].padStart(2, '0')}-${birthParts[1].padStart(2, '0')}`
+        : '';
 
-    const dataToUse = patientData || defaultData;
+      setFormData({
+        name: patientData.name || '',
+        gender: patientData.gender === 'M' ? 'Male' : patientData.gender === 'F' ? 'Female' : patientData.gender || '',
+        birthDate: formattedBirthDate || '',
+        nic: patientData.nic || '',
+        phone: patientData.phone || '',
+        email: patientData.email || '',
+        address: patientData.address || '',
+        profileImage: patientData.profileImage || null
+      });
 
-    // Format birthDate from MM/DD/YYYY to YYYY-MM-DD for the date input
-    const birthParts = dataToUse.birthDate?.split('/');
-    const formattedBirthDate = birthParts?.length === 3 
-      ? `${birthParts[2]}-${birthParts[0].padStart(2, '0')}-${birthParts[1].padStart(2, '0')}`
-      : '';
-
-    setFormData({
-      name: dataToUse.name || '',
-      gender: dataToUse.gender === 'M' ? 'Male' : dataToUse.gender === 'F' ? 'Female' : '',
-      birthDate: formattedBirthDate || '',
-      nic: dataToUse.nic || '',
-      phone: dataToUse.phone || '',
-      email: dataToUse.email || '',
-      address: dataToUse.address || '',
-      profileImage: dataToUse.profileImage || null
-    });
-
-    if (dataToUse.profileImage) {
-      setPreviewImage(`data:image/jpeg;base64,${dataToUse.profileImage}`);
+      if (patientData.profileImage) {
+        setPreviewImage(`data:image/jpeg;base64,${patientData.profileImage}`);
+      }
     }
   }, [patientData]);
 
@@ -296,11 +284,6 @@ const EditProfilePage = ({ patientData, onBack, onSave }) => {
         profileImageBase64: formData.profileImage || "",
       };
   
-      //
-      // ===== THE ONLY CHANGE IS HERE =====
-      // The API endpoint is changed from 'http' to 'https' to match the backend's
-      // requirement set by `app.UseHttpsRedirection()`.
-      //
       await axios.put(`https://localhost:7021/api/PatientProfile/${patientId}`, dataToSend);
   
       // Format data for the parent component for UI update
@@ -475,6 +458,7 @@ const handleBack = () => {
               <TextField
                 name="name"
                 label="Full Name"
+                placeholder="e.g. Ravindu Dilshan"
                 value={formData.name}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
@@ -516,11 +500,14 @@ const handleBack = () => {
                   onChange={handleInputChange}
                   onBlur={handleBlur}
                   label="Gender"
+                  displayEmpty
                   startAdornment={<PersonIcon sx={{ color: hasError('gender') ? '#f44336' : "#5da9a7", mr: 1 }} />}
                 >
+                  <MenuItem value="" disabled sx={{ fontStyle: 'italic', color: '#999' }}>
+                    Select your gender
+                  </MenuItem>
                   <MenuItem value="Male">Male</MenuItem>
                   <MenuItem value="Female">Female</MenuItem>
-                  
                 </Select>
                 {hasError('gender') && (
                   <FormHelperText>{errors.gender}</FormHelperText>
@@ -538,7 +525,7 @@ const handleBack = () => {
                 required
                 fullWidth
                 error={hasError('birthDate')}
-                helperText={hasError('birthDate') ? errors.birthDate : ''}
+                helperText={hasError('birthDate') ? errors.birthDate : 'Select your date of birth'}
                 InputLabelProps={{ shrink: true }}
                 InputProps={{
                   startAdornment: <CakeIcon sx={{ color: hasError('birthDate') ? '#f44336' : "#5da9a7", mr: 1 }} />,
@@ -557,13 +544,14 @@ const handleBack = () => {
               <TextField
                 name="nic"
                 label="NIC"
+                placeholder="e.g. 200012345678"
                 value={formData.nic}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 required
                 fullWidth
                 error={hasError('nic')}
-                helperText={hasError('nic') ? errors.nic : ''}
+                helperText={hasError('nic') ? errors.nic : '12 digits or 9 digits + V/X'}
                 InputProps={{
                   startAdornment: <BadgeIcon sx={{ color: hasError('nic') ? '#f44336' : "#5da9a7", mr: 1 }} />,
                 }}
@@ -582,13 +570,14 @@ const handleBack = () => {
                 name="phone"
                 label="Contact Number"
                 type="tel"
+                placeholder="e.g. 0771234567"
                 value={formData.phone}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 required
                 fullWidth
                 error={hasError('phone')}
-                helperText={hasError('phone') ? errors.phone : ''}
+                helperText={hasError('phone') ? errors.phone : 'Sri Lankan mobile number'}
                 InputProps={{
                   startAdornment: <PhoneIcon sx={{ color: hasError('phone') ? '#f44336' : "#5da9a7", mr: 1 }} />,
                 }}
@@ -607,13 +596,14 @@ const handleBack = () => {
                 name="email"
                 label="Email Address"
                 type="email"
+                placeholder="e.g. dlshan.ravndu@gmail.com"
                 value={formData.email}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 required
                 fullWidth
                 error={hasError('email')}
-                helperText={hasError('email') ? errors.email : ''}
+                helperText={hasError('email') ? errors.email : 'Your primary email address'}
                 InputProps={{
                   startAdornment: <EmailIcon sx={{ color: hasError('email') ? '#f44336' : "#5da9a7", mr: 1 }} />,
                 }}
@@ -631,6 +621,7 @@ const handleBack = () => {
               <TextField
                 name="address"
                 label="Address"
+                placeholder="e.g. No 169e,Katubedda , Moratuwa"
                 value={formData.address}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
@@ -639,7 +630,7 @@ const handleBack = () => {
                 multiline
                 rows={2}
                 error={hasError('address')}
-                helperText={hasError('address') ? errors.address : ''}
+                helperText={hasError('address') ? errors.address : 'Your complete residential address'}
                 InputProps={{
                   startAdornment: <LocationOnIcon sx={{ color: hasError('address') ? '#f44336' : "#5da9a7", mr: 1, alignSelf: "flex-start", mt: 1 }} />,
                 }}
