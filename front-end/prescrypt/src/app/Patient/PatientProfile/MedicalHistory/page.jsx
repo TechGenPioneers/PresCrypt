@@ -7,7 +7,7 @@ import Sidebar from '@/app/Patient/PatientComponents/navBar';
 import useAuthGuard from '@/utils/useAuthGuard';
 
 const HealthRecord = () => {
-  useAuthGuard(["Patient"]); // Ensure the user is authenticated as a Patient
+  useAuthGuard(["Patient","Doctor"]); // Ensure the user is authenticated as a Patient
   const router = useRouter();
   
   const [healthData, setHealthData] = useState({
