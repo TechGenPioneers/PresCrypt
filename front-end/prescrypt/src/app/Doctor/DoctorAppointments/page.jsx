@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import DateTimeDisplay from "../DoctorComponents/DateTimeDisplay";
 import PageHeaderDisplay from "../DoctorComponents/PageHeaderDisplay";
 import PatientViewModal from "./PatientViewModal";
 import RescheduleModal from "./RescheduleModal";
@@ -416,7 +415,7 @@ export default function AppointmentsPage() {
                 </tr>
               </thead>
             </table>
-            <div className="overflow-y-auto max-h-[400px]">
+            <div className="overflow-y-auto max-h-[380px]">
               <table className="w-full table-auto sm:table-fixed min-w-full">
                 <tbody>
                   {appointments.length > 0 ? (
@@ -522,8 +521,7 @@ export default function AppointmentsPage() {
           </div>
         </div>
       )}
-       <DateTimeDisplay />
-   
+
       {/* Modal */}
       <PatientViewModal
         isOpen={isPatientModalOpen}
@@ -535,7 +533,6 @@ export default function AppointmentsPage() {
         onClose={() => setIsRescheduleModalOpen(false)}
         doctorId={doctorId}
       />
-      
     </div>
   );
 }

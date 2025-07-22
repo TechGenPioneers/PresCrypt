@@ -16,6 +16,8 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
   const [error, setError] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [markCompleteStatus, setMarkCompleteStatus] = useState(null);
+  const [isMarkingComplete, setIsMarkingComplete] = useState(false);
+  const [appointmentCompleted, setAppointmentCompleted] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -24,8 +26,14 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
       setError(null);
       setIsDragOver(false);
       setMarkCompleteStatus(null);
+      setIsMarkingComplete(false);
+      setAppointmentCompleted(false);
+    } else {
+      // Check if appointment is already completed when modal opens
+      setAppointmentCompleted(patient?.status === "Completed");
     }
-  }, [isOpen]);
+  }, [isOpen, patient?.status]);
+
   const isToday = (dateStr) => {
     const today = new Date();
     const appointmentDate = new Date(dateStr);
@@ -138,16 +146,22 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
+
   const handleMarkAsCompleted = async () => {
+    setIsMarkingComplete(true);
     try {
       await DoctorPatientsService.markTodayAppointmentComplete(
         patient.patientId
       );
       setMarkCompleteStatus({ success: true, message: "Appointment marked as completed successfully" });
-      setTimeout(() => setMarkCompleteStatus(null), 3000);
+      setAppointmentCompleted(true);
+      setTimeout(() => setMarkCompleteStatus(null), 8000); // Show success message for 8 seconds
     } catch (error) {
       setMarkCompleteStatus({ success: false, message: "Failed to mark appointment as completed" });
+      setTimeout(() => setMarkCompleteStatus(null), 5000); // Show error message for 5 seconds
       console.error(error);
+    } finally {
+      setIsMarkingComplete(false);
     }
   };
 
@@ -155,8 +169,8 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
 
   return (
     <div className="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gradient-to-br from-emerald-50/90 to-green-50/90 rounded-3xl shadow-2xl border border-emerald-500 max-w-6xl w-full max-h-[95vh] overflow-hidden">
-        <div className="bg-white/80 backdrop-blur-sm m-4 rounded-2xl border border-emerald-200/40 overflow-y-auto max-h-[calc(95vh-2rem)]">
+      <div className="bg-gradient-to-br from-teal-50/90 to-teal-100/90 rounded-3xl shadow-2xl border border-teal-500 max-w-6xl w-full max-h-[95vh] overflow-hidden">
+        <div className="bg-white/80 backdrop-blur-sm m-4 rounded-2xl border border-teal-200/40 overflow-y-auto max-h-[calc(95vh-2rem)]">
           <div className="p-8 relative">
             <button
               onClick={onClose}
@@ -176,7 +190,7 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                   <div className="w-20 h-1 bg-teal-500 rounded-full"></div>
                 </div>
 
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-7 border border-emerald-100/60 shadow-lg space-y-7">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-7 border border-teal-100/60 shadow-lg space-y-7">
                   {/* Patient Profile */}
                   <div className="flex items-start gap-6">
                     <div className="relative">
@@ -187,14 +201,14 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                             : "/patient.png"
                         }
                         alt="Patient Profile"
-                        className="w-28 h-28 rounded-2xl object-cover border-3 border-emerald-200/70 shadow-md"
+                        className="w-28 h-28 rounded-2xl object-cover border-3 border-teal-200/70 shadow-md"
                         onError={(e) => {
                           e.target.onerror = null; // prevent infinite loop if fallback also fails
                           e.target.src = "/patient.png";
                         }}
                       />
 
-                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full border-3 border-white flex items-center justify-center shadow-sm">
+                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-teal-500 rounded-full border-3 border-white flex items-center justify-center shadow-sm">
                         <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
                     </div>
@@ -203,7 +217,7 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                         {patient.patientName}
                       </h3>
                       <div className="flex items-center gap-4 text-black text-sm mb-3">
-                        <span className="flex items-center gap-2 bg-emerald-50/80 px-3 py-1 rounded-full">
+                        <span className="flex items-center gap-2 bg-teal-50/80 px-3 py-1 rounded-full">
                           <svg
                             className="w-4 h-4"
                             fill="none"
@@ -219,7 +233,7 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                           </svg>
                           {patient.gender === "M" ? "Male" : "Female"}
                         </span>
-                        <span className="flex items-center gap-2 bg-emerald-50/80 px-3 py-1 rounded-full">
+                        <span className="flex items-center gap-2 bg-teal-50/80 px-3 py-1 rounded-full">
                           <svg
                             className="w-4 h-4"
                             fill="none"
@@ -238,8 +252,8 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                           years
                         </span>
                       </div>
-                      <div className="inline-flex items-center gap-2 bg-emerald-100/80 px-4 py-2 rounded-full shadow-sm">
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                      <div className="inline-flex items-center gap-2 bg-teal-100/80 px-4 py-2 rounded-full shadow-sm">
+                        <span className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></span>
                         <span className="text-sm font-medium text-black tracking-wider">
                           ID: {patient.patientId}
                         </span>
@@ -248,12 +262,12 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                   </div>
 
                   {/* Appointment Details */}
-                  <div className="space-y-4 pt-6 border-t border-emerald-100/60">
+                  <div className="space-y-4 pt-6 border-t border-teal-100/60">
                   
-                    <div className="flex items-center justify-between py-4 px-5 bg-gradient-to-r from-emerald-50/80 to-emerald-100/60 rounded-xl shadow-sm">
+                    <div className="flex items-center justify-between py-4 px-5 bg-gradient-to-r from-teal-50/80 to-teal-100/60 rounded-xl shadow-sm">
                       <div className="flex items-center gap-4">
                         
-                        <div className="w-10 h-10 bg-emerald-200/70 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-teal-200/70 rounded-full flex items-center justify-center">
                           <svg
                             className="w-5 h-5 text-black"
                             fill="none"
@@ -270,19 +284,19 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                         </div>
                         
                         <div>
-                          <p className="text-xs font-semibold text-emerald-600 tracking-wider uppercase mb-1">
+                          <p className="text-xs font-semibold text-teal-600 tracking-wider uppercase mb-1">
                             Hospital
                           </p>
-                          <p className="text-emerald-800 font-medium">
+                          <p className="text-teal-800 font-medium">
                             {patient.hospitalName}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between py-4 px-5 bg-gradient-to-r from-emerald-50/80 to-emerald-100/60 rounded-xl shadow-sm">
+                    <div className="flex items-center justify-between py-4 px-5 bg-gradient-to-r from-teal-50/80 to-teal-100/60 rounded-xl shadow-sm">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-emerald-200/70 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-teal-200/70 rounded-full flex items-center justify-center">
                           <svg
                             className="w-5 h-5 text-black"
                             fill="none"
@@ -298,10 +312,10 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                           </svg>
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-emerald-600 tracking-wider uppercase mb-1">
+                          <p className="text-xs font-semibold text-teal-600 tracking-wider uppercase mb-1">
                             Appointment Time
                           </p>
-                          <p className="text-emerald-800 font-medium">
+                          <p className="text-teal-800 font-medium">
                             {patient.time}
                           </p>
                         </div>
@@ -332,22 +346,32 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
 
                           <span
                             className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium shadow-sm ${
-                              patient.status === "Completed"
+                              patient.status === "Completed" || appointmentCompleted
                                 ? "bg-teal-100 text-teal-800 border border-teal-200"
                                 : "bg-amber-100 text-amber-800 border border-amber-200"
                             }`}
                           >
-                            {patient.status}
+                            {patient.status === "Completed" || appointmentCompleted ? "Completed" : patient.status}
                           </span>
 
                           <button
                             onClick={handleMarkAsCompleted}
                             disabled={
-                              !isToday(patient.date) || patient.status === "Completed"
+                              !isToday(patient.date) || 
+                              patient.status === "Completed" || 
+                              appointmentCompleted || 
+                              isMarkingComplete
                             }
-                            className="mt-3 px-3 py-1 ml-25 text-teal-700 rounded-lg font-medium text-sm tracking-wide shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed bg-transparent border border-teal-300/50 hover:border-teal-400/70 transition-all duration-200"
+                            className="mt-3 px-3 py-1 ml-25 cursor-pointer text-teal-700 rounded-lg font-medium text-sm tracking-wide shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed bg-transparent border border-teal-500 hover:border-teal-400/70 transition-all duration-200 flex items-center gap-2"
                           >
-                            Mark as Completed
+                            {isMarkingComplete ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Processing...</span>
+                              </>
+                            ) : (
+                              "Mark as Completed"
+                            )}
                           </button>
                           
                           {markCompleteStatus && (
@@ -371,7 +395,7 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                   <div className="w-20 h-1 bg-teal-500 rounded-full"></div>
                 </div>
 
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-7 border border-emerald-100/60 shadow-lg">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-7 border border-teal-100/60 shadow-lg">
                   <div className="space-y-8">
                     <div>
                       <label className="block text-sm font-semibold text-black tracking-wider uppercase mb-4">
@@ -380,17 +404,17 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                       <div
                         className={`border-3 border-dashed rounded-2xl p-10 text-center transition-all duration-300 ${
                           isDragOver
-                            ? "border-emerald-400 bg-emerald-100/70"
+                            ? "border-teal-400 bg-teal-100/70"
                             : prescriptionFile
-                            ? "border-emerald-300 bg-emerald-50/60"
-                            : "border-emerald-200/70 bg-emerald-50/40 hover:bg-emerald-100/60 hover:border-emerald-300"
+                            ? "border-teal-300 bg-teal-50/60"
+                            : "border-teal-200/70 bg-teal-50/40 hover:bg-teal-100/60 hover:border-teal-300"
                         }`}
                         onDrop={handleDrop}
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                       >
-                        <div className="w-20 h-20 bg-emerald-100/80 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-                          <CloudUpload className="text-emerald-600" size={36} />
+                        <div className="w-20 h-20 bg-teal-100/80 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                          <CloudUpload className="text-teal-600" size={36} />
                         </div>
 
                         {!prescriptionFile ? (
@@ -398,24 +422,24 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                             <button
                               type="button"
                               onClick={() => fileInputRef.current.click()}
-                              className="px-5 cursor-pointer py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl font-semibold tracking-wide hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-md hover:shadow-lg transform"
+                              className="px-5 cursor-pointer py-3 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl font-semibold tracking-wide hover:from-teal-700 hover:to-teal-800 transition-all duration-200 shadow-md hover:shadow-lg transform"
                             >
                               Choose File
                             </button>
                             <p className="mt-6 text-black font-medium">
                               or drag and drop your file here
                             </p>
-                            <p className="mt-3 text-sm text-black bg-emerald-50/60 inline-block px-4 py-2 rounded-lg">
+                            <p className="mt-3 text-sm text-black bg-teal-50/60 inline-block px-4 py-2 rounded-lg">
                               Supported: PDF, JPG, JPEG, PNG • Max size: 10MB
                             </p>
                           </>
                         ) : (
                           <div className="text-center">
-                            <CheckCircle2 className="w-16 h-16 text-emerald-600 mx-auto mb-4" />
-                            <p className="text-emerald-800 font-semibold text-lg">
+                            <CheckCircle2 className="w-16 h-16 text-teal-600 mx-auto mb-4" />
+                            <p className="text-teal-800 font-semibold text-lg">
                               File Ready!
                             </p>
-                            <p className="text-emerald-600 text-sm">
+                            <p className="text-teal-600 text-sm">
                               Click submit when ready
                             </p>
                           </div>
@@ -431,17 +455,17 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                       </div>
 
                       {prescriptionFile && (
-                        <div className="mt-6 p-5 bg-gradient-to-r from-emerald-50/90 to-green-50/90 rounded-xl border-2 border-emerald-200/60 shadow-sm">
+                        <div className="mt-6 p-5 bg-gradient-to-r from-teal-50/90 to-teal-100/90 rounded-xl border-2 border-teal-200/60 shadow-sm">
                           <div className="flex justify-between items-start gap-4">
                             <div className="flex items-center gap-4 flex-1">
-                              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-emerald-100">
+                              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-teal-100">
                                 {getFileIcon(prescriptionFile.type)}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-emerald-800 font-semibold truncate text-lg">
+                                <p className="text-teal-800 font-semibold truncate text-lg">
                                   {prescriptionFile.name}
                                 </p>
-                                <p className="text-emerald-600 text-sm mt-1">
+                                <p className="text-teal-600 text-sm mt-1">
                                   {formatFileSize(prescriptionFile.size)} •{" "}
                                   {prescriptionFile.type.includes("pdf")
                                     ? "PDF Document"
@@ -478,7 +502,7 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                     <button
                       onClick={handleSubmit}
                       disabled={isSubmitting || !prescriptionFile}
-                      className="w-full cursor-pointer mt-10 px-5 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl font-semibold text-lg tracking-wide hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center transform disabled:transform-none"
+                      className="w-full cursor-pointer mt-10 px-5 py-3 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl font-semibold text-lg tracking-wide hover:from-teal-700 hover:to-teal-800 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center transform disabled:transform-none"
                     >
                       {isSubmitting ? (
                         <>

@@ -87,9 +87,9 @@ const RefundPolicyDialog = ({ open, onClose }) => {
           onClick={onClose}
           variant="contained"
           sx={{
-            backgroundColor: "#4CAF50",
+            backgroundColor: "#00897B",  
             color: "#fff",
-            "&:hover": { backgroundColor: "#388E3C" },
+            "&:hover": { backgroundColor: "#00796B" },  
             borderRadius: "20px",
             px: 4,
             py: 1,
@@ -129,15 +129,15 @@ const PaymentView = () => {
       <div className="flex flex-col space-y-12 flex-1 min-w-[320px] max-w-[480px]">
         {/* Payment Method Selection */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-shadow duration-300">
-          <div className="h-1 bg-gradient-to-r from-green-400 to-green-600 rounded-full mb-6"></div>
+          <div className="h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mb-6"></div>
           <h2 className="text-xl font-bold text-gray-800 mb-6">Choose Payment Method</h2>
           
           <div className="flex flex-col space-y-4">
             <button
               className={`${buttonBaseClass} ${
                 selectedMethod === "location"
-                  ? "bg-green-200 border-green-600 text-green-800 shadow-lg ring-2 ring-green-200"
-                  : "bg-white border-black text-black hover:bg-green-100 hover:border-green-600 hover:text-green-700"
+                  ? "bg-teal-200 border-teal-600 text-teal-800 shadow-lg ring-2 ring-teal-200"
+                  : "bg-white border-black text-black hover:bg-green-100 hover:border-teal-600 hover:text-teal-700"
               }`}
               onClick={() => setSelectedMethod("location")}
             >
@@ -153,8 +153,8 @@ const PaymentView = () => {
             <button
               className={`${buttonBaseClass} ${
                 selectedMethod === "online"
-                  ? "bg-green-200 border-green-600 text-green-800 shadow-lg ring-2 ring-green-200"
-                  : "bg-white border-black text-black hover:bg-green-100 hover:border-green-600 hover:text-green-700"
+                  ? "bg-teal-200 border-teal-600 text-teal-800 shadow-lg ring-2 ring-teal-200"
+                  : "bg-white border-black text-black hover:bg-teal-100 hover:border-teal-600 hover:text-teal-700"
               }`}
               onClick={() => setSelectedMethod("online")}
             >
@@ -170,7 +170,7 @@ const PaymentView = () => {
           {/* Refund Policy Button */}
           <div className="mt-6 text-center">
             <button
-              className="px-4 py-2 border border-green-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center mx-auto min-w-[180px] transition-all duration-200"
+              className="px-4 py-2 border border-teal-300 rounded-md text-white bg-teal-600 hover:bg-teal-700 shadow-sm flex justify-center items-center mx-auto min-w-[180px] transition-all duration-200"
               onClick={() => setRefundPolicyOpen(true)}
             >
               <InfoOutlinedIcon sx={{ fontSize: 18, mr: 1 }} />

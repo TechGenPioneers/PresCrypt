@@ -6,15 +6,15 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
 
   return (
     <div className="fixed bg-[#ffffffc0] backdrop-blur-sm inset-0 flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-[#E9FAF2] to-[#E9FAF2]/80 rounded-3xl shadow-2xl p-2 max-w-4xl w-full border border-[#094A4D]/20">
-        <div className="bg-white p-8 rounded-2xl flex flex-col md:flex-row relative shadow-lg border border-[#094A4D]/20">
+      <div className="bg-gradient-to-br from-teal-50 to-teal-50/80 rounded-3xl shadow-2xl p-2 max-w-4xl w-full border border-teal-500/20">
+        <div className="bg-white p-8 rounded-2xl flex flex-col md:flex-row relative shadow-lg border border-teal-500/20">
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 p-2 hover:bg-[#E9FAF2] rounded-full cursor-pointer transition-all duration-200 group z-10"
+            className="absolute top-6 right-6 p-2 hover:bg-teal-50 rounded-full cursor-pointer transition-all duration-200 group z-10"
             aria-label="Close modal"
           >
-            <X className="w-6 h-6 text-[#094A4D]/60 group-hover:text-[#094A4D] transition-colors duration-200" />
+            <X className="w-6 h-6 text-teal-500/60 group-hover:text-teal-500 transition-colors duration-200" />
           </button>
 
           {/* Patient Info Section */}
@@ -23,16 +23,16 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
             <div className="w-1/2 space-y-6">
               {/* Header */}
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl shadow-lg">
+                <div className="p-3 bg-gradient-to-r from-teal-500 to-teal-600 rounded-2xl shadow-lg">
                   <User className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-[#094A4D]">
+                <h2 className="text-2xl font-bold text-teal-800">
                   Patient Details
                 </h2>
               </div>
 
               {/* Patient Profile Card */}
-              <div className="bg-gradient-to-r from-[#E9FAF2]/50 to-[#E9FAF2]/30 p-6 rounded-2xl border border-[#094A4D]/20 shadow-sm">
+              <div className="bg-gradient-to-r from-teal-50/50 to-teal-50/30 p-6 rounded-2xl border border-teal-500/20 shadow-sm">
                 <div className="flex items-center gap-6">
                   {/* Profile Image */}
                   <div className="relative">
@@ -43,7 +43,7 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                           : "/patient.png"
                       }
                       alt="Profile"
-                      className="w-40 h-40 rounded-full border-2 border-[#094A4D]/20 shadow-sm object-cover object-top bg-white"
+                      className="w-40 h-40 rounded-full border-2 border-teal-500/20 shadow-sm object-cover object-top bg-white"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = "/patient.png";
@@ -53,7 +53,7 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
 
                   {/* Patient Info */}
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-emerald-600 mb-2">
+                    <h3 className="text-xl font-bold text-teal-600 mb-2">
                       {patient.patientName}
                     </h3>
                     <div className="space-y-1">
@@ -64,8 +64,8 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                         years old
                       </p>
                       <div className="flex items-center gap-2 mt-3">
-                        <div className="p-1.5 bg-[#094A4D]/10 rounded-lg">
-                          <CreditCard className="w-4 h-4 text-emerald-600" />
+                        <div className="p-1.5 bg-teal-500/10 rounded-lg">
+                          <CreditCard className="w-4 h-4 text-teal-500" />
                         </div>
                         <p className="text-sm text-black font-medium">
                           ID: {patient.patientId}
@@ -80,25 +80,25 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
             {/* Right Side - Hospital & Visit Info */}
             <div className="w-1/2 space-y-6">
               {/* Hospital Information */}
-              <div className="bg-gradient-to-r from-[#E9FAF2]/50 to-[#E9FAF2]/30 p-6 rounded-2xl border border-[#094A4D]/20 shadow-sm">
+              <div className="bg-gradient-to-r from-teal-50/50 to-teal-50/30 p-6 rounded-2xl border border-teal-500/20 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-[#094A4D]/10 rounded-xl">
-                    <Building2 className="w-5 h-5 text-[#094A4D]" />
+                  <div className="p-2 bg-teal-500/10 rounded-xl">
+                    <Building2 className="w-5 h-5 text-teal-500" />
                   </div>
-                  <h3 className="text-lg font-bold text-[#094A4D]">Hospital</h3>
+                  <h3 className="text-lg font-bold text-teal-800">Hospital</h3>
                 </div>
-                <p className="text-[#094A4D] font-semibold text-lg pl-2">
+                <p className="text-teal-800 font-semibold text-lg pl-2">
                   {patient.hospitalName}
                 </p>
               </div>
 
               {/* Last Visit Information */}
-              <div className="bg-gradient-to-r from-[#E9FAF2]/50 to-[#E9FAF2]/30 p-6 rounded-2xl border border-[#094A4D]/20 shadow-sm">
+              <div className="bg-gradient-to-r from-teal-50/50 to-teal-50/30 p-6 rounded-2xl border border-teal-500/20 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-[#094A4D]/10 rounded-xl">
-                    <Calendar className="w-5 h-5 text-[#094A4D]" />
+                  <div className="p-2 bg-teal-500/10 rounded-xl">
+                    <Calendar className="w-5 h-5 text-teal-500" />
                   </div>
-                  <h3 className="text-lg font-bold text-[#094A4D]">
+                  <h3 className="text-lg font-bold text-teal-800">
                     Last Visit
                   </h3>
                 </div>
@@ -106,12 +106,12 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
                 <div className="space-y-3 pl-2">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-[#094A4D]/60" />
-                      <span className="text-sm font-medium text-[#094A4D]/70">
+                      <Calendar className="w-4 h-4 text-teal-500/60" />
+                      <span className="text-sm font-medium text-teal-500/70">
                         Date:
                       </span>
                     </div>
-                    <span className="text-[#094A4D] font-semibold">
+                    <span className="text-teal-800 font-semibold">
                       {new Date(patient.date).toLocaleString([], {
                         year: "numeric",
                         month: "numeric",
@@ -122,12 +122,12 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
 
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-[#094A4D]/60" />
-                      <span className="text-sm font-medium text-[#094A4D]/70">
+                      <Clock className="w-4 h-4 text-teal-500/60" />
+                      <span className="text-sm font-medium text-teal-500/70">
                         Time:
                       </span>
                     </div>
-                    <span className="text-[#094A4D] font-semibold">
+                    <span className="text-teal-800 font-semibold">
                       {patient.time}
                     </span>
                   </div>

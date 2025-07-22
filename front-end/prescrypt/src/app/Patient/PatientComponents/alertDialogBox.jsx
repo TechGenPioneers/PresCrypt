@@ -49,12 +49,12 @@ const AlertDialogBox = ({ open, onClose, message }) => {
         className="flex flex-col items-center text-center"
         sx={{ padding: "8px 16px 16px 16px" }}
       >
-        <WarningAmberOutlinedIcon sx={{ fontSize: 56, color: "#047857", mb: 1.5 }} />
+        <WarningAmberOutlinedIcon sx={{ fontSize: 56, color: "#00897B", mb: 1.5 }} />
         <Typography
           variant="h6"
           sx={{ 
             fontWeight: "600", 
-            color: "#047857",
+            color: "#00897B",        
             fontSize: "1.1rem",
             mb: 1
           }}
@@ -79,19 +79,18 @@ const AlertDialogBox = ({ open, onClose, message }) => {
           onClick={onClose}
           variant="contained"
           sx={{
-            backgroundColor: "#2e7d32",
+            backgroundColor: "#00897B", 
             color: "#fff",
-            "&:hover": { backgroundColor: "#1b5e20" },
             borderRadius: "20px",
             px: 4,
             py: 1,
             fontWeight: "600",
             fontSize: "0.9rem",
             textTransform: "none",
-            boxShadow: "0px 3px 8px rgba(46, 125, 50, 0.3)",
+            boxShadow: "0px 3px 8px rgba(0, 137, 123, 0.3)", 
             "&:hover": { 
-              backgroundColor: "#1b5e20",
-              boxShadow: "0px 4px 12px rgba(46, 125, 50, 0.4)"
+              backgroundColor: "#00796B", 
+              boxShadow: "0px 4px 12px rgba(0, 121, 107, 0.4)" 
             }
           }}
         >

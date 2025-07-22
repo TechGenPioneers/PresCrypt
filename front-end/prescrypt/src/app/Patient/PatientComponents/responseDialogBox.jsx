@@ -135,7 +135,7 @@ const ResponseDialogBox = ({
         <div className="text-left w-full space-y-3">
           {/* Payment Method Info */}
           {paymentMethod && (
-            <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg">
+            <div className="bg-teal-50 border-l-4 border-teal-400 p-3 rounded-r-lg">
               <Typography
                 variant="body2"
                 sx={{ color: "#2E7D32", fontWeight: "500", fontSize: "0.9rem" }}
@@ -147,7 +147,7 @@ const ResponseDialogBox = ({
 
           {/* Appointment Date & Time Info */}
           {appointmentDate && appointmentTime && (
-            <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg">
+            <div className="bg-teal-50 border-l-4 border-teal-400 p-3 rounded-r-lg">
               <Typography
                 variant="body2"
                 sx={{ color: "#2E7D32", fontWeight: "500", fontSize: "0.9rem" }}
@@ -190,16 +190,17 @@ const ResponseDialogBox = ({
           onClick={onClose}
           variant="contained"
           sx={{
-            backgroundColor: "#4CAF50",
+            backgroundColor: "#0d9488", 
             color: "#fff",
-            "&:hover": { backgroundColor: "#388E3C" },
+            "&:hover": { backgroundColor: "#0f766e" }, 
             borderRadius: "20px",
             px: 4,
             py: 1,
             fontWeight: "600",
             fontSize: "0.9rem",
             textTransform: "none",
-            boxShadow: "0px 3px 8px rgba(76, 175, 80, 0.3)",
+            boxShadow: "0px 3px 8px rgba(13, 148, 136, 0.3)", 
+
           }}
         >
           Close

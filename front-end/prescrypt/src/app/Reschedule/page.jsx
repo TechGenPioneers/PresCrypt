@@ -67,7 +67,7 @@ export default function AppointmentConfirmation() {
               <button
                 onClick={() => handleAction("confirm")}
                 disabled={status === "loading"}
-                className={`bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-[10px] cursor-pointer ${
+                className={`bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-[10px] cursor-pointer${
                   status === "loading" ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
