@@ -97,3 +97,24 @@ export const getAppointmentSummary = async (patientId) => {
     throw error;
   }
 };
+
+
+export const updateCancelStatus = async (patientId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/Patient/update-cancel-status/${patientId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Failed to update cancel status");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Cancel status update failed:", error);
+    throw error;
+  }
+};
+

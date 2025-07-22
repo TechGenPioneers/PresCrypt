@@ -174,12 +174,12 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
         body: JSON.stringify({
           amount: totalCharge,
           item: `Booking for Dr. ${doctorName} on ${appointmentDate}`,
-          first_name: "Dewmin",
-          last_name: "Deniyegedara",
+          first_name: "PresCrypt",
+          last_name: "Healthcare",
           email,
-          phone: "0771234567",
-          address: "Colombo 07",
-          city: "Colombo",
+          phone: "0762085246",
+          address: "University of Moratuwa",
+          city: "Moratuwa",
           country: "Sri Lanka",
         }),
       });
