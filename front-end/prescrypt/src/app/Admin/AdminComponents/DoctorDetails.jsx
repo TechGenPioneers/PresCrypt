@@ -24,6 +24,7 @@ export default function DoctorDetails({ doctorID }) {
   const [payAmount, setPayAmount] = useState(0);
   const [isPaying, setIsPaying] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+   const [error, setError] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -180,11 +181,23 @@ export default function DoctorDetails({ doctorID }) {
   };
   const handlePayDoctor = async () => {
     console.log("pay", payAmount);
-    setIsPaying(true);
+     setPaymentSuccess(false);
+    if (
+      !payAmount ||
+      Number(payAmount) <= 0 ||
+      Number(payAmount) > doctor.doctor.totalAmtToPay
+    ) {
+      setPaymentSuccess(false);
+      setIsPaying(false);
+      setError("Please enter a valid amount.")
+      return;
+    }
+   
     setPaymentSuccess(false);
     try {
       // Simulate API call
       await PayAmount(doctor.doctor.doctorId, payAmount);
+      setError("")
       fetchDoctor();
       setPaymentSuccess(true);
     } catch (err) {
@@ -323,6 +336,11 @@ export default function DoctorDetails({ doctorID }) {
                     {paymentSuccess && (
                       <p className="mt-3 text-sm text-green-700 text-center font-medium">
                         Payment successful!
+                      </p>
+                    )}
+                    {error && (
+                      <p className="mt-3 text-sm text-red-700 text-center font-medium">
+                       {error}
                       </p>
                     )}
                   </div>
