@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import { green } from '@mui/material/colors';
+import { teal } from '@mui/material/colors';
 
 export default function LoadingSpinner() {
   const [progress, setProgress] = React.useState(0);
@@ -47,7 +48,7 @@ export default function LoadingSpinner() {
     >
       <Typography
         variant="h6"
-        sx={{ mb: 2, color: green[900], fontWeight: 'bold' }}
+        sx={{ mb: 2, color: '#004D40', fontWeight: 'bold' }}
       >
         Hang tight, we are working on it...
       </Typography>
@@ -58,12 +59,12 @@ export default function LoadingSpinner() {
         sx={{
           height: 10,
           borderRadius: 5,
-          backgroundColor: green[100],
+          backgroundColor: teal[100],
           '& .MuiLinearProgress-bar': {
-            backgroundColor: green[700],
+            backgroundColor: teal[700],
           },
           '& .MuiLinearProgress-barBuffer': {
-            backgroundColor: green[300],
+            backgroundColor: teal[300],
           },
         }}
       />

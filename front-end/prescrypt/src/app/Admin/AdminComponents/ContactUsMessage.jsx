@@ -119,8 +119,38 @@ const MessageTable = () => {
     }`;
   };
 
+  const [showModel, setShowModel] = useState(true);
+
+  useEffect(() => {
+    // Minimum 5 second delay
+    const timer = setTimeout(() => {
+      setShowModel(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // set date and time
+  if (showModel || !messages) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 border-4 border-[#E9FAF2] border-t-[#50d094] rounded-full animate-spin"></div>
+          <p className="text-slate-600 text-lg font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  function getUnreadCount(messages) {
+    return messages.reduce(
+      (count, msg) => (!msg.isRead ? count + 1 : count),
+      0
+    );
+  }
+
+  const unreadCount = getUnreadCount(messages);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -150,27 +180,34 @@ const MessageTable = () => {
               </button>
             ))}
           </div>
-
-          <div className="flex flex-wrap gap-3">
-            <span className="text-sm font-medium text-slate-600 flex items-center">
-              Status:
-            </span>
-            {["all", "read", "unread"].map((status) => (
-              <button
-                key={status}
-                onClick={() => setReadFilter(status)}
-                className={getFilterButtonClass(readFilter === status)}
-              >
-                {status === "all"
-                  ? "All Messages"
-                  : status === "read"
-                  ? "Read"
-                  : "Unread"}
-              </button>
-            ))}
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3">
+              <span className="text-sm font-medium text-slate-600 flex items-center">
+                Status:
+              </span>
+              {["all", "read", "unread"].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setReadFilter(status)}
+                  className={getFilterButtonClass(readFilter === status)}
+                >
+                  {status === "all"
+                    ? "All Messages"
+                    : status === "read"
+                    ? "Read"
+                    : "Unread"}
+                </button>
+              ))}
+            </div>
+            {/* Unread Count */}
+            <div className="text-sm text-slate-500 whitespace-nowrap ml-auto">
+              Unread Messages:{" "}
+              <span className="font-semibold text-slate-700">
+                {unreadCount}
+              </span>
+            </div>
           </div>
         </div>
-
         {/* Messages Grid */}
         <div className="grid gap-4 max-h-[600px] overflow-y-auto">
           {filteredMessages.map((msg) => (
@@ -379,9 +416,7 @@ const MessageTable = () => {
                       <Check className="w-5 h-5 text-green-600" />
                       <p className="text-green-800 font-medium">
                         Message already read
-                        {selected.replyMessage
-                          ? " With Message"
-                          : ""}
+                        {selected.replyMessage ? " With Message" : ""}
                       </p>
                     </div>
                   </div>

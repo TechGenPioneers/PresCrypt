@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { ChevronDown, Search, Plus, Trash2 } from "lucide-react";
 import { Button } from "@mui/material";
@@ -45,6 +44,104 @@ export default function HospitalScheduleForm({
     fetchHospitals();
   }, []);
 
+  // Helper function to convert time string to minutes for comparison
+  const timeToMinutes = (timeStr) => {
+    if (!timeStr) return 0;
+    const [time, period] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+    
+    if (period === 'PM' && hours !== 12) {
+      hours += 12;
+    } else if (period === 'AM' && hours === 12) {
+      hours = 0;
+    }
+    
+    return hours * 60 + minutes;
+  };
+
+  // Helper function to check if two time ranges overlap
+  const timeRangesOverlap = (start1, end1, start2, end2) => {
+    const start1Minutes = timeToMinutes(start1);
+    const end1Minutes = timeToMinutes(end1);
+    const start2Minutes = timeToMinutes(start2);
+    const end2Minutes = timeToMinutes(end2);
+
+    return start1Minutes < end2Minutes && start2Minutes < end1Minutes;
+  };
+
+  // Function to get booked time slots for a specific day (excluding current hospital being edited)
+  const getBookedTimeSlotsForDay = (day) => {
+    const bookedSlots = [];
+    
+    // Check existing hospital schedules
+    formData.hospitalSchedules.forEach(schedule => {
+      // Skip if this is the same hospital we're currently editing
+      if (schedule.hospitalId === currentSchedule?.hospitalId) return;
+      
+      if (schedule.availability[day]) {
+        bookedSlots.push({
+          startTime: schedule.availability[day].startTime,
+          endTime: schedule.availability[day].endTime,
+          hospitalName: schedule.hospitalName
+        });
+      }
+    });
+
+    return bookedSlots;
+  };
+
+  // Function to check if a specific time is available
+  const isTimeSlotAvailable = (day, startTime, endTime) => {
+    if (!startTime || !endTime) return true;
+    
+    const bookedSlots = getBookedTimeSlotsForDay(day);
+    
+    return !bookedSlots.some(slot => 
+      timeRangesOverlap(startTime, endTime, slot.startTime, slot.endTime)
+    );
+  };
+
+  // Function to get filtered time options based on availability
+  const getAvailableTimeOptions = (day, timeType) => {
+    const bookedSlots = getBookedTimeSlotsForDay(day);
+    
+    if (bookedSlots.length === 0) {
+      return timeOptions;
+    }
+
+    return timeOptions.filter(time => {
+      // For start time selection, check if this time would conflict when paired with any end time
+      if (timeType === 'start') {
+        const currentEndTime = currentSchedule?.availability?.[day]?.endTime;
+        if (currentEndTime) {
+          // Check if the current start-end combination conflicts
+          return isTimeSlotAvailable(day, time, currentEndTime);
+        } else {
+          // If no end time selected yet, allow all times that don't start during booked periods
+          return !bookedSlots.some(slot => {
+            const timeMinutes = timeToMinutes(time);
+            const slotStartMinutes = timeToMinutes(slot.startTime);
+            const slotEndMinutes = timeToMinutes(slot.endTime);
+            return timeMinutes >= slotStartMinutes && timeMinutes < slotEndMinutes;
+          });
+        }
+      } else {
+        // For end time selection
+        const currentStartTime = currentSchedule?.availability?.[day]?.startTime;
+        if (currentStartTime) {
+          return isTimeSlotAvailable(day, currentStartTime, time);
+        } else {
+          return !bookedSlots.some(slot => {
+            const timeMinutes = timeToMinutes(time);
+            const slotStartMinutes = timeToMinutes(slot.startTime);
+            const slotEndMinutes = timeToMinutes(slot.endTime);
+            return timeMinutes > slotStartMinutes && timeMinutes <= slotEndMinutes;
+          });
+        }
+      }
+    });
+  };
+
   const filteredHospitals = hospitals.filter(
     (h) =>
       h.hospitalName.toLowerCase().includes(hospitalSearchTerm.toLowerCase()) ||
@@ -53,37 +150,82 @@ export default function HospitalScheduleForm({
 
   const handleDayAvailability = (day, isSelected) => {
     setCurrentSchedule((prev) => ({
-      ...prev,
+      ...(prev || {}),
       availability: {
-        ...prev.availability,
+        ...(prev?.availability || {}),
         [day]: isSelected ? { startTime: "", endTime: "" } : undefined,
       },
     }));
   };
 
   const updateDayTimeSlot = (day, field, value) => {
-    setCurrentSchedule((prev) => ({
-      ...prev,
-      availability: {
-        ...prev.availability,
+    setCurrentSchedule((prev) => {
+      const prevData = prev || {};
+      const prevAvailability = prevData.availability || {};
+      
+      const newAvailability = {
+        ...prevAvailability,
         [day]: {
-          ...prev.availability[day],
+          ...(prevAvailability[day] || {}),
           [field]: value,
         },
-      },
+      };
+
+      // Clear the other field if the new time selection would cause a conflict
+      if (field === 'startTime') {
+        const endTime = prevAvailability[day]?.endTime;
+        if (endTime && !isTimeSlotAvailable(day, value, endTime)) {
+          newAvailability[day].endTime = "";
+        }
+      } else if (field === 'endTime') {
+        const startTime = prevAvailability[day]?.startTime;
+        if (startTime && !isTimeSlotAvailable(day, startTime, value)) {
+          newAvailability[day].startTime = "";
+        }
+      }
+
+      return {
+        ...prevData,
+        availability: newAvailability,
+      };
+    });
+
+    // Clear any existing time conflict errors
+    setErrors((prev) => ({
+      ...prev,
+      [`${day}_timeConflict`]: "",
     }));
   };
 
   const addHospitalSchedule = () => {
     const newErrors = {};
-    if (!currentSchedule.hospitalId) newErrors.hospitalSchedule = "Hospital is required";
+    if (!currentSchedule?.hospitalId) newErrors.hospitalSchedule = "Hospital is required";
 
-    const hasValidAvailability = Object.values(currentSchedule.availability).some(
+    const hasValidAvailability = currentSchedule?.availability && Object.values(currentSchedule.availability).some(
       (times) => times?.startTime && times?.endTime
     );
 
     if (!hasValidAvailability) {
       newErrors.hospitalSchedule = "At least one availability slot required";
+    }
+
+    // Check for time conflicts before adding
+    let hasTimeConflict = false;
+    if (currentSchedule?.availability) {
+      Object.entries(currentSchedule.availability).forEach(([day, times]) => {
+        if (times?.startTime && times?.endTime) {
+          if (!isTimeSlotAvailable(day, times.startTime, times.endTime)) {
+            const bookedSlots = getBookedTimeSlotsForDay(day);
+            const conflictingSlot = bookedSlots.find(slot => 
+              timeRangesOverlap(times.startTime, times.endTime, slot.startTime, slot.endTime)
+            );
+            
+            newErrors[`${day}_timeConflict`] = 
+              `Time conflict on ${day}: ${times.startTime}-${times.endTime} overlaps with ${conflictingSlot?.hospitalName} (${conflictingSlot?.startTime}-${conflictingSlot?.endTime})`;
+            hasTimeConflict = true;
+          }
+        }
+      });
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -95,7 +237,7 @@ export default function HospitalScheduleForm({
       hospitalId: currentSchedule.hospitalId,
       hospitalName: currentSchedule.hospital,
       availability: Object.fromEntries(
-        Object.entries(currentSchedule.availability)
+        Object.entries(currentSchedule.availability || {})
           .filter(([_, times]) => times?.startTime && times?.endTime)
           .map(([day, times]) => [
             day,
@@ -136,14 +278,14 @@ export default function HospitalScheduleForm({
         <div className="relative mb-6">
           <button
             className={`w-full p-3 border rounded-lg bg-white text-left text-sm flex justify-between items-center ${
-              !currentSchedule.hospital ? "border-red-500" : "border-gray-300"
+              !currentSchedule?.hospital ? "border-red-500" : "border-gray-300"
             }`}
             onClick={() => {
               setShowHospitalDropdown(!showHospitalDropdown);
               setHospitalSearchTerm("");
             }}
           >
-            {currentSchedule.hospital || "Select Hospital"}
+            {currentSchedule?.hospital || "Select Hospital"}
             <ChevronDown size={18} className="text-gray-600" />
           </button>
           {showHospitalDropdown && (
@@ -171,11 +313,11 @@ export default function HospitalScheduleForm({
                       key={hospital.hospitalId}
                       className="p-3 hover:bg-gray-100 cursor-pointer text-sm"
                       onClick={() => {
-                        setCurrentSchedule({
-                          ...currentSchedule,
+                        setCurrentSchedule(prev => ({
+                          ...(prev || {}),
                           hospital: hospital.hospitalName,
                           hospitalId: hospital.hospitalId,
-                        });
+                        }));
                         setShowHospitalDropdown(false);
                       }}
                     >
@@ -191,7 +333,7 @@ export default function HospitalScheduleForm({
               </div>
             </div>
           )}
-          {!currentSchedule.hospital && errors.hospitalSchedule && (
+          {!currentSchedule?.hospital && errors.hospitalSchedule && (
             <p className="text-red-500 text-xs mt-1">{errors.hospitalSchedule}</p>
           )}
         </div>
@@ -201,64 +343,94 @@ export default function HospitalScheduleForm({
             Availability
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {daysOfWeek.map((day) => (
-              <div
-                key={day}
-                className="p-2 bg-white rounded-lg border border-gray-200 hover:border-teal-200 hover:shadow-sm transition-all"
-              >
-                <label className="flex items-center gap-3 cursor-pointer text-sm font-medium text-gray-600">
-                  <input
-                    type="checkbox"
-                    checked={!!currentSchedule.availability[day]}
-                    onChange={(e) => handleDayAvailability(day, e.target.checked)}
-                    className="w-4 h-4 accent-green-800 rounded"
-                  />
-                  <span>{day}</span>
-                </label>
-                {currentSchedule.availability[day] && (
-                  <div className="mt-1 ml-0 flex flex-col gap-1 p-0 bg-white rounded">
-                    <div>
-                      <label className="text-xs font-medium text-gray-300 block mb-2">
-                        Start Time
-                      </label>
-                      <select
-                        value={currentSchedule.availability[day].startTime}
-                        onChange={(e) =>
-                          updateDayTimeSlot(day, "startTime", e.target.value)
-                        }
-                        className="w-full p-2 border rounded text-sm bg-white text-gray-800 focus:outline-none focus:border-teal-200 focus:ring-2 focus:ring-teal-100"
-                      >
-                        <option value="">Select Start Time</option>
-                        {timeOptions.map((time) => (
-                          <option key={`${day}-start-${time}`} value={time}>
-                            {time}
-                          </option>
-                        ))}
-                      </select>
+            {daysOfWeek.map((day) => {
+              const bookedSlots = getBookedTimeSlotsForDay(day);
+              const hasBookedSlots = bookedSlots.length > 0;
+              
+              return (
+                <div
+                  key={day}
+                  className="p-2 bg-white rounded-lg border border-gray-200 hover:border-teal-200 hover:shadow-sm transition-all"
+                >
+                  <label className="flex items-center gap-3 cursor-pointer text-sm font-medium text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={!!currentSchedule?.availability?.[day]}
+                      onChange={(e) => handleDayAvailability(day, e.target.checked)}
+                      className="w-4 h-4 accent-green-800 rounded"
+                    />
+                    <span>{day}</span>
+                    {hasBookedSlots && (
+                      <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+                        {bookedSlots.length} booked
+                      </span>
+                    )}
+                  </label>
+                  
+                  {/* Show existing bookings for this day */}
+                  {hasBookedSlots && currentSchedule?.availability?.[day] && (
+                    <div className="mt-2 mb-2">
+                      <div className="text-xs text-gray-500 mb-1">Already booked:</div>
+                      {bookedSlots.map((slot, index) => (
+                        <div key={index} className="text-xs bg-red-50 text-red-700 p-1 rounded mb-1">
+                          {slot.startTime} - {slot.endTime} at {slot.hospitalName}
+                        </div>
+                      ))}
                     </div>
-                    <div>
-                      <label className="text-xs font-medium text-gray-300 block mb-1">
-                        End Time
-                      </label>
-                      <select
-                        value={currentSchedule.availability[day].endTime}
-                        onChange={(e) =>
-                          updateDayTimeSlot(day, "endTime", e.target.value)
-                        }
-                        className="w-full p-2 border rounded text-sm bg-white text-gray-800 focus:outline-none focus:border-teal-200 focus:ring-2 focus:ring-teal-100"
-                      >
-                        <option value="">Select End Time</option>
-                        {timeOptions.map((time) => (
-                          <option key={`${day}-end-${time}`} value={time}>
-                            {time}
-                          </option>
-                        ))}
-                      </select>
+                  )}
+
+                  {currentSchedule?.availability?.[day] && (
+                    <div className="mt-1 ml-0 flex flex-col gap-1 p-0 bg-white rounded">
+                      <div>
+                        <label className="text-xs font-medium text-gray-300 block mb-2">
+                          Start Time
+                        </label>
+                        <select
+                          value={currentSchedule.availability[day].startTime || ""}
+                          onChange={(e) =>
+                            updateDayTimeSlot(day, "startTime", e.target.value)
+                          }
+                          className="w-full p-2 border rounded text-sm bg-white text-gray-800 focus:outline-none focus:border-teal-200 focus:ring-2 focus:ring-teal-100"
+                        >
+                          <option value="">Select Start Time</option>
+                          {getAvailableTimeOptions(day, 'start').map((time) => (
+                            <option key={`${day}-start-${time}`} value={time}>
+                              {time}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-300 block mb-1">
+                          End Time
+                        </label>
+                        <select
+                          value={currentSchedule.availability[day].endTime || ""}
+                          onChange={(e) =>
+                            updateDayTimeSlot(day, "endTime", e.target.value)
+                          }
+                          className="w-full p-2 border rounded text-sm bg-white text-gray-800 focus:outline-none focus:border-teal-200 focus:ring-2 focus:ring-teal-100"
+                        >
+                          <option value="">Select End Time</option>
+                          {getAvailableTimeOptions(day, 'end').map((time) => (
+                            <option key={`${day}-end-${time}`} value={time}>
+                              {time}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      {/* Display time conflict error for this specific day */}
+                      {errors[`${day}_timeConflict`] && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors[`${day}_timeConflict`]}
+                        </p>
+                      )}
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
         <Button

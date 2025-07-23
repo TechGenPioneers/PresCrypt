@@ -6,8 +6,10 @@ import Footer from "../../Components/footer/Footer";
 import NavBar from "../PatientComponents/navBar";
 import Chatbot from "../ChatbotComponents/chatbot";
 import Image from 'next/image';
+import useAuthGuard from "@/utils/useAuthGuard";
 
 const HelpUsPage = () => {
+  useAuthGuard(["Patient"]); // Ensure only authenticated patients can access this component
   const [price, setPrice] = useState(0);
   const [currentSentence, setCurrentSentence] = useState(0);
   const [payhereReady, setPayhereReady] = useState(false);
@@ -116,7 +118,7 @@ const HelpUsPage = () => {
   };
 
   return (
-  <div className="min-h-screen flex flex-col bg-gray-50">
+  <div className="min-h-screen flex flex-col">
     <div className="flex flex-grow">
      
 
@@ -126,7 +128,7 @@ const HelpUsPage = () => {
         <div className="flex-1 space-y-6">
 
             {/* Dynamic Text Section */}
-            <h2 className="text-3xl font-bold text-green-700 mb-2 text-center lg:text-left">
+            <h2 className="text-3xl font-bold text-teal-600 mb-2 text-center lg:text-left">
                Contribute to Us
             </h2>
 
@@ -141,16 +143,16 @@ const HelpUsPage = () => {
           {/* Our Mission Section */}
             <div className="flex flex-col lg:flex-row items-center gap-10">
             {/* Text */}
-            <div className="flex-1 border border-green-300 rounded-lg p-6 bg-green-50 shadow-sm">
+            <div className="flex-1 border border-teal-300 rounded-lg p-6 bg-white shadow-sm">
                 <h3 className="text-xl font-semibold text-green-700 mb-4">Our Mission</h3>
                 <p className="text-gray-800 text-base leading-relaxed font-serif">
-                Our mission is to simplify prescription management for patients and give doctors quick, easy access to health data. We improve appointment booking process faster and smarter. Using AI we simplified the navigation and simple user queires more helpful for patients. While now focusing on connecting doctors and patients, we plan to expand the platform to hospitals and pharmacies. This will create a complete, seamless healthcare network. Ultimately, we aim to build a more efficient and connected healthcare system that benefits everyone involved.
+                Our mission is to simplify healthcare by making prescriptions, appointments, and doctor-patient connections faster, smarter, and more accessible while intergrating AI options and ensuring the highest standards of security and privacy.
                 </p>
             </div>
             {/* Image */}
             <div className="w-full lg:w-1/2 relative rounded shadow overflow-hidden h-64">
                 <Image
-                src="/OurMission.jpg"
+                src="/OurMission.png"
                 alt="Our Mission"
                 fill
                 className="object-contain rounded"
@@ -163,14 +165,14 @@ const HelpUsPage = () => {
             {/* Image */}
             <div className="w-full lg:w-1/2 relative rounded shadow overflow-hidden h-64">
                 <Image
-                src="/OurStory.jpg"
+                src="/OurStory.png"
                 alt="Our Story"
                 fill
                 className="object-cover rounded"
                 />
             </div>
             {/* Text */}
-            <div className="flex-1 order-1 lg:order-2 border border-green-300 rounded-lg p-6 bg-green-50 shadow-sm">
+            <div className="flex-1 order-1 lg:order-2 border border-teal-300 rounded-lg p-6 bg-white shadow-sm">
                 <h3 className="text-xl font-semibold text-green-700 mb-4">Our Story</h3>
                 <p className="text-gray-800 text-base leading-relaxed font-serif">
 
@@ -185,8 +187,8 @@ const HelpUsPage = () => {
         </div>
 
         {/* Right Contribution Box */}
-        <div className="w-[450px] bg-white shadow-xl p-8 rounded-xl border border-green-300">
-          <h2 className="text-2xl font-bold text-green-600 mb-6 text-center">
+        <div className="w-[450px] bg-white shadow-xl p-8 rounded-xl border border-teal-300">
+          <h2 className="text-2xl font-bold text-teal-600 mb-6 text-center">
             Contribute to Us
           </h2>
 
@@ -223,7 +225,7 @@ const HelpUsPage = () => {
               step="100"
               value={price}
               onChange={(e) => setPrice(Number(e.target.value))}
-              className="w-full accent-green-600 cursor-pointer"
+              className="w-full accent-teal-600 cursor-pointer"
             />
             {errors.price && (
               <p className="text-red-500 text-sm mt-1">{errors.price}</p>
@@ -233,8 +235,8 @@ const HelpUsPage = () => {
           <button
               className={`w-full py-3 rounded text-white font-semibold transition flex items-center justify-center gap-2 ${
                 loading
-                  ? "bg-green-400 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700"
+                  ? "bg-teal-400 cursor-not-allowed"
+                  : "bg-teal-600 hover:bg-teal-700"
               }`}
               onClick={handleContribute}
               disabled={loading || Object.keys(errors).length > 0}

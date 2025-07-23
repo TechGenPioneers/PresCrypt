@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import styles from "./AdminReg.module.css";
+import useAuthGuard from "@/utils/useAuthGuard";
 
-export default function PatientRegistration() {
+export default function AdminRegistration() {
+  useAuthGuard(["Admin"]); // Ensure only Admin can access this page
   const router = useRouter();
   const [formData, setFormData] = useState({
     FirstName: "",
@@ -114,41 +116,7 @@ export default function PatientRegistration() {
           <h2 className={styles.title}>JOIN US FOR A HEALTHIER TOMORROW!</h2>
           <p className={styles.subtitle}>Create your account</p>
 
-          {/* Role Dropdown */}
-          <div className={styles.dropdownContainer}>
-            <button 
-              type="button"
-              className={styles.dropdownButton} 
-              onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-            >
-              {formData.role || "Choose your Role"}
-            </button>
-            {showRoleDropdown && (
-              <div className={styles.dropdownMenu}>
-                {["Patient", "Doctor"].map((role) => (
-                  <div
-                    key={role}
-                    className={styles.dropdownItem}
-                    onClick={() => {
-                      setFormData({ ...formData, role });
-                      setShowRoleDropdown(false);
-                      if (role === "Doctor") {
-                        router.push("/Auth/DoctorRegistration");
-                      } else if (role === "Patient") {
-                        router.push("/Auth/PatientRegistration");
-                      }
-                      if (errors.role) {
-                        setErrors({ ...errors, role: "" });
-                      }
-                    }}
-                  >
-                    {role}
-                  </div>
-                ))}
-              </div>
-            )}
-            {errors.role && <p className={styles.errorMessage}>{errors.role}</p>}
-          </div>
+        
 
           {/* Input Fields */}
           {[

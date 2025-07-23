@@ -14,27 +14,26 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import MedicalServicesIcon from "@mui/icons-material/MedicalServices"; // Large icon for dialog
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
+import CloseIcon from "@mui/icons-material/Close";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import {
   getNotifications,
   markAsRead,
   respondToRequest,
+  markAsResponded
 } from "../services/PatientHeaderService";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 
 export default function NotificationIcon({ patientId }) {
   const [connection, setConnection] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState(false);
-  const [responded, setResponded] = useState("");
+  const [responded, setResponded] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
-  const [responseMessage, setResponseMessage] = useState(false);
-  const [snackOpen, setSnackOpen] = useState(false);
-  const [alreadyRespondedSnackbarOpen, setAlreadyRespondedSnackbarOpen] =
-    useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
 
+  const [snackOpen, setSnackOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   useEffect(() => {
@@ -75,6 +74,7 @@ export default function NotificationIcon({ patientId }) {
               isRead: false,
               type: msg.type,
               doctorId: msg.doctorId || null,
+              isResponded: false,
             },
             ...prev,
           ]);
@@ -97,11 +97,7 @@ export default function NotificationIcon({ patientId }) {
     try {
       await markAsRead(id);
       setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === selectedNotification.id
-            ? { ...n, isRead: true, responseSent: true, accepted: accepted }
-            : n
-        )
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
       );
     } catch (err) {
       console.error("Failed to mark notification as read", err);
@@ -111,6 +107,8 @@ export default function NotificationIcon({ patientId }) {
   const confirmAccept = (notification) => {
     setSelectedNotification(notification);
     setConfirmDialog(true);
+    setResponded(false); // Reset responded state when opening dialog
+    setResponseMessage(""); // Reset response message
   };
 
   const handleResponse = async (accepted) => {
@@ -121,7 +119,7 @@ export default function NotificationIcon({ patientId }) {
 
       if (!patientId) {
         console.error("Missing patientId");
-        alert("User ID missing. Please login again.");
+        setResponseMessage("User ID missing. Please login again.");
         return;
       }
 
@@ -131,28 +129,76 @@ export default function NotificationIcon({ patientId }) {
         accepted: accepted,
       });
 
-      
-      setResponded(true); // Mark as responded
       setNotifications((prev) =>
         prev.map((n) =>
-          n.id === selectedNotification.id ? { ...n, isRead: true } : n
+          n.id === selectedNotification.id ? { ...n, isRead: true, isResponded: true } : n
         )
+      );
+
+      // Mark as responded in the backend
+      await markAsResponded(selectedNotification.id);
+
+      setResponded(true);
+      setResponseMessage(
+        accepted
+          ? "✅ Your response has been sent to the doctor."
+          : "❌ You have rejected the request from the doctor."
       );
     } catch (error) {
       console.error("Error responding to access request:", error);
-      setAlreadyRespondedSnackbarOpen(true);
-
-      setResponded(false); // Reset state on error
+      setResponseMessage("You have already sent a response to this request.");
+      setResponded(false);
     }
+  };
+
+  const formatTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 1) return 'Just now';
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
   };
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <>
-      <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
-        <Badge badgeContent={unreadCount} color="error">
-          <NotificationsIcon />
+      <IconButton 
+        color="inherit" 
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            backgroundColor: 'rgba(21, 128, 61, 0.1)',
+            transform: 'scale(1.05)'
+          }
+        }}
+      >
+        <Badge 
+          badgeContent={unreadCount} 
+          color="error"
+          sx={{
+            '& .MuiBadge-badge': {
+              backgroundColor: '#00897B', 
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '0.75rem',
+              minWidth: '20px',
+              height: '20px',
+              boxShadow: '0 2px 6px rgba(0, 137, 123, 0.3)' 
+
+            }
+          }}
+        >
+          <NotificationsIcon sx={{ fontSize: '1.4rem' }} />
         </Badge>
       </IconButton>
 
@@ -161,158 +207,356 @@ export default function NotificationIcon({ patientId }) {
         open={open}
         onClose={handleClose}
         PaperProps={{
-          style: {
-            maxHeight: 400,
-            width: 450,
-            padding: 10,
-            borderRadius: 16,
-            overflowY: "auto",
+          sx: {
+            maxHeight: 450,
+            width: 420,
+            borderRadius: '16px',
+            boxShadow: '0px 6px 30px rgba(0, 0, 0, 0.15)',
+            border: '1px solid #dcfce7',
+            overflow: 'hidden',
+            mt: 1
           },
         }}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <Box display="flex" alignItems="center" px={1} mb={1}>
-          <Typography variant="h6" fontWeight="bold">
+        <Box 
+          sx={{ 
+            backgroundColor: '#00897B', 
+            color: 'white',
+            px: 3,
+            py: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Typography variant="h6" fontWeight="600" sx={{ fontSize: '1.1rem' }}>
             Notifications
           </Typography>
+          {unreadCount > 0 && (
+            <Typography variant="caption" sx={{ 
+              backgroundColor: 'rgba(255,255,255,0.2)', 
+              px: 1.5, 
+              py: 0.5, 
+              borderRadius: '12px',
+              fontSize: '0.75rem',
+              fontWeight: '500'
+            }}>
+              {unreadCount} new
+            </Typography>
+          )}
         </Box>
 
-        {notifications.length === 0 ? (
-          <Box p={2}>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              textAlign="center"
-            >
-              No notifications
-            </Typography>
-          </Box>
-        ) : (
-          notifications.map((n) => (
-            <Box
-              key={n.id}
-              bgcolor={n.isRead ? "#f9f9f9" : "#E8F4F2"}
-              borderRadius={2}
-              border="1px solid #ccc"
-              p={2}
-              mb={1}
-              display="flex"
-              flexDirection="column"
-              gap={1}
-              position="relative"
-            >
-              <Typography variant="body1" fontWeight="bold">
-                {n.title}
+        <Box sx={{ maxHeight: 350, overflowY: 'auto' }}>
+          {notifications.length === 0 ? (
+            <Box p={4} textAlign="center">
+              <NotificationsIcon sx={{ fontSize: 48, color: '#E0E0E0', mb: 1 }} />
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontWeight: '500' }}
+              >
+                No notifications yet
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {n.message}
-              </Typography>
-
-              {n.type === "Request" && (
-                <Box display="flex" gap={1} mt={1}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    onClick={() => confirmAccept(n)}
+            </Box>
+          ) : (
+            notifications.map((n, index) => (
+              <Box
+                key={n.id}
+                sx={{
+                  backgroundColor: n.isRead ? '#ffffff' : '#e6fffa', // teal-50
+                  borderLeft: n.isRead ? '4px solid transparent' : '4px solid #00897B', // teal-600
+                  p: 2.5,
+                  borderBottom: index < notifications.length - 1 ? '1px solid #F0F0F0' : 'none',
+                  position: 'relative',
+                  transition: 'all 0.2s ease-in-out',
+                  minHeight: '120px', // Fixed minimum height to prevent layout shifts
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  '&:hover': {
+                    backgroundColor: n.isRead ? '#f9fafb' : '#b2dfdb' // teal-100 on hover when unread
+                  }
+                }}
+              >
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
+                  <Typography 
+                    variant="subtitle2" 
+                    fontWeight="600"
+                    sx={{ 
+                      color: '#166534',
+                      fontSize: '0.95rem',
+                      lineHeight: 1.3
+                    }}
                   >
-                    View Request
-                  </Button>
+                    {n.title}
+                  </Typography>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    {n.date && (
+                      <Box display="flex" alignItems="center" gap={0.5}>
+                        <AccessTimeIcon sx={{ fontSize: 14, color: '#757575' }} />
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            color: '#757575',
+                            fontSize: '0.7rem',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {formatTime(n.date)}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
                 </Box>
-              )}
-
-              {!n.isRead && (
-                <IconButton
-                  size="small"
-                  onClick={() => handleMarkAsRead(n.id)}
-                  sx={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    backgroundColor: "#fff",
-                    "&:hover": {
-                      backgroundColor: "#e0e0e0",
-                    },
+                
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: '#666',
+                    mb: n.type === "Request" ? 2 : 0,
+                    lineHeight: 1.4,
+                    fontSize: '0.85rem'
                   }}
                 >
-                  <CheckIcon fontSize="small" />
-                </IconButton>
-              )}
-            </Box>
-          ))
-        )}
+                  {n.message}
+                </Typography>
+
+                {n.type === "Request" && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => confirmAccept(n)}
+                    disabled={n.isResponded}
+                    sx={{
+                      backgroundColor: n.isResponded ? '#dcfce7' : '#00897B', 
+                      color: n.isResponded ? '#166534' : 'white',           
+                      borderRadius: '6px',
+                      px: 3,
+                      py: 1,
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      textTransform: 'none',
+                      border: '1px solid #d1d5db',
+                      boxShadow: n.isResponded ? 'none' : '0px 1px 2px rgba(0, 0, 0, 0.05)',
+                      minWidth: '130px',
+                      cursor: n.isResponded ? 'not-allowed' : 'pointer',
+                      '&:hover': {
+                        backgroundColor: n.isResponded ? '#dcfce7' : '#00796B', 
+                        boxShadow: n.isResponded ? 'none' : '0px 1px 3px rgba(0, 0, 0, 0.1)'
+                      },
+                      '&:disabled': {
+                        backgroundColor: '#dcfce7',
+                        color: '#166534',
+                        cursor: 'not-allowed'
+                      }
+
+                    }}
+                  >
+                    {n.isResponded ? 'Responded' : 'View Request'}
+                  </Button>
+                )}
+
+                {!n.isRead && (
+                  <IconButton
+                    size="small"
+                    onClick={() => handleMarkAsRead(n.id)}
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      backgroundColor: 'rgba(21, 128, 61, 0.1)',
+                      color: '#15803d',
+                      width: 28,
+                      height: 28,
+                      '&:hover': {
+                        backgroundColor: 'rgba(21, 128, 61, 0.2)',
+                        transform: 'scale(1.1)'
+                      },
+                      transition: 'all 0.2s ease-in-out'
+                    }}
+                  >
+                    <CheckIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
+            ))
+          )}
+        </Box>
       </Menu>
 
       <Dialog
         open={confirmDialog}
         onClose={() => setConfirmDialog(false)}
-        PaperProps={{
-          className:
-            "rounded-xl p-6 bg-gradient-to-br from-green-50 to-white shadow-2xl w-[90%] max-w-md mx-auto transform scale-100 hover:scale-105 transition duration-300",
+        maxWidth="sm"
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: '8px',
+            padding: '24px 20px',
+            border: '2px solid #15803d',
+            backgroundColor: '#fffdfd',
+            boxShadow: '0px 6px 30px rgba(0, 0, 0, 0.15)',
+            minWidth: '400px',
+            maxWidth: '500px',
+          },
         }}
       >
-        <DialogTitle className="text-2xl font-bold text-center text-green-800 bg-gradient-to-r from-green-100 to-white p-4 rounded-t-xl">
-          Confirm Access
+        <IconButton
+          onClick={() => setConfirmDialog(false)}
+          sx={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            color: '#15803d',
+            '&:hover': { 
+              backgroundColor: 'rgba(21, 128, 61, 0.1)',
+              transform: 'scale(1.1)'
+            },
+            transition: 'all 0.2s ease-in-out'
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+
+        <DialogTitle sx={{ 
+          textAlign: 'center', 
+          color: '#166534',
+          fontWeight: '700',
+          fontSize: '1.3rem',
+          pt: 2,
+          pb: 1
+        }}>
+          Confirm Access Request
         </DialogTitle>
 
-        <DialogContent className="py-6 text-center text-gray-700 flex flex-col items-center">
+        <DialogContent sx={{ py: 3, textAlign: 'center' }}>
           <MedicalServicesIcon
-            sx={{ fontSize: 100, color: "#4CAF50" }}
-            className="mb-4 animate-pulse"
+            sx={{ 
+              fontSize: 80, 
+              color: '#15803d', 
+              mb: 2,
+              filter: 'drop-shadow(0 2px 4px rgba(21, 128, 61, 0.3))'
+            }}
           />
-          <p className="text-lg">
-            A Doctor is requesting to access your medical health data.
-          </p>
-          <p className="text-lg font-medium text-blue-600 mt-2">
-            Are you sure you want to allow?
-          </p>
-          {responseMessage && (
-            <p className="mt-4 text-sm text-gray-600">{responseMessage}</p>
+          
+          <Box className="bg-teal-50 border-l-4 border-teal-700 p-3 rounded-r-lg mb-3">
+            <Typography
+              variant="body1"
+              sx={{ 
+                color: '#166534',
+                fontWeight: '500',
+                fontSize: '1rem',
+                lineHeight: 1.5
+              }}
+            >
+              A Doctor is requesting access to your medical health data.
+            </Typography>
+          </Box>
+          
+          {!responded ? (
+            <Typography
+              variant="body1"
+              sx={{ 
+                color: '#1976D2',
+                fontWeight: '600',
+                fontSize: '1.1rem'
+              }}
+            >
+              Do you want to allow this access?
+            </Typography>
+          ) : (
+            <Box sx={{ mt: 3, mb: 2 }}>
+              <Typography
+                variant="body1"
+                sx={{ 
+                  color: responseMessage.includes('✅') ? '#15803d' : '#dc2626',
+                  fontWeight: '600',
+                  fontSize: '1rem',
+                  backgroundColor: responseMessage.includes('✅') ? '#f0fdf4' : '#fef2f2',
+                  border: `1px solid ${responseMessage.includes('✅') ? '#15803d' : '#dc2626'}`,
+                  borderRadius: '8px',
+                  padding: '12px 16px'
+                }}
+              >
+                {responseMessage}
+              </Typography>
+            </Box>
           )}
         </DialogContent>
 
-        <DialogActions className="flex flex-col items-center space-y-4 px-4 pb-6">
+        <DialogActions sx={{ justifyContent: 'center', gap: 2, px: 3, pb: 3 }}>
           {!responded ? (
-            <div className="flex space-x-6">
+            <>
               <Button
-                disabled={responded}
                 onClick={() => handleResponse(false)}
-                className={`px-6 py-3 rounded-lg font-semibold bg-red-500 hover:bg-red-600 text-white transition duration-300 transform hover:scale-105 ${
-                  responded ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                sx={{
+                  backgroundColor: '#dc2626',
+                  color: '#fff',
+                  borderRadius: '6px',
+                  px: 3,
+                  py: 1.5,
+                  fontWeight: '500',
+                  fontSize: '0.875rem',
+                  textTransform: 'none',
+                  border: '1px solid #d1d5db',
+                  minWidth: '120px',
+                  boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
+                  '&:hover': { 
+                    backgroundColor: '#b91c1c',
+                    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)'
+                  },
+                  transition: 'all 0.2s ease-in-out'
+                }}
               >
                 No, Deny
               </Button>
               <Button
-                disabled={responded}
                 onClick={() => handleResponse(true)}
-                className={`px-6 py-3 rounded-lg font-semibold bg-green-500 hover:bg-green-600 text-white transition duration-300 transform hover:scale-105 ${
-                  responded ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                sx={{
+                  backgroundColor: '#15803d',
+                  color: '#fff',
+                  borderRadius: '6px',
+                  px: 3,
+                  py: 1.5,
+                  fontWeight: '500',
+                  fontSize: '0.875rem',
+                  textTransform: 'none',
+                  border: '1px solid #d1d5db',
+                  minWidth: '120px',
+                  boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
+                  '&:hover': { 
+                    backgroundColor: '#16a34a',
+                    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)'
+                  },
+                  transition: 'all 0.2s ease-in-out'
+                }}
               >
-                Yes, I’m OK
+                Yes, I'm OK
               </Button>
-            </div>
+            </>
           ) : (
-            <p className="text-green-600 font-semibold text-lg">
-              ✅ Your response has been sent.
-            </p>
+            <Button
+              onClick={() => setConfirmDialog(false)}
+              sx={{
+                backgroundColor: '#15803d',
+                color: '#fff',
+                borderRadius: '6px',
+                px: 3,
+                py: 1.5,
+                fontWeight: '500',
+                fontSize: '0.875rem',
+                textTransform: 'none',
+                minWidth: '120px',
+                '&:hover': { 
+                  backgroundColor: '#16a34a'
+                }
+              }}
+            >
+              Close
+            </Button>
           )}
         </DialogActions>
-        <Snackbar
-          open={alreadyRespondedSnackbarOpen}
-          autoHideDuration={4000}
-          onClose={() => setAlreadyRespondedSnackbarOpen(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <MuiAlert
-            onClose={() => setAlreadyRespondedSnackbarOpen(false)}
-            severity="info"
-            elevation={6}
-            variant="filled"
-          >
-            You have already sent a response to this request.
-          </MuiAlert>
-        </Snackbar>
       </Dialog>
     </>
   );

@@ -27,30 +27,38 @@ const SearchBar = ({ setDoctors }) => {
     selectedSpecialization.trim().length > 0 || selectedLocation.trim().length > 0;
 
   const handleFindDoctor = async () => {
-    if (!selectedName && (!selectedSpecialization || !selectedLocation)) {
-      setAlertMessage("Please select a specialization and location or a doctor to make an appointment.");
-      setAlertOpen(true);
-      return;
-    }
+  const patientStatus = localStorage.getItem("status"); 
+  if (patientStatus === "Inactive") {
+    setAlertMessage("You Status has been marked as Inactive. Please contact us for more assistance.");
+    setAlertOpen(true);
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const doctorsData = await findDoctors({
-        specialization: selectedSpecialization,
-        hospitalName: selectedLocation,
-        name: selectedName,
-      });
+  if (!selectedName && (!selectedSpecialization || !selectedLocation)) {
+    setAlertMessage("Please select a specialization and location or a doctor to make an appointment.");
+    setAlertOpen(true);
+    return;
+  }
 
-      setDoctors(doctorsData);
-      console.log("Doctors found:", doctorsData);
-    } catch (error) {
-      console.error("Error fetching doctors:", error);
-      setAlertMessage("Failed to fetch doctor details. Please try again.");
-      setAlertOpen(true);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const doctorsData = await findDoctors({
+      specialization: selectedSpecialization,
+      hospitalName: selectedLocation,
+      name: selectedName,
+    });
+
+    setDoctors(doctorsData);
+    console.log("Doctors found:", doctorsData);
+  } catch (error) {
+    console.error("Error fetching doctors:", error);
+    setAlertMessage("Failed to fetch doctor details. Please try again.");
+    setAlertOpen(true);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   
   useEffect(() => {
@@ -182,7 +190,7 @@ const SearchBar = ({ setDoctors }) => {
             </button>
 
             <button
-              className="px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center relative min-w-[160px]"
+              className="px-6 py-3 border border-gray-300 rounded-md text-white bg-teal-600 hover:bg-teal-700 shadow-sm flex justify-center items-center relative min-w-[160px]"
               onClick={handleFindDoctor}
               disabled={loading}
             >

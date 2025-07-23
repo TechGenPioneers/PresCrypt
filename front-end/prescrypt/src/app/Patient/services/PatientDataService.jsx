@@ -69,5 +69,52 @@ export const getPatientIdByEmail = async (email) => {
     throw new Error("Failed to fetch patient ID by email");
   }
   const data = await res.json();
-  return data.patientId; 
+  return data; 
 };
+
+
+export const addDoctorCharge = async (doctorId, doctorCharge) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/Doctor/AddCharge`, {
+      doctorId: doctorId,
+      chargeToAdd: doctorCharge,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating doctor charge:", error);
+    throw error;
+  }
+};
+
+
+export const getAppointmentSummary = async (patientId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Appointments/summary/${patientId}`);
+    return response.data; 
+  } catch (error) {
+    console.error("Error fetching appointment summary:", error);
+    throw error;
+  }
+};
+
+
+export const updateCancelStatus = async (patientId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/Patient/update-cancel-status/${patientId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Failed to update cancel status");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Cancel status update failed:", error);
+    throw error;
+  }
+};
+

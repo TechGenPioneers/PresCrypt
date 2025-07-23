@@ -1,17 +1,12 @@
 "use client";
 import TeamCard from "../PatientComponents/teamCard";
 import React from "react";
+import useAuthGuard from "@/utils/useAuthGuard"; // Ensure the user is authenticated as a Patient
 
 export default function TeamPage() {
+  useAuthGuard("Patient"); // Ensure the user is authenticated as a Patient
   return (
     <div className="relative min-h-screen flex flex-col">
-      {/* Background Image with Opacity */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-30 z-0"
-        style={{ backgroundImage: "url('/BGImage.png')" }}
-      ></div>
-
-     
       <div className="relative z-10 flex flex-col min-h-screen">
         <main className="flex-grow">
           <TeamCard />

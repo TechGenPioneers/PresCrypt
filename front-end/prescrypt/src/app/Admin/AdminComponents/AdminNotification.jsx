@@ -8,7 +8,6 @@ import {
   MarkAsRead,
 } from "../service/AdminDashboardService";
 import { useMemo } from "react";
-
 const AdminNotification = () => {
   const [connection, setConnection] = useState(null);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -32,25 +31,28 @@ const AdminNotification = () => {
 
   // SignalR setup
   useEffect(() => {
-    GetNotifications(); // fetch all notifications
+    GetNotifications(); // fetch existing notifications
 
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${process.env.NEXT_PUBLIC_API_BASE_URL}/AdminNotificationHub`, {
+      .withUrl("https://localhost:7021/adminNotificationHub", {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
-        logger: signalR.LogLevel.Debug,
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
+    let connectionStarted = false;
+
     newConnection
       .start()
       .then(() => {
-        console.log("Connected to SignalR hub");
+        connectionStarted = true;
+        console.log("✅ Connected to adminNotificationHub");
 
         newConnection.on("ReceiveNotification", (msg) => {
-          console.log("New Notification", msg);
+          console.log("📬 New Notification", msg);
+
           setNotifications((prev) => [
             {
               id: msg.id,
@@ -66,13 +68,19 @@ const AdminNotification = () => {
             ...prev,
           ]);
         });
-      })
-      .catch((err) => console.error("SignalR connection failed:", err));
 
-    setConnection(newConnection);
+        setConnection(newConnection);
+      })
+      .catch((err) => {
+        console.error("❌ adminNotificationHub connection failed:", err);
+      });
 
     return () => {
-      newConnection.stop();
+      if (connectionStarted) {
+        newConnection.stop().then(() => {
+          console.log("🛑 SignalR connection stopped");
+        });
+      }
     };
   }, []);
 
@@ -179,8 +187,6 @@ const AdminNotification = () => {
         </button>
       </div>
 
-
-
       {/* Notification Sidebar */}
       <div
         ref={sidebarRef}
@@ -189,8 +195,8 @@ const AdminNotification = () => {
             ? "top-16 h-[70%] w-72 sm:w-96 md:w-[28rem] lg:w-[32rem] opacity-100 scale-100"
             : "top-5 h-12 w-12 opacity-0 scale-75"
         } overflow-hidden z-40`}
-         style={{
-          transformOrigin: 'top right'
+        style={{
+          transformOrigin: "top right",
         }}
       >
         {/* notification Header */}

@@ -100,7 +100,7 @@ const PatientNavBar = () => {
     { text: "Profile", icon: "/image12.png", link: "/Patient/PatientProfile" },
     { text: "Appointments", icon: "/image27.png", link: "/Patient/PatientAppointments" },
     { text: "Health Records", icon: "/image19.png", link: "/Patient/PatientHealthRecords" },
-    { text: "Chat with doctor", icon: "/image20.png", link: "/Communication" },
+    { text: "Chat with doctor", icon: "/image18.png", link: "/Communication" },
   ];
 
   return (

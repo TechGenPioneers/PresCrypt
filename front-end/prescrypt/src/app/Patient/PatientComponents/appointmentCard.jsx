@@ -34,6 +34,7 @@ const AppointmentCard = ({
   const [appointmentDates, setAppointmentDates] = useState([]);
   const [appointmentCounts, setAppointmentCounts] = useState({});
   const router = useRouter();
+  const [bookingLoading, setBookingLoading] = useState({});
 
   const daysOfWeek = {
     Sunday: 0,
@@ -111,26 +112,39 @@ const AppointmentCard = ({
     }
   }, [open, doctorId]);
 
-  const handleBooking = (selectedDate) => {
-    if (doctorDetails) {
-      localStorage.setItem(
-        "selectedAppointment",
-        JSON.stringify({
-          doctorId,
-          firstName,
-          lastName,
-          charge: doctorDetails.charge,
-          selectedDate,
-          appointmentTime,
-          specialization,
-          hospitalName,
-          hospitalId,
-          hospitalCharge,
-        })
-      );
-      router.push(`/Patient/Bookings/Payments/${doctorId}`);
-    }
-  };
+  const handleBooking = async (selectedDate) => {
+      if (doctorDetails) {
+        // Set loading state for this specific date
+        setBookingLoading(prev => ({ ...prev, [selectedDate]: true }));
+        
+        try {
+          localStorage.setItem(
+            "selectedAppointment",
+            JSON.stringify({
+              doctorId,
+              firstName,
+              lastName,
+              charge: doctorDetails.charge,
+              selectedDate,
+              appointmentTime,
+              specialization,
+              hospitalName,
+              hospitalId,
+              hospitalCharge,
+            })
+          );
+          
+          // Add a small delay to show the loading state (optional)
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          router.push(`/Patient/Bookings/Payments/${doctorId}`);
+        } catch (error) {
+          console.error('Booking error:', error);
+          // Reset loading state on error
+          setBookingLoading(prev => ({ ...prev, [selectedDate]: false }));
+        }
+      }
+    };
 
   return (
     <Dialog
@@ -148,7 +162,7 @@ const AppointmentCard = ({
         },
       }}
     >
-      <div className="bg-white rounded-3xl shadow-lg p-0 relative w-full border-2 border-green-700">
+      <div className="bg-white rounded-3xl shadow-lg p-0 relative w-full border-2 border-teal-700">
         {/* Close Button */}
         <button
           onClick={handleClose}
@@ -158,7 +172,7 @@ const AppointmentCard = ({
         </button>
 
         {/* Header */}
-        <div className="bg-green-700 text-white py-6 px-8 rounded-t-3xl text-center">
+        <div className="bg-teal-600 text-white py-6 px-8 rounded-t-3xl text-center">
           <DialogTitle className="text-2xl font-bold p-0 m-0">
             Dr. {firstName} {lastName}
           </DialogTitle>
@@ -170,7 +184,7 @@ const AppointmentCard = ({
         >
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <CircularProgress size={48} className="text-green-600" />
+              <CircularProgress size={48} className="text-teal-600" />
             </div>
           ) : error ? (
             <div className="text-center py-12">
@@ -189,9 +203,9 @@ const AppointmentCard = ({
                         "/profile.png"
                       }
                       alt="Doctor"
-                      className="w-24 h-24 rounded-full object-cover border-4 border-green-100 shadow-lg"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-teal-100 shadow-lg"
                     />
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-teal-500 rounded-full border-2 border-white flex items-center justify-center">
                       <span className="text-white text-xs font-bold">✓</span>
                     </div>
                   </div>
@@ -224,7 +238,7 @@ const AppointmentCard = ({
               {/* Available Slots Section */}
               <div className="mb-8">
                 <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   Available Slots
@@ -237,7 +251,7 @@ const AppointmentCard = ({
                       className="bg-gray-50 p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300"
                     >
                       <div className="flex items-center gap-2 mb-3">
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         <span className="text-sm font-medium text-gray-600">Date</span>
@@ -261,13 +275,29 @@ const AppointmentCard = ({
                       </div>
 
                       <button
-                        onClick={() => handleBooking(date)}
-                        className="w-full px-6 py-3 border border-gray-300 rounded-md text-white bg-green-700 hover:bg-green-600 shadow-sm flex justify-center items-center relative min-w-[160px] font-semibold transition-all duration-300"
-                      >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        Book This Slot
+                          onClick={() => handleBooking(date)}
+                          className={`w-full px-6 py-3 border border-gray-300 rounded-md text-white shadow-sm flex justify-center items-center relative min-w-[160px] font-semibold transition-all duration-300 disabled:cursor-not-allowed ${
+                            bookingLoading[date]
+                              ? 'bg-teal-400 opacity-75' 
+                              : 'bg-teal-600 hover:bg-teal-700'
+                          }`}
+                          disabled={bookingLoading[date]}
+                        >
+                          {bookingLoading[date] ? (
+                            <>
+                              <svg className="animate-spin w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              Book This Slot
+                            </>
+                          )}
                       </button>
                     </div>
                   ))}

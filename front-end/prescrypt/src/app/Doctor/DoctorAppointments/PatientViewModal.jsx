@@ -1,45 +1,65 @@
 import React, { useState, useRef, useEffect } from "react";
-import { CloudUpload, Loader2, X } from "lucide-react";
+import {
+  CloudUpload,
+  Loader2,
+  X,
+  FileText,
+  Image,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
+import DoctorPatientsService from "../services/DoctorAppointmentsService"
 
 export default function PatientViewModal({ isOpen, onClose, patient }) {
-  const [isTextMode, setIsTextMode] = useState(false);
-  const [prescriptionText, setPrescriptionText] = useState('');
   const [prescriptionFile, setPrescriptionFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [markCompleteStatus, setMarkCompleteStatus] = useState(null);
+  const [isMarkingComplete, setIsMarkingComplete] = useState(false);
+  const [appointmentCompleted, setAppointmentCompleted] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (!isOpen) {
-      setIsTextMode(false);
-      setPrescriptionText('');
       setPrescriptionFile(null);
       setError(null);
+      setIsDragOver(false);
+      setMarkCompleteStatus(null);
+      setIsMarkingComplete(false);
+      setAppointmentCompleted(false);
+    } else {
+      // Check if appointment is already completed when modal opens
+      setAppointmentCompleted(patient?.status === "Completed");
     }
-  }, [isOpen]);
+  }, [isOpen, patient?.status]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const isToday = (dateStr) => {
+    const today = new Date();
+    const appointmentDate = new Date(dateStr);
+    return (
+      today.getDate() === appointmentDate.getDate() &&
+      today.getMonth() === appointmentDate.getMonth() &&
+      today.getFullYear() === appointmentDate.getFullYear()
+    );
+  };
+
+  const handleSubmit = async () => {
     setError(null);
     setIsSubmitting(true);
 
     try {
-      if (!prescriptionText && !prescriptionFile) {
-        throw new Error("Please enter prescription text or upload a file");
+      if (!prescriptionFile) {
+        throw new Error("Please upload a prescription file");
       }
 
       const formData = new FormData();
-      formData.append('patientId', patient.patientId);
-      formData.append('hospitalId', patient.hospitalId);
+      formData.append("patientId", patient.patientId);
+      formData.append("hospitalId", patient.hospitalId);
+      formData.append("prescriptionFile", prescriptionFile);
 
-      if (isTextMode) {
-        formData.append('prescriptionText', prescriptionText);
-      } else if (prescriptionFile) {
-        formData.append('prescriptionFile', prescriptionFile);
-      }
-
-      const response = await fetch('/DoctorPrescription/submit-prescription', {
-        method: 'POST',
+      const response = await fetch("/DoctorPrescription/submit-prescription", {
+        method: "POST",
         body: formData,
       });
 
@@ -48,7 +68,7 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
         throw new Error(errorData.message || "Failed to submit prescription");
       }
 
-      alert('Prescription submitted successfully');
+      alert("Prescription submitted successfully");
       onClose();
     } catch (error) {
       setError(error.message);
@@ -58,14 +78,18 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (file) => {
     if (file) {
-      const validTypes = ['image/jpeg', 'image/png'];
-      const maxSize = 10 * 1024 * 1024; // 5MB
+      const validTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+        "application/pdf",
+      ];
+      const maxSize = 10 * 1024 * 1024; // 10MB
 
       if (!validTypes.includes(file.type)) {
-        setError("Please upload a JPEG or PNG image file");
+        setError("Please upload a PDF, JPEG, JPG, or PNG file");
         return;
       }
 
@@ -79,159 +103,422 @@ export default function PatientViewModal({ isOpen, onClose, patient }) {
     }
   };
 
+  const handleInputFileChange = (e) => {
+    const file = e.target.files[0];
+    handleFileChange(file);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files[0];
+    handleFileChange(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
   const removeFile = () => {
     setPrescriptionFile(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
-  if (!isOpen || !patient) return null;
+  const getFileIcon = (fileType) => {
+    if (fileType === "application/pdf") {
+      return <FileText className="w-5 h-5 text-red-500" />;
+    }
+    return <Image className="w-5 h-5 text-blue-500" />;
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  const handleMarkAsCompleted = async () => {
+    setIsMarkingComplete(true);
+    try {
+      await DoctorPatientsService.markTodayAppointmentComplete(
+        patient.patientId
+      );
+      setMarkCompleteStatus({ success: true, message: "Appointment marked as completed successfully" });
+      setAppointmentCompleted(true);
+      setTimeout(() => setMarkCompleteStatus(null), 8000); // Show success message for 8 seconds
+    } catch (error) {
+      setMarkCompleteStatus({ success: false, message: "Failed to mark appointment as completed" });
+      setTimeout(() => setMarkCompleteStatus(null), 5000); // Show error message for 5 seconds
+      console.error(error);
+    } finally {
+      setIsMarkingComplete(false);
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#ffffffc0] flex items-center justify-center z-50">
-      <div className="p-1 bg-[#E9FAF2] rounded-[20px] shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="p-10 relative border-2 border-dashed border-black rounded-[20px]">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-1 rounded-full cursor-pointer"
-            aria-label="Close modal"
-          >
-            <X className="w-6 h-6 text-gray-500" />
-          </button>
+    <div className="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gradient-to-br from-teal-50/90 to-teal-100/90 rounded-3xl shadow-2xl border border-teal-500 max-w-6xl w-full max-h-[95vh] overflow-hidden">
+        <div className="bg-white/80 backdrop-blur-sm m-4 rounded-2xl border border-teal-200/40 overflow-y-auto max-h-[calc(95vh-2rem)]">
+          <div className="p-8 relative">
+            <button
+              onClick={onClose}
+              className="absolute top-6 right-6 p-3 rounded-full hover:bg-red-50/80 transition-all duration-200 group shadow-sm border border-red-100/50"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5 text-red-600 group-hover:text-red-700" />
+            </button>
 
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Patient Info Section */}
-            <div className="md:w-1/2">
-              <h2 className="text-xl font-bold mb-4">Patient Details</h2>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <img
-                    src={`data:image/jpeg;base64,${patient.profileImage}`}
-                    alt="Patient"
-                    className="w-30 h-30 rounded-full object-cover border-2 border-[#094A4D]"
-                  />
-                  <div>
-                    <h3 className="text-lg font-semibold">{patient.patientName}</h3>
-                    <p className="text-gray-600">
-                      {patient.gender === "M" ? "Male" : "Female"},{" "}
-                      {new Date().getFullYear() - new Date(patient.dob).getFullYear()} years
-                    </p>
-                    <p className="text-sm text-gray-500">ID: {patient.patientId}</p>
-                  </div>
+            <div className="flex flex-col lg:flex-row gap-10">
+              {/* Patient Info Section */}
+              <div className="lg:w-1/2">
+                <div className="mb-8">
+                  <h2 className="text-3xl font-light mb-3 text-black tracking-wide">
+                    Patient Information
+                  </h2>
+                  <div className="w-20 h-1 bg-teal-500 rounded-full"></div>
                 </div>
 
-                <div className="space-y-2">
-                  <div>
-                    <span className="font-semibold">Hospital:</span>{" "}
-                    <span>{patient.hospitalName}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold">Appointment Time:</span>{" "}
-                    <span>{patient.time}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold">Status:</span>{" "}
-                    <span
-                      className={`px-2 py-1 rounded text-sm ${
-                        patient.status === "Completed"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {patient.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Prescription Section */}
-            <div className="md:w-1/2">
-              <h2 className="text-xl font-bold mb-4 text-center">Add Prescription</h2>
-
-              <div className="flex justify-center mb-4">
-                <button
-                  type="button"
-                  onClick={() => setIsTextMode(!isTextMode)}
-                  className="px-4 py-2 rounded-lg text-[#094A4D] transition-colors cursor-pointer hover:underline"
-                >
-                  {isTextMode ? "Switch to File Upload" : "Switch to Text Entry"}
-                </button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {isTextMode ? (
-                  <div>
-                    <label className="block font-medium mb-2">Prescription Details</label>
-                    <textarea
-                      value={prescriptionText}
-                      onChange={(e) => setPrescriptionText(e.target.value)}
-                      rows={6}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#094A4D] focus:border-transparent"
-                      placeholder="Enter prescription details..."
-                      required={isTextMode}
-                    />
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <div className="border-2 border-dashed border-gray-300 rounded-[20px] p-6">
-                      <CloudUpload className="mx-auto mb-3 text-[#094A4D]" size={32} />
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current.click()}
-                        className="px-4 py-2 bg-[#094A4D] text-white rounded-[10px] cursor-pointer transition-colors"
-                      >
-                        Browse Files
-                      </button>
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        className="hidden"
-                        accept=".jpg,.jpeg,.png"
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-7 border border-teal-100/60 shadow-lg space-y-7">
+                  {/* Patient Profile */}
+                  <div className="flex items-start gap-6">
+                    <div className="relative">
+                      <img
+                        src={
+                          patient.profileImage
+                            ? `data:image/jpeg;base64,${patient.profileImage}`
+                            : "/patient.png"
+                        }
+                        alt="Patient Profile"
+                        className="w-28 h-28 rounded-2xl object-cover border-3 border-teal-200/70 shadow-md"
+                        onError={(e) => {
+                          e.target.onerror = null; // prevent infinite loop if fallback also fails
+                          e.target.src = "/patient.png";
+                        }}
                       />
-                      <p className="mt-4 text-sm text-gray-500">
-                        Supported formats: JPG, PNG (max 10MB)
-                      </p>
+
+                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-teal-500 rounded-full border-3 border-white flex items-center justify-center shadow-sm">
+                        <CheckCircle2 className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-light text-black mb-2">
+                        {patient.patientName}
+                      </h3>
+                      <div className="flex items-center gap-4 text-black text-sm mb-3">
+                        <span className="flex items-center gap-2 bg-teal-50/80 px-3 py-1 rounded-full">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
+                          {patient.gender === "M" ? "Male" : "Female"}
+                        </span>
+                        <span className="flex items-center gap-2 bg-teal-50/80 px-3 py-1 rounded-full">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          {new Date().getFullYear() -
+                            new Date(patient.dob).getFullYear()}{" "}
+                          years
+                        </span>
+                      </div>
+                      <div className="inline-flex items-center gap-2 bg-teal-100/80 px-4 py-2 rounded-full shadow-sm">
+                        <span className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></span>
+                        <span className="text-sm font-medium text-black tracking-wider">
+                          ID: {patient.patientId}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Appointment Details */}
+                  <div className="space-y-4 pt-6 border-t border-teal-100/60">
+                  
+                    <div className="flex items-center justify-between py-4 px-5 bg-gradient-to-r from-teal-50/80 to-teal-100/60 rounded-xl shadow-sm">
+                      <div className="flex items-center gap-4">
+                        
+                        <div className="w-10 h-10 bg-teal-200/70 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-black"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                            />
+                          </svg>
+                        </div>
+                        
+                        <div>
+                          <p className="text-xs font-semibold text-teal-600 tracking-wider uppercase mb-1">
+                            Hospital
+                          </p>
+                          <p className="text-teal-800 font-medium">
+                            {patient.hospitalName}
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
-                    {prescriptionFile && (
-                      <div className="mt-4 p-3 bg-gray-50 rounded-[10px] flex justify-between items-center">
-                        <span className="truncate">{prescriptionFile.name}</span>
-                        <button
-                          type="button"
-                          onClick={removeFile}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <X size={16} />
-                        </button>
+                    <div className="flex items-center justify-between py-4 px-5 bg-gradient-to-r from-teal-50/80 to-teal-100/60 rounded-xl shadow-sm">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-teal-200/70 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-black"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-teal-600 tracking-wider uppercase mb-1">
+                            Appointment Time
+                          </p>
+                          <p className="text-teal-800 font-medium">
+                            {patient.time}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between py-4 px-5 bg-gradient-to-r from-teal-50/80 to-teal-100/60 rounded-xl shadow-sm">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-teal-200/70 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-black"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-semibold text-teal-600 tracking-wider uppercase mb-1">
+                            Status
+                          </p>
+
+                          <span
+                            className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium shadow-sm ${
+                              patient.status === "Completed" || appointmentCompleted
+                                ? "bg-teal-100 text-teal-800 border border-teal-200"
+                                : "bg-amber-100 text-amber-800 border border-amber-200"
+                            }`}
+                          >
+                            {patient.status === "Completed" || appointmentCompleted ? "Completed" : patient.status}
+                          </span>
+
+                          <button
+                            onClick={handleMarkAsCompleted}
+                            disabled={
+                              !isToday(patient.date) || 
+                              patient.status === "Completed" || 
+                              appointmentCompleted || 
+                              isMarkingComplete
+                            }
+                            className="mt-3 px-3 py-1 ml-25 cursor-pointer text-teal-700 rounded-lg font-medium text-sm tracking-wide shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed bg-transparent border border-teal-500 hover:border-teal-400/70 transition-all duration-200 flex items-center gap-2"
+                          >
+                            {isMarkingComplete ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Processing...</span>
+                              </>
+                            ) : (
+                              "Mark as Completed"
+                            )}
+                          </button>
+                          
+                          {markCompleteStatus && (
+                            <div className={`mt-2 text-sm ${markCompleteStatus.success ? 'text-teal-600' : 'text-red-600'}`}>
+                              {markCompleteStatus.message}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Prescription Section */}
+              <div className="lg:w-1/2">
+                <div className="mb-8">
+                  <h2 className="text-3xl font-light mb-3 text-black tracking-wide">
+                    Upload Prescription
+                  </h2>
+                  <div className="w-20 h-1 bg-teal-500 rounded-full"></div>
+                </div>
+
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-7 border border-teal-100/60 shadow-lg">
+                  <div className="space-y-8">
+                    <div>
+                      <label className="block text-sm font-semibold text-black tracking-wider uppercase mb-4">
+                        Prescription Document
+                      </label>
+                      <div
+                        className={`border-3 border-dashed rounded-2xl p-10 text-center transition-all duration-300 ${
+                          isDragOver
+                            ? "border-teal-400 bg-teal-100/70"
+                            : prescriptionFile
+                            ? "border-teal-300 bg-teal-50/60"
+                            : "border-teal-200/70 bg-teal-50/40 hover:bg-teal-100/60 hover:border-teal-300"
+                        }`}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                      >
+                        <div className="w-20 h-20 bg-teal-100/80 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                          <CloudUpload className="text-teal-600" size={36} />
+                        </div>
+
+                        {!prescriptionFile ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => fileInputRef.current.click()}
+                              className="px-5 cursor-pointer py-3 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl font-semibold tracking-wide hover:from-teal-700 hover:to-teal-800 transition-all duration-200 shadow-md hover:shadow-lg transform"
+                            >
+                              Choose File
+                            </button>
+                            <p className="mt-6 text-black font-medium">
+                              or drag and drop your file here
+                            </p>
+                            <p className="mt-3 text-sm text-black bg-teal-50/60 inline-block px-4 py-2 rounded-lg">
+                              Supported: PDF, JPG, JPEG, PNG • Max size: 10MB
+                            </p>
+                          </>
+                        ) : (
+                          <div className="text-center">
+                            <CheckCircle2 className="w-16 h-16 text-teal-600 mx-auto mb-4" />
+                            <p className="text-teal-800 font-semibold text-lg">
+                              File Ready!
+                            </p>
+                            <p className="text-teal-600 text-sm">
+                              Click submit when ready
+                            </p>
+                          </div>
+                        )}
+
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleInputFileChange}
+                          className="hidden"
+                          accept=".jpg,.jpeg,.png,.pdf"
+                        />
+                      </div>
+
+                      {prescriptionFile && (
+                        <div className="mt-6 p-5 bg-gradient-to-r from-teal-50/90 to-teal-100/90 rounded-xl border-2 border-teal-200/60 shadow-sm">
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="flex items-center gap-4 flex-1">
+                              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-teal-100">
+                                {getFileIcon(prescriptionFile.type)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-teal-800 font-semibold truncate text-lg">
+                                  {prescriptionFile.name}
+                                </p>
+                                <p className="text-teal-600 text-sm mt-1">
+                                  {formatFileSize(prescriptionFile.size)} •{" "}
+                                  {prescriptionFile.type.includes("pdf")
+                                    ? "PDF Document"
+                                    : "Image File"}
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={removeFile}
+                              className="p-2.5 rounded-full hover:bg-red-100/80 transition-all duration-200 group shadow-sm border border-red-100"
+                            >
+                              <X
+                                size={18}
+                                className="text-red-500 group-hover:text-red-600"
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {error && (
+                      <div className="p-5 bg-red-50/90 backdrop-blur-sm border-l-4 border-red-400 rounded-xl shadow-sm">
+                        <div className="flex items-center gap-4">
+                          <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <AlertCircle className="w-5 h-5 text-red-600" />
+                          </div>
+                          <p className="text-red-700 font-medium">{error}</p>
+                        </div>
                       </div>
                     )}
+
+                    <button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || !prescriptionFile}
+                      className="w-full cursor-pointer mt-10 px-5 py-3 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl font-semibold text-lg tracking-wide hover:from-teal-700 hover:to-teal-800 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center transform disabled:transform-none"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="animate-spin mr-4" size={24} />
+                          <span>Processing Prescription...</span>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <CheckCircle2 className="w-6 h-6" />
+                          <span>Submit Prescription</span>
+                        </div>
+                      )}
+                    </button>
                   </div>
-                )}
-
-                {error && (
-                  <p className="text-sm text-red-600 bg-red-50 p-2 rounded-lg">
-                    {error}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full mt-6 px-4 py-2 bg-[#094A4D] text-white rounded-[10px] cursor-pointer transition-colors flex justify-center items-center"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="animate-spin mr-2" size={18} />
-                      Submitting...
-                    </>
-                  ) : (
-                    "Submit Prescription"
-                  )}
-                </button>
-              </form>
+                </div>
+              </div>
             </div>
           </div>
         </div>

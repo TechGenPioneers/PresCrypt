@@ -69,12 +69,15 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
   }, [selectedMethod]);
 
   const handleConfirmBooking = async () => {
+    if (loading) return; // Prevent multiple clicks
+    
     if (selectedMethod === "location") {
       if (!checkbox1Checked || !checkbox2Checked) {
         setAlertMessage("Please mark both checkboxes to confirm your booking.");
         setAlertOpen(true);
         return;
       }
+      setLoading(true);
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       setGeneratedOtp(otp);
 
@@ -89,6 +92,8 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
         console.error("Failed to send OTP:", error);
         setAlertMessage("Failed to send OTP. Please try again.");
         setAlertOpen(true);
+      } finally {
+        setLoading(false);
       }
     } else if (selectedMethod === "online") {
       handleOnlinePayment();
@@ -169,12 +174,12 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
         body: JSON.stringify({
           amount: totalCharge,
           item: `Booking for Dr. ${doctorName} on ${appointmentDate}`,
-          first_name: "Dewmin",
-          last_name: "Deniyegedara",
+          first_name: "PresCrypt",
+          last_name: "Healthcare",
           email,
-          phone: "0771234567",
-          address: "Colombo 07",
-          city: "Colombo",
+          phone: "0762085246",
+          address: "University of Moratuwa",
+          city: "Moratuwa",
           country: "Sri Lanka",
         }),
       });
@@ -188,6 +193,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
 
       window.payhere.onDismissed = function () {
         console.log("Payment dismissed");
+        setLoading(false);
       };
 
       window.payhere.onError = async function (error) {
@@ -208,6 +214,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
           console.error("Failed to send failure notifications", notifyError);
         }
         alert("Payment failed. Please try again or choose pay at location.");
+        setLoading(false);
       };
 
       const payment = {
@@ -237,7 +244,6 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
     } catch (err) {
       console.error("Payment init error:", err);
       alert("Failed to initiate payment.");
-    } finally {
       setLoading(false);
     }
   };
@@ -250,10 +256,10 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
   return (
     <>
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-shadow duration-300">
-        <div className="h-1 bg-gradient-to-r from-green-400 to-green-600 rounded-full mb-6"></div>
+        <div className="h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mb-6"></div>
         
         <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           Appointment Summary
@@ -303,7 +309,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
                 type="checkbox" 
                 checked={checkbox1Checked} 
                 onChange={() => setCheckbox1Checked(!checkbox1Checked)}
-                className="mt-1 w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                className="mt-1 w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
               />
               <span>I confirm that I have read the appointment summary and will attend on time.</span>
             </label>
@@ -312,7 +318,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
                 type="checkbox" 
                 checked={checkbox2Checked} 
                 onChange={() => setCheckbox2Checked(!checkbox2Checked)}
-                className="mt-1 w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                className="mt-1 w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
               />
               <span>I'm aware that not attending without notice may affect future bookings.</span>
             </label>
@@ -320,7 +326,11 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
         )}
 
         <button
-          className="w-full bg-green-700 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`w-full font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 disabled:cursor-not-allowed ${
+            loading 
+              ? 'bg-teal-400 text-white opacity-50' 
+              : 'bg-teal-600 hover:bg-teal-700 text-white'
+          }`}
           onClick={handleConfirmBooking}
           disabled={loading}
         >
@@ -360,7 +370,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
           "& .MuiDialog-paper": {
             borderRadius: "20px",
             padding: "20px",
-            border: "2px solid #4CAF50",
+            border: "2px solid #00897B",
             boxShadow: "0px 8px 24px rgba(76, 175, 80, 0.2)",
           },
         }}
@@ -396,7 +406,7 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
                     textAlign: "center",
                     width: "48px",
                     height: "30px",
-                    border: "1px solid #4CAF50",
+                    border: "1px solid #00897B",
                     borderRadius: "8px",
                     fontSize: "20px",
                   },
@@ -413,15 +423,16 @@ const PaymentAtLocation = ({ selectedMethod, totalCharge, onlineFee }) => {
             onClick={handleVerifyOtp}
             variant="contained"
             sx={{
-              backgroundColor: "#4CAF50",
+              backgroundColor: "#00897B", // Teal 600
               borderRadius: "10px",
               fontWeight: 600,
               px: 4,
               py: 1,
               textTransform: "none",
               "&:hover": {
-                backgroundColor: "#43A047",
+                backgroundColor: "#00796B", // Teal 700
               },
+
             }}
           >
             Verify OTP

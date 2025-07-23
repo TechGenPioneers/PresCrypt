@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { updateCancelStatus } from "../services/PatientDataService";
 import axios from "axios";
 
 const ResponseDialogBox = ({
@@ -22,7 +23,7 @@ const ResponseDialogBox = ({
   paymentAmount,
   payHereObjectId,
 }) => {
-  // Combine appointmentDate + appointmentTime into JS Date object
+  
   const appointmentDateTime = useMemo(() => {
     if (!appointmentDate || !appointmentTime) return null;
     return new Date(`${appointmentDate}T${appointmentTime}`);
@@ -69,6 +70,30 @@ const ResponseDialogBox = ({
     return null;
   }, [paymentMethod, paymentAmount, hoursUntilAppointment, appointmentDate, appointmentTime, payHereObjectId]);
 
+
+   useEffect(() => {
+    const handleCancelStatusUpdate = async () => {
+      if (open && paymentMethod === "Location") {
+        const storedPatientId = localStorage.getItem("patientId");
+
+        if (!storedPatientId) {
+          console.warn("No patientId found in localStorage");
+          return;
+        }
+
+        try {
+          await updateCancelStatus(storedPatientId);
+          console.log("Patient cancel status updated successfully.");
+        } catch (error) {
+          console.error("Error updating patient cancel status:", error);
+        }
+      }
+    };
+
+    handleCancelStatusUpdate();
+  }, [open, paymentMethod]);
+
+  
   useEffect(() => {
     const sendRefundRequest = async () => {
       if (
@@ -135,7 +160,7 @@ const ResponseDialogBox = ({
         <div className="text-left w-full space-y-3">
           {/* Payment Method Info */}
           {paymentMethod && (
-            <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg">
+            <div className="bg-teal-50 border-l-4 border-teal-400 p-3 rounded-r-lg">
               <Typography
                 variant="body2"
                 sx={{ color: "#2E7D32", fontWeight: "500", fontSize: "0.9rem" }}
@@ -147,7 +172,7 @@ const ResponseDialogBox = ({
 
           {/* Appointment Date & Time Info */}
           {appointmentDate && appointmentTime && (
-            <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg">
+            <div className="bg-teal-50 border-l-4 border-teal-400 p-3 rounded-r-lg">
               <Typography
                 variant="body2"
                 sx={{ color: "#2E7D32", fontWeight: "500", fontSize: "0.9rem" }}
@@ -190,16 +215,17 @@ const ResponseDialogBox = ({
           onClick={onClose}
           variant="contained"
           sx={{
-            backgroundColor: "#4CAF50",
+            backgroundColor: "#0d9488", 
             color: "#fff",
-            "&:hover": { backgroundColor: "#388E3C" },
+            "&:hover": { backgroundColor: "#0f766e" }, 
             borderRadius: "20px",
             px: 4,
             py: 1,
             fontWeight: "600",
             fontSize: "0.9rem",
             textTransform: "none",
-            boxShadow: "0px 3px 8px rgba(76, 175, 80, 0.3)",
+            boxShadow: "0px 3px 8px rgba(13, 148, 136, 0.3)", 
+
           }}
         >
           Close

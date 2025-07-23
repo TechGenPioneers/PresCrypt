@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { sendPatientContactUs } from "../services/PatientDataService"; 
 import AlertDialogBox from "./alertDialogBox"; 
+import { teal } from "@mui/material/colors";
 import {
   Dialog,
   DialogTitle,
@@ -39,8 +40,8 @@ const TermsDialog = ({ open, onClose }) => {
           position: "absolute", 
           top: 12, 
           right: 12,
-          color: "#4CAF50",
-          "&:hover": { backgroundColor: "rgba(76, 175, 80, 0.1)" }
+          color: teal[600], // teal-600
+          "&:hover": { backgroundColor: "rgba(13, 148, 136, 0.1)" } 
         }}
       >
         <CloseIcon />
@@ -48,7 +49,7 @@ const TermsDialog = ({ open, onClose }) => {
 
       <DialogTitle sx={{ 
         fontWeight: "700", 
-        color: "#2E7D32", 
+        color: "#0f766e", 
         textAlign: "center",
         fontSize: "1.5rem",
         pb: 2
@@ -74,8 +75,8 @@ const TermsDialog = ({ open, onClose }) => {
           },
         }}
       >
-        <Typography variant="body1" paragraph sx={{ color: "#2E7D32", fontWeight: "500" }}>
-          Welcome to our platform! By using our services, you agree to the following terms and conditions:
+        <Typography variant="body1" paragraph sx={{ color: "#0f766e", fontWeight: "500" }}>
+          Welcome to our platform! By submitting this form, you agree to the following terms and conditions:
         </Typography>
         <Typography variant="body2" paragraph sx={{ color: "#555", lineHeight: 1.6 }}>
           1. Your personal information will be kept confidential and used only for service purposes.
@@ -90,9 +91,9 @@ const TermsDialog = ({ open, onClose }) => {
           4. You agree not to misuse our services or attempt unauthorized access.
         </Typography>
         <Typography variant="body2" paragraph sx={{ color: "#555", lineHeight: 1.6 }}>
-          5. For detailed guidelines, please visit our official documentation or contact support.
+          5. Please describe your full problem descriptively.
         </Typography>
-        <Typography variant="body2" paragraph sx={{ color: "#2E7D32", fontWeight: "500" }}>
+        <Typography variant="body2" paragraph sx={{ color: "#0f766e", fontWeight: "500" }}>
           Thank you for understanding and cooperating.
         </Typography>
       </DialogContent>
@@ -102,16 +103,18 @@ const TermsDialog = ({ open, onClose }) => {
           onClick={onClose}
           variant="contained"
           sx={{
-            backgroundColor: "#4CAF50",
+            backgroundColor: "#0d9488", 
             color: "#fff",
-            "&:hover": { backgroundColor: "#388E3C" },
+            "&:hover": {
+              backgroundColor: "#0f766e", 
+            },
             borderRadius: "25px",
             padding: "10px 30px",
             fontWeight: "600",
             fontSize: "0.95rem",
             textTransform: "none",
-            boxShadow: "0px 4px 15px rgba(76, 175, 80, 0.3)",
-          }}
+            boxShadow: "0px 4px 15px rgba(13, 148, 136, 0.3)", 
+                      }}
         >
           I Understand and Accept
         </Button>
@@ -168,7 +171,7 @@ const ContactUsForm = () => {
     try {
       console.log("Submitting data:", dataload);
       await sendPatientContactUs(dataload);
-      setAlertMessage("Submission successful! We will get back to you soon.");
+      setAlertMessage("Submission successful! We will get back to you soon within 24 hours through the provided email.");
       setAlertOpen(true);
       setFormData({
         firstName: "",
@@ -191,14 +194,11 @@ const ContactUsForm = () => {
       <div className="flex items-center justify-center p-4">
         <form
           onSubmit={handleSubmit}
-          className="bg-white/70 backdrop-blur-md p-6 md:p-8 rounded-3xl shadow-xl w-full max-w-2xl mx-auto space-y-5 border border-green-300/30"
-          style={{
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(76, 175, 80, 0.1)"
-          }}
+          className="bg-white p-6 md:p-8 rounded-3xl shadow-xl w-full max-w-2xl mx-auto space-y-5 border border-green-300/30"
         >
           <div className="text-center mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-green-700 mb-2">Contact Us</h2>
-            <p className="text-green-600/80 text-sm md:text-base">Your Personal Health Hub</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-teal-700 mb-2">Contact Us</h2>
+            <p className="text-teal-600/80 text-sm md:text-base">Your Personal Health Hub</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -224,6 +224,8 @@ const ContactUsForm = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Email Address"
+              pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+              title="Please enter a valid email address"
               className="border border-green-300/30 focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 p-3 rounded-xl w-full bg-white/40 backdrop-blur-sm transition-all duration-200"
               required
             />
@@ -233,8 +235,11 @@ const ContactUsForm = () => {
               value={formData.phoneNumber}
               onChange={handleChange}
               placeholder="Phone Number"
+              pattern="^\d{10,15}$"
+              title="Enter a valid phone number (10 to 15 digits)"
               className="border border-green-300/30 focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 p-3 rounded-xl w-full bg-white/40 backdrop-blur-sm transition-all duration-200"
             />
+
           </div>
 
           <select
@@ -249,6 +254,8 @@ const ContactUsForm = () => {
             <option value="prescription">Prescription</option>
             <option value="technical">Technical Support</option>
             <option value="complaint">Complaint</option>
+            <option value="feedback">Feedback</option>
+            <option value="other">Other</option>
           </select>
 
           <textarea
@@ -267,14 +274,14 @@ const ContactUsForm = () => {
               name="termsAccepted"
               checked={formData.termsAccepted}
               onChange={handleChange}
-              className="mt-1 w-4 h-4 accent-green-600 rounded"
+              className="mt-1 w-4 h-4 accent-teal-600 rounded"
               required
             />
-            <label className="text-sm text-green-700 leading-relaxed">
+            <label className="text-sm text-teal-700 leading-relaxed">
               I accept the{" "}
               <span
                 onClick={() => setIsTermsOpen(true)}
-                className="underline cursor-pointer text-green-800 hover:text-green-900 font-medium transition-colors duration-200"
+                className="underline cursor-pointer text-teal-800 hover:text-teal-900 font-medium transition-colors duration-200"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -283,7 +290,7 @@ const ContactUsForm = () => {
                   }
                 }}
               >
-                terms and conditions
+                Terms and Conditions
               </span>
             </label>
           </div>
@@ -291,7 +298,7 @@ const ContactUsForm = () => {
           <div className="text-center pt-2">
             <button
               type="submit"
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-8 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-green-800 text-white font-semibold px-8 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               Submit Message
             </button>

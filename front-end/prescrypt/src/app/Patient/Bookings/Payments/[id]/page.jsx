@@ -16,7 +16,12 @@ function PaymentClient({ id }) {
   const [patientId, setPatientId] = useState("");
   const [username, setUsername] = useState("");
 
-  const generatePaymentId = () => `PY25-${Math.floor(Math.random() * 900) + 100}`;
+  const generatePaymentId = () => {
+  const randomNumber = Math.floor(Math.random() * 100000000);
+  const paddedNumber = String(randomNumber).padStart(8, '0'); 
+  return `PY25-${paddedNumber}`;
+};
+
 
   useEffect(() => {
     const storedData = localStorage.getItem("selectedAppointment");

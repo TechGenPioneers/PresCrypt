@@ -234,8 +234,9 @@ const ChatList = ({
 
               {/* User Info */}
               <div className="flex flex-col w-full">
-                <div className="flex justify-between items-center mb-0.5">
-                  <div className="font-medium truncate text-gray-900">
+                {/* Top row: name + time + ticks */}
+                <div className="flex justify-between items-center">
+                  <div className="text-sm font-semibold text-gray-900 truncate max-w-[65%]">
                     {user.fullName}
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-400">
@@ -254,25 +255,37 @@ const ChatList = ({
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-0.5">
+                {/* Message preview */}
+                <div className="flex flex-col items-start text-sm mt-0.5">
                   {user.image && (
                     <div
-                      className={`flex items-center gap-1 text-sm truncate ${
+                      className={`flex items-center gap-1 truncate ${
                         !user.isRead && user.lastMessageSenderId !== userId
                           ? "text-emerald-600 font-semibold"
                           : "text-zinc-400"
                       }`}
                     >
-                      <Image className="w-4 h-4" />
-                      {user.lastMessageSenderId === userId
-                        ? "You: Attachment"
-                        : `${user.fullName}: Attachment`}
+                      <div className="flex items-center gap-1">
+                        {user.lastMessageSenderId === userId ? (
+                          <>
+                            <span>You:</span>
+                            <Image className="w-4 h-4" />
+                            <span>Attachment</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>{user.fullName}:</span>
+                            <Image className="w-4 h-4" />
+                            <span>Attachment</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   )}
 
                   {user.lastMessage && (
                     <div
-                      className={`text-sm truncate ${
+                      className={`truncate ${
                         !user.isRead && user.lastMessageSenderId !== userId
                           ? "text-emerald-600 font-semibold"
                           : "text-zinc-400"
@@ -286,8 +299,9 @@ const ChatList = ({
                   )}
                 </div>
 
+                {/* Unread badge */}
                 {unread > 0 && (
-                  <span className="mt-1 self-start text-xs font-semibold text-white bg-emerald-500 px-2 py-0.5 rounded-full">
+                  <span className="-mt-4 self-end text-xs font-semibold text-white bg-emerald-500 px-2 py-0.5 rounded-full">
                     {unread}
                   </span>
                 )}
