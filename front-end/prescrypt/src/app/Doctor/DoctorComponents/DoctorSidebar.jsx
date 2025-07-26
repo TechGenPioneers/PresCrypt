@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import axios from "axios";
 import DoctorDashboardService from "../services/DoctorDashboardService";
 import DoctorProfileImageService from "../services/DoctorProfileImageService";
-import LogoutConfirmationDialog from "./LogoutConfirmationDialog"; // Import the component
+import LogoutConfirmationDialog from "./logoutConfirmationDialog"; // Import the component
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);

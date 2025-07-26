@@ -1,7 +1,7 @@
 "use client";
 
-import Header from "../Components/Header/Header";
-import Footer from "../Components/Footer/Footer";
+import Header from "../Components/header/Header";
+import Footer from "../Components/footer/Footer";
 import Nav from "./PatientComponents/navBar";
 import Chatbot from "./ChatbotComponents/chatbot";
 

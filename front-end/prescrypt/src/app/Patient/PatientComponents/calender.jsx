@@ -4,7 +4,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { PickersDay } from "@mui/x-date-pickers/PickersDay";
 import dayjs from "dayjs";
-import AppointmentViewDialog from "./AppointmentViewDialog";
+import AppointmentViewDialog from "./appointmentViewDialog";
 import { getAppointmentsByPatientId } from "../services/AppointmentsFindingService";
 import "./calender.css";
 
