@@ -22,6 +22,15 @@ const AdminNavBar = ({ adminName }) => {
   const pathname = usePathname();
   const [activeIndex, setActiveIndex] = useState(-1);
 
+  useEffect(() => {
+  if (adminName) {
+    localStorage.setItem("adminName", adminName);
+  }
+}, [adminName]);
+
+const name = localStorage.getItem("adminName");
+
+
   // Set active index on mount and when path changes
   useEffect(() => {
     const index = navItems.findIndex((item) => item.link === pathname);
@@ -85,7 +94,7 @@ const AdminNavBar = ({ adminName }) => {
         {/* User Avatar and Name */}
         <div className="flex flex-col items-center">
           
-          {isExpanded && <div className="mt-2">{adminName}</div>}
+          {isExpanded && <div className="mt-2">{name}</div>}
         </div>
 
         {/* Navigation Icons */}
