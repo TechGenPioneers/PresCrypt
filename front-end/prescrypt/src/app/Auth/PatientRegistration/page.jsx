@@ -13,6 +13,7 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+
 export default function PatientRegistration() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -196,6 +197,41 @@ export default function PatientRegistration() {
     return fieldMapping[backendField] || backendField;
   };
 
+  // Function to call OpenMRS API
+  const createOpenMrsPatient = async (patientId) => {
+    try {
+      console.log('Calling OpenMRS API with patientId:', patientId);
+      
+      const openMrsResponse = await fetch(
+        "https://localhost:7021/api/OpenMrsCreatePatient/create",
+        {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            patientId: patientId
+          }),
+        }
+      );
+
+      if (!openMrsResponse.ok) {
+        const errorText = await openMrsResponse.text();
+        console.error('OpenMRS API error:', errorText);
+        throw new Error(`OpenMRS API failed: ${openMrsResponse.status}`);
+      }
+
+      const openMrsData = await openMrsResponse.text();
+      console.log('OpenMRS API success:', openMrsData);
+      return true;
+    } catch (error) {
+      console.error('Error calling OpenMRS API:', error);
+      // Don't throw the error - we still want to proceed to dashboard
+      // Just log it for debugging
+      return false;
+    }
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -260,7 +296,7 @@ export default function PatientRegistration() {
         responseData = { token: data };
       }
 
-      setSnackbarMessage("Registration Successful! Redirecting to dashboard...");
+      setSnackbarMessage("Registration Successful! Setting up your profile...");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
       
@@ -273,6 +309,32 @@ export default function PatientRegistration() {
       }
       if (responseData.username) {
         localStorage.setItem("username", responseData.username);
+      }
+      
+      // Store patientId if available for OpenMRS API call
+      if (responseData.patientId) {
+        localStorage.setItem("patientId", responseData.patientId);
+      }
+
+      // Get patientId from localStorage (assuming it was stored during registration)
+      const storedPatientId = localStorage.getItem("patientId");
+      
+      if (storedPatientId) {
+        // Update loading message
+        setSnackbarMessage("Creating your medical profile...");
+        
+        // Call OpenMRS API
+        const openMrsSuccess = await createOpenMrsPatient(storedPatientId);
+        
+        if (openMrsSuccess) {
+          setSnackbarMessage("Profile setup complete! Redirecting to dashboard...");
+        } else {
+          setSnackbarMessage("Registration successful! Redirecting to dashboard...");
+          // Continue to dashboard even if OpenMRS API fails
+        }
+      } else {
+        console.warn('PatientId not found in localStorage');
+        setSnackbarMessage("Registration successful! Redirecting to dashboard...");
       }
 
       // Keep loading state active during redirect
