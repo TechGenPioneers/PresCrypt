@@ -171,7 +171,7 @@ const ContactUsForm = () => {
     try {
       console.log("Submitting data:", dataload);
       await sendPatientContactUs(dataload);
-      setAlertMessage("Submission successful! We will get back to you soon.");
+      setAlertMessage("Submission successful! We will get back to you soon within 24 hours through the provided email.");
       setAlertOpen(true);
       setFormData({
         firstName: "",

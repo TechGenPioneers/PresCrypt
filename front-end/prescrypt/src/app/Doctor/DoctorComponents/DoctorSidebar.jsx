@@ -101,14 +101,14 @@ export default function Sidebar() {
     }
   };
 
-  const collapsedWidth = 128; // 8rem in pixels
+  const collapsedWidth = 104; // 8rem in pixels
   const expandedWidth = 256; // 16rem in pixels
 
   return (
       <div
         className={`h-full bg-white shadow-2xl font-medium font-sans transition-all duration-300 ease-in-out flex flex-col fixed left-0 top-0 z-50`}
         style={{
-          width: isExpanded ? "16rem" : "8rem",
+          width: isExpanded ? "16rem" : "6.5rem",
         }}
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => setIsExpanded(false)}
