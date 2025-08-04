@@ -3,8 +3,16 @@ import React, { useState, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { GetAllDetails, GetReportDetails } from "../service/AdminReportService";
-import { Calendar, FileText, Download, Filter, AlertCircle, User, Stethoscope, Building } from 'lucide-react';
-
+import {
+  Calendar,
+  FileText,
+  Download,
+  Filter,
+  AlertCircle,
+  User,
+  Stethoscope,
+  Building,
+} from "lucide-react";
 
 //searchable dropdown
 const SearchableDropdown = ({
@@ -13,11 +21,11 @@ const SearchableDropdown = ({
   onChange,
   disabled,
   placeholder,
-  required ,
+  required,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showOptions, setShowOptions] = useState(false);
-   const [dropdownRef, setDropdownRef] = useState(null);
+  const [dropdownRef, setDropdownRef] = useState(null);
 
   const filteredOptions = options.filter((opt) =>
     opt.label.toLowerCase().includes(searchTerm.toLowerCase())
@@ -36,21 +44,18 @@ const SearchableDropdown = ({
     setSearchTerm("");
   };
 
-
-
-   // Close dropdown when clicking outside
- useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (dropdownRef && !dropdownRef.contains(event.target)) {
-      setShowOptions(false);
-    }
-  };
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => {
-    document.removeEventListener('mousedown', handleClickOutside);
-  };
-}, [dropdownRef]);
-
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef && !dropdownRef.contains(event.target)) {
+        setShowOptions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   return (
     <div ref={setDropdownRef} className="relative w-full">
@@ -63,7 +68,9 @@ const SearchableDropdown = ({
         placeholder={placeholder}
         required={required}
         className={`w-full px-4 py-3 pr-10 text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-          disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:border-gray-300'
+          disabled
+            ? "opacity-50 cursor-not-allowed bg-gray-50"
+            : "hover:border-gray-300"
         }`}
       />
       {value && !disabled && (
@@ -72,14 +79,36 @@ const SearchableDropdown = ({
           onClick={handleClear}
           className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       )}
       <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-        <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showOptions ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        <svg
+          className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+            showOptions ? "rotate-180" : ""
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </div>
       {showOptions && !disabled && (
@@ -94,7 +123,9 @@ const SearchableDropdown = ({
             </li>
           ))}
           {filteredOptions.length === 0 && (
-            <li className="px-4 py-3 text-gray-500 text-center">No results found</li>
+            <li className="px-4 py-3 text-gray-500 text-center">
+              No results found
+            </li>
           )}
         </ul>
       )}
@@ -111,9 +142,10 @@ export default function ReportGenerator() {
   const [reportType, setReportType] = useState("");
   const [dateTime, setDateTime] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
- const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportData, setReportData] = useState(null);
+  const [isDownloading, setIsDownloading] = useState(false);
   const reportRef = useRef(null);
 
   const handleGenerate = async () => {
@@ -180,21 +212,43 @@ export default function ReportGenerator() {
 
   //generate pdf
   const handleDownload = async () => {
+    setIsDownloading(true);
     const element = reportRef.current;
-    const canvas = await html2canvas(element, { scale: 5 });
+
+    const canvas = await html2canvas(element, { scale: 2 }); // scale can be 2–3 for balance
     const imgData = canvas.toDataURL("image/png");
+
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "px",
       format: "a4",
     });
 
-    const width = pdf.internal.pageSize.getWidth();
-    const height = (canvas.height * width) / canvas.width;
-    const today1 = new Date();
-    const todayDate = today1.toISOString().split("T")[0];
-    pdf.addImage(imgData, "PNG", 5, 5, width, height);
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    const todayDate = new Date().toISOString().split("T")[0];
+
+    while (heightLeft > 0) {
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      position -= pageHeight;
+
+      if (heightLeft > 0) {
+        pdf.addPage();
+      }
+    }
+
     pdf.save(`${todayDate}-report.pdf`);
+    setIsDownloading(false);
+    setIsModalOpen(false);
+    setIsGenerating(false)
   };
 
   const [doctorOptions, setDoctorOptions] = useState([]);
@@ -250,6 +304,11 @@ export default function ReportGenerator() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleCloseModel = () => {
+    setIsGenerating(false);
+    setIsModalOpen(false);
+  };
+
   if (!dateTime) return null;
 
   const formattedDate = dateTime.toLocaleDateString("en-GB", {
@@ -282,7 +341,7 @@ export default function ReportGenerator() {
       : reportTypeOptions; // Show all other options when none of the above conditions are true
 
   return (
-     <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -305,8 +364,12 @@ export default function ReportGenerator() {
                     <Filter className="w-4 h-4 text-[#09424D]" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-[#09424D]">Generate Report</h2>
-                    <p className="text-[#09424D] text-sm">Configure your report parameters</p>
+                    <h2 className="text-2xl font-bold text-[#09424D]">
+                      Generate Report
+                    </h2>
+                    <p className="text-[#09424D] text-sm">
+                      Configure your report parameters
+                    </p>
                   </div>
                 </div>
               </div>
@@ -317,7 +380,9 @@ export default function ReportGenerator() {
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 mb-4">
                     <Calendar className="w-4 h-4 text-[#09424D]" />
-                    <h3 className="text-lg font-semibold text-gray-900">Date Range</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Date Range
+                    </h3>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -328,9 +393,13 @@ export default function ReportGenerator() {
                         type="date"
                         value={fromDate}
                         onChange={(e) => setFromDate(e.target.value)}
-                        disabled={["summary", "detailed", "activity"].includes(reportType)}
+                        disabled={["summary", "detailed", "activity"].includes(
+                          reportType
+                        )}
                         className={`w-full px-4 py-3 text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                          ["summary", "detailed", "activity"].includes(reportType)
+                          ["summary", "detailed", "activity"].includes(
+                            reportType
+                          )
                             ? "opacity-50 cursor-not-allowed bg-gray-50"
                             : "hover:border-gray-300"
                         }`}
@@ -345,9 +414,13 @@ export default function ReportGenerator() {
                         type="date"
                         value={toDate}
                         onChange={(e) => setToDate(e.target.value)}
-                        disabled={["summary", "detailed", "activity"].includes(reportType)}
+                        disabled={["summary", "detailed", "activity"].includes(
+                          reportType
+                        )}
                         className={`w-full px-4 py-3 text-gray-700 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                          ["summary", "detailed", "activity"].includes(reportType)
+                          ["summary", "detailed", "activity"].includes(
+                            reportType
+                          )
                             ? "opacity-50 cursor-not-allowed bg-gray-50"
                             : "hover:border-gray-300"
                         }`}
@@ -361,9 +434,11 @@ export default function ReportGenerator() {
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 mb-4">
                     <Filter className="w-4 h-4 text-[#09424D]" />
-                    <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Filters
+                    </h3>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
@@ -425,7 +500,9 @@ export default function ReportGenerator() {
                     <div className="space-y-2">
                       <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                         <FileText className="w-4 h-4" />
-                        <span>Report Type <span className="text-red-500">*</span></span>
+                        <span>
+                          Report Type <span className="text-red-500">*</span>
+                        </span>
                       </label>
                       <SearchableDropdown
                         options={filteredReportTypeOptions}
@@ -451,9 +528,10 @@ export default function ReportGenerator() {
               <div className="bg-gray-50 px-8 py-6 border-t border-gray-100">
                 <div className="flex justify-end">
                   <button
-                   onClick={handleGenerate}
+                    onClick={handleGenerate}
                     disabled={isGenerating}
-                    className="flex items-center gap-4 px-8 py-3  bg-[#A9C9CD] text-[#09424D]  font-semibold rounded-xl hover:bg-[#91B4B8]  transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    className="flex items-center gap-4 px-8 py-3  bg-[#A9C9CD] text-[#09424D]  font-semibold rounded-xl hover:bg-[#91B4B8]  transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
                     {isGenerating ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -477,7 +555,7 @@ export default function ReportGenerator() {
         <div className="fixed inset-0  bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] max-h-[80%] overflow-auto p-6 rounded-lg shadow-xl relative">
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={handleCloseModel}
               className="absolute top-2 right-2 text-red-600 text-lg font-bold cursor-pointer"
             >
               ×
@@ -487,6 +565,10 @@ export default function ReportGenerator() {
             <div ref={reportRef} className="text-[#09424D] p-5">
               {/* Header */}
               <header className="flex flex-col mb-4">
+                <div className="mt-2 text-right text-sm">
+                  <p>Generated at - {new Date().toLocaleDateString()}</p>
+                  <p>Generated by - Admin</p>
+                </div>
                 <img
                   src="/logo.png"
                   alt="Logo"
@@ -724,183 +806,193 @@ export default function ReportGenerator() {
                 )}
 
               {/* summary Info for patient*/}
-              {reportType === "summary" && patient !== "" && doctor === "" && (
-                <>
-                  <h2 className="text-lg font-bold mb-2 text-left">
-                    Summary Report
-                  </h2>
-                  <div className="mb-4">
-                    <img
-                      src={
-                        reportData?.singlePatient?.profileImage ||
-                        "/profile2.png"
-                      }
-                      alt="Avatar"
-                      className="rounded-full mt-5 mb-5"
-                    />
-                    <p>
-                      <strong>Patient:</strong> {patient}{" "}
-                      {reportData?.singlePatient?.firstName}{" "}
-                      {reportData?.singlePatient?.lastName}
-                    </p>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full">
-                      <thead>
-                        <tr>
-                          <th className="border px-4 py-2">Field</th>
-                          <th className="border px-4 py-2">Value</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Full Name
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singlePatient?.firstName}{" "}
-                            {reportData?.singlePatient?.lastName}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Email
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singlePatient?.email}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            NIC
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singlePatient?.nic}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Date Of Birth
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singlePatient?.dob}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Gender
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singlePatient?.gender}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Status
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singlePatient?.status}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
+              {reportType === "summary" &&
+                patient !== "" &&
+                patient !== "all" &&
+                doctor === "" && (
+                  <>
+                    <h2 className="text-lg font-bold mb-2 text-left">
+                      Summary Report
+                    </h2>
+                    <div className="mb-4">
+                      <img
+                        src={
+                          reportData?.singlePatient?.profileImage &&
+                          reportData?.singlePatient?.profileImage.trim() !== ""
+                            ? `data:image/jpeg;base64,${reportData?.singlePatient?.profileImage}`
+                            : "/profile2.png"
+                        }
+                        alt="Avatar"
+                        className="rounded-full mt-5 mb-5 w-52 h-52"
+                      />
+                      <p>
+                        <strong>Patient:</strong> {patient}{" "}
+                        {reportData?.singlePatient?.firstName}{" "}
+                        {reportData?.singlePatient?.lastName}
+                      </p>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full">
+                        <thead>
+                          <tr>
+                            <th className="border px-4 py-2">Field</th>
+                            <th className="border px-4 py-2">Value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Full Name
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singlePatient?.firstName}{" "}
+                              {reportData?.singlePatient?.lastName}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Email
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singlePatient?.email}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              NIC
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singlePatient?.nic}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Date Of Birth
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singlePatient?.dob}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Gender
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singlePatient?.gender}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Status
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singlePatient?.status}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
               {/* summary Info for doctor*/}
-              {reportType === "summary" && patient === "" && doctor !== "" && (
-                <>
-                  <h2 className="text-lg font-bold mb-2 text-left">
-                    Summary Report
-                  </h2>
-                  <div className="mb-4">
-                    <img
-                      src={
-                        reportData?.singleDoctor?.profilePhoto ||
-                        "/profile2.png"
-                      }
-                      alt="Avatar"
-                      className="rounded-full mt-5 mb-5"
-                    />
-                    <p>
-                      <strong>Doctor:</strong> {doctor}{" "}
-                      {reportData?.singleDoctor?.firstName}{" "}
-                      {reportData?.singleDoctor?.lastName}
-                    </p>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full">
-                      <thead>
-                        <tr>
-                          <th className="border px-4 py-2">Field</th>
-                          <th className="border px-4 py-2">Value</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Full Name
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singleDoctor?.firstName}{" "}
-                            {reportData?.singleDoctor?.lastName}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Email
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singleDoctor?.email}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Charge
-                          </td>
-                          <td className="border px-4 py-2">
-                            Rs.{reportData?.singleDoctor?.charge}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Specialization
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singleDoctor?.specialization}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Gender
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singleDoctor?.gender}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Status
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singleDoctor?.status
-                              ? "Active"
-                              : "Inactive"}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border px-4 py-2 font-semibold">
-                            Description
-                          </td>
-                          <td className="border px-4 py-2">
-                            {reportData?.singleDoctor?.description}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
+              {reportType === "summary" &&
+                patient === "" &&
+                doctor !== "" &&
+                doctor !== "all" && (
+                  <>
+                    <h2 className="text-lg font-bold mb-2 text-left">
+                      Summary Report
+                    </h2>
+                    <div className="mb-4">
+                      <img
+                        src={
+                          reportData?.singleDoctor?.profilePhoto &&
+                          reportData?.singleDoctor?.profilePhoto.trim() !== ""
+                            ? `data:image/jpeg;base64,${reportData?.singleDoctor?.profilePhoto}`
+                            : "/profile2.png"
+                        }
+                        alt="Avatar"
+                        className="rounded-full mt-5 mb-5 w-52 h-52"
+                      />
+                      <p>
+                        <strong>Doctor:</strong> {doctor}{" "}
+                        {reportData?.singleDoctor?.firstName}{" "}
+                        {reportData?.singleDoctor?.lastName}
+                      </p>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full">
+                        <thead>
+                          <tr>
+                            <th className="border px-4 py-2">Field</th>
+                            <th className="border px-4 py-2">Value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Full Name
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singleDoctor?.firstName}{" "}
+                              {reportData?.singleDoctor?.lastName}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Email
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singleDoctor?.email}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Charge
+                            </td>
+                            <td className="border px-4 py-2">
+                              Rs.{reportData?.singleDoctor?.charge}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Specialization
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singleDoctor?.specialization}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Gender
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singleDoctor?.gender}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Status
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singleDoctor?.status
+                                ? "Active"
+                                : "Inactive"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border px-4 py-2 font-semibold">
+                              Description
+                            </td>
+                            <td className="border px-4 py-2">
+                              {reportData?.singleDoctor?.description}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
               {/* detailed Info for doctor*/}
               {reportType === "detailed" &&
                 patient === "" &&
@@ -914,11 +1006,13 @@ export default function ReportGenerator() {
                     <div className="mb-4">
                       <img
                         src={
-                          reportData?.singleDoctor?.profilePhoto ||
-                          "/profile2.png"
+                          reportData.singleDoctor.profilePhoto &&
+                          reportData.singleDoctor.profilePhoto.trim() !== ""
+                            ? `data:image/jpeg;base64,${reportData.singleDoctor.profilePhoto}`
+                            : "/profile2.png"
                         }
                         alt="Avatar"
-                        className="rounded-full mt-5 mb-5"
+                        className="rounded-full mt-5 mb-5 w-52 h-52"
                       />
                       <p>
                         <strong>Doctor:</strong> {doctor}{" "}
@@ -1086,11 +1180,13 @@ export default function ReportGenerator() {
                     <div className="mb-4">
                       <img
                         src={
-                          reportData?.singlePatient?.profileImage ||
-                          "/profile2.png"
+                          reportData?.singlePatient?.profileImage &&
+                          reportData?.singlePatient?.profileImage.trim() !== ""
+                            ? `data:image/jpeg;base64,${reportData?.singlePatient?.profileImage}`
+                            : "/profile2.png"
                         }
                         alt="Avatar"
-                        className="rounded-full mt-5 mb-5"
+                        className="rounded-full mt-5 mb-5 w-52 h-52"
                       />
                       <p>
                         <strong>Patient:</strong> {patient}{" "}
@@ -1456,9 +1552,20 @@ export default function ReportGenerator() {
             {/* Download Button */}
             <button
               onClick={handleDownload}
-              className="mt-4 px-10 py-1 bg-[#007e8556] text-[#006369] rounded-lg hover:bg-[#007e8589] cursor-pointer"
+              disabled={isDownloading}
+              className="flex items-center gap-4 px-8 py-3  bg-[#A9C9CD] text-[#09424D]  font-semibold rounded-xl hover:bg-[#91B4B8]  transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
-              Download PDF
+              {isDownloading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Downloading...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  <span>Download PDF</span>
+                </>
+              )}
             </button>
           </div>
         </div>

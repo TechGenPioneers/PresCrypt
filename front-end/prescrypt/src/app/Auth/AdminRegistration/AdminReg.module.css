@@ -4,12 +4,10 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background-color: #ffffff;
   }
   
   .registerBox {
     display: flex;
-    background: white;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow: hidden;

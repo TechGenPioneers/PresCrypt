@@ -92,7 +92,7 @@ const Hospitals = () => {
       const response = await UpdateHospital(selectedHospital);
       if (response.status == 204) {
         setIsModalOpen(false);
-        selectedHospital(null);
+        setSelectedHospital(null);
         getHospitals();
       }
     } catch (error) {

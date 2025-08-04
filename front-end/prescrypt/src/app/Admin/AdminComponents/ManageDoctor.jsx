@@ -527,7 +527,7 @@ export default function ManageDoctor({ doctorData }) {
                         value={newDoctor.Email}
                         onChange={handleChange}
                         className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#CEE4E6] focus:border-transparent transition-all duration-200 hover:border-gray-300"
-                        required
+                        readOnly
                       />
                     </div>
 
