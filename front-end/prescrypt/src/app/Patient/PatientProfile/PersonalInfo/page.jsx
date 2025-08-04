@@ -596,7 +596,7 @@ const handleBack = () => {
                 name="email"
                 label="Email Address"
                 type="email"
-                placeholder="e.g. dlshan.ravndu@gmail.com"
+                placeholder="e.g. ravndu.dlshan@gmail.com"
                 value={formData.email}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
