@@ -102,6 +102,7 @@ const PatientDetails = ({ patientId }) => {
     try {
       const sent = await ChangePatientStatus(
         patientData.patient.patientId,
+        patientData.patient.email,
         status
       );
 

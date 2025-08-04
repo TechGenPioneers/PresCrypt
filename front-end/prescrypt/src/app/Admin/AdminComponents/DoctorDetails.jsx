@@ -277,7 +277,7 @@ export default function DoctorDetails({ doctorID }) {
 
                 {/* Key Info */}
                 <div className="space-y-3">
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border border-teal-200 shadow-md max-w-md mx-auto">
+                  {/* <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border border-teal-200 shadow-md max-w-md mx-auto">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-base font-semibold text-slate-700">
                         Want to Pay
@@ -343,7 +343,7 @@ export default function DoctorDetails({ doctorID }) {
                        {error}
                       </p>
                     )}
-                  </div>
+                  </div> */}
 
                   <InfoItem
                     icon={User}

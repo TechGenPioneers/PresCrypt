@@ -26,11 +26,13 @@ const GetPatientById = async (patientId) => {
   }
 
    //change patient status
-const ChangePatientStatus = async (patientId,status) => {
+const ChangePatientStatus = async (patientId,email,status) => {
   const changePatient = {
     patientId: patientId,
+    email:email,
     status: status
   };
+  console.log("data",changePatient)
   try{
     const response = await axios.patch(
       AddPatientURL,
